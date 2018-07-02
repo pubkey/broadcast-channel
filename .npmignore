@@ -1,0 +1,15 @@
+.git/
+config/
+docs/
+test/
+test_tmp/
+tmp/
+.babelrc
+.editorconfig
+.eslintrc.json
+.gitignore
+.travis.yml
+ISSUE_TEMPLATE.md
+PULL_REQUEST_TEMPLATE.md
+
+log.txt

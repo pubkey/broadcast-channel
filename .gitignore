@@ -1,0 +1,9 @@
+node_modules/
+package-lock.json
+.idea/
+.vscode/
+.transpile_state.json
+.com.google.*
+shelljs_*
+test_tmp/
+tmp/

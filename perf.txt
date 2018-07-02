@@ -1,0 +1,68 @@
+BEFORE:
+
+(clean application state), exmpty idb
+- intervall-timeout set to zero
+2220ms
+2494ms
+2235ms
+
+// series run without cleaning the state
+2385
+4813
+6079
+7553
+9573
+
+
+AFTER:
+(clear state)
+1370
+1281
+1212
+
+(non clear)
+1312
+1314
+1362
+1448
+1450
+1397
+
+
+
+
+
+===================================
+20.06.2018
+===================================
+IndexedDB
+
+BEFORE:
+3610
+3380
+3489
+
+
+AFTER (with localstorage ping):
+4183
+3962
+3821
+
+=> sending localstorage-pings is slower
+
+
+
+
+====== build-size
+BEFORE: 37251
+AFTER: 4077
+
+
+====== build-size 2
+BEFORE: 4077
+AFTER: 3795
+
+
+====== build-size 3
+BEFORE: 3795
+AFTER: 3110

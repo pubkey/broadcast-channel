@@ -1,0 +1,65 @@
+<html>
+
+<head>
+    <style>
+        .msg-box {
+            background-color: white;
+            width: 400px;
+            float: right;
+            height: 500px;
+            overflow-y: scroll;
+        }
+
+        #right {
+            float: left;
+            background-color: white;
+            width: 500px;
+            min-height: 200px;
+            padding: 10px;
+        }
+    </style>
+</head>
+
+<body id="body">
+    <a href="https://github.com/pubkey/broadcast-channel" target="_blank">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"
+            alt="Fork me on GitHub">
+    </a>
+    <div id="right">
+        <h2>BroadcastChannel live test</h2>
+        <h4>(If this screen goes green, everything works)</h4>
+        <p>This will send a message from the main-context, await until the iframe and the web-worker answered, then repeat until
+            all messages have been send.</p>
+        <b>User-Agent:</b>
+        <span id="user-agent">unknown</span>
+        <br />
+        <b>Method:</b>
+        <select id="method-type-select">
+            <option value="" selected>default</option>
+            <option value="native">native</option>
+            <option value="idb">IndexedDb</option>
+            <option value="localstorage">localstorage</option>
+        </select>
+        <span id="method">X</span>
+        <br />
+        <b>MessageCount:</b>
+        <span id="msg-count">0</span>
+        <br />
+        <b>Amount Time:</b>
+        <span id="time-amount">X</span>
+        <br />
+        <b>State:</b>
+        <b>
+            <span id="state">Running</span>
+        </b>
+        <br />
+        <br/>
+        <p>This is kirby, which stucks if the process is blocked</p>
+        <img src="kirby.gif" />
+    </div>
+    <iframe id="test-iframe" class="msg-box"></iframe>
+    <div id="messages" class="msg-box"></div>
+    <script src="./index.js"></script>
+</body>
+
+</html>
