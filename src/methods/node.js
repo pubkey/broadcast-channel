@@ -408,7 +408,7 @@ export async function refreshReaderClients(channelState) {
     Object.keys(channelState.otherReaderClients)
         .filter(readerUuid => !otherReaders.includes(readerUuid))
         .forEach(readerUuid => {
-            channelState.otherReaderClients[readerUuid].close();
+            channelState.otherReaderClients[readerUuid].destroy();
             delete channelState.otherReaderClients[readerUuid];
         });
 
@@ -480,7 +480,9 @@ export async function close(channelState) {
     channelState.readQueue.clear();
     channelState.writeQueue.clear();
 
-    await unlink(channelState.infoFilePath);
+    try {
+        await unlink(channelState.infoFilePath);
+    } catch (err) { }
 
     Object.values(channelState.otherReaderClients)
         .forEach(client => client.destroy());

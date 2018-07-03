@@ -30,24 +30,23 @@ const BroadcastChannel = function (name, options) {
         internal: []
     };
 
+    /**
+     * array of promises that will be awaited
+     * before the channel is closed
+     */
+    this._beforeClose = [];
+
     this._preparePromise = null;
     _prepareChannel(this);
 };
 
 BroadcastChannel.prototype = {
-    postMessage(msg) {
+    _post(type, msg) {
         const msgObj = {
             time: new Date().getTime(),
-            type: 'message',
+            type,
             data: msg
         };
-
-        if (this.closed) {
-            throw new Error(
-                'BroadcastChannel.postMessage(): ' +
-                'Cannot post message after channel has closed'
-            );
-        }
 
         const awaitPrepare = this._preparePromise ? this._preparePromise : Promise.resolve();
         return awaitPrepare.then(() => {
@@ -56,6 +55,18 @@ BroadcastChannel.prototype = {
                 msgObj
             );
         });
+    },
+    postMessage(msg) {
+        if (this.closed) {
+            throw new Error(
+                'BroadcastChannel.postMessage(): ' +
+                'Cannot post message after channel has closed'
+            );
+        }
+        return this._post('message', msg);
+    },
+    postInternal(msg) {
+        return this._post('internal', msg);
     },
     set onmessage(fn) {
         const time = new Date().getTime() - 5;
@@ -86,17 +97,20 @@ BroadcastChannel.prototype = {
     },
 
     close() {
+        if (this.closed) return;
         this.closed = true;
         const awaitPrepare = this._preparePromise ? this._preparePromise : Promise.resolve();
 
         this._onMessageListener = null;
         this._addEventListeners.message = [];
 
-        return awaitPrepare.then(() => {
-            return this.method.close(
-                this._state
-            );
-        });
+        return awaitPrepare
+            .then(() => Promise.all(this._beforeClose.map(fn => fn())))
+            .then(() => {
+                return this.method.close(
+                    this._state
+                );
+            });
     },
     get type() {
         return this.method.type;

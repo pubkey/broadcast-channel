@@ -1,0 +1,8 @@
+{
+  "name": "leader-election",
+  "description": "Leader-Election submodule",
+  "main": "../dist/lib/leader-election/index.es5.js",
+  "jsnext:main": "../dist/es/leader-election/index.js",
+  "module": "../dist/es/leader-election/index.js",
+  "types": "index.d.ts"
+}
