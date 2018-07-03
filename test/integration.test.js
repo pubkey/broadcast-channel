@@ -433,11 +433,10 @@ function runTest(channelType) {
                     const elector = LeaderElection.create(channel);
                     const elector2 = LeaderElection.create(channel2);
 
-
                     await elector.applyOnce();
 
-                    console.log('##################   ' + elector.token);
                     await elector.die();
+                    await AsyncTestUtil.wait(200);
 
                     await elector2.applyOnce();
                     assert.ok(elector2.isLeader);
@@ -455,7 +454,7 @@ function runTest(channelType) {
                     await elector.applyOnce();
                     await channel.close();
                     assert.ok(elector.isDead);
-
+                    await AsyncTestUtil.wait(200);
 
                     await elector2.applyOnce();
                     assert.ok(elector2.isLeader);
@@ -541,7 +540,6 @@ if (isNode) {
     runTest('node');
 } else {
     runTest('native');
-    // TODO comment in
-//    runTest('idb');
-//    runTest('localstorage');
+    runTest('idb');
+    runTest('localstorage');
 }

@@ -40,8 +40,8 @@ LeaderElection.prototype = {
         const recieved = [];
 
         const handleMessage = (msg) => {
-            console.log('handleMessage()  ' + this.token);
-            console.dir(msg);
+          //  console.log('handleMessage()  ' + this.token);
+            //console.dir(msg);
             if (msg.context === 'leader' && msg.token != this.token) {
                 recieved.push(msg);
 
