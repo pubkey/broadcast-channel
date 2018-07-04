@@ -25,7 +25,6 @@ const LeaderElection = function (channel, options) {
 LeaderElection.prototype = {
 
     applyOnce() {
-        console.log('applyOnce()');
         if (this.isLeader) return Promise.resolve(false);
         if (this.isDead) return Promise.resolve(false);
 
@@ -40,8 +39,6 @@ LeaderElection.prototype = {
         const recieved = [];
 
         const handleMessage = (msg) => {
-          //  console.log('handleMessage()  ' + this.token);
-            //console.dir(msg);
             if (msg.context === 'leader' && msg.token != this.token) {
                 recieved.push(msg);
 
@@ -71,7 +68,6 @@ LeaderElection.prototype = {
             })
             .then(() => sleep(this._options.responseTime)) // let others time to respond
             .then(() => {
-                console.log('check 2nd time');
                 if (stopCriteria) return Promise.reject();
                 else return this._sendMessage();
             })
@@ -137,7 +133,6 @@ LeaderElection.prototype = {
     },
 
     die() {
-        console.log('die()');
         if (this.isDead) return;
         this.isDead = true;
 

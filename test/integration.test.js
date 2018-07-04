@@ -14,7 +14,7 @@ function runTest(channelType) {
         type: channelType
     };
 
-    describe('integration.test.js', () => {
+    describe('integration.test.js (' + channelType + ')', () => {
 
         describe('BroadcastChannel', () => {
             describe('.constructor()', () => {
@@ -360,7 +360,7 @@ function runTest(channelType) {
                     window.BroadcastChannel = broadcastChannelBefore;
                 });
                 it('', () => {
-                    console.log('Finiished: ' + channelType);
+                    console.log('Finished: ' + channelType);
                 });
             });
         });
@@ -512,6 +512,7 @@ function runTest(channelType) {
                     channel2.close();
                 });
                 it('should resolve when leader-process exits', async () => {
+                    await AsyncTestUtil.wait(150);
                     const channelName = AsyncTestUtil.randomString(12);
                     const channel = new BroadcastChannel(channelName, channelOptions);
                     const channel2 = new BroadcastChannel(channelName, channelOptions);
@@ -525,6 +526,7 @@ function runTest(channelType) {
 
                     // run all unloads to simulate closing process
                     unload.runAll();
+                    unload._resetUnloaded();
 
                     await AsyncTestUtil.waitUntil(() => resolved === true);
 
