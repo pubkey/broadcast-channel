@@ -94,7 +94,7 @@ const run = async function () {
 
 
 
-    // load iframe
+    // load iframer
     iframeEl.src = './iframe.html?channelName=' + channel.name + '&methodType=' + channel.type + '&t=' + rand;
     await new Promise(res => iframeEl.onload = () => res());
     console.log('main: Iframe has loaded');
@@ -129,4 +129,34 @@ const run = async function () {
     });
     console.log('main: message send (0)');
 }
-run();
+//run();
+
+
+
+
+
+
+
+
+
+
+// LEADER-ELECTION
+
+const runLeaderElectionTest = function () {
+    const FRAMES_COUNT = 10;
+    const rand = new Date().getTime();
+    const frameSrc = './leader-iframe.html?channelName=' + channel.name + '&methodType=' + channel.type + '&t=' + rand;
+    var leaderIframes = document.getElementById('leader-iframes');
+
+
+    // create iframes
+    new Array(FRAMES_COUNT)
+        .fill(0)
+        .forEach(() => {
+            const ifrm = document.createElement('iframe');
+            ifrm.setAttribute('src', frameSrc);
+            leaderIframes.appendChild(ifrm);
+        });
+
+}
+runLeaderElectionTest();
