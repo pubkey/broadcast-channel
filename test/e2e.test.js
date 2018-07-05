@@ -5,8 +5,8 @@ import AsyncTestUtil from 'async-test-util';
 
 const BASE_PAGE = 'http://127.0.0.1:8080/';
 
-fixture `Example page`
-    .page `http://127.0.0.1:8080/`;
+fixture`Example page`
+    .page`http://127.0.0.1:8080/`;
 
 
 // BroadcastChannel
@@ -21,6 +21,10 @@ fixture `Example page`
         const stateContainer = Selector('#state');
 
         await AsyncTestUtil.waitUntil(async () => {
+
+            // make a console.log so travis does not terminate because of no output
+            console.log('.');
+
             const value = await stateContainer.innerText;
             //       console.log(value);
 
@@ -29,7 +33,7 @@ fixture `Example page`
             // console.log(JSON.stringify(out));
 
             return value === 'SUCCESS';
-        });
+        }, 0, 500);
     });
 });
 
@@ -46,6 +50,10 @@ fixture `Example page`
         const stateContainer = Selector('#state');
 
         await AsyncTestUtil.waitUntil(async () => {
+
+            // make a console.log so travis does not terminate because of no output
+            console.log('.');
+
             const value = await stateContainer.innerText;
             //       console.log(value);
 
@@ -54,6 +62,6 @@ fixture `Example page`
             // console.log(JSON.stringify(out));
 
             return value === 'SUCCESS';
-        });
+        }, 0, 1000);
     });
 });
