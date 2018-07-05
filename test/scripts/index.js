@@ -88,13 +88,11 @@ channel.onmessage = function (msg) {
     }
 };
 
-const run = async function () {
+window.startBroadcastChannel = async function () {
+    stateContainer.innerHTML = 'running..'
     const rand = new Date().getTime();
-    console.log('aaaa');
 
-
-
-    // load iframer
+    // load iframe
     iframeEl.src = './iframe.html?channelName=' + channel.name + '&methodType=' + channel.type + '&t=' + rand;
     await new Promise(res => iframeEl.onload = () => res());
     console.log('main: Iframe has loaded');
@@ -129,7 +127,6 @@ const run = async function () {
     });
     console.log('main: message send (0)');
 }
-//run();
 
 
 
@@ -141,22 +138,64 @@ const run = async function () {
 
 
 // LEADER-ELECTION
+window.startLeaderElection = async function () {
 
-const runLeaderElectionTest = function () {
+    stateContainer.innerHTML = 'running..'
+
     const FRAMES_COUNT = 10;
     const rand = new Date().getTime();
     const frameSrc = './leader-iframe.html?channelName=' + channel.name + '&methodType=' + channel.type + '&t=' + rand;
     var leaderIframes = document.getElementById('leader-iframes');
 
-
     // create iframes
-    new Array(FRAMES_COUNT)
+    let leaderFramesCache = new Array(FRAMES_COUNT)
         .fill(0)
-        .forEach(() => {
+        .map(() => {
             const ifrm = document.createElement('iframe');
             ifrm.setAttribute('src', frameSrc);
             leaderIframes.appendChild(ifrm);
+            return ifrm;
         });
 
+    // wait until all iframes have loaded
+    await Promise.all(
+        leaderFramesCache.map(iframe => {
+            return new Promise(res => iframe.onload = () => res());
+        })
+    );
+
+    startTime = new Date().getTime();
+
+    /**
+     * remove the leader-iframe until no iframe is left
+     */
+    while (leaderFramesCache.length > 0) {
+        leaderFramesCache = await removeLeaderIframe(leaderFramesCache);
+    }
+
+    // done
+    body.style.backgroundColor = 'green';
+    stateContainer.innerHTML = 'SUCCESS'
+    const amountTime = new Date().getTime() - startTime;
+    document.getElementById('time-amount').innerHTML = amountTime + 'ms';
+
 }
-runLeaderElectionTest();
+
+const removeLeaderIframe = async (leaderFramesCache) => {
+    const leaders = leaderFramesCache.filter(frame => {
+        const boxText = frame.contentDocument.getElementById('box').innerHTML;
+        return boxText === 'Leader';
+    });
+    if (leaders.length === 0) {
+        return new Promise(res => setTimeout(() => {
+            res(leaderFramesCache);
+        }, 20));
+    }
+    if (leaders.length > 1) {
+        throw new Error('LeaderElection: There is more then one leader!');
+    }
+    // remove iframe
+    leaders[0].parentNode.removeChild(leaders[0]);
+
+    return leaderFramesCache.filter(f => f !== leaders[0]);
+}

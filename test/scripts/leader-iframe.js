@@ -31,6 +31,6 @@ boxEl.innerHTML = 'start election';
 console.log('leader-iframe ('+elector.token+'): start leader-election');
 elector.awaitLeadership().then(()=> {
     console.log('leader-iframe ('+elector.token+'): I am now the leader!');
-    boxEl.innerHTML = 'Leader ♛';
+    boxEl.innerHTML = 'Leader';
     document.title = '♛ Leader';
 });
