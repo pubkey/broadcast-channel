@@ -148,3 +148,8 @@ export function canBeUsed() {
     if (!ls) return false;
     return true;
 };
+
+
+export function averageResponseTime(){
+    return 50;
+}

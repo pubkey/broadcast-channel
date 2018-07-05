@@ -461,6 +461,26 @@ function runTest(channelType) {
 
                     channel2.close();
                 });
+                it('should clean up all unloaded when dead', async()=> {
+                    return; // TODO run this once unload-module has been fixed
+                    console.log('======');
+
+                    const cacheLengthBefore = Object.keys(unload._getCache()).length;
+                    console.dir(cacheLengthBefore);
+
+                    const channelName = AsyncTestUtil.randomString(12);
+                    const channel = new BroadcastChannel(channelName, channelOptions);
+                    const elector = LeaderElection.create(channel);
+                    await elector.awaitLeadership();
+
+                    await elector.die();
+
+                    const cacheLengthAfter = Object.keys(unload._getCache()).length;
+
+                    assert.equal(cacheLengthBefore, cacheLengthAfter);
+
+                    process.exit();
+                });
             });
             describe('.awaitLeadership()', () => {
                 it('should resolve when elector becomes leader', async () => {

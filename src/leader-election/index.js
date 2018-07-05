@@ -138,7 +138,9 @@ LeaderElection.prototype = {
 
         this._listeners.forEach(listener => this._channel.removeEventListener('internal', listener));
         this._intervals.forEach(interval => clearInterval(interval));
-        this._unloads.forEach(uFn => uFn());
+        this._unloads.forEach(uFn => {
+            uFn();
+        });
         return this._sendMessage('death');
     },
 
@@ -170,7 +172,7 @@ LeaderElection.prototype = {
     }
 };
 
-function fillOptionsWithDefaults(options) {
+function fillOptionsWithDefaults(options, channel) {
     if (!options) options = {};
     options = JSON.parse(JSON.stringify(options));
 
@@ -179,8 +181,7 @@ function fillOptionsWithDefaults(options) {
     }
 
     if (!options.responseTime) {
-        // TODO set this depending on used method
-        options.responseTime = 300;
+        options.responseTime = channel.method.averageResponseTime(channel.options);
     }
 
     return options;
@@ -191,7 +192,7 @@ export function create(channel, options) {
         throw new Error('BroadcastChannel already has a leader-elector');
     }
 
-    options = fillOptionsWithDefaults(options);
+    options = fillOptionsWithDefaults(options, channel);
     const elector = new LeaderElection(channel, options);
     channel._beforeClose.push(() => elector.die());
 

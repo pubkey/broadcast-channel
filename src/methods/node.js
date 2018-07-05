@@ -492,3 +492,8 @@ export async function close(channelState) {
 export function canBeUsed() {
     return isNode;
 };
+
+
+export function averageResponseTime(){
+    return 50;
+}

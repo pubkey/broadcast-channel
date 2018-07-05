@@ -261,3 +261,7 @@ export function canBeUsed() {
     if (!idb) return false;
     return true;
 };
+
+export function averageResponseTime(options){
+    return options.idb.fallbackInterval * 1.5;
+}
