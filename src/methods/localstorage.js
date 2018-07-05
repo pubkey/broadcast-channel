@@ -151,5 +151,5 @@ export function canBeUsed() {
 
 
 export function averageResponseTime(){
-    return 50;
+    return 120;
 }

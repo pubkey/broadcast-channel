@@ -11,6 +11,8 @@ import {
 var methodType = getParameterByName('methodType');
 if (!methodType || methodType === '' || methodType === 'default') methodType = undefined;
 
+var autoStart = getParameterByName('autoStart');
+
 // set select-input
 var selectEl = document.getElementById('method-type-select');
 selectEl.onchange = function (ev) {
@@ -198,4 +200,9 @@ const removeLeaderIframe = async (leaderFramesCache) => {
     leaders[0].parentNode.removeChild(leaders[0]);
 
     return leaderFramesCache.filter(f => f !== leaders[0]);
+}
+
+
+if(autoStart && autoStart !== ''){
+    window[autoStart]();
 }
