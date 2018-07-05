@@ -8,6 +8,8 @@
 <h1 align="center">BroadcastChannel</h1>
 <p align="center">
   <strong>A BroadcastChannel that works in old browsers, new browsers, WebWorkers and NodeJs</strong>
+  <br/>
+  <span>+ LeaderElection over the channels</span>
 </p>
 
 <p align="center">
@@ -28,7 +30,7 @@ This implementation works with old browsers, new browsers, WebWorkers and NodeJs
 
 This behaves similar to the [BroadcastChannel-API](https://developer.mozilla.org/en-US/docs/Web/API/Broadcast_Channel_API) which is currently not featured in all browsers.
 
-## Usage
+## Using the BroadcastChannel
 
 This API behaves similar to the [javascript-standard](https://developer.mozilla.org/en-US/docs/Web/API/Broadcast_Channel_API).
 
@@ -106,6 +108,40 @@ Depending in which environment this is used, a proper method is automatically se
 | **IndexedDB**    | [Browsers with WebWorkers](https://caniuse.com/#feat=indexeddb) | If there is no native BroadcastChannel support, the IndexedDB method is used because it supports messaging between browser-tabs, iframes and WebWorkers |
 | **LocalStorage** | [Older Browsers](https://caniuse.com/#feat=namevalue-storage)   | In older browsers that do not support IndexedDb, a localstorage-method is used                                                                          |
 | **Sockets**      | NodeJs                                                          | In NodeJs the communication is handled by sockets that send each other messages                                                                         |
+
+
+
+## Using the LeaderElection
+
+This module also comes with a leader-election which can be used so elect a leader between different BroadcastChannels.
+For example if you have a stable connection from the frontend to your server, you can use the LeaderElection to save server-side performance by only connecting once, even if the user has opened your website in multiple tabs.
+
+Create a channel and an elector.
+
+```js
+const BroadcastChannel = require('broadcast-channel');
+const LeaderElection = require('leader-election');
+const channel = new BroadcastChannel('foobar');
+const elector = LeaderElection.create(channel);
+```
+
+Wait until the elector becomes leader.
+
+```js
+const LeaderElection = require('leader-election');
+const elector = LeaderElection.create(channel);
+elector.awaitLeadership().then(()=> {
+  console.log('this tab is now leader');
+})
+```
+
+Let the leader die. (automatically happens if the tab is closed or the process exits).
+
+```js
+const elector = LeaderElection.create(channel);
+await elector.die();
+```
+
 
 
 ## What this is

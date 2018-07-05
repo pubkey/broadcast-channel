@@ -12,7 +12,8 @@
     "indexeddb",
     "postMessage",
     "crosstab",
-    "ipc"
+    "ipc",
+    "leader-election"
   ],
   "repository": {
     "type": "git",

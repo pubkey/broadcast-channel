@@ -13,6 +13,7 @@ describe('typings.test.ts', () => {
         declare type Message = {
             foo: string;
         };
+        import LeaderElection from '${mainPath}/leader-election';
     `;
     const transpileCode = async (code) => {
         const spawn = require('child-process-promise').spawn;
@@ -21,7 +22,7 @@ describe('typings.test.ts', () => {
         const promise = spawn('ts-node', [
             '--no-cache',
             '--compilerOptions', '{"target":"es6", "strict": true, "strictNullChecks": true}',
-            '--type-check',
+            //'--type-check',
             '-p', codeBase + '\n' + code
         ]);
         const childProcess = promise.childProcess;
@@ -117,6 +118,18 @@ describe('typings.test.ts', () => {
                 () => transpileCode(code)
             );
         });
-
+    });
+    describe('LeaderElection', ()=> {
+        it('call all methods', async () => {
+            const code = `
+                (async()=>{
+                    const channel = new BroadcastChannel<Message>('foobar');
+                    const elector = LeaderElection.create(channel, {});
+                    await elector.awaitLeadership();
+                    await elector.die();
+                })();
+            `;
+            await transpileCode(code);
+        });
     });
 });
