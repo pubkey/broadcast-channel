@@ -144,7 +144,7 @@ window.startLeaderElection = async function () {
 
     stateContainer.innerHTML = 'running..'
 
-    const FRAMES_COUNT = 10;
+    const FRAMES_COUNT = 5;
     const rand = new Date().getTime();
     const frameSrc = './leader-iframe.html?channelName=' + channel.name + '&methodType=' + channel.type + '&t=' + rand;
     var leaderIframes = document.getElementById('leader-iframes');
