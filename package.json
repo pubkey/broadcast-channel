@@ -67,7 +67,7 @@
     "babel-cli": "6.26.0",
     "babel-core": "6.26.3",
     "babel-eslint": "8.2.5",
-    "babel-loader": "7.1.4",
+    "babel-loader": "7.1.5",
     "babel-plugin-transform-async-to-generator": "6.24.1",
     "babel-plugin-transform-class-properties": "6.24.1",
     "babel-plugin-transform-es2015-block-scoping": "6.26.0",
@@ -92,7 +92,7 @@
     "copyfiles": "2.0.0",
     "cross-env": "5.2.0",
     "eslint": "4.19.1",
-    "gzip-size-cli": "^2.1.0",
+    "gzip-size-cli": "3.0.0",
     "http-server": "0.11.1",
     "karma": "2.0.4",
     "karma-babel-preprocessor": "7.0.0",
@@ -111,9 +111,9 @@
     "random-int": "1.0.0",
     "random-token": "0.0.8",
     "rimraf": "2.6.2",
-    "testcafe": "0.20.3",
-    "testcafe-hammerhead": "14.0.0",
-    "ts-node": "6.1.2",
+    "testcafe": "0.20.4",
+    "testcafe-hammerhead": "14.1.1",
+    "ts-node": "7.0.0",
     "typescript": "2.9.2"
   }
 }
