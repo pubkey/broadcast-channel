@@ -8,6 +8,7 @@ exports.close = close;
 exports.postMessage = postMessage;
 exports.onMessage = onMessage;
 exports.canBeUsed = canBeUsed;
+exports.averageResponseTime = averageResponseTime;
 var isNode = require('detect-node');
 
 var type = exports.type = 'native';
@@ -50,3 +51,7 @@ function canBeUsed() {
 
     if (typeof BroadcastChannel === 'function') return true;
 };
+
+function averageResponseTime() {
+    return 100;
+}

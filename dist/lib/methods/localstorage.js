@@ -13,6 +13,7 @@ exports.create = create;
 exports.close = close;
 exports.onMessage = onMessage;
 exports.canBeUsed = canBeUsed;
+exports.averageResponseTime = averageResponseTime;
 
 var _options = require('../options');
 
@@ -152,3 +153,7 @@ function canBeUsed() {
     if (!ls) return false;
     return true;
 };
+
+function averageResponseTime() {
+    return 120;
+}

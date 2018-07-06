@@ -28,28 +28,39 @@ var BroadcastChannel = function BroadcastChannel(name, options) {
         internal: []
     };
 
+    /**
+     * array of promises that will be awaited
+     * before the channel is closed
+     */
+    this._beforeClose = [];
+
     this._preparePromise = null;
     _prepareChannel(this);
 };
 
 BroadcastChannel.prototype = {
-    postMessage: function postMessage(msg) {
+    _post: function _post(type, msg) {
         var _this = this;
 
         var msgObj = {
             time: new Date().getTime(),
-            type: 'message',
+            type: type,
             data: msg
         };
-
-        if (this.closed) {
-            throw new Error('BroadcastChannel.postMessage(): ' + 'Cannot post message after channel has closed');
-        }
 
         var awaitPrepare = this._preparePromise ? this._preparePromise : Promise.resolve();
         return awaitPrepare.then(function () {
             return _this.method.postMessage(_this._state, msgObj);
         });
+    },
+    postMessage: function postMessage(msg) {
+        if (this.closed) {
+            throw new Error('BroadcastChannel.postMessage(): ' + 'Cannot post message after channel has closed');
+        }
+        return this._post('message', msg);
+    },
+    postInternal: function postInternal(msg) {
+        return this._post('internal', msg);
     },
 
     set onmessage(fn) {
@@ -84,6 +95,7 @@ BroadcastChannel.prototype = {
     close: function close() {
         var _this2 = this;
 
+        if (this.closed) return;
         this.closed = true;
         var awaitPrepare = this._preparePromise ? this._preparePromise : Promise.resolve();
 
@@ -91,6 +103,10 @@ BroadcastChannel.prototype = {
         this._addEventListeners.message = [];
 
         return awaitPrepare.then(function () {
+            return Promise.all(_this2._beforeClose.map(function (fn) {
+                return fn();
+            }));
+        }).then(function () {
             return _this2.method.close(_this2._state);
         });
     },

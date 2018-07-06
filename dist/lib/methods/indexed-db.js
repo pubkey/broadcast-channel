@@ -17,6 +17,7 @@ exports.close = close;
 exports.postMessage = postMessage;
 exports.onMessage = onMessage;
 exports.canBeUsed = canBeUsed;
+exports.averageResponseTime = averageResponseTime;
 
 var _util = require('../util.js');
 
@@ -279,3 +280,7 @@ function canBeUsed() {
     if (!idb) return false;
     return true;
 };
+
+function averageResponseTime(options) {
+    return options.idb.fallbackInterval * 1.5;
+}

@@ -46,28 +46,39 @@ var BroadcastChannel = function BroadcastChannel(name, options) {
         internal: []
     };
 
+    /**
+     * array of promises that will be awaited
+     * before the channel is closed
+     */
+    this._beforeClose = [];
+
     this._preparePromise = null;
     _prepareChannel(this);
 };
 
 BroadcastChannel.prototype = {
-    postMessage: function postMessage(msg) {
+    _post: function _post(type, msg) {
         var _this = this;
 
         var msgObj = {
             time: new Date().getTime(),
-            type: 'message',
+            type: type,
             data: msg
         };
-
-        if (this.closed) {
-            throw new Error('BroadcastChannel.postMessage(): ' + 'Cannot post message after channel has closed');
-        }
 
         var awaitPrepare = this._preparePromise ? this._preparePromise : Promise.resolve();
         return awaitPrepare.then(function () {
             return _this.method.postMessage(_this._state, msgObj);
         });
+    },
+    postMessage: function postMessage(msg) {
+        if (this.closed) {
+            throw new Error('BroadcastChannel.postMessage(): ' + 'Cannot post message after channel has closed');
+        }
+        return this._post('message', msg);
+    },
+    postInternal: function postInternal(msg) {
+        return this._post('internal', msg);
     },
 
     set onmessage(fn) {
@@ -102,6 +113,7 @@ BroadcastChannel.prototype = {
     close: function close() {
         var _this2 = this;
 
+        if (this.closed) return;
         this.closed = true;
         var awaitPrepare = this._preparePromise ? this._preparePromise : Promise.resolve();
 
@@ -109,6 +121,10 @@ BroadcastChannel.prototype = {
         this._addEventListeners.message = [];
 
         return awaitPrepare.then(function () {
+            return Promise.all(_this2._beforeClose.map(function (fn) {
+                return fn();
+            }));
+        }).then(function () {
             return _this2.method.close(_this2._state);
         });
     },
@@ -258,6 +274,7 @@ exports.close = close;
 exports.postMessage = postMessage;
 exports.onMessage = onMessage;
 exports.canBeUsed = canBeUsed;
+exports.averageResponseTime = averageResponseTime;
 
 var _util = require('../util.js');
 
@@ -520,6 +537,10 @@ function canBeUsed() {
     if (!idb) return false;
     return true;
 };
+
+function averageResponseTime(options) {
+    return options.idb.fallbackInterval * 1.5;
+}
 },{"../options":7,"../util.js":8,"detect-node":426}],5:[function(require,module,exports){
 'use strict';
 
@@ -536,6 +557,7 @@ exports.create = create;
 exports.close = close;
 exports.onMessage = onMessage;
 exports.canBeUsed = canBeUsed;
+exports.averageResponseTime = averageResponseTime;
 
 var _options = require('../options');
 
@@ -675,6 +697,10 @@ function canBeUsed() {
     if (!ls) return false;
     return true;
 };
+
+function averageResponseTime() {
+    return 120;
+}
 },{"../options":7,"../util":8,"detect-node":426}],6:[function(require,module,exports){
 'use strict';
 
@@ -686,6 +712,7 @@ exports.close = close;
 exports.postMessage = postMessage;
 exports.onMessage = onMessage;
 exports.canBeUsed = canBeUsed;
+exports.averageResponseTime = averageResponseTime;
 var isNode = require('detect-node');
 
 var type = exports.type = 'native';
@@ -728,6 +755,10 @@ function canBeUsed() {
 
     if (typeof BroadcastChannel === 'function') return true;
 };
+
+function averageResponseTime() {
+    return 100;
+}
 },{"detect-node":426}],7:[function(require,module,exports){
 'use strict';
 
@@ -9516,6 +9547,8 @@ var BroadcastChannel = require('../../');
 var methodType = (0, _util.getParameterByName)('methodType');
 if (!methodType || methodType === '' || methodType === 'default') methodType = undefined;
 
+var autoStart = (0, _util.getParameterByName)('autoStart');
+
 // set select-input
 var selectEl = document.getElementById('method-type-select');
 selectEl.onchange = function (ev) {
@@ -9593,80 +9626,203 @@ channel.onmessage = function (msg) {
     }
 };
 
-var run = function () {
-    var _ref = (0, _asyncToGenerator3['default'])( /*#__PURE__*/_regenerator2['default'].mark(function _callee() {
-        var rand, worker;
-        return _regenerator2['default'].wrap(function _callee$(_context) {
-            while (1) {
-                switch (_context.prev = _context.next) {
-                    case 0:
-                        rand = new Date().getTime();
+window.startBroadcastChannel = (0, _asyncToGenerator3['default'])( /*#__PURE__*/_regenerator2['default'].mark(function _callee() {
+    var rand, worker;
+    return _regenerator2['default'].wrap(function _callee$(_context) {
+        while (1) {
+            switch (_context.prev = _context.next) {
+                case 0:
+                    stateContainer.innerHTML = 'running..';
+                    rand = new Date().getTime();
 
-                        console.log('aaaa');
+                    // load iframe
 
-                        // load iframe
-                        iframeEl.src = './iframe.html?channelName=' + channel.name + '&methodType=' + channel.type + '&t=' + rand;
-                        _context.next = 5;
+                    iframeEl.src = './iframe.html?channelName=' + channel.name + '&methodType=' + channel.type + '&t=' + rand;
+                    _context.next = 5;
+                    return new Promise(function (res) {
+                        return iframeEl.onload = function () {
+                            return res();
+                        };
+                    });
+
+                case 5:
+                    console.log('main: Iframe has loaded');
+
+                    // spawn web-worker if possible
+
+                    if (!(channel.type !== 'localstorage' && typeof window.Worker === 'function')) {
+                        _context.next = 12;
+                        break;
+                    }
+
+                    useWorker = true;
+                    worker = new Worker('worker.js?t=' + rand);
+
+                    worker.onerror = function (event) {
+                        throw new Error('worker: ' + event.message + " (" + event.filename + ":" + event.lineno + ")");
+                    };
+                    _context.next = 12;
+                    return new Promise(function (res) {
+                        worker.addEventListener('message', function (e) {
+                            // run when message returned, so we know the worker has started
+                            console.log('main: Worker has started');
+                            res();
+                        }, false);
+                        worker.postMessage({
+                            'cmd': 'start',
+                            'msg': {
+                                channelName: channel.name,
+                                methodType: channel.type
+                            }
+                        });
+                    });
+
+                case 12:
+                    console.log('========== START SENDING MESSAGES ' + channel.type);
+                    startTime = new Date().getTime();
+                    channel.postMessage({
+                        from: 'main',
+                        step: 0
+                    });
+                    console.log('main: message send (0)');
+
+                case 16:
+                case 'end':
+                    return _context.stop();
+            }
+        }
+    }, _callee, this);
+}));
+
+// LEADER-ELECTION
+window.startLeaderElection = (0, _asyncToGenerator3['default'])( /*#__PURE__*/_regenerator2['default'].mark(function _callee2() {
+    var FRAMES_COUNT, rand, frameSrc, leaderIframes, leaderFramesCache, amountTime;
+    return _regenerator2['default'].wrap(function _callee2$(_context2) {
+        while (1) {
+            switch (_context2.prev = _context2.next) {
+                case 0:
+
+                    stateContainer.innerHTML = 'running..';
+
+                    FRAMES_COUNT = 5;
+                    rand = new Date().getTime();
+                    frameSrc = './leader-iframe.html?channelName=' + channel.name + '&methodType=' + channel.type + '&t=' + rand;
+                    leaderIframes = document.getElementById('leader-iframes');
+
+                    // create iframes
+
+                    leaderFramesCache = new Array(FRAMES_COUNT).fill(0).map(function () {
+                        var ifrm = document.createElement('iframe');
+                        ifrm.setAttribute('src', frameSrc);
+                        leaderIframes.appendChild(ifrm);
+                        return ifrm;
+                    });
+
+                    // wait until all iframes have loaded
+
+                    _context2.next = 8;
+                    return Promise.all(leaderFramesCache.map(function (iframe) {
                         return new Promise(function (res) {
-                            return iframeEl.onload = function () {
+                            return iframe.onload = function () {
                                 return res();
                             };
                         });
+                    }));
 
-                    case 5:
-                        console.log('main: Iframe has loaded');
+                case 8:
 
-                        // spawn web-worker if possible
+                    startTime = new Date().getTime();
 
-                        if (!(channel.type !== 'localstorage' && typeof window.Worker === 'function')) {
-                            _context.next = 12;
+                    /**
+                     * remove the leader-iframe until no iframe is left
+                     */
+
+                case 9:
+                    if (!(leaderFramesCache.length > 0)) {
+                        _context2.next = 15;
+                        break;
+                    }
+
+                    _context2.next = 12;
+                    return removeLeaderIframe(leaderFramesCache);
+
+                case 12:
+                    leaderFramesCache = _context2.sent;
+                    _context2.next = 9;
+                    break;
+
+                case 15:
+
+                    // done
+                    body.style.backgroundColor = 'green';
+                    stateContainer.innerHTML = 'SUCCESS';
+                    amountTime = new Date().getTime() - startTime;
+
+                    document.getElementById('time-amount').innerHTML = amountTime + 'ms';
+
+                case 19:
+                case 'end':
+                    return _context2.stop();
+            }
+        }
+    }, _callee2, this);
+}));
+
+var removeLeaderIframe = function () {
+    var _ref3 = (0, _asyncToGenerator3['default'])( /*#__PURE__*/_regenerator2['default'].mark(function _callee3(leaderFramesCache) {
+        var leaders;
+        return _regenerator2['default'].wrap(function _callee3$(_context3) {
+            while (1) {
+                switch (_context3.prev = _context3.next) {
+                    case 0:
+                        leaders = leaderFramesCache.filter(function (frame) {
+                            var boxText = frame.contentDocument.getElementById('box').innerHTML;
+                            return boxText === 'Leader';
+                        });
+
+                        if (!(leaders.length === 0)) {
+                            _context3.next = 3;
                             break;
                         }
 
-                        useWorker = true;
-                        worker = new Worker('worker.js?t=' + rand);
+                        return _context3.abrupt('return', new Promise(function (res) {
+                            return setTimeout(function () {
+                                res(leaderFramesCache);
+                            }, 20);
+                        }));
 
-                        worker.onerror = function (event) {
-                            throw new Error('worker: ' + event.message + " (" + event.filename + ":" + event.lineno + ")");
-                        };
-                        _context.next = 12;
-                        return new Promise(function (res) {
-                            worker.addEventListener('message', function (e) {
-                                // run when message returned, so we know the worker has started
-                                console.log('main: Worker has started');
-                                res();
-                            }, false);
-                            worker.postMessage({
-                                'cmd': 'start',
-                                'msg': {
-                                    channelName: channel.name,
-                                    methodType: channel.type
-                                }
-                            });
-                        });
+                    case 3:
+                        if (!(leaders.length > 1)) {
+                            _context3.next = 5;
+                            break;
+                        }
 
-                    case 12:
-                        console.log('========== START SENDING MESSAGES ' + channel.type);
-                        startTime = new Date().getTime();
-                        channel.postMessage({
-                            from: 'main',
-                            step: 0
-                        });
-                        console.log('main: message send (0)');
+                        throw new Error('LeaderElection: There is more then one leader!');
 
-                    case 16:
+                    case 5:
+                        // remove iframe
+                        leaders[0].parentNode.removeChild(leaders[0]);
+
+                        return _context3.abrupt('return', leaderFramesCache.filter(function (f) {
+                            return f !== leaders[0];
+                        }));
+
+                    case 7:
                     case 'end':
-                        return _context.stop();
+                        return _context3.stop();
                 }
             }
-        }, _callee, this);
+        }, _callee3, undefined);
     }));
 
-    return function run() {
-        return _ref.apply(this, arguments);
+    return function removeLeaderIframe(_x) {
+        return _ref3.apply(this, arguments);
     };
 }();
-run();
+
+if (autoStart && autoStart !== '') {
+    window[autoStart]();
+}
 },{"../../":1,"./util.js":430,"babel-polyfill":9,"babel-runtime/helpers/asyncToGenerator":14,"babel-runtime/helpers/typeof":15,"babel-runtime/regenerator":16}],430:[function(require,module,exports){
 'use strict';
 

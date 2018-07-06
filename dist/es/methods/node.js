@@ -762,7 +762,7 @@ export var refreshReaderClients = function () {
                         Object.keys(channelState.otherReaderClients).filter(function (readerUuid) {
                             return !otherReaders.includes(readerUuid);
                         }).forEach(function (readerUuid) {
-                            channelState.otherReaderClients[readerUuid].close();
+                            channelState.otherReaderClients[readerUuid].destroy();
                             delete channelState.otherReaderClients[readerUuid];
                         });
 
@@ -917,21 +917,30 @@ export var close = function () {
                         channelState.readQueue.clear();
                         channelState.writeQueue.clear();
 
-                        _context20.next = 7;
+                        _context20.prev = 5;
+                        _context20.next = 8;
                         return unlink(channelState.infoFilePath);
 
-                    case 7:
+                    case 8:
+                        _context20.next = 12;
+                        break;
+
+                    case 10:
+                        _context20.prev = 10;
+                        _context20.t0 = _context20['catch'](5);
+
+                    case 12:
 
                         Object.values(channelState.otherReaderClients).forEach(function (client) {
                             return client.destroy();
                         });
 
-                    case 8:
+                    case 13:
                     case 'end':
                         return _context20.stop();
                 }
             }
-        }, _callee19, this);
+        }, _callee19, this, [[5, 10]]);
     }));
 
     return function close(_x30) {
@@ -942,3 +951,7 @@ export var close = function () {
 export function canBeUsed() {
     return isNode;
 };
+
+export function averageResponseTime() {
+    return 50;
+}

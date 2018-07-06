@@ -40,3 +40,7 @@ export function canBeUsed() {
 
     if (typeof BroadcastChannel === 'function') return true;
 };
+
+export function averageResponseTime() {
+    return 100;
+}
