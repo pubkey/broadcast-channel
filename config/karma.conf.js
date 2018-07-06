@@ -54,13 +54,13 @@ const configuration = {
     client: {
         mocha: {
             bail: false,
-            timeout: 6000
+            timeout: 12000
         },
         captureConsole: true
     },
     //    browsers: ['ChromeNoSandbox'],
-    browserDisconnectTimeout: 8000,
-    processKillTimeout: 8000,
+    browserDisconnectTimeout: 24000,
+    processKillTimeout: 24000,
     customLaunchers: {
         Chrome_travis_ci: {
             base: 'Chrome',
