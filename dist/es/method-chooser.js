@@ -16,7 +16,14 @@ var REQUIRE_FUN = require;
  */
 if (isNode) {
     var NodeMethod = REQUIRE_FUN('./methods/node.js');
-    METHODS.push(NodeMethod);
+
+    /**
+     * this will be false for webpackbuilds
+     * which will shim the node-method with an empty object {}
+     */
+    if (typeof NodeMethod.canBeUsed === 'function') {
+        METHODS.push(NodeMethod);
+    }
 }
 
 export function chooseMethod(options) {
@@ -37,7 +44,7 @@ export function chooseMethod(options) {
     }
 
     var useMethod = chooseMethods.find(function (method) {
-        return typeof method === 'function' && method.canBeUsed();
+        return method.canBeUsed();
     });
     if (!useMethod) throw new Error('No useable methode found:' + JSON.stringify(METHODS.map(function (m) {
         return m.type;
