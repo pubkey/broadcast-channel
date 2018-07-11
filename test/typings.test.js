@@ -119,7 +119,7 @@ describe('typings.test.ts', () => {
             );
         });
     });
-    describe('LeaderElection', ()=> {
+    describe('LeaderElection', () => {
         it('call all methods', async () => {
             const code = `
                 (async()=>{

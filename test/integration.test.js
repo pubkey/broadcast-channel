@@ -369,7 +369,7 @@ function runTest(channelType) {
                 it('should create an elector', () => {
                     const channelName = AsyncTestUtil.randomString(12);
                     const channel = new BroadcastChannel(channelName, channelOptions);
-                    const elector = LeaderElection.create(channel);
+                    LeaderElection.create(channel);
                     channel.close();
                 });
             });
@@ -461,8 +461,9 @@ function runTest(channelType) {
 
                     channel2.close();
                 });
-                it('should clean up all unloaded when dead', async()=> {
+                it('should clean up all unloaded when dead', async() => {
                     return; // TODO run this once unload-module has been fixed
+                    /*
                     console.log('======');
 
                     const cacheLengthBefore = Object.keys(unload._getCache()).length;
@@ -479,7 +480,7 @@ function runTest(channelType) {
 
                     assert.equal(cacheLengthBefore, cacheLengthAfter);
 
-                    process.exit();
+                    process.exit();*/
                 });
             });
             describe('.awaitLeadership()', () => {
@@ -556,7 +557,7 @@ function runTest(channelType) {
             });
         });
     });
-};
+}
 
 if (isNode) {
     runTest('node');

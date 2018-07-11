@@ -5,7 +5,7 @@ const IndexeDbMethod = require('./methods/indexed-db.js');
 const LocalstorageMethod = require('./methods/localstorage.js');
 
 // order is important
-let METHODS = [
+const METHODS = [
     NativeMethod, // fastest
     IndexeDbMethod,
     LocalstorageMethod
@@ -37,7 +37,7 @@ export function chooseMethod(options) {
         chooseMethods = METHODS.filter(m => m.type !== 'idb');
     }
 
-    const useMethod = chooseMethods.find(method => method.canBeUsed());
+    const useMethod = chooseMethods.find(method => typeof method === 'function' && method.canBeUsed());
     if (!useMethod)
         throw new Error('No useable methode found:' + JSON.stringify(METHODS.map(m => m.type)));
     else

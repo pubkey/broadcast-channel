@@ -2,8 +2,6 @@ const AsyncTestUtil = require('async-test-util');
 const assert = require('assert');
 const isNode = require('detect-node');
 
-const util = require('../../dist/lib/util.js');
-
 describe('unit/node.method.test.js', () => {
     /**
      * do not run in browser-tests

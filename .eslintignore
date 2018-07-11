@@ -1,0 +1,5 @@
+dist/
+node_modules/
+tmp/
+test/scripts/worker.js
+test/e2e.test.js

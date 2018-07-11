@@ -41,7 +41,7 @@ export function cleanPipeName(str) {
     } else {
         return str;
     }
-};
+}
 
 const mkdir = util.promisify(fs.mkdir);
 const writeFile = util.promisify(fs.writeFile);
@@ -90,7 +90,7 @@ export async function ensureFoldersExist(channelName) {
         await mkdir(paths.readers).catch(() => null),
         await mkdir(paths.messages).catch(() => null)
     ]);
-};
+}
 
 export function socketPath(channelName, readerUuid) {
 
@@ -491,9 +491,9 @@ export async function close(channelState) {
 
 export function canBeUsed() {
     return isNode;
-};
+}
 
 
-export function averageResponseTime(){
+export function averageResponseTime() {
     return 50;
 }

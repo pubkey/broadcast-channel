@@ -55,7 +55,7 @@ LeaderElection.prototype = {
                     stopCriteria = true;
                 }
             }
-        }
+        };
         this._channel.addEventListener('internal', handleMessage);
 
 
@@ -63,12 +63,12 @@ LeaderElection.prototype = {
         const ret = this._sendMessage('apply') // send out that this one is applying
             .then(() => sleep(this._options.responseTime)) // let others time to respond
             .then(() => {
-                if (stopCriteria) return Promise.reject();
+                if (stopCriteria) return Promise.reject(new Error());
                 else return this._sendMessage('apply');
             })
             .then(() => sleep(this._options.responseTime)) // let others time to respond
             .then(() => {
-                if (stopCriteria) return Promise.reject();
+                if (stopCriteria) return Promise.reject(new Error());
                 else return this._sendMessage();
             })
             .then(() => this._beLeader()) // no one disagreed -> this one is now leader
@@ -81,7 +81,7 @@ LeaderElection.prototype = {
                     this._reApply = false;
                     return this.applyOnce();
                 } else return success;
-            })
+            });
         return ret;
     },
 
@@ -118,8 +118,8 @@ LeaderElection.prototype = {
                     this.applyOnce().then(() => {
                         if (this.isLeader) finish();
                     });
-                };
-            }
+                }
+            };
             this._channel.addEventListener('internal', whenDeathListener);
             this._listeners.push(whenDeathListener);
         });
@@ -164,8 +164,8 @@ LeaderElection.prototype = {
         const isLeaderListener = msg => {
             if (msg.context === 'leader' && msg.action === 'apply') {
                 this._sendMessage('tell');
-            };
-        }
+            }
+        };
         this._channel.addEventListener('internal', isLeaderListener);
         this._listeners.push(isLeaderListener);
         return this._sendMessage('tell');
