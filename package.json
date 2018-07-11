@@ -34,8 +34,10 @@
     "test:browser": "npm run build && karma start ./config/karma.conf.js --single-run",
     "test:e2e": "concurrently \"npm run docs:serve\" \"testcafe all test/e2e.test.js\" --kill-others --success first",
     "test:typings": "npm run build && mocha ./test/typings.test.js -b --timeout 12000 --exit",
-    "test:size": "npm run build && rimraf test_tmp/browserify.js && browserify --no-builtins dist/lib/browserify.index.js > test_tmp/browserify.js && uglifyjs --compress --mangle --output test_tmp/browserify.min.js -- test_tmp/browserify.js && echo \"Build-Size (minified+gzip):\" && gzip-size --raw test_tmp/browserify.min.js",
-    "lint": "eslint --ignore-path ./config/.eslintignore src test config scripts",
+    "size:prewebpack": "npm run build && cross-env NODE_ENV=build webpack --config ./config/webpack.config.js",
+    "size:webpack": "npm run size:prewebpack && echo \"Build-Size Webpack (minified+gzip):\" && gzip-size --raw ./test_tmp/webpack.bundle.js",
+    "size:browserify": "npm run build && rimraf test_tmp/browserify.js && browserify --no-builtins dist/lib/browserify.index.js > test_tmp/browserify.js && uglifyjs --compress --mangle --output test_tmp/browserify.min.js -- test_tmp/browserify.js && echo \"Build-Size browserify (minified+gzip):\" && gzip-size --raw test_tmp/browserify.min.js",
+    "lint": "eslint src test config",
     "clear": "rimraf -rf ./dist && rimraf -rf ./gen",
     "build:es6": "rimraf -rf dist/es && cross-env NODE_ENV=es6 babel src --out-dir dist/es",
     "build:es5": "cross-env NODE_ENV=es5 node node_modules/babel-cli/bin/babel.js src --out-dir dist/lib",
@@ -91,7 +93,7 @@
     "convert-hrtime": "2.0.0",
     "copyfiles": "2.0.0",
     "cross-env": "5.2.0",
-    "eslint": "4.19.1",
+    "eslint": "5.1.0",
     "gzip-size-cli": "3.0.0",
     "http-server": "0.11.1",
     "karma": "2.0.4",
@@ -114,6 +116,12 @@
     "testcafe": "0.20.4",
     "testcafe-hammerhead": "14.1.1",
     "ts-node": "7.0.0",
-    "typescript": "2.9.2"
+    "typescript": "2.9.2",
+    "webpack": "4.16.0",
+    "webpack-cli": "3.0.8"
+  },
+  "browser": {
+    "./dist/es/methods/node.js": false,
+    "./dist/lib/methods/node.js": false
   }
 }
