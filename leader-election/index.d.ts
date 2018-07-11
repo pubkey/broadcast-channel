@@ -18,10 +18,12 @@ export declare class LeaderElector {
 
 }
 
-export function create(channel: BroadcastChannel, options?: LeaderElectionOptions): LeaderElector;
+type CreateFunction = (channel: BroadcastChannel, options?: LeaderElectionOptions) => LeaderElector;
+
+export const create: CreateFunction;
 
 declare const _default: {
-    create;
-}
+    create: CreateFunction,
+};
 
 export default _default;
