@@ -19,7 +19,14 @@ const REQUIRE_FUN = require;
  */
 if (isNode) {
     const NodeMethod = REQUIRE_FUN('./methods/node.js');
-    METHODS.push(NodeMethod);
+
+    /**
+     * this will be false for webpackbuilds
+     * which will shim the node-method with an empty object {}
+     */
+    if (typeof NodeMethod.canBeUsed === 'function') {
+        METHODS.push(NodeMethod);
+    }
 }
 
 
@@ -37,7 +44,7 @@ export function chooseMethod(options) {
         chooseMethods = METHODS.filter(m => m.type !== 'idb');
     }
 
-    const useMethod = chooseMethods.find(method => typeof method === 'function' && method.canBeUsed());
+    const useMethod = chooseMethods.find(method => method.canBeUsed());
     if (!useMethod)
         throw new Error('No useable methode found:' + JSON.stringify(METHODS.map(m => m.type)));
     else
