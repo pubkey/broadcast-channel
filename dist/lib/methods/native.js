@@ -30,7 +30,7 @@ function create(channelName, options) {
     };
 
     return state;
-};
+}
 
 function close(channelState) {
     channelState.bc.close();
@@ -50,7 +50,7 @@ function canBeUsed() {
     if (isNode) return false;
 
     if (typeof BroadcastChannel === 'function') return true;
-};
+}
 
 function averageResponseTime() {
     return 100;

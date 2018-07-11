@@ -43,7 +43,7 @@ function chooseMethod(options) {
     }
 
     var useMethod = chooseMethods.find(function (method) {
-        return method.canBeUsed();
+        return typeof method === 'function' && method.canBeUsed();
     });
     if (!useMethod) throw new Error('No useable methode found:' + JSON.stringify(METHODS.map(function (m) {
         return m.type;

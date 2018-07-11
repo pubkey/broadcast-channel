@@ -957,7 +957,7 @@ function cleanPipeName(str) {
     } else {
         return str;
     }
-};
+}
 
 var mkdir = util.promisify(fs.mkdir);
 var writeFile = util.promisify(fs.writeFile);
@@ -981,8 +981,6 @@ function getPaths(channelName) {
         messages: folderPathMessages
     };
 }
-
-;
 
 function socketPath(channelName, readerUuid) {
 
@@ -1018,7 +1016,7 @@ function onMessage(channelState, fn) {
 
 function canBeUsed() {
     return _detectNode2['default'];
-};
+}
 
 function averageResponseTime() {
     return 50;

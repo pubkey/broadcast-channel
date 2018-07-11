@@ -151,7 +151,7 @@ function _startListening(channel) {
             channel._addEventListeners[msgObj.type].forEach(function (obj) {
                 if (msgObj.time >= obj.time) {
                     obj.fn(msgObj.data);
-                };
+                }
             });
         };
 

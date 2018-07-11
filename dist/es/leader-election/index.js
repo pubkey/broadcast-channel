@@ -61,12 +61,12 @@ LeaderElection.prototype = {
             return sleep(_this._options.responseTime);
         }) // let others time to respond
         .then(function () {
-            if (stopCriteria) return Promise.reject();else return _this._sendMessage('apply');
+            if (stopCriteria) return Promise.reject(new Error());else return _this._sendMessage('apply');
         }).then(function () {
             return sleep(_this._options.responseTime);
         }) // let others time to respond
         .then(function () {
-            if (stopCriteria) return Promise.reject();else return _this._sendMessage();
+            if (stopCriteria) return Promise.reject(new Error());else return _this._sendMessage();
         }).then(function () {
             return _this._beLeader();
         }) // no one disagreed -> this one is now leader
@@ -120,7 +120,7 @@ LeaderElection.prototype = {
                     _this2.applyOnce().then(function () {
                         if (_this2.isLeader) finish();
                     });
-                };
+                }
             };
             _this2._channel.addEventListener('internal', whenDeathListener);
             _this2._listeners.push(whenDeathListener);
@@ -174,7 +174,7 @@ LeaderElection.prototype = {
         var isLeaderListener = function isLeaderListener(msg) {
             if (msg.context === 'leader' && msg.action === 'apply') {
                 _this4._sendMessage('tell');
-            };
+            }
         };
         this._channel.addEventListener('internal', isLeaderListener);
         this._listeners.push(isLeaderListener);

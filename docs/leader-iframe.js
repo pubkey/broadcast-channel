@@ -175,7 +175,7 @@ function _startListening(channel) {
             channel._addEventListeners[msgObj.type].forEach(function (obj) {
                 if (msgObj.time >= obj.time) {
                     obj.fn(msgObj.data);
-                };
+                }
             });
         };
 
@@ -290,12 +290,12 @@ LeaderElection.prototype = {
             return (0, _util.sleep)(_this._options.responseTime);
         }) // let others time to respond
         .then(function () {
-            if (stopCriteria) return Promise.reject();else return _this._sendMessage('apply');
+            if (stopCriteria) return Promise.reject(new Error());else return _this._sendMessage('apply');
         }).then(function () {
             return (0, _util.sleep)(_this._options.responseTime);
         }) // let others time to respond
         .then(function () {
-            if (stopCriteria) return Promise.reject();else return _this._sendMessage();
+            if (stopCriteria) return Promise.reject(new Error());else return _this._sendMessage();
         }).then(function () {
             return _this._beLeader();
         }) // no one disagreed -> this one is now leader
@@ -349,7 +349,7 @@ LeaderElection.prototype = {
                     _this2.applyOnce().then(function () {
                         if (_this2.isLeader) finish();
                     });
-                };
+                }
             };
             _this2._channel.addEventListener('internal', whenDeathListener);
             _this2._listeners.push(whenDeathListener);
@@ -403,7 +403,7 @@ LeaderElection.prototype = {
         var isLeaderListener = function isLeaderListener(msg) {
             if (msg.context === 'leader' && msg.action === 'apply') {
                 _this4._sendMessage('tell');
-            };
+            }
         };
         this._channel.addEventListener('internal', isLeaderListener);
         this._listeners.push(isLeaderListener);
@@ -490,7 +490,7 @@ function chooseMethod(options) {
     }
 
     var useMethod = chooseMethods.find(function (method) {
-        return method.canBeUsed();
+        return typeof method === 'function' && method.canBeUsed();
     });
     if (!useMethod) throw new Error('No useable methode found:' + JSON.stringify(METHODS.map(function (m) {
         return m.type;
@@ -537,9 +537,9 @@ var type = exports.type = 'idb';
 
 function getIdb() {
     if (typeof indexedDB !== 'undefined') return indexedDB;
-    if (typeof mozIndexedDB !== 'undefined') return mozIndexedDB;
-    if (typeof webkitIndexedDB !== 'undefined') return webkitIndexedDB;
-    if (typeof msIndexedDB !== 'undefined') return msIndexedDB;
+    if (typeof window.mozIndexedDB !== 'undefined') return window.mozIndexedDB;
+    if (typeof window.webkitIndexedDB !== 'undefined') return window.webkitIndexedDB;
+    if (typeof window.msIndexedDB !== 'undefined') return window.msIndexedDB;
 
     return false;
 }
@@ -778,7 +778,7 @@ function canBeUsed() {
 
     if (!idb) return false;
     return true;
-};
+}
 
 function averageResponseTime(options) {
     return options.idb.fallbackInterval * 1.5;
@@ -938,7 +938,7 @@ function canBeUsed() {
 
     if (!ls) return false;
     return true;
-};
+}
 
 function averageResponseTime() {
     return 120;
@@ -976,7 +976,7 @@ function create(channelName, options) {
     };
 
     return state;
-};
+}
 
 function close(channelState) {
     channelState.bc.close();
@@ -996,7 +996,7 @@ function canBeUsed() {
     if (isNode) return false;
 
     if (typeof BroadcastChannel === 'function') return true;
-};
+}
 
 function averageResponseTime() {
     return 100;
@@ -1067,10 +1067,11 @@ function randomInt(min, max) {
  * https://stackoverflow.com/a/1349426/3443137
  */
 function randomToken(length) {
+    if (!length) length = 5;
     var text = '';
     var possible = 'abcdefghijklmnopqrstuvwxzy0123456789';
 
-    for (var i = 0; i < 5; i++) {
+    for (var i = 0; i < length; i++) {
         text += possible.charAt(Math.floor(Math.random() * possible.length));
     }return text;
 }
@@ -9063,6 +9064,8 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 exports.getParameterByName = getParameterByName;
+/* eslint no-useless-escape: "off" */
+
 // https://stackoverflow.com/a/901144/3443137
 function getParameterByName(name, url) {
     if (!url) url = window.location.href;

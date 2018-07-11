@@ -33,7 +33,7 @@ export function cleanPipeName(str) {
     } else {
         return str;
     }
-};
+}
 
 var mkdir = util.promisify(fs.mkdir);
 var writeFile = util.promisify(fs.writeFile);
@@ -108,7 +108,7 @@ export var ensureFoldersExist = function () {
     return function ensureFoldersExist(_x) {
         return _ref.apply(this, arguments);
     };
-}();;
+}();
 
 export function socketPath(channelName, readerUuid) {
 
@@ -950,7 +950,7 @@ export var close = function () {
 
 export function canBeUsed() {
     return isNode;
-};
+}
 
 export function averageResponseTime() {
     return 50;

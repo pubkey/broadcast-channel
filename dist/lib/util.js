@@ -33,10 +33,11 @@ function randomInt(min, max) {
  * https://stackoverflow.com/a/1349426/3443137
  */
 function randomToken(length) {
+    if (!length) length = 5;
     var text = '';
     var possible = 'abcdefghijklmnopqrstuvwxzy0123456789';
 
-    for (var i = 0; i < 5; i++) {
+    for (var i = 0; i < length; i++) {
         text += possible.charAt(Math.floor(Math.random() * possible.length));
     }return text;
 }

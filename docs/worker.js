@@ -175,7 +175,7 @@ function _startListening(channel) {
             channel._addEventListeners[msgObj.type].forEach(function (obj) {
                 if (msgObj.time >= obj.time) {
                     obj.fn(msgObj.data);
-                };
+                }
             });
         };
 
@@ -248,7 +248,7 @@ function chooseMethod(options) {
     }
 
     var useMethod = chooseMethods.find(function (method) {
-        return method.canBeUsed();
+        return typeof method === 'function' && method.canBeUsed();
     });
     if (!useMethod) throw new Error('No useable methode found:' + JSON.stringify(METHODS.map(function (m) {
         return m.type;
@@ -295,9 +295,9 @@ var type = exports.type = 'idb';
 
 function getIdb() {
     if (typeof indexedDB !== 'undefined') return indexedDB;
-    if (typeof mozIndexedDB !== 'undefined') return mozIndexedDB;
-    if (typeof webkitIndexedDB !== 'undefined') return webkitIndexedDB;
-    if (typeof msIndexedDB !== 'undefined') return msIndexedDB;
+    if (typeof window.mozIndexedDB !== 'undefined') return window.mozIndexedDB;
+    if (typeof window.webkitIndexedDB !== 'undefined') return window.webkitIndexedDB;
+    if (typeof window.msIndexedDB !== 'undefined') return window.msIndexedDB;
 
     return false;
 }
@@ -536,7 +536,7 @@ function canBeUsed() {
 
     if (!idb) return false;
     return true;
-};
+}
 
 function averageResponseTime(options) {
     return options.idb.fallbackInterval * 1.5;
@@ -696,7 +696,7 @@ function canBeUsed() {
 
     if (!ls) return false;
     return true;
-};
+}
 
 function averageResponseTime() {
     return 120;
@@ -734,7 +734,7 @@ function create(channelName, options) {
     };
 
     return state;
-};
+}
 
 function close(channelState) {
     channelState.bc.close();
@@ -754,7 +754,7 @@ function canBeUsed() {
     if (isNode) return false;
 
     if (typeof BroadcastChannel === 'function') return true;
-};
+}
 
 function averageResponseTime() {
     return 100;
@@ -825,10 +825,11 @@ function randomInt(min, max) {
  * https://stackoverflow.com/a/1349426/3443137
  */
 function randomToken(length) {
+    if (!length) length = 5;
     var text = '';
     var possible = 'abcdefghijklmnopqrstuvwxzy0123456789';
 
-    for (var i = 0; i < 5; i++) {
+    for (var i = 0; i < length; i++) {
         text += possible.charAt(Math.floor(Math.random() * possible.length));
     }return text;
 }

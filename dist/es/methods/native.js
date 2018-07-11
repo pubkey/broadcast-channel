@@ -19,7 +19,7 @@ export function create(channelName, options) {
     };
 
     return state;
-};
+}
 
 export function close(channelState) {
     channelState.bc.close();
@@ -39,7 +39,7 @@ export function canBeUsed() {
     if (isNode) return false;
 
     if (typeof BroadcastChannel === 'function') return true;
-};
+}
 
 export function averageResponseTime() {
     return 100;
