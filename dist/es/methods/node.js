@@ -871,7 +871,10 @@ export var postMessage = function () {
                                                 }
                                             };
                                             _context18.next = 8;
-                                            return Promise.all(Object.values(channelState.otherReaderClients).map(function (client) {
+                                            return Promise.all(Object.values(channelState.otherReaderClients).filter(function (client) {
+                                                return client.writable;
+                                            }) // client might have closed in between
+                                            .map(function (client) {
                                                 return client.write(JSON.stringify(pingObj));
                                             }));
 
@@ -928,39 +931,47 @@ export var close = function () {
             while (1) {
                 switch (_context20.prev = _context20.next) {
                     case 0:
+                        if (!channelState.closed) {
+                            _context20.next = 2;
+                            break;
+                        }
+
+                        return _context20.abrupt('return');
+
+                    case 2:
                         channelState.closed = true;
 
                         if (typeof channelState.removeUnload === 'function') channelState.removeUnload();
 
-                        channelState.socketEE.server.close();
+                        /**
+                         * the server get closed lazy because others might still write on it
+                         * and have not found out that the infoFile was deleted
+                         */
+                        setTimeout(function () {
+                            return channelState.socketEE.server.close();
+                        }, 200);
+
                         channelState.socketEE.emitter.removeAllListeners();
                         channelState.readQueue.clear();
                         channelState.writeQueue.clear();
 
-                        _context20.prev = 6;
-                        _context20.next = 9;
-                        return unlink(channelState.infoFilePath);
+                        _context20.next = 10;
+                        return unlink(channelState.infoFilePath)['catch'](function () {
+                            return null;
+                        });
 
-                    case 9:
-                        _context20.next = 13;
-                        break;
-
-                    case 11:
-                        _context20.prev = 11;
-                        _context20.t0 = _context20['catch'](6);
-
-                    case 13:
+                    case 10:
 
                         Object.values(channelState.otherReaderClients).forEach(function (client) {
                             return client.destroy();
                         });
 
-                    case 14:
+                    case 11:
                     case 'end':
                         return _context20.stop();
                 }
             }
-        }, _callee19, this, [[6, 11]]);
+        }, _callee19, this);
     }));
 
     return function close(_x30) {
