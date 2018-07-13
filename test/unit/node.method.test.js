@@ -454,11 +454,12 @@ describe('unit/node.method.test.js', () => {
 
             NodeMethod.refreshReaderClients(channelStateOwn);
 
-            otherStates.forEach(state => NodeMethod.close(state));
+            const closePromises = otherStates.map(state => NodeMethod.close(state));
 
             await NodeMethod.close(channelStateOwn);
 
             // this might throw later
+            await Promise.all(closePromises);
             await AsyncTestUtil.wait(300);
         });
     });

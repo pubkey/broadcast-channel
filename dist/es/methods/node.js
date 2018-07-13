@@ -462,66 +462,31 @@ export var cleanOldMessages = function () {
 export var type = 'node';
 
 export var create = function () {
-    var _ref11 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee12(channelName) {
-        var _this = this;
-
+    var _ref11 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee11(channelName) {
         var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-        var uuid, _ref12, otherReaderUuids, socketEE, infoFilePath, otherReaderClients, readQueue, writeQueue, state;
+        var uuid, _ref12, otherReaderUuids, socketEE, infoFilePath, readQueue, writeQueue, state;
 
-        return _regeneratorRuntime.wrap(function _callee12$(_context12) {
+        return _regeneratorRuntime.wrap(function _callee11$(_context11) {
             while (1) {
-                switch (_context12.prev = _context12.next) {
+                switch (_context11.prev = _context11.next) {
                     case 0:
                         options = fillOptionsWithDefaults(options);
 
-                        _context12.next = 3;
+                        _context11.next = 3;
                         return ensureFoldersExist(channelName);
 
                     case 3:
                         uuid = randomToken(10);
-                        _context12.next = 6;
+                        _context11.next = 6;
                         return Promise.all([getReadersUuids(channelName), createSocketEventEmitter(channelName, uuid), createSocketInfoFile(channelName, uuid)]);
 
                     case 6:
-                        _ref12 = _context12.sent;
+                        _ref12 = _context11.sent;
                         otherReaderUuids = _ref12[0];
                         socketEE = _ref12[1];
                         infoFilePath = _ref12[2];
-                        otherReaderClients = {};
-                        _context12.next = 13;
-                        return Promise.all(otherReaderUuids.filter(function (readerUuid) {
-                            return readerUuid !== uuid;
-                        }) // not own
-                        .map(function () {
-                            var _ref13 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee11(readerUuid) {
-                                var client;
-                                return _regeneratorRuntime.wrap(function _callee11$(_context11) {
-                                    while (1) {
-                                        switch (_context11.prev = _context11.next) {
-                                            case 0:
-                                                _context11.next = 2;
-                                                return openClientConnection(channelName, readerUuid);
 
-                                            case 2:
-                                                client = _context11.sent;
-
-                                                otherReaderClients[readerUuid] = client;
-
-                                            case 4:
-                                            case 'end':
-                                                return _context11.stop();
-                                        }
-                                    }
-                                }, _callee11, _this);
-                            }));
-
-                            return function (_x22) {
-                                return _ref13.apply(this, arguments);
-                            };
-                        }()));
-
-                    case 13:
 
                         // ensures we do not read messages in parrallel
                         readQueue = new IdleQueue(1);
@@ -539,15 +504,19 @@ export var create = function () {
                             readQueue: readQueue,
                             writeQueue: writeQueue,
                             otherReaderUuids: otherReaderUuids,
-                            otherReaderClients: otherReaderClients,
+                            otherReaderClients: {},
                             // ensure if process crashes, everything is cleaned up
                             removeUnload: unload.add(function () {
                                 return close(state);
-                            })
+                            }),
+                            closed: false
                         };
+                        _context11.next = 15;
+                        return refreshReaderClients(state);
+
+                    case 15:
 
                         // when new message comes in, we read it and emit it
-
                         socketEE.emitter.on('data', function (data) {
                             var obj = JSON.parse(data);
                             if (obj.a === 'msg') {
@@ -556,14 +525,14 @@ export var create = function () {
                             }
                         });
 
-                        return _context12.abrupt('return', state);
+                        return _context11.abrupt('return', state);
 
-                    case 18:
+                    case 17:
                     case 'end':
-                        return _context12.stop();
+                        return _context11.stop();
                 }
             }
-        }, _callee12, this);
+        }, _callee11, this);
     }));
 
     return function create(_x20) {
@@ -576,47 +545,47 @@ export var create = function () {
  * run this
  */
 export var handleMessagePing = function () {
-    var _ref14 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee14(state) {
-        var _this2 = this;
+    var _ref13 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee13(state) {
+        var _this = this;
 
         var msgObj = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-        return _regeneratorRuntime.wrap(function _callee14$(_context15) {
+        return _regeneratorRuntime.wrap(function _callee13$(_context14) {
             while (1) {
-                switch (_context15.prev = _context15.next) {
+                switch (_context14.prev = _context14.next) {
                     case 0:
                         if (state.messagesCallback) {
-                            _context15.next = 2;
+                            _context14.next = 2;
                             break;
                         }
 
-                        return _context15.abrupt('return');
+                        return _context14.abrupt('return');
 
                     case 2:
-                        _context15.next = 4;
+                        _context14.next = 4;
                         return state.readQueue.requestIdlePromise();
 
                     case 4:
-                        _context15.next = 6;
-                        return state.readQueue.wrapCall(_asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee13() {
-                            var messages, useMessages, _loop, _iterator, _isArray, _i, _ref16, _ret;
+                        _context14.next = 6;
+                        return state.readQueue.wrapCall(_asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee12() {
+                            var messages, useMessages, _loop, _iterator, _isArray, _i, _ref15, _ret;
 
-                            return _regeneratorRuntime.wrap(function _callee13$(_context14) {
+                            return _regeneratorRuntime.wrap(function _callee12$(_context13) {
                                 while (1) {
-                                    switch (_context14.prev = _context14.next) {
+                                    switch (_context13.prev = _context13.next) {
                                         case 0:
                                             messages = void 0;
 
                                             if (msgObj) {
-                                                _context14.next = 7;
+                                                _context13.next = 7;
                                                 break;
                                             }
 
-                                            _context14.next = 4;
+                                            _context13.next = 4;
                                             return getAllMessages(state.channelName);
 
                                         case 4:
-                                            messages = _context14.sent;
-                                            _context14.next = 8;
+                                            messages = _context13.sent;
+                                            _context13.next = 8;
                                             break;
 
                                         case 7:
@@ -638,53 +607,53 @@ export var handleMessagePing = function () {
                                             }); // sort by time    
 
                                             if (!state.messagesCallback) {
-                                                _context14.next = 18;
+                                                _context13.next = 18;
                                                 break;
                                             }
 
                                             _loop = /*#__PURE__*/_regeneratorRuntime.mark(function _loop() {
                                                 var msgObj, content;
-                                                return _regeneratorRuntime.wrap(function _loop$(_context13) {
+                                                return _regeneratorRuntime.wrap(function _loop$(_context12) {
                                                     while (1) {
-                                                        switch (_context13.prev = _context13.next) {
+                                                        switch (_context12.prev = _context12.next) {
                                                             case 0:
                                                                 if (!_isArray) {
-                                                                    _context13.next = 6;
+                                                                    _context12.next = 6;
                                                                     break;
                                                                 }
 
                                                                 if (!(_i >= _iterator.length)) {
-                                                                    _context13.next = 3;
+                                                                    _context12.next = 3;
                                                                     break;
                                                                 }
 
-                                                                return _context13.abrupt('return', 'break');
+                                                                return _context12.abrupt('return', 'break');
 
                                                             case 3:
-                                                                _ref16 = _iterator[_i++];
-                                                                _context13.next = 10;
+                                                                _ref15 = _iterator[_i++];
+                                                                _context12.next = 10;
                                                                 break;
 
                                                             case 6:
                                                                 _i = _iterator.next();
 
                                                                 if (!_i.done) {
-                                                                    _context13.next = 9;
+                                                                    _context12.next = 9;
                                                                     break;
                                                                 }
 
-                                                                return _context13.abrupt('return', 'break');
+                                                                return _context12.abrupt('return', 'break');
 
                                                             case 9:
-                                                                _ref16 = _i.value;
+                                                                _ref15 = _i.value;
 
                                                             case 10:
-                                                                msgObj = _ref16;
-                                                                _context13.next = 13;
+                                                                msgObj = _ref15;
+                                                                _context12.next = 13;
                                                                 return readMessage(msgObj);
 
                                                             case 13:
-                                                                content = _context13.sent;
+                                                                content = _context12.sent;
 
                                                                 state.emittedMessagesIds.add(msgObj.token);
                                                                 setTimeout(function () {
@@ -697,54 +666,54 @@ export var handleMessagePing = function () {
 
                                                             case 17:
                                                             case 'end':
-                                                                return _context13.stop();
+                                                                return _context12.stop();
                                                         }
                                                     }
-                                                }, _loop, _this2);
+                                                }, _loop, _this);
                                             });
                                             _iterator = useMessages, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();
 
                                         case 12:
-                                            return _context14.delegateYield(_loop(), 't0', 13);
+                                            return _context13.delegateYield(_loop(), 't0', 13);
 
                                         case 13:
-                                            _ret = _context14.t0;
+                                            _ret = _context13.t0;
 
                                             if (!(_ret === 'break')) {
-                                                _context14.next = 16;
+                                                _context13.next = 16;
                                                 break;
                                             }
 
-                                            return _context14.abrupt('break', 18);
+                                            return _context13.abrupt('break', 18);
 
                                         case 16:
-                                            _context14.next = 12;
+                                            _context13.next = 12;
                                             break;
 
                                         case 18:
                                         case 'end':
-                                            return _context14.stop();
+                                            return _context13.stop();
                                     }
                                 }
-                            }, _callee13, _this2);
+                            }, _callee12, _this);
                         })));
 
                     case 6:
                     case 'end':
-                        return _context15.stop();
+                        return _context14.stop();
                 }
             }
-        }, _callee14, this);
+        }, _callee13, this);
     }));
 
-    return function handleMessagePing(_x23) {
-        return _ref14.apply(this, arguments);
+    return function handleMessagePing(_x22) {
+        return _ref13.apply(this, arguments);
     };
 }();
 
 export var refreshReaderClients = function () {
-    var _ref17 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee16(channelState) {
-        var _this3 = this;
+    var _ref16 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee16(channelState) {
+        var _this2 = this;
 
         var otherReaders;
         return _regeneratorRuntime.wrap(function _callee16$(_context17) {
@@ -761,10 +730,39 @@ export var refreshReaderClients = function () {
                         // remove subscriptions to closed readers
                         Object.keys(channelState.otherReaderClients).filter(function (readerUuid) {
                             return !otherReaders.includes(readerUuid);
-                        }).forEach(function (readerUuid) {
-                            channelState.otherReaderClients[readerUuid].destroy();
-                            delete channelState.otherReaderClients[readerUuid];
-                        });
+                        }).forEach(function () {
+                            var _ref17 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee14(readerUuid) {
+                                return _regeneratorRuntime.wrap(function _callee14$(_context15) {
+                                    while (1) {
+                                        switch (_context15.prev = _context15.next) {
+                                            case 0:
+                                                _context15.prev = 0;
+                                                _context15.next = 3;
+                                                return channelState.otherReaderClients[readerUuid].destroy();
+
+                                            case 3:
+                                                _context15.next = 7;
+                                                break;
+
+                                            case 5:
+                                                _context15.prev = 5;
+                                                _context15.t0 = _context15['catch'](0);
+
+                                            case 7:
+                                                delete channelState.otherReaderClients[readerUuid];
+
+                                            case 8:
+                                            case 'end':
+                                                return _context15.stop();
+                                        }
+                                    }
+                                }, _callee14, _this2, [[0, 5]]);
+                            }));
+
+                            return function (_x25) {
+                                return _ref17.apply(this, arguments);
+                            };
+                        }());
 
                         _context17.next = 6;
                         return Promise.all(otherReaders.filter(function (readerUuid) {
@@ -780,26 +778,45 @@ export var refreshReaderClients = function () {
                                     while (1) {
                                         switch (_context16.prev = _context16.next) {
                                             case 0:
-                                                _context16.next = 2;
+                                                _context16.prev = 0;
+
+                                                if (!channelState.closed) {
+                                                    _context16.next = 3;
+                                                    break;
+                                                }
+
+                                                return _context16.abrupt('return');
+
+                                            case 3:
+                                                _context16.next = 5;
                                                 return openClientConnection(channelState.channelName, readerUuid);
 
-                                            case 2:
+                                            case 5:
                                                 client = _context16.sent;
 
                                                 channelState.otherReaderClients[readerUuid] = client;
+                                                _context16.next = 11;
+                                                break;
 
-                                            case 4:
+                                            case 9:
+                                                _context16.prev = 9;
+                                                _context16.t0 = _context16['catch'](0);
+
+                                            case 11:
                                             case 'end':
                                                 return _context16.stop();
                                         }
                                     }
-                                }, _callee15, _this3);
+                                }, _callee15, _this2, [[0, 9]]);
                             }));
 
                             return function (_x26) {
                                 return _ref18.apply(this, arguments);
                             };
-                        }()));
+                        }()
+                        // this might throw if the other channel is closed at the same time when this one is running refresh
+                        // so we do not throw an error
+                        ));
 
                     case 6:
                     case 'end':
@@ -809,14 +826,14 @@ export var refreshReaderClients = function () {
         }, _callee16, this);
     }));
 
-    return function refreshReaderClients(_x25) {
-        return _ref17.apply(this, arguments);
+    return function refreshReaderClients(_x24) {
+        return _ref16.apply(this, arguments);
     };
 }();
 
 export var postMessage = function () {
     var _ref19 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee18(channelState, messageJson) {
-        var _this4 = this;
+        var _this3 = this;
 
         return _regeneratorRuntime.wrap(function _callee18$(_context19) {
             while (1) {
@@ -877,7 +894,7 @@ export var postMessage = function () {
                                             return _context18.stop();
                                     }
                                 }
-                            }, _callee17, _this4);
+                            }, _callee17, _this3);
                         }))
 
                         // emit to own eventEmitter
@@ -911,36 +928,39 @@ export var close = function () {
             while (1) {
                 switch (_context20.prev = _context20.next) {
                     case 0:
-                        channelState.removeUnload();
+                        channelState.closed = true;
+
+                        if (typeof channelState.removeUnload === 'function') channelState.removeUnload();
+
                         channelState.socketEE.server.close();
                         channelState.socketEE.emitter.removeAllListeners();
                         channelState.readQueue.clear();
                         channelState.writeQueue.clear();
 
-                        _context20.prev = 5;
-                        _context20.next = 8;
+                        _context20.prev = 6;
+                        _context20.next = 9;
                         return unlink(channelState.infoFilePath);
 
-                    case 8:
-                        _context20.next = 12;
+                    case 9:
+                        _context20.next = 13;
                         break;
 
-                    case 10:
-                        _context20.prev = 10;
-                        _context20.t0 = _context20['catch'](5);
+                    case 11:
+                        _context20.prev = 11;
+                        _context20.t0 = _context20['catch'](6);
 
-                    case 12:
+                    case 13:
 
                         Object.values(channelState.otherReaderClients).forEach(function (client) {
                             return client.destroy();
                         });
 
-                    case 13:
+                    case 14:
                     case 'end':
                         return _context20.stop();
                 }
             }
-        }, _callee19, this, [[5, 10]]);
+        }, _callee19, this, [[6, 11]]);
     }));
 
     return function close(_x30) {
