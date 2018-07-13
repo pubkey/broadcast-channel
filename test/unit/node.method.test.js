@@ -440,4 +440,26 @@ describe('unit/node.method.test.js', () => {
             NodeMethod.close(senderState);
         });
     });
+    describe('ISSUES', () => {
+        it('should not throw when other client is closing at the same time while other is created', async () => {
+            const channelName = AsyncTestUtil.randomString(12);
+            const channelStateOwn = await NodeMethod.create(channelName);
+            await AsyncTestUtil.wait(100);
+
+            const otherStates = await Promise.all(
+                new Array(10)
+                    .fill(0)
+                    .map(() => NodeMethod.create(channelName))
+            );
+
+            NodeMethod.refreshReaderClients(channelStateOwn);
+
+            otherStates.forEach(state => NodeMethod.close(state));
+
+            await NodeMethod.close(channelStateOwn);
+
+            // this might throw later
+            await AsyncTestUtil.wait(300);
+        });
+    });
 });

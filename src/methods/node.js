@@ -305,16 +305,6 @@ export async function create(channelName, options = {}) {
         createSocketInfoFile(channelName, uuid)
     ]);
 
-    const otherReaderClients = {};
-    await Promise.all(
-        otherReaderUuids
-            .filter(readerUuid => readerUuid !== uuid) // not own
-            .map(async (readerUuid) => {
-                const client = await openClientConnection(channelName, readerUuid);
-                otherReaderClients[readerUuid] = client;
-            })
-    );
-
     // ensures we do not read messages in parrallel
     const readQueue = new IdleQueue(1);
     const writeQueue = new IdleQueue(1);
@@ -332,10 +322,13 @@ export async function create(channelName, options = {}) {
         readQueue,
         writeQueue,
         otherReaderUuids,
-        otherReaderClients,
+        otherReaderClients: {},
         // ensure if process crashes, everything is cleaned up
-        removeUnload: unload.add(() => close(state))
+        removeUnload: unload.add(() => close(state)),
+        closed: false
     };
+
+    await refreshReaderClients(state);
 
     // when new message comes in, we read it and emit it
     socketEE.emitter.on('data', data => {
@@ -407,8 +400,10 @@ export async function refreshReaderClients(channelState) {
     // remove subscriptions to closed readers
     Object.keys(channelState.otherReaderClients)
         .filter(readerUuid => !otherReaders.includes(readerUuid))
-        .forEach(readerUuid => {
-            channelState.otherReaderClients[readerUuid].destroy();
+        .forEach(async (readerUuid) => {
+            try {
+                await channelState.otherReaderClients[readerUuid].destroy();
+            } catch (err) { }
             delete channelState.otherReaderClients[readerUuid];
         });
 
@@ -417,8 +412,14 @@ export async function refreshReaderClients(channelState) {
             .filter(readerUuid => readerUuid !== channelState.uuid) // not own
             .filter(readerUuid => !channelState.otherReaderClients[readerUuid]) // not already has client
             .map(async (readerUuid) => {
-                const client = await openClientConnection(channelState.channelName, readerUuid);
-                channelState.otherReaderClients[readerUuid] = client;
+                try {
+                    if (channelState.closed) return;
+                    const client = await openClientConnection(channelState.channelName, readerUuid);
+                    channelState.otherReaderClients[readerUuid] = client;
+                } catch (err) {
+                    // this might throw if the other channel is closed at the same time when this one is running refresh
+                    // so we do not throw an error
+                }
             })
     );
 }
@@ -474,7 +475,11 @@ export function onMessage(channelState, fn, time = new Date().getTime()) {
 }
 
 export async function close(channelState) {
-    channelState.removeUnload();
+    channelState.closed = true;
+
+    if (typeof channelState.removeUnload === 'function')
+        channelState.removeUnload();
+
     channelState.socketEE.server.close();
     channelState.socketEE.emitter.removeAllListeners();
     channelState.readQueue.clear();
