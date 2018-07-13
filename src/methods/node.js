@@ -448,6 +448,7 @@ export async function postMessage(channelState, messageJson) {
             };
             await Promise.all(
                 Object.values(channelState.otherReaderClients)
+                    .filter(client => client.writable) // client might have closed in between
                     .map(client => client.write(JSON.stringify(pingObj)))
             );
 
@@ -475,19 +476,23 @@ export function onMessage(channelState, fn, time = new Date().getTime()) {
 }
 
 export async function close(channelState) {
+    if (channelState.closed) return;
     channelState.closed = true;
 
     if (typeof channelState.removeUnload === 'function')
         channelState.removeUnload();
 
-    channelState.socketEE.server.close();
+    /**
+     * the server get closed lazy because others might still write on it
+     * and have not found out that the infoFile was deleted
+     */
+    setTimeout(() => channelState.socketEE.server.close(), 200);
+
     channelState.socketEE.emitter.removeAllListeners();
     channelState.readQueue.clear();
     channelState.writeQueue.clear();
 
-    try {
-        await unlink(channelState.infoFilePath);
-    } catch (err) { }
+    await unlink(channelState.infoFilePath).catch(() => null);
 
     Object.values(channelState.otherReaderClients)
         .forEach(client => client.destroy());
