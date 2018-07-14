@@ -306,7 +306,6 @@ export async function create(channelName, options = {}) {
     ]);
 
     // ensures we do not read messages in parrallel
-    const readQueue = new IdleQueue(1);
     const writeQueue = new IdleQueue(1);
 
     const state = {
@@ -319,7 +318,6 @@ export async function create(channelName, options = {}) {
         emittedMessagesIds: new Set(),
         messagesCallbackTime: null,
         messagesCallback: null,
-        readQueue,
         writeQueue,
         otherReaderUuids,
         otherReaderClients: {},
@@ -333,10 +331,7 @@ export async function create(channelName, options = {}) {
     // when new message comes in, we read it and emit it
     socketEE.emitter.on('data', data => {
         const obj = JSON.parse(data);
-        if (obj.a === 'msg') {
-            handleMessagePing(state, obj.d);
-            return;
-        }
+        handleMessagePing(state, obj);
     });
 
     return state;
@@ -353,44 +348,38 @@ export async function handleMessagePing(state, msgObj = null) {
      */
     if (!state.messagesCallback) return;
 
-    await state.readQueue.requestIdlePromise();
-    await state.readQueue.wrapCall(
-        async () => {
 
+    let messages;
+    if (!msgObj) {
+        // get all
+        messages = await getAllMessages(state.channelName);
+    } else {
+        // get single message
+        messages = [
+            getSingleMessage(state.channelName, msgObj)
+        ];
+    }
 
-            let messages;
-            if (!msgObj) {
-                // get all
-                messages = await getAllMessages(state.channelName);
-            } else {
-                // get single message
-                messages = [
-                    getSingleMessage(state.channelName, msgObj)
-                ];
-            }
+    const useMessages = messages
+        .filter(msgObj => msgObj.senderUuid !== state.uuid) // not send by own
+        .filter(msgObj => !state.emittedMessagesIds.has(msgObj.token)) // not already emitted
+        .filter(msgObj => msgObj.time >= state.messagesCallbackTime) // not older then onMessageCallback
+        .sort((msgObjA, msgObjB) => msgObjA.time - msgObjB.time); // sort by time    
 
-            const useMessages = messages
-                .filter(msgObj => msgObj.senderUuid !== state.uuid) // not send by own
-                .filter(msgObj => !state.emittedMessagesIds.has(msgObj.token)) // not already emitted
-                .filter(msgObj => msgObj.time >= state.messagesCallbackTime) // not older then onMessageCallback
-                .sort((msgObjA, msgObjB) => msgObjA.time - msgObjB.time); // sort by time    
+    if (state.messagesCallback) {
+        for (const msgObj of useMessages) {
+            const content = await readMessage(msgObj);
+            state.emittedMessagesIds.add(msgObj.token);
+            setTimeout(
+                () => state.emittedMessagesIds.delete(msgObj.token),
+                state.options.node.ttl * 2
+            );
 
             if (state.messagesCallback) {
-                for (const msgObj of useMessages) {
-                    const content = await readMessage(msgObj);
-                    state.emittedMessagesIds.add(msgObj.token);
-                    setTimeout(
-                        () => state.emittedMessagesIds.delete(msgObj.token),
-                        state.options.node.ttl * 2
-                    );
-
-                    if (state.messagesCallback) {
-                        state.messagesCallback(content.data);
-                    }
-                }
+                state.messagesCallback(content.data);
             }
         }
-    );
+    }
 }
 
 export async function refreshReaderClients(channelState) {
@@ -437,19 +426,16 @@ export async function postMessage(channelState, messageJson) {
                 messageJson
             );
 
-            // ping other readers
-            const pingObj = {
-                a: 'msg',
-                d: {
-                    t: msgObj.time,
-                    u: msgObj.uuid,
-                    to: msgObj.token
-                }
-            };
+            const pingStr = '{"t":' + msgObj.time + ',"u":"' + msgObj.uuid + '","to":"' + msgObj.token + '"}';
+
             await Promise.all(
                 Object.values(channelState.otherReaderClients)
                     .filter(client => client.writable) // client might have closed in between
-                    .map(client => client.write(JSON.stringify(pingObj)))
+                    .map(client => {
+                        return new Promise(res => {
+                            client.write(pingStr, res);
+                        });
+                    })
             );
 
             /**
@@ -457,9 +443,9 @@ export async function postMessage(channelState, messageJson) {
              * to not waste resources on cleaning up,
              * only if random-int matches, we clean up old messages
              */
-            if (randomInt(0, 10) === 0) {
+            if (randomInt(0, 50) === 0) {
                 const messages = await getAllMessages(channelState.channelName);
-                await cleanOldMessages(messages, channelState.options.node.ttl);
+                /*await*/ cleanOldMessages(messages, channelState.options.node.ttl);
             }
 
             // emit to own eventEmitter
@@ -489,7 +475,6 @@ export async function close(channelState) {
     setTimeout(() => channelState.socketEE.server.close(), 200);
 
     channelState.socketEE.emitter.removeAllListeners();
-    channelState.readQueue.clear();
     channelState.writeQueue.clear();
 
     await unlink(channelState.infoFilePath).catch(() => null);

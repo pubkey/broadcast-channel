@@ -254,8 +254,7 @@ describe('unit/node.method.test.js', () => {
                 await NodeMethod.postMessage(channelStateOwn, 'foo bar');
                 await AsyncTestUtil.waitUntil(() => emittedOther.length === 1);
 
-                assert.equal(JSON.parse(emittedOther[0]).a, 'msg');
-                assert.equal(typeof JSON.parse(emittedOther[0]).d.t, 'number');
+                assert.equal(typeof JSON.parse(emittedOther[0]).t, 'number');
 
                 await NodeMethod.close(channelStateOther);
                 await NodeMethod.close(channelStateOwn);

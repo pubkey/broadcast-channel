@@ -34,6 +34,7 @@
     "test:browser": "npm run build && karma start ./config/karma.conf.js --single-run",
     "test:e2e": "concurrently \"npm run docs:serve\" \"sleep 5 && testcafe all test/e2e.test.js\" --kill-others --success first",
     "test:typings": "npm run build && mocha ./test/typings.test.js -b --timeout 12000 --exit",
+    "test:performance": "npm run build && mocha ./test/performance.test.js -b --timeout 24000 --exit",
     "size:prewebpack": "npm run build && cross-env NODE_ENV=build webpack --config ./config/webpack.config.js",
     "size:webpack": "npm run size:prewebpack && echo \"Build-Size Webpack (minified+gzip):\" && gzip-size --raw ./test_tmp/webpack.bundle.js",
     "size:browserify": "npm run build && rimraf test_tmp/browserify.js && browserify --no-builtins dist/lib/browserify.index.js > test_tmp/browserify.js && uglifyjs --compress --mangle --output test_tmp/browserify.min.js -- test_tmp/browserify.js && echo \"Build-Size browserify (minified+gzip):\" && gzip-size --raw test_tmp/browserify.min.js",

@@ -15,6 +15,7 @@ script:
 - travis_retry npm run test:node
 - travis_retry npm run test:browser
 - travis_retry npm run test:e2e
+- travis_retry npm run test:performance
 - npm run test:typings
 - npm run size:webpack
 - npm run size:browserify
