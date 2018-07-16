@@ -58,7 +58,7 @@ BroadcastChannel.prototype = {
     },
 
     set onmessage(fn) {
-        var time = new Date().getTime() - 5;
+        var time = new Date().getTime();
         var listenObj = {
             time: time,
             fn: fn
@@ -73,7 +73,7 @@ BroadcastChannel.prototype = {
     },
 
     addEventListener: function addEventListener(type, fn) {
-        var time = new Date().getTime() - 5;
+        var time = new Date().getTime();
         var listenObj = {
             time: time,
             fn: fn
