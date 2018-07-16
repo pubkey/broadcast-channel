@@ -89,3 +89,60 @@ after: {
   }
 }
 -----------------------------------------
+
+
+
+-----------------------------------------
+16. July.2018: test:performance
+
+BEFORE: {
+  "openClose": 1499.9152579996735,
+  "sendRecieve": {
+    "parallel": 6752.695256000385,
+    "series": 5142.3914529997855
+  }
+}
+
+AFTER: {  // getPathsCache
+  "openClose": 1154.4196130000055,
+  "sendRecieve": {
+    "parallel": 6559.061360999942,
+    "series": 4965.728401999921
+  }
+}
+
+AFTER2: { // cleanup things
+  "openClose": 1086.149023000151,
+  "sendRecieve": {
+    "parallel": 6496.672225000337,
+    "series": 4932.777033999562
+  }
+}
+
+AFTER3: { // run things in parallel
+  "openClose": 737.8487470000982,
+  "sendRecieve": {
+    "parallel": 6637.516607999802,
+    "series": 4835.849313000217
+  }
+}
+
+AFTER4: {  // read content in parallel
+  "openClose": 746.0398439988494,
+  "sendRecieve": {
+    "parallel": 6332.704676998779,
+    "series": 4761.053835000843
+  }
+}
+
+AFTER5: { // better postMessage
+  "openClose": 666.0222460012883,
+  "sendRecieve": {
+    "parallel": 5854.225347001106,
+    "series": 4425.243154998869
+  }
+}
+
+
+
+-----------------------------------------

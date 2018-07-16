@@ -69,7 +69,7 @@ BroadcastChannel.prototype = {
         return this._post('internal', msg);
     },
     set onmessage(fn) {
-        const time = new Date().getTime() - 5;
+        const time = new Date().getTime();
         const listenObj = {
             time,
             fn
@@ -84,7 +84,7 @@ BroadcastChannel.prototype = {
     },
 
     addEventListener(type, fn) {
-        const time = new Date().getTime() - 5;
+        const time = new Date().getTime();
         const listenObj = {
             time,
             fn

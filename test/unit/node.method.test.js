@@ -39,6 +39,7 @@ describe('unit/node.method.test.js', () => {
         it('should create the file', async () => {
             const channelName = AsyncTestUtil.randomString(12);
             const readerUuid = AsyncTestUtil.randomString(12);
+            await NodeMethod.ensureFoldersExist(channelName);
             const path = await NodeMethod.createSocketInfoFile(channelName, readerUuid);
 
             assert.ok(path.endsWith(readerUuid + '.json'));
