@@ -1,9 +1,15 @@
 const isNode = require('detect-node');
 
+import {
+    microSeconds as micro
+} from '../util';
+
+export const microSeconds = micro;
+
 export const type = 'native';
 
 export function create(channelName, options) {
-    if(!options) options = {};
+    if (!options) options = {};
     const state = {
         channelName,
         options,

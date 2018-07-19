@@ -71,6 +71,7 @@ function runTest(channelType) {
                     const channel = new BroadcastChannel(channelName, channelOptions);
                     const otherChannel = new BroadcastChannel(channelName, channelOptions);
 
+
                     const emitted = [];
                     otherChannel.onmessage = msg => emitted.push(msg);
                     await channel.postMessage({
@@ -160,7 +161,7 @@ function runTest(channelType) {
                     channel1.close();
                     channel2.close();
                 });
-                it('should emit all events if subscribed directly after postMessage', async () => {
+                it('should NOT emit all events if subscribed directly after postMessage', async () => {
                     const channelName = AsyncTestUtil.randomString(12);
                     const channel1 = new BroadcastChannel(channelName, channelOptions);
                     const channel2 = new BroadcastChannel(channelName, channelOptions);
@@ -173,8 +174,9 @@ function runTest(channelType) {
 
                     channel1.postMessage('foo3');
 
-                    await AsyncTestUtil.waitUntil(() => emitted.length === 3);
-                    assert.equal(emitted.length, 3);
+                    await AsyncTestUtil.waitUntil(() => emitted.length === 1);
+                    await AsyncTestUtil.wait(100);
+                    assert.equal(emitted.length, 1);
 
                     channel1.close();
                     channel2.close();
@@ -222,22 +224,20 @@ function runTest(channelType) {
                     otherChannel.close();
                 });
                 it('should not read messages created before the channel was created', async () => {
+                    await AsyncTestUtil.wait(100);
+
                     const channelName = AsyncTestUtil.randomString(12);
                     const channel = new BroadcastChannel(channelName, channelOptions);
 
-                    const msgJson = {
-                        foo: 'bar'
-                    };
-
-                    await channel.postMessage(msgJson);
+                    await channel.postMessage('foo1');
                     await AsyncTestUtil.wait(50);
 
                     const otherChannel = new BroadcastChannel(channelName, channelOptions);
                     const emittedOther = [];
                     otherChannel.onmessage = msg => emittedOther.push(msg);
 
-                    await channel.postMessage(msgJson);
-                    await channel.postMessage(msgJson);
+                    await channel.postMessage('foo2');
+                    await channel.postMessage('foo3');
 
                     await AsyncTestUtil.waitUntil(() => emittedOther.length >= 2);
                     await AsyncTestUtil.wait(100);
@@ -461,7 +461,7 @@ function runTest(channelType) {
 
                     channel2.close();
                 });
-                it('should clean up all unloaded when dead', async() => {
+                it('should clean up all unloaded when dead', async () => {
                     return; // TODO run this once unload-module has been fixed
                     /*
                     console.log('======');

@@ -146,3 +146,22 @@ AFTER5: { // better postMessage
 
 
 -----------------------------------------
+16. July.2018: test:performance
+
+BEFORE: {
+  "openClose": 714.9132689982653,
+  "sendRecieve": {
+    "parallel": 6018.035248000175,
+    "series": 4019.5094799995422
+  }
+}
+
+AFTER: { // write message up front
+  "openClose": 703.9341719998047,
+  "sendRecieve": {
+    "parallel": 233.59367400035262,
+    "series": 4531.717969999649
+  }
+}
+
+-----------------------------------------

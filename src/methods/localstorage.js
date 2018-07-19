@@ -14,8 +14,11 @@ import {
 
 import {
     sleep,
-    randomToken
+    randomToken,
+    microSeconds as micro
 } from '../util';
+
+export const microSeconds = micro;
 
 const KEY_PREFIX = 'pubkey.broadcastChannel-';
 export const type = 'localstorage';
@@ -117,7 +120,7 @@ export function create(channelName, options) {
             if (!state.messagesCallback) return; // no listener
             if (msgObj.uuid === uuid) return; // own message
             if (!msgObj.token || emittedMessagesIds.has(msgObj.token)) return; // already emitted
-            if (msgObj.time && msgObj.time < state.messagesCallbackTime) return; // too old
+            if (msgObj.data.time && msgObj.data.time < state.messagesCallbackTime) return; // too old
 
             emittedMessagesIds.add(msgObj.token);
             setTimeout(

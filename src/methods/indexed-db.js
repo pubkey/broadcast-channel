@@ -9,8 +9,11 @@ const isNode = require('detect-node');
 import {
     sleep,
     randomInt,
-    randomToken
+    randomToken,
+    microSeconds as micro
 } from '../util.js';
+
+export const microSeconds = micro;
 
 import {
     fillOptionsWithDefaults
@@ -193,10 +196,22 @@ function _readLoop(state) {
         .then(() => _readLoop(state));
 }
 
+
+function _filterMessage(msgObj, state) {
+    if (msgObj.uuid === state.uuid) return false; // send by own
+    if (state.emittedMessagesIds.has(msgObj.id)) return false; // already emitted
+    if (msgObj.data.time < state.messagesCallbackTime) return false; // older then onMessageCallback
+    return true;
+}
+
 /**
  * reads all new messages from the database and emits them
  */
 function readNewMessages(state) {
+
+    // if no one is listening, we do not need to scan for new messages
+    if (!state.messagesCallback) return Promise.resolve();
+
     return getMessagesHigherThen(state.db, state.lastCursorId)
         .then(newerMessages => {
             const useMessages = newerMessages
@@ -206,12 +221,8 @@ function readNewMessages(state) {
                     }
                     return msgObj;
                 })
-                .filter(msgObj => msgObj.uuid !== state.uuid) // not send by own
-                .filter(msgObj => !state.emittedMessagesIds.has(msgObj.id)) // not already emitted
-                .filter(msgObj => msgObj.time >= state.messagesCallbackTime) // not older then onMessageCallback
+                .filter(msgObj => _filterMessage(msgObj, state))
                 .sort((msgObjA, msgObjB) => msgObjA.time - msgObjB.time); // sort by time
-
-
             useMessages.forEach(msgObj => {
                 if (state.messagesCallback) {
                     state.emittedMessagesIds.add(msgObj.id);

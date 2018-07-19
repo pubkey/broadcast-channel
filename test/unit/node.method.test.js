@@ -267,7 +267,7 @@ describe('unit/node.method.test.js', () => {
                 await AsyncTestUtil.wait(100);
 
                 const emittedOther = [];
-                NodeMethod.onMessage(channelStateOther, msg => emittedOther.push(msg), new Date().getTime());
+                NodeMethod.onMessage(channelStateOther, msg => emittedOther.push(msg), new Date().getMilliseconds());
 
                 const msgJson = {
                     foo: 'bar2'
@@ -294,8 +294,8 @@ describe('unit/node.method.test.js', () => {
                     foo: 'bar'
                 };
 
-                NodeMethod.onMessage(channelStateOther, msg => emittedOther.push(msg), new Date().getTime());
-                NodeMethod.onMessage(channelStateOwn, msg => emittedOwn.push(msg), new Date().getTime());
+                NodeMethod.onMessage(channelStateOther, msg => emittedOther.push(msg), new Date().getMilliseconds());
+                NodeMethod.onMessage(channelStateOwn, msg => emittedOwn.push(msg), new Date().getMilliseconds());
 
                 await NodeMethod.postMessage(channelStateOwn, msgJson);
 
@@ -312,7 +312,7 @@ describe('unit/node.method.test.js', () => {
                 const channelStateOther = await NodeMethod.create(channelName);
 
                 const emitted = [];
-                NodeMethod.onMessage(channelStateOther, msg => emitted.push(msg), new Date().getTime());
+                NodeMethod.onMessage(channelStateOther, msg => emitted.push(msg), new Date().getMilliseconds());
 
                 NodeMethod.postMessage(channelStateOwn, {
                     foo: 0
@@ -386,7 +386,7 @@ describe('unit/node.method.test.js', () => {
 
             const emittedOther = [];
             const channelStateOther = await NodeMethod.create(channelName, channelOptions);
-            NodeMethod.onMessage(channelStateOther, msg => emittedOther.push(msg), new Date().getTime());
+            NodeMethod.onMessage(channelStateOther, msg => emittedOther.push(msg), new Date().getMilliseconds());
 
             await NodeMethod.postMessage(channelStateOwn, msgJson);
             await NodeMethod.postMessage(channelStateOwn, msgJson);
@@ -406,7 +406,7 @@ describe('unit/node.method.test.js', () => {
                     .map(async () => {
                         const channelState = await NodeMethod.create(channelName);
                         const emitted = [];
-                        NodeMethod.onMessage(channelState, msg => emitted.push(msg), new Date().getTime());
+                        NodeMethod.onMessage(channelState, msg => emitted.push(msg), new Date().getMilliseconds());
                         return {
                             channelState,
                             emitted

@@ -9,6 +9,8 @@ import * as os from 'os';
 import * as events from 'events';
 import * as net from 'net';
 import * as path from 'path';
+import micro from 'nano-time';
+
 import {
     sha3_224
 } from 'js-sha3';
@@ -124,7 +126,7 @@ export function createSocketInfoFile(channelName, readerUuid) {
     return writeFile(
         pathToFile,
         JSON.stringify({
-            time: new Date().getTime()
+            time: microSeconds()
         })
     ).then(() => pathToFile);
 }
@@ -184,7 +186,7 @@ export async function openClientConnection(channelName, readerUuid) {
  * so other readers can find it
  */
 export async function writeMessage(channelName, readerUuid, messageJson) {
-    const time = new Date().getTime();
+    const time = microSeconds();
     const writeObject = {
         uuid: readerUuid,
         time,
@@ -276,11 +278,10 @@ export function readMessage(messageObj) {
 }
 
 export async function cleanOldMessages(messageObjects, ttl) {
-    const olderThen = new Date().getTime() - ttl;
-
+    const olderThen = Date.now() - ttl;
     await Promise.all(
         messageObjects
-            .filter(obj => obj.time < olderThen)
+            .filter(obj => (obj.time / 1000) < olderThen)
             .map(obj => unlink(obj.path).catch(() => null))
     );
 }
@@ -291,7 +292,7 @@ export const type = 'node';
 
 export async function create(channelName, options = {}) {
     options = fillOptionsWithDefaults(options);
-
+    const time = microSeconds();
     await ensureFoldersExist(channelName);
     const uuid = randomToken(10);
 
@@ -300,6 +301,7 @@ export async function create(channelName, options = {}) {
     const writeQueue = new IdleQueue(1);
 
     const state = {
+        time,
         channelName,
         options,
         uuid,
@@ -334,22 +336,33 @@ export async function create(channelName, options = {}) {
     return state;
 }
 
-
-
-
 export function _filterMessage(msgObj, state) {
     if (msgObj.senderUuid === state.uuid) return false; // not send by own
     if (state.emittedMessagesIds.has(msgObj.token)) return false; // not already emitted
     if (msgObj.time < state.messagesCallbackTime) return false; // not older then onMessageCallback
+    if (msgObj.time < state.time) return false; // msgObj is older then channel
+
+    _addToEmittedList(msgObj, state);
     return true;
 }
 
+
+export function _addToEmittedList(msgObj, state) {
+    if (state.emittedMessagesIds.has(msgObj.token)) return; // already there
+    state.emittedMessagesIds.add(msgObj.token);
+
+    setTimeout( // remove when no longer needed
+        () => state.emittedMessagesIds.delete(msgObj.token),
+        state.options.node.ttl * 2
+    );
+}
 
 /**
  * when the socket pings, so that we now new messages came,
  * run this
  */
 export async function handleMessagePing(state, msgObj) {
+
     /**
      * when there are no listener, we do nothing
      */
@@ -384,12 +397,10 @@ export async function handleMessagePing(state, msgObj) {
 
     useMessages.forEach(msgObj => {
         state.emittedMessagesIds.add(msgObj.token);
-        setTimeout(
-            () => state.emittedMessagesIds.delete(msgObj.token),
-            state.options.node.ttl * 2
-        );
+        _addToEmittedList(msgObj, state);
 
         if (state.messagesCallback) {
+            // emit to subscribers
             state.messagesCallback(msgObj.content.data);
         }
     });
@@ -427,17 +438,20 @@ export async function refreshReaderClients(channelState) {
 }
 
 export function postMessage(channelState, messageJson) {
+
+    const writePromise = writeMessage(
+        channelState.channelName,
+        channelState.uuid,
+        messageJson
+    );
+
     // ensure we do this not in parallel
     return channelState.writeQueue.requestIdlePromise()
         .then(
             () => channelState.writeQueue.wrapCall(
                 async () => {
                     const [msgObj] = await Promise.all([
-                        writeMessage(
-                            channelState.channelName,
-                            channelState.uuid,
-                            messageJson
-                        ),
+                        writePromise,
                         refreshReaderClients(channelState)
                     ]);
                     const pingStr = '{"t":' + msgObj.time + ',"u":"' + msgObj.uuid + '","to":"' + msgObj.token + '"}';
@@ -457,7 +471,7 @@ export function postMessage(channelState, messageJson) {
                      * to not waste resources on cleaning up,
                      * only if random-int matches, we clean up old messages
                      */
-                    if (randomInt(0, 50) === 0) {
+                    if (randomInt(0, 20) === 0) {
                         /* await */ getAllMessages(channelState.channelName)
                             .then(allMessages => cleanOldMessages(allMessages, channelState.options.node.ttl));
                     }
@@ -470,7 +484,7 @@ export function postMessage(channelState, messageJson) {
 }
 
 
-export function onMessage(channelState, fn, time = new Date().getTime()) {
+export function onMessage(channelState, fn, time = microSeconds()) {
     channelState.messagesCallbackTime = time;
     channelState.messagesCallback = fn;
     handleMessagePing(channelState);
@@ -503,7 +517,10 @@ export function canBeUsed() {
     return isNode;
 }
 
-
 export function averageResponseTime() {
     return 50;
+}
+
+export function microSeconds() {
+    return parseInt(micro.microseconds());
 }

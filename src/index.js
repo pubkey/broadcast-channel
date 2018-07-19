@@ -42,8 +42,9 @@ const BroadcastChannel = function (name, options) {
 
 BroadcastChannel.prototype = {
     _post(type, msg) {
+        const time = this.method.microSeconds();
         const msgObj = {
-            time: new Date().getTime(),
+            time,
             type,
             data: msg
         };
@@ -69,7 +70,7 @@ BroadcastChannel.prototype = {
         return this._post('internal', msg);
     },
     set onmessage(fn) {
-        const time = new Date().getTime();
+        const time = this.method.microSeconds();
         const listenObj = {
             time,
             fn
@@ -84,7 +85,7 @@ BroadcastChannel.prototype = {
     },
 
     addEventListener(type, fn) {
-        const time = new Date().getTime();
+        const time = this.method.microSeconds();
         const listenObj = {
             time,
             fn
@@ -155,13 +156,20 @@ function _startListening(channel) {
 
         const listenerFn = msgObj => {
             channel._addEventListeners[msgObj.type].forEach(obj => {
+
+                /*
+                console.log('... message time:');
+                console.dir(msgObj);
+                console.log('listener time:');
+                console.dir(obj);*/
+
                 if (msgObj.time >= obj.time) {
                     obj.fn(msgObj.data);
                 }
             });
         };
 
-        const time = new Date().getTime() - 5;
+        const time = channel.method.microSeconds();
         if (channel._preparePromise) {
             channel._preparePromise.then(() => {
                 channel._isListening = true;
@@ -186,7 +194,7 @@ function _stopListening(channel) {
     if (channel._isListening && !_hasMessageListeners(channel)) {
         // noone is listening, stop subscribing
         channel._isListening = false;
-        const time = new Date().getTime() - 5;
+        const time = channel.method.microSeconds();
         channel.method.onMessage(
             channel._state,
             null,
