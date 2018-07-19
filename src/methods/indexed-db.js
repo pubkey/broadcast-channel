@@ -14,6 +14,7 @@ import {
 } from '../util.js';
 
 export const microSeconds = micro;
+import ObliviousSet from '../oblivious-set';
 
 import {
     fillOptionsWithDefaults
@@ -171,7 +172,7 @@ export function create(channelName, options) {
             options,
             uuid,
             // contains all messages that have been emitted before
-            emittedMessagesIds: new Set(),
+            emittedMessagesIds: new ObliviousSet(options.idb.ttl * 2),
             messagesCallback: null,
             readQueuePromises: [],
             db
@@ -226,11 +227,6 @@ function readNewMessages(state) {
             useMessages.forEach(msgObj => {
                 if (state.messagesCallback) {
                     state.emittedMessagesIds.add(msgObj.id);
-                    setTimeout(
-                        () => state.emittedMessagesIds.delete(msgObj.id),
-                        state.options.idb.ttl * 2
-                    );
-
                     state.messagesCallback(msgObj.data);
                 }
             });

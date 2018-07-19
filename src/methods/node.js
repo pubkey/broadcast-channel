@@ -28,6 +28,8 @@ import {
     randomToken
 } from '../util';
 
+import ObliviousSet from '../oblivious-set';
+
 /**
  * windows sucks, so we have handle windows-type of socket-paths
  * @link https://gist.github.com/domenic/2790533#gistcomment-331356
@@ -306,7 +308,7 @@ export async function create(channelName, options = {}) {
         options,
         uuid,
         // contains all messages that have been emitted before
-        emittedMessagesIds: new Set(),
+        emittedMessagesIds: new ObliviousSet(options.node.ttl * 2),
         messagesCallbackTime: null,
         messagesCallback: null,
         writeQueue,
@@ -342,19 +344,8 @@ export function _filterMessage(msgObj, state) {
     if (msgObj.time < state.messagesCallbackTime) return false; // not older then onMessageCallback
     if (msgObj.time < state.time) return false; // msgObj is older then channel
 
-    _addToEmittedList(msgObj, state);
-    return true;
-}
-
-
-export function _addToEmittedList(msgObj, state) {
-    if (state.emittedMessagesIds.has(msgObj.token)) return; // already there
     state.emittedMessagesIds.add(msgObj.token);
-
-    setTimeout( // remove when no longer needed
-        () => state.emittedMessagesIds.delete(msgObj.token),
-        state.options.node.ttl * 2
-    );
+    return true;
 }
 
 /**
@@ -397,7 +388,6 @@ export async function handleMessagePing(state, msgObj) {
 
     useMessages.forEach(msgObj => {
         state.emittedMessagesIds.add(msgObj.token);
-        _addToEmittedList(msgObj, state);
 
         if (state.messagesCallback) {
             // emit to subscribers
@@ -493,6 +483,7 @@ export function onMessage(channelState, fn, time = microSeconds()) {
 export function close(channelState) {
     if (channelState.closed) return;
     channelState.closed = true;
+    channelState.emittedMessagesIds.clear();
 
     if (typeof channelState.removeUnload === 'function')
         channelState.removeUnload();

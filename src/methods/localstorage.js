@@ -7,6 +7,7 @@
  */
 
 const isNode = require('detect-node');
+import ObliviousSet from '../oblivious-set';
 
 import {
     fillOptionsWithDefaults
@@ -103,7 +104,7 @@ export function create(channelName, options) {
     const uuid = randomToken(10);
 
     // contains all messages that have been emitted before
-    const emittedMessagesIds = new Set();
+    const emittedMessagesIds = new ObliviousSet(options.localstorage.removeTimeout);
 
     const state = {
         startTime,
@@ -123,10 +124,6 @@ export function create(channelName, options) {
             if (msgObj.data.time && msgObj.data.time < state.messagesCallbackTime) return; // too old
 
             emittedMessagesIds.add(msgObj.token);
-            setTimeout(
-                () => emittedMessagesIds.delete(msgObj.token),
-                options.localstorage.removeTimeout
-            );
             state.messagesCallback(msgObj.data);
         }
     );
