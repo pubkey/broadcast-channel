@@ -385,12 +385,20 @@ var create = exports.create = function () {
 
                         // when new message comes in, we read it and emit it
                         socketEE.emitter.on('data', function (data) {
-                            try {
-                                var obj = JSON.parse(data);
-                                handleMessagePing(state, obj);
-                            } catch (err) {
-                                throw new Error('could not parse data: ' + data);
-                            }
+
+                            // if the socket is used fast, it may appear that multiple messages are flushed at once
+                            // so we have to split them before
+                            var singleOnes = data.split('|');
+                            singleOnes.filter(function (single) {
+                                return single !== '';
+                            }).forEach(function (single) {
+                                try {
+                                    var obj = JSON.parse(single);
+                                    handleMessagePing(state, obj);
+                                } catch (err) {
+                                    throw new Error('could not parse data: ' + single);
+                                }
+                            });
                         });
 
                         return _context9.abrupt('return', state);
@@ -823,7 +831,7 @@ function _filterMessage(msgObj, state) {
                         msgObj = _ref18[0];
 
                         emitOverFastPath(channelState, msgObj, messageJson);
-                        pingStr = '{"t":' + msgObj.time + ',"u":"' + msgObj.uuid + '","to":"' + msgObj.token + '"}';
+                        pingStr = '{"t":' + msgObj.time + ',"u":"' + msgObj.uuid + '","to":"' + msgObj.token + '"}|';
                         _context14.next = 13;
                         return Promise.all(Object.values(channelState.otherReaderClients).filter(function (client) {
                             return client.writable;
