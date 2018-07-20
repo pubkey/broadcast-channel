@@ -329,8 +329,12 @@ export async function create(channelName, options = {}) {
 
     // when new message comes in, we read it and emit it
     socketEE.emitter.on('data', data => {
-        const obj = JSON.parse(data);
-        handleMessagePing(state, obj);
+        try {
+            const obj = JSON.parse(data);
+            handleMessagePing(state, obj);
+        } catch (err) {
+            throw new Error('could not parse data: ' + data);
+        }
     });
 
     return state;
@@ -444,7 +448,11 @@ export function postMessage(channelState, messageJson) {
     );
 
     channelState.writeBlockPromise = channelState.writeBlockPromise.then(async () => {
+
+        // w8 to ticks to let the buffer flush
         await new Promise(res => setTimeout(res, 0));
+        await new Promise(res => setTimeout(res, 0));
+
         const [msgObj] = await Promise.all([
             writePromise,
             refreshReaderClients(channelState)
