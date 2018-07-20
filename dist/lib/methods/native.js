@@ -22,6 +22,7 @@ var type = exports.type = 'native';
 function create(channelName, options) {
     if (!options) options = {};
     var state = {
+        uuid: (0, _util.randomToken)(10),
         channelName: channelName,
         options: options,
         messagesCallback: null,

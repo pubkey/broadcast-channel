@@ -385,8 +385,12 @@ var create = exports.create = function () {
 
                         // when new message comes in, we read it and emit it
                         socketEE.emitter.on('data', function (data) {
-                            var obj = JSON.parse(data);
-                            handleMessagePing(state, obj);
+                            try {
+                                var obj = JSON.parse(data);
+                                handleMessagePing(state, obj);
+                            } catch (err) {
+                                throw new Error('could not parse data: ' + data);
+                            }
                         });
 
                         return _context9.abrupt('return', state);
@@ -805,16 +809,22 @@ function _filterMessage(msgObj, state) {
 
                     case 2:
                         _context14.next = 4;
-                        return Promise.all([writePromise, refreshReaderClients(channelState)]);
+                        return new Promise(function (res) {
+                            return setTimeout(res, 0);
+                        });
 
                     case 4:
+                        _context14.next = 6;
+                        return Promise.all([writePromise, refreshReaderClients(channelState)]);
+
+                    case 6:
                         _ref17 = _context14.sent;
                         _ref18 = (0, _slicedToArray3['default'])(_ref17, 1);
                         msgObj = _ref18[0];
 
                         emitOverFastPath(channelState, msgObj, messageJson);
                         pingStr = '{"t":' + msgObj.time + ',"u":"' + msgObj.uuid + '","to":"' + msgObj.token + '"}';
-                        _context14.next = 11;
+                        _context14.next = 13;
                         return Promise.all(Object.values(channelState.otherReaderClients).filter(function (client) {
                             return client.writable;
                         }) // client might have closed in between
@@ -824,7 +834,7 @@ function _filterMessage(msgObj, state) {
                             });
                         }));
 
-                    case 11:
+                    case 13:
 
                         /**
                          * clean up old messages
@@ -840,7 +850,7 @@ function _filterMessage(msgObj, state) {
                         // emit to own eventEmitter
                         // channelState.socketEE.emitter.emit('data', JSON.parse(JSON.stringify(messageJson)));
 
-                    case 12:
+                    case 14:
                     case 'end':
                         return _context14.stop();
                 }

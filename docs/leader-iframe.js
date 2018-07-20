@@ -174,13 +174,11 @@ function _startListening(channel) {
 
         var listenerFn = function listenerFn(msgObj) {
             channel._addEventListeners[msgObj.type].forEach(function (obj) {
-
                 /*
-                console.log('... message time:');
-                console.dir(msgObj);
-                console.log('listener time:');
-                console.dir(obj);*/
-
+                console.log('got message for ' + channel._state.uuid);
+                console.log('... message time:' + channel._state.uuid + ' - ' + msgObj.time);
+                console.log('listener time:' + channel._state.uuid + ' - ' + obj.time);
+                */
                 if (msgObj.time >= obj.time) {
                     obj.fn(msgObj.data);
                 }
@@ -452,7 +450,7 @@ function create(channel, options) {
 exports['default'] = {
     create: create
 };
-},{"../util.js":11,"unload":342}],5:[function(require,module,exports){
+},{"../util.js":11,"unload":341}],5:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -1001,6 +999,7 @@ var type = exports.type = 'native';
 function create(channelName, options) {
     if (!options) options = {};
     var state = {
+        uuid: (0, _util.randomToken)(10),
         channelName: channelName,
         options: options,
         messagesCallback: null,
@@ -1135,8 +1134,6 @@ exports.sleep = sleep;
 exports.randomInt = randomInt;
 exports.randomToken = randomToken;
 exports.microSeconds = microSeconds;
-var micro = require('microseconds/now.js');
-
 /**
  * returns true if the given object is a promise
  */
@@ -1172,14 +1169,28 @@ function randomToken(length) {
     }return text;
 }
 
+var lastMs = 0;
+var additional = 0;
+
 /**
  * returns the current time in micro-seconds,
- * by using performance now and a fallback do Date.getTime
+ * WARNING: This is a pseudo-function
+ * Performance.now is not reliable in webworkers, so we just make sure to never return the same time.
+ * This is enough in browsers, and this function will not be used in nodejs.
+ * The main reason for this hack is to ensure that BroadcastChannel behaves equal to production when it is used in fast-running unit tests.
  */
 function microSeconds() {
-    return micro();
+    var ms = new Date().getTime();
+    if (ms === lastMs) {
+        additional++;
+        return ms * 1000 + additional;
+    } else {
+        lastMs = ms;
+        additional = 0;
+        return ms * 1000;
+    }
 }
-},{"microseconds/now.js":339}],12:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 (function (global){
 "use strict";
 
@@ -8739,40 +8750,6 @@ try {
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],339:[function(require,module,exports){
-(function (process,global){
-/* global performance */
-'use strict';
-
-var now;
-
-if (global.process && process.hrtime) {
-  var hrtime = process.hrtime;
-
-  now = function () {
-    var hr = hrtime();
-    return (hr[0] * 1e9 + hr[1]) / 1e3;
-  };
-
-} else if (global.performance && performance.now) {
-
-  var start = (performance.timing && performance.timing.navigationStart) || Date.now();
-
-  now = function() {
-    return (start + performance.now()) * 1e3;
-  };
-
-} else {
-
-  now = function() {
-    return Date.now() * 1e3;
-  };
-
-}
-
-module.exports = now;
-
-}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":340}],340:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -8958,7 +8935,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],341:[function(require,module,exports){
+},{}],340:[function(require,module,exports){
 module.exports = (function() {
     var exports = {};
 
@@ -8997,7 +8974,7 @@ module.exports = (function() {
     return exports;
 })();
 
-},{}],342:[function(require,module,exports){
+},{}],341:[function(require,module,exports){
 module.exports = (function(
     envs
 ) {
@@ -9084,7 +9061,7 @@ module.exports = (function(
     browser: require('./browser.js')
 });
 
-},{"./browser.js":341,"./node.js":343}],343:[function(require,module,exports){
+},{"./browser.js":340,"./node.js":342}],342:[function(require,module,exports){
 (function (process){
 module.exports = (function() {
     var exports = {};
@@ -9154,7 +9131,7 @@ module.exports = (function() {
 })();
 
 }).call(this,require('_process'))
-},{"_process":340}],344:[function(require,module,exports){
+},{"_process":339}],343:[function(require,module,exports){
 'use strict';
 
 var _util = require('./util.js');
@@ -9195,7 +9172,7 @@ elector.awaitLeadership().then(function () {
     boxEl.innerHTML = 'Leader';
     document.title = '♛ Leader';
 });
-},{"../../":1,"../../leader-election":3,"./util.js":345,"babel-polyfill":12}],345:[function(require,module,exports){
+},{"../../":1,"../../leader-election":3,"./util.js":344,"babel-polyfill":12}],344:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -9214,4 +9191,4 @@ function getParameterByName(name, url) {
     if (!results[2]) return '';
     return decodeURIComponent(results[2].replace(/\+/g, ' '));
 }
-},{}]},{},[344]);
+},{}]},{},[343]);
