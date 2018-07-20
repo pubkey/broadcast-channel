@@ -329,12 +329,20 @@ export async function create(channelName, options = {}) {
 
     // when new message comes in, we read it and emit it
     socketEE.emitter.on('data', data => {
-        try {
-            const obj = JSON.parse(data);
-            handleMessagePing(state, obj);
-        } catch (err) {
-            throw new Error('could not parse data: ' + data);
-        }
+
+        // if the socket is used fast, it may appear that multiple messages are flushed at once
+        // so we have to split them before
+        const singleOnes = data.split('|');
+        singleOnes
+            .filter(single => single !== '')
+            .forEach(single => {
+                try {
+                    const obj = JSON.parse(single);
+                    handleMessagePing(state, obj);
+                } catch (err) {
+                    throw new Error('could not parse data: ' + single);
+                }
+            });
     });
 
     return state;
@@ -458,7 +466,7 @@ export function postMessage(channelState, messageJson) {
             refreshReaderClients(channelState)
         ]);
         emitOverFastPath(channelState, msgObj, messageJson);
-        const pingStr = '{"t":' + msgObj.time + ',"u":"' + msgObj.uuid + '","to":"' + msgObj.token + '"}';
+        const pingStr = '{"t":' + msgObj.time + ',"u":"' + msgObj.uuid + '","to":"' + msgObj.token + '"}|';
 
         await Promise.all(
             Object.values(channelState.otherReaderClients)
