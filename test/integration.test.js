@@ -170,7 +170,7 @@ function runTest(channelOptions) {
 
                     channel1.postMessage('foo3');
 
-                    await AsyncTestUtil.waitUntil(() => emitted.length === 1);
+                    await AsyncTestUtil.waitUntil(() => emitted.length >= 1);
                     await AsyncTestUtil.wait(100);
                     assert.equal(emitted.length, 1);
 

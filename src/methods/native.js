@@ -1,6 +1,7 @@
 const isNode = require('detect-node');
 
 import {
+    randomToken,
     microSeconds as micro
 } from '../util';
 
@@ -11,6 +12,7 @@ export const type = 'native';
 export function create(channelName, options) {
     if (!options) options = {};
     const state = {
+        uuid: randomToken(10),
         channelName,
         options,
         messagesCallback: null,

@@ -1,5 +1,3 @@
-const micro = require('microseconds/now.js');
-
 /**
  * returns true if the given object is a promise
  */
@@ -35,10 +33,25 @@ export function randomToken(length) {
     return text;
 }
 
+
+let lastMs = 0;
+let additional = 0;
+
 /**
  * returns the current time in micro-seconds,
- * by using performance now and a fallback do Date.getTime
+ * WARNING: This is a pseudo-function
+ * Performance.now is not reliable in webworkers, so we just make sure to never return the same time.
+ * This is enough in browsers, and this function will not be used in nodejs.
+ * The main reason for this hack is to ensure that BroadcastChannel behaves equal to production when it is used in fast-running unit tests.
  */
 export function microSeconds() {
-    return micro();
+    const ms = new Date().getTime();
+    if (ms === lastMs) {
+        additional++;
+        return ms * 1000 + additional;
+    } else {
+        lastMs = ms;
+        additional = 0;
+        return ms * 1000;
+    }
 }

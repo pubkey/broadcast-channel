@@ -203,6 +203,6 @@ const removeLeaderIframe = async (leaderFramesCache) => {
 }
 
 
-if(autoStart && autoStart !== ''){
+if (autoStart && autoStart !== '') {
     window[autoStart]();
 }

@@ -6,10 +6,10 @@ require('babel-polyfill');
 var BroadcastChannel = require('../../');
 
 // overwrite console.log
-try{
+try {
     var logBefore = console.log;
-//    console.log = function (str) { logBefore('worker: ' + str); }    
-}catch(err){
+    //    console.log = function (str) { logBefore('worker: ' + str); }    
+} catch (err) {
     // does not work in IE11
 }
 
@@ -32,7 +32,7 @@ self.addEventListener('message', function (e) {
             channel = new BroadcastChannel(data.msg.channelName, {
                 type: data.msg.methodType
             });
-            var messages = [];
+            // console.log('Worker channel-uuid: ' + channel._state.uuid);
             channel.onmessage = function (msg) {
                 console.log('recieved message(' + msg.step + ') from ' + msg.from + ': ' + JSON.stringify(msg));
                 if (!msg.answer) {
