@@ -109,8 +109,10 @@ window.startBroadcastChannel = async function () {
         await new Promise(res => {
             worker.addEventListener('message', e => {
                 // run when message returned, so we know the worker has started
-                console.log('main: Worker has started');
-                res();
+                setTimeout(() => {
+                    console.log('main: Worker has started');
+                    res();
+                }, 200);
             }, false);
             worker.postMessage({
                 'cmd': 'start',
@@ -191,7 +193,7 @@ const removeLeaderIframe = async (leaderFramesCache) => {
     if (leaders.length === 0) {
         return new Promise(res => setTimeout(() => {
             res(leaderFramesCache);
-        }, 20));
+        }, 50));
     }
     if (leaders.length > 1) {
         throw new Error('LeaderElection: There is more then one leader!');
