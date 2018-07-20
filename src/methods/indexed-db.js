@@ -173,6 +173,8 @@ export function create(channelName, options) {
             uuid,
             // contains all messages that have been emitted before
             emittedMessagesIds: new ObliviousSet(options.idb.ttl * 2),
+            // ensures we do not read messages in parrallel
+            writeBlockPromise: Promise.resolve(),
             messagesCallback: null,
             readQueuePromises: [],
             db
@@ -241,18 +243,23 @@ export function close(channelState) {
 }
 
 export function postMessage(channelState, messageJson) {
-    return writeMessage(
-        channelState.db,
-        channelState.uuid,
-        messageJson
-    ).then(() => {
-        if (randomInt(0, 10) === 0) {
-            /* await (do not await) */ cleanOldMessages(
-                channelState.db,
-                channelState.options.idb.ttl
-            );
-        }
-    });
+
+    channelState.writeBlockPromise = channelState.writeBlockPromise
+        .then(() => writeMessage(
+            channelState.db,
+            channelState.uuid,
+            messageJson
+        ))
+        .then(() => {
+            if (randomInt(0, 10) === 0) {
+                /* await (do not await) */ cleanOldMessages(
+                    channelState.db,
+                    channelState.options.idb.ttl
+                );
+            }
+        });
+
+    return channelState.writeBlockPromise;
 }
 
 export function onMessage(channelState, fn, time) {

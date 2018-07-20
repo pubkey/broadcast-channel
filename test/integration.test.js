@@ -355,6 +355,35 @@ function runTest(channelOptions) {
 
                     window.BroadcastChannel = broadcastChannelBefore;
                 });
+                it('should always emit in the correct order', async () => {
+                    const channelName = AsyncTestUtil.randomString(12);
+                    const channel = new BroadcastChannel(channelName, channelOptions);
+                    const otherChannel = new BroadcastChannel(channelName, channelOptions);
+
+                    const emitted = [];
+                    otherChannel.onmessage = msg => emitted.push(msg);
+
+                    const amount = 300;
+                    let nr = 0;
+                    new Array(amount).fill(0).forEach(() => {
+                        channel.postMessage({
+                            nr,
+                            long: AsyncTestUtil.randomString(512)
+                        });
+                        nr++;
+                    });
+
+                    await AsyncTestUtil.waitUntil(() => emitted.length === amount);
+
+                    let checkNr = 0;
+                    emitted.forEach(msg => {
+                        assert.equal(checkNr, msg.nr);
+                        checkNr++;
+                    });
+
+                    channel.close();
+                    otherChannel.close();
+                });
             });
         });
         describe('LeaderElection', () => {
