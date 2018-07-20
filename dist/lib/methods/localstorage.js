@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.type = undefined;
+exports.type = exports.microSeconds = undefined;
 exports.getLocalStorage = getLocalStorage;
 exports.storageKey = storageKey;
 exports.postMessage = postMessage;
@@ -15,9 +15,15 @@ exports.onMessage = onMessage;
 exports.canBeUsed = canBeUsed;
 exports.averageResponseTime = averageResponseTime;
 
+var _obliviousSet = require('../oblivious-set');
+
+var _obliviousSet2 = _interopRequireDefault(_obliviousSet);
+
 var _options = require('../options');
 
 var _util = require('../util');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 /**
  * A localStorage-only method which uses localstorage and its 'storage'-event
@@ -28,6 +34,7 @@ var _util = require('../util');
  */
 
 var isNode = require('detect-node');
+var microSeconds = exports.microSeconds = _util.microSeconds;
 
 var KEY_PREFIX = 'pubkey.broadcastChannel-';
 var type = exports.type = 'localstorage';
@@ -111,7 +118,7 @@ function create(channelName, options) {
     var uuid = (0, _util.randomToken)(10);
 
     // contains all messages that have been emitted before
-    var emittedMessagesIds = new Set();
+    var emittedMessagesIds = new _obliviousSet2['default'](options.localstorage.removeTimeout);
 
     var state = {
         startTime: startTime,
@@ -125,12 +132,9 @@ function create(channelName, options) {
         if (!state.messagesCallback) return; // no listener
         if (msgObj.uuid === uuid) return; // own message
         if (!msgObj.token || emittedMessagesIds.has(msgObj.token)) return; // already emitted
-        if (msgObj.time && msgObj.time < state.messagesCallbackTime) return; // too old
+        if (msgObj.data.time && msgObj.data.time < state.messagesCallbackTime) return; // too old
 
         emittedMessagesIds.add(msgObj.token);
-        setTimeout(function () {
-            return emittedMessagesIds['delete'](msgObj.token);
-        }, options.localstorage.removeTimeout);
         state.messagesCallback(msgObj.data);
     });
 

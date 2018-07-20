@@ -1,3 +1,5 @@
+var micro = require('microseconds/now.js');
+
 /**
  * returns true if the given object is a promise
  */
@@ -31,4 +33,12 @@ export function randomToken(length) {
     for (var i = 0; i < length; i++) {
         text += possible.charAt(Math.floor(Math.random() * possible.length));
     }return text;
+}
+
+/**
+ * returns the current time in micro-seconds,
+ * by using performance now and a fallback do Date.getTime
+ */
+export function microSeconds() {
+    return micro();
 }

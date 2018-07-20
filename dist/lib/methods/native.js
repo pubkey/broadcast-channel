@@ -3,13 +3,19 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.type = exports.microSeconds = undefined;
 exports.create = create;
 exports.close = close;
 exports.postMessage = postMessage;
 exports.onMessage = onMessage;
 exports.canBeUsed = canBeUsed;
 exports.averageResponseTime = averageResponseTime;
+
+var _util = require('../util');
+
 var isNode = require('detect-node');
+
+var microSeconds = exports.microSeconds = _util.microSeconds;
 
 var type = exports.type = 'native';
 

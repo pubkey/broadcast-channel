@@ -11,15 +11,18 @@ import * as os from 'os';
 import * as events from 'events';
 import * as net from 'net';
 import * as path from 'path';
+import micro from 'nano-time';
+
 import { sha3_224 } from 'js-sha3';
 
 import isNode from 'detect-node';
-import IdleQueue from 'custom-idle-queue';
 import unload from 'unload';
 
 import { fillOptionsWithDefaults } from '../options';
 
 import { randomInt, randomToken } from '../util';
+
+import ObliviousSet from '../oblivious-set';
 
 /**
  * windows sucks, so we have handle windows-type of socket-paths
@@ -42,6 +45,7 @@ var unlink = util.promisify(fs.unlink);
 var readdir = util.promisify(fs.readdir);
 
 var TMP_FOLDER_NAME = 'pubkey.broadcast-channel';
+var OTHER_INSTANCES = {};
 
 var getPathsCache = new Map();
 export function getPaths(channelName) {
@@ -137,7 +141,7 @@ export function socketInfoPath(channelName, readerUuid) {
 export function createSocketInfoFile(channelName, readerUuid) {
     var pathToFile = socketInfoPath(channelName, readerUuid);
     return writeFile(pathToFile, JSON.stringify({
-        time: new Date().getTime()
+        time: microSeconds()
     })).then(function () {
         return pathToFile;
     });
@@ -162,8 +166,6 @@ export var createSocketEventEmitter = function () {
                             });
 
                             stream.on('data', function (msg) {
-                                // console.log('server: got data:');
-                                // console.dir(msg.toString());
                                 emitter.emit('data', msg.toString());
                             });
                         });
@@ -239,7 +241,7 @@ export var writeMessage = function () {
             while (1) {
                 switch (_context4.prev = _context4.next) {
                     case 0:
-                        time = new Date().getTime();
+                        time = microSeconds();
                         writeObject = {
                             uuid: readerUuid,
                             time: time,
@@ -397,10 +399,10 @@ export var cleanOldMessages = function () {
             while (1) {
                 switch (_context8.prev = _context8.next) {
                     case 0:
-                        olderThen = new Date().getTime() - ttl;
+                        olderThen = Date.now() - ttl;
                         _context8.next = 3;
                         return Promise.all(messageObjects.filter(function (obj) {
-                            return obj.time < olderThen;
+                            return obj.time / 1000 < olderThen;
                         }).map(function (obj) {
                             return unlink(obj.path)['catch'](function () {
                                 return null;
@@ -426,32 +428,30 @@ export var create = function () {
     var _ref9 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee9(channelName) {
         var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-        var uuid, writeQueue, state, _ref10, socketEE, infoFilePath;
+        var time, uuid, state, _ref10, socketEE, infoFilePath;
 
         return _regeneratorRuntime.wrap(function _callee9$(_context9) {
             while (1) {
                 switch (_context9.prev = _context9.next) {
                     case 0:
                         options = fillOptionsWithDefaults(options);
-
-                        _context9.next = 3;
+                        time = microSeconds();
+                        _context9.next = 4;
                         return ensureFoldersExist(channelName);
 
-                    case 3:
+                    case 4:
                         uuid = randomToken(10);
-
-                        // ensures we do not read messages in parrallel
-
-                        writeQueue = new IdleQueue(1);
                         state = {
+                            time: time,
                             channelName: channelName,
                             options: options,
                             uuid: uuid,
                             // contains all messages that have been emitted before
-                            emittedMessagesIds: new Set(),
+                            emittedMessagesIds: new ObliviousSet(options.node.ttl * 2),
                             messagesCallbackTime: null,
                             messagesCallback: null,
-                            writeQueue: writeQueue,
+                            // ensures we do not read messages in parrallel
+                            writeBlockPromise: Promise.resolve(),
                             otherReaderClients: {},
                             // ensure if process crashes, everything is cleaned up
                             removeUnload: unload.add(function () {
@@ -459,10 +459,15 @@ export var create = function () {
                             }),
                             closed: false
                         };
-                        _context9.next = 8;
+
+
+                        if (!OTHER_INSTANCES[channelName]) OTHER_INSTANCES[channelName] = [];
+                        OTHER_INSTANCES[channelName].push(state);
+
+                        _context9.next = 10;
                         return Promise.all([createSocketEventEmitter(channelName, uuid), createSocketInfoFile(channelName, uuid), refreshReaderClients(state)]);
 
-                    case 8:
+                    case 10:
                         _ref10 = _context9.sent;
                         socketEE = _ref10[0];
                         infoFilePath = _ref10[1];
@@ -478,7 +483,7 @@ export var create = function () {
 
                         return _context9.abrupt('return', state);
 
-                    case 15:
+                    case 17:
                     case 'end':
                         return _context9.stop();
                 }
@@ -492,9 +497,22 @@ export var create = function () {
 }();
 
 export function _filterMessage(msgObj, state) {
+
+    /*    console.log('_filterMessage()');
+        console.dir(msgObj);
+        console.log(msgObj.senderUuid === state.uuid);
+        console.log(state.emittedMessagesIds.has(msgObj.token));
+        console.log(!state.messagesCallback);
+        console.log(msgObj.time < state.messagesCallbackTime);
+        console.log(msgObj.time < state.time);*/
+
     if (msgObj.senderUuid === state.uuid) return false; // not send by own
     if (state.emittedMessagesIds.has(msgObj.token)) return false; // not already emitted
+    if (!state.messagesCallback) return false; // no listener
     if (msgObj.time < state.messagesCallbackTime) return false; // not older then onMessageCallback
+    if (msgObj.time < state.time) return false; // msgObj is older then channel
+
+    state.emittedMessagesIds.add(msgObj.token);
     return true;
 }
 
@@ -565,11 +583,9 @@ export var handleMessagePing = function () {
 
                         useMessages.forEach(function (msgObj) {
                             state.emittedMessagesIds.add(msgObj.token);
-                            setTimeout(function () {
-                                return state.emittedMessagesIds['delete'](msgObj.token);
-                            }, state.options.node.ttl * 2);
 
                             if (state.messagesCallback) {
+                                // emit to subscribers
                                 state.messagesCallback(msgObj.content.data);
                             }
                         });
@@ -710,60 +726,95 @@ export var refreshReaderClients = function () {
 export function postMessage(channelState, messageJson) {
     var _this2 = this;
 
-    // ensure we do this not in parallel
-    return channelState.writeQueue.requestIdlePromise().then(function () {
-        return channelState.writeQueue.wrapCall(_asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee14() {
-            var _ref16, msgObj, pingStr;
+    var writePromise = writeMessage(channelState.channelName, channelState.uuid, messageJson);
 
-            return _regeneratorRuntime.wrap(function _callee14$(_context14) {
-                while (1) {
-                    switch (_context14.prev = _context14.next) {
-                        case 0:
-                            _context14.next = 2;
-                            return Promise.all([writeMessage(channelState.channelName, channelState.uuid, messageJson), refreshReaderClients(channelState)]);
+    channelState.writeBlockPromise = channelState.writeBlockPromise.then(_asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee14() {
+        var _ref16, msgObj, pingStr;
 
-                        case 2:
-                            _ref16 = _context14.sent;
-                            msgObj = _ref16[0];
-                            pingStr = '{"t":' + msgObj.time + ',"u":"' + msgObj.uuid + '","to":"' + msgObj.token + '"}';
-                            _context14.next = 7;
-                            return Promise.all(Object.values(channelState.otherReaderClients).filter(function (client) {
-                                return client.writable;
-                            }) // client might have closed in between
-                            .map(function (client) {
-                                return new Promise(function (res) {
-                                    client.write(pingStr, res);
-                                });
-                            }));
+        return _regeneratorRuntime.wrap(function _callee14$(_context14) {
+            while (1) {
+                switch (_context14.prev = _context14.next) {
+                    case 0:
+                        _context14.next = 2;
+                        return new Promise(function (res) {
+                            return setTimeout(res, 0);
+                        });
 
-                        case 7:
+                    case 2:
+                        _context14.next = 4;
+                        return Promise.all([writePromise, refreshReaderClients(channelState)]);
 
-                            /**
-                             * clean up old messages
-                             * to not waste resources on cleaning up,
-                             * only if random-int matches, we clean up old messages
-                             */
-                            if (randomInt(0, 50) === 0) {
-                                /* await */getAllMessages(channelState.channelName).then(function (allMessages) {
-                                    return cleanOldMessages(allMessages, channelState.options.node.ttl);
-                                });
-                            }
+                    case 4:
+                        _ref16 = _context14.sent;
+                        msgObj = _ref16[0];
 
-                            // emit to own eventEmitter
-                            // channelState.socketEE.emitter.emit('data', JSON.parse(JSON.stringify(messageJson)));
+                        emitOverFastPath(channelState, msgObj, messageJson);
+                        pingStr = '{"t":' + msgObj.time + ',"u":"' + msgObj.uuid + '","to":"' + msgObj.token + '"}';
+                        _context14.next = 10;
+                        return Promise.all(Object.values(channelState.otherReaderClients).filter(function (client) {
+                            return client.writable;
+                        }) // client might have closed in between
+                        .map(function (client) {
+                            return new Promise(function (res) {
+                                client.write(pingStr, res);
+                            });
+                        }));
 
-                        case 8:
-                        case 'end':
-                            return _context14.stop();
-                    }
+                    case 10:
+
+                        /**
+                         * clean up old messages
+                         * to not waste resources on cleaning up,
+                         * only if random-int matches, we clean up old messages
+                         */
+                        if (randomInt(0, 20) === 0) {
+                            /* await */getAllMessages(channelState.channelName).then(function (allMessages) {
+                                return cleanOldMessages(allMessages, channelState.options.node.ttl);
+                            });
+                        }
+
+                        // emit to own eventEmitter
+                        // channelState.socketEE.emitter.emit('data', JSON.parse(JSON.stringify(messageJson)));
+
+                    case 11:
+                    case 'end':
+                        return _context14.stop();
                 }
-            }, _callee14, _this2);
-        })));
+            }
+        }, _callee14, _this2);
+    })));
+
+    return channelState.writeBlockPromise;
+}
+
+/**
+ * When multiple BroadcastChannels with the same name
+ * are created in a single node-process, we can access them directly and emit messages.
+ * This might not happen often in production
+ * but will speed up things when this module is used in unit-tests.
+ */
+export function emitOverFastPath(state, msgObj, messageJson) {
+    if (!state.options.node.useFastPath) return; // disabled
+    var others = OTHER_INSTANCES[state.channelName].filter(function (s) {
+        return s !== state;
+    });
+
+    var checkObj = {
+        time: msgObj.time,
+        senderUuid: msgObj.uuid,
+        token: msgObj.token
+    };
+
+    others.filter(function (otherState) {
+        return _filterMessage(checkObj, otherState);
+    }).forEach(function (otherState) {
+        //  console.log('EMIT OVER FAST PATH');
+        otherState.messagesCallback(messageJson);
     });
 }
 
 export function onMessage(channelState, fn) {
-    var time = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : new Date().getTime();
+    var time = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : microSeconds();
 
     channelState.messagesCallbackTime = time;
     channelState.messagesCallback = fn;
@@ -773,6 +824,10 @@ export function onMessage(channelState, fn) {
 export function close(channelState) {
     if (channelState.closed) return;
     channelState.closed = true;
+    channelState.emittedMessagesIds.clear();
+    OTHER_INSTANCES[channelState.channelName] = OTHER_INSTANCES[channelState.channelName].filter(function (o) {
+        return o !== channelState;
+    });
 
     if (typeof channelState.removeUnload === 'function') channelState.removeUnload();
 
@@ -785,7 +840,6 @@ export function close(channelState) {
     }, 200);
 
     channelState.socketEE.emitter.removeAllListeners();
-    channelState.writeQueue.clear();
 
     Object.values(channelState.otherReaderClients).forEach(function (client) {
         return client.destroy();
@@ -802,4 +856,8 @@ export function canBeUsed() {
 
 export function averageResponseTime() {
     return 50;
+}
+
+export function microSeconds() {
+    return parseInt(micro.microseconds());
 }

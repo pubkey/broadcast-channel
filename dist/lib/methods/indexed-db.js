@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-exports.type = undefined;
+exports.type = exports.microSeconds = undefined;
 exports.getIdb = getIdb;
 exports.createDatabase = createDatabase;
 exports.writeMessage = writeMessage;
@@ -21,7 +21,13 @@ exports.averageResponseTime = averageResponseTime;
 
 var _util = require('../util.js');
 
+var _obliviousSet = require('../oblivious-set');
+
+var _obliviousSet2 = _interopRequireDefault(_obliviousSet);
+
 var _options = require('../options');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 /**
  * this method uses indexeddb to store the messages
@@ -30,6 +36,9 @@ var _options = require('../options');
  */
 
 var isNode = require('detect-node');
+
+var microSeconds = exports.microSeconds = _util.microSeconds;
+
 
 var DB_PREFIX = 'pubkey.broadcast-channel-0-';
 var OBJECT_STORE_ID = 'messages';
@@ -188,7 +197,9 @@ function create(channelName, options) {
             options: options,
             uuid: uuid,
             // contains all messages that have been emitted before
-            emittedMessagesIds: new Set(),
+            emittedMessagesIds: new _obliviousSet2['default'](options.idb.ttl * 2),
+            // ensures we do not read messages in parrallel
+            writeBlockPromise: Promise.resolve(),
             messagesCallback: null,
             readQueuePromises: [],
             db: db
@@ -215,10 +226,21 @@ function _readLoop(state) {
     });
 }
 
+function _filterMessage(msgObj, state) {
+    if (msgObj.uuid === state.uuid) return false; // send by own
+    if (state.emittedMessagesIds.has(msgObj.id)) return false; // already emitted
+    if (msgObj.data.time < state.messagesCallbackTime) return false; // older then onMessageCallback
+    return true;
+}
+
 /**
  * reads all new messages from the database and emits them
  */
 function readNewMessages(state) {
+
+    // if no one is listening, we do not need to scan for new messages
+    if (!state.messagesCallback) return Promise.resolve();
+
     return getMessagesHigherThen(state.db, state.lastCursorId).then(function (newerMessages) {
         var useMessages = newerMessages.map(function (msgObj) {
             if (msgObj.id > state.lastCursorId) {
@@ -226,26 +248,13 @@ function readNewMessages(state) {
             }
             return msgObj;
         }).filter(function (msgObj) {
-            return msgObj.uuid !== state.uuid;
-        }) // not send by own
-        .filter(function (msgObj) {
-            return !state.emittedMessagesIds.has(msgObj.id);
-        }) // not already emitted
-        .filter(function (msgObj) {
-            return msgObj.time >= state.messagesCallbackTime;
-        }) // not older then onMessageCallback
-        .sort(function (msgObjA, msgObjB) {
+            return _filterMessage(msgObj, state);
+        }).sort(function (msgObjA, msgObjB) {
             return msgObjA.time - msgObjB.time;
         }); // sort by time
-
-
         useMessages.forEach(function (msgObj) {
             if (state.messagesCallback) {
                 state.emittedMessagesIds.add(msgObj.id);
-                setTimeout(function () {
-                    return state.emittedMessagesIds['delete'](msgObj.id);
-                }, state.options.idb.ttl * 2);
-
                 state.messagesCallback(msgObj.data);
             }
         });
@@ -260,11 +269,16 @@ function close(channelState) {
 }
 
 function postMessage(channelState, messageJson) {
-    return writeMessage(channelState.db, channelState.uuid, messageJson).then(function () {
+
+    channelState.writeBlockPromise = channelState.writeBlockPromise.then(function () {
+        return writeMessage(channelState.db, channelState.uuid, messageJson);
+    }).then(function () {
         if ((0, _util.randomInt)(0, 10) === 0) {
             /* await (do not await) */cleanOldMessages(channelState.db, channelState.options.idb.ttl);
         }
     });
+
+    return channelState.writeBlockPromise;
 }
 
 function onMessage(channelState, fn, time) {

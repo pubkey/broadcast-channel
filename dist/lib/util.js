@@ -7,6 +7,9 @@ exports.isPromise = isPromise;
 exports.sleep = sleep;
 exports.randomInt = randomInt;
 exports.randomToken = randomToken;
+exports.microSeconds = microSeconds;
+var micro = require('microseconds/now.js');
+
 /**
  * returns true if the given object is a promise
  */
@@ -40,4 +43,12 @@ function randomToken(length) {
     for (var i = 0; i < length; i++) {
         text += possible.charAt(Math.floor(Math.random() * possible.length));
     }return text;
+}
+
+/**
+ * returns the current time in micro-seconds,
+ * by using performance now and a fallback do Date.getTime
+ */
+function microSeconds() {
+    return micro();
 }

@@ -7,10 +7,13 @@
  */
 
 var isNode = require('detect-node');
+import ObliviousSet from '../oblivious-set';
 
 import { fillOptionsWithDefaults } from '../options';
 
-import { sleep, randomToken } from '../util';
+import { sleep, randomToken, microSeconds as micro } from '../util';
+
+export var microSeconds = micro;
 
 var KEY_PREFIX = 'pubkey.broadcastChannel-';
 export var type = 'localstorage';
@@ -94,7 +97,7 @@ export function create(channelName, options) {
     var uuid = randomToken(10);
 
     // contains all messages that have been emitted before
-    var emittedMessagesIds = new Set();
+    var emittedMessagesIds = new ObliviousSet(options.localstorage.removeTimeout);
 
     var state = {
         startTime: startTime,
@@ -108,12 +111,9 @@ export function create(channelName, options) {
         if (!state.messagesCallback) return; // no listener
         if (msgObj.uuid === uuid) return; // own message
         if (!msgObj.token || emittedMessagesIds.has(msgObj.token)) return; // already emitted
-        if (msgObj.time && msgObj.time < state.messagesCallbackTime) return; // too old
+        if (msgObj.data.time && msgObj.data.time < state.messagesCallbackTime) return; // too old
 
         emittedMessagesIds.add(msgObj.token);
-        setTimeout(function () {
-            return emittedMessagesIds['delete'](msgObj.token);
-        }, options.localstorage.removeTimeout);
         state.messagesCallback(msgObj.data);
     });
 

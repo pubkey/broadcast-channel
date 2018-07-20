@@ -24,6 +24,7 @@ function fillOptionsWithDefaults(options) {
     // node
     if (!options.node) options.node = {};
     if (!options.node.ttl) options.node.ttl = 1000 * 60 * 2; // 2 minutes;
+    if (typeof options.node.useFastPath === 'undefined') options.node.useFastPath = true;
 
     return options;
 }
