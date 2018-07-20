@@ -169,5 +169,20 @@ AFTER: { // write message up front
 -----------------------------------------
 19. July.2018: test:performance - forgetting set
 
+BEFORE: {
+  "openClose": 703.9341719998047,
+  "sendRecieve": {
+    "parallel": 233.59367400035262,
+    "series": 4531.717969999649
+  }
+}
+
+AFTER: { // add fast path
+  "openClose": 698.5278329998255,
+  "sendRecieve": {
+    "parallel": 254.588275000453,
+    "series": 3679.5491359978914
+  }
+}
 
 -----------------------------------------

@@ -13,6 +13,7 @@ export type BroadcastChannelOptions = {
     prepareDelay?: number;
     node?: {
         ttl?: number;
+        useFastPath?: boolean;
     };
     idb?: {
         ttl?: number;

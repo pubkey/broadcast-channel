@@ -9,17 +9,13 @@ const LeaderElection = require('../leader-election');
 /**
  * we run this test once per method
  */
-function runTest(channelType) {
-    const channelOptions = {
-        type: channelType
-    };
-
-    describe('integration.test.js (' + channelType + ')', () => {
+function runTest(channelOptions) {
+    describe('integration.test.js (' + JSON.stringify(channelOptions) + ')', () => {
 
         describe('BroadcastChannel', () => {
             describe('.constructor()', () => {
                 it('asdf', () => {
-                    console.log('Started: ' + channelType);
+                    console.log('Started: ' + JSON.stringify(channelOptions));
                 });
                 it('should create a channel', async () => {
                     const channelName = AsyncTestUtil.randomString(12);
@@ -359,9 +355,6 @@ function runTest(channelType) {
 
                     window.BroadcastChannel = broadcastChannelBefore;
                 });
-                it('', () => {
-                    console.log('Finished: ' + channelType);
-                });
             });
         });
         describe('LeaderElection', () => {
@@ -554,15 +547,39 @@ function runTest(channelType) {
                     channel.close();
                     channel2.close();
                 });
+                it('log', () => {
+                    console.log('Finished: ' + JSON.stringify(channelOptions));
+                });        
             });
         });
     });
 }
 
+const useOptions = [];
+
 if (isNode) {
-    runTest('node');
+    useOptions.push({
+        type: 'node',
+        node: {
+            useFastPath: true
+        }
+    });
+    useOptions.push({
+        type: 'node',
+        node: {
+            useFastPath: false
+        }
+    });
 } else {
-    runTest('native');
-    runTest('idb');
-    runTest('localstorage');
+    useOptions.push({
+        type: 'native'
+    });
+    useOptions.push({
+        type: 'idb'
+    });
+    useOptions.push({
+        type: 'localstorage'
+    });
 }
+
+useOptions.forEach(o => runTest(o));

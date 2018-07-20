@@ -54,6 +54,7 @@ const unlink = util.promisify(fs.unlink);
 const readdir = util.promisify(fs.readdir);
 
 const TMP_FOLDER_NAME = 'pubkey.broadcast-channel';
+const OTHER_INSTANCES = {};
 
 const getPathsCache = new Map();
 export function getPaths(channelName) {
@@ -148,8 +149,6 @@ export async function createSocketEventEmitter(channelName, readerUuid) {
             });
 
             stream.on('data', function (msg) {
-                // console.log('server: got data:');
-                // console.dir(msg.toString());
                 emitter.emit('data', msg.toString());
             });
         });
@@ -318,6 +317,9 @@ export async function create(channelName, options = {}) {
         closed: false
     };
 
+    if (!OTHER_INSTANCES[channelName]) OTHER_INSTANCES[channelName] = [];
+    OTHER_INSTANCES[channelName].push(state);
+
     const [
         socketEE,
         infoFilePath
@@ -339,8 +341,18 @@ export async function create(channelName, options = {}) {
 }
 
 export function _filterMessage(msgObj, state) {
+
+    /*    console.log('_filterMessage()');
+        console.dir(msgObj);
+        console.log(msgObj.senderUuid === state.uuid);
+        console.log(state.emittedMessagesIds.has(msgObj.token));
+        console.log(!state.messagesCallback);
+        console.log(msgObj.time < state.messagesCallbackTime);
+        console.log(msgObj.time < state.time);*/
+
     if (msgObj.senderUuid === state.uuid) return false; // not send by own
     if (state.emittedMessagesIds.has(msgObj.token)) return false; // not already emitted
+    if (!state.messagesCallback) return false; // no listener
     if (msgObj.time < state.messagesCallbackTime) return false; // not older then onMessageCallback
     if (msgObj.time < state.time) return false; // msgObj is older then channel
 
@@ -456,6 +468,8 @@ export function postMessage(channelState, messageJson) {
                             })
                     );
 
+                    emitOverFastPath(channelState, msgObj, messageJson);
+
                     /**
                      * clean up old messages
                      * to not waste resources on cleaning up,
@@ -473,6 +487,30 @@ export function postMessage(channelState, messageJson) {
         );
 }
 
+/**
+ * When multiple BroadcastChannels with the same name
+ * are created in a single node-process, we can access them directly and emit messages.
+ * This might not happen often in production
+ * but will speed up things when this module is used in unit-tests.
+ */
+export function emitOverFastPath(state, msgObj, messageJson) {
+    if (!state.options.node.useFastPath) return; // disabled
+    const others = OTHER_INSTANCES[state.channelName].filter(s => s !== state);
+
+    const checkObj = {
+        time: msgObj.time,
+        senderUuid: msgObj.uuid,
+        token: msgObj.token
+    };
+
+    others
+        .filter(otherState => _filterMessage(checkObj, otherState))
+        .forEach(otherState => {
+            //  console.log('EMIT OVER FAST PATH');
+            otherState.messagesCallback(messageJson);
+        });
+}
+
 
 export function onMessage(channelState, fn, time = microSeconds()) {
     channelState.messagesCallbackTime = time;
@@ -484,6 +522,7 @@ export function close(channelState) {
     if (channelState.closed) return;
     channelState.closed = true;
     channelState.emittedMessagesIds.clear();
+    OTHER_INSTANCES[channelState.channelName] = OTHER_INSTANCES[channelState.channelName].filter(o => o !== channelState);
 
     if (typeof channelState.removeUnload === 'function')
         channelState.removeUnload();
