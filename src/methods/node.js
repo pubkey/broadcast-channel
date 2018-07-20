@@ -16,7 +16,6 @@ import {
 } from 'js-sha3';
 
 import isNode from 'detect-node';
-import IdleQueue from 'custom-idle-queue';
 import unload from 'unload';
 
 import {
@@ -297,10 +296,6 @@ export async function create(channelName, options = {}) {
     await ensureFoldersExist(channelName);
     const uuid = randomToken(10);
 
-
-    // ensures we do not read messages in parrallel
-    const writeQueue = new IdleQueue(1);
-
     const state = {
         time,
         channelName,
@@ -310,7 +305,8 @@ export async function create(channelName, options = {}) {
         emittedMessagesIds: new ObliviousSet(options.node.ttl * 2),
         messagesCallbackTime: null,
         messagesCallback: null,
-        writeQueue,
+        // ensures we do not read messages in parrallel
+        writeBlockPromise: Promise.resolve(),
         otherReaderClients: {},
         // ensure if process crashes, everything is cleaned up
         removeUnload: unload.add(() => close(state)),
@@ -447,44 +443,40 @@ export function postMessage(channelState, messageJson) {
         messageJson
     );
 
-    // ensure we do this not in parallel
-    return channelState.writeQueue.requestIdlePromise()
-        .then(
-            () => channelState.writeQueue.wrapCall(
-                async () => {
-                    const [msgObj] = await Promise.all([
-                        writePromise,
-                        refreshReaderClients(channelState)
-                    ]);
-                    const pingStr = '{"t":' + msgObj.time + ',"u":"' + msgObj.uuid + '","to":"' + msgObj.token + '"}';
+    channelState.writeBlockPromise = channelState.writeBlockPromise.then(async () => {
+        await new Promise(res => setTimeout(res, 0));
+        const [msgObj] = await Promise.all([
+            writePromise,
+            refreshReaderClients(channelState)
+        ]);
+        emitOverFastPath(channelState, msgObj, messageJson);
+        const pingStr = '{"t":' + msgObj.time + ',"u":"' + msgObj.uuid + '","to":"' + msgObj.token + '"}';
 
-                    await Promise.all(
-                        Object.values(channelState.otherReaderClients)
-                            .filter(client => client.writable) // client might have closed in between
-                            .map(client => {
-                                return new Promise(res => {
-                                    client.write(pingStr, res);
-                                });
-                            })
-                    );
-
-                    emitOverFastPath(channelState, msgObj, messageJson);
-
-                    /**
-                     * clean up old messages
-                     * to not waste resources on cleaning up,
-                     * only if random-int matches, we clean up old messages
-                     */
-                    if (randomInt(0, 20) === 0) {
-                        /* await */ getAllMessages(channelState.channelName)
-                            .then(allMessages => cleanOldMessages(allMessages, channelState.options.node.ttl));
-                    }
-
-                    // emit to own eventEmitter
-                    // channelState.socketEE.emitter.emit('data', JSON.parse(JSON.stringify(messageJson)));
-                }
-            )
+        await Promise.all(
+            Object.values(channelState.otherReaderClients)
+                .filter(client => client.writable) // client might have closed in between
+                .map(client => {
+                    return new Promise(res => {
+                        client.write(pingStr, res);
+                    });
+                })
         );
+
+        /**
+         * clean up old messages
+         * to not waste resources on cleaning up,
+         * only if random-int matches, we clean up old messages
+         */
+        if (randomInt(0, 20) === 0) {
+            /* await */ getAllMessages(channelState.channelName)
+                .then(allMessages => cleanOldMessages(allMessages, channelState.options.node.ttl));
+        }
+
+        // emit to own eventEmitter
+        // channelState.socketEE.emitter.emit('data', JSON.parse(JSON.stringify(messageJson)));
+    });
+
+    return channelState.writeBlockPromise;
 }
 
 /**
@@ -534,7 +526,6 @@ export function close(channelState) {
     setTimeout(() => channelState.socketEE.server.close(), 200);
 
     channelState.socketEE.emitter.removeAllListeners();
-    channelState.writeQueue.clear();
 
     Object.values(channelState.otherReaderClients)
         .forEach(client => client.destroy());

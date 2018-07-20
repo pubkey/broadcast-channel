@@ -93,7 +93,7 @@ after: {
 
 
 -----------------------------------------
-16. July.2018: test:performance
+test:performance
 
 BEFORE: {
   "openClose": 1499.9152579996735,
@@ -146,7 +146,7 @@ AFTER5: { // better postMessage
 
 
 -----------------------------------------
-16. July.2018: test:performance
+test:performance
 
 BEFORE: {
   "openClose": 714.9132689982653,
@@ -167,7 +167,7 @@ AFTER: { // write message up front
 -----------------------------------------
 
 -----------------------------------------
-19. July.2018: test:performance - forgetting set
+test:performance - forgetting set
 
 BEFORE: {
   "openClose": 703.9341719998047,
@@ -182,6 +182,25 @@ AFTER: { // add fast path
   "sendRecieve": {
     "parallel": 254.588275000453,
     "series": 3679.5491359978914
+  }
+}
+
+-----------------------------------------
+no idle-queue
+
+BEFORE: {
+  "openClose": 720.8237979999976,
+  "sendRecieve": {
+    "parallel": 250.95046299998648,
+    "series": 3671.9275919999927
+  }
+}
+
+AFTER: {
+  "openClose": 684.5638470000122,
+  "sendRecieve": {
+    "parallel": 246.08427699981257,
+    "series": 2251.4478739998303
   }
 }
 

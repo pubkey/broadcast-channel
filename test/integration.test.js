@@ -549,7 +549,7 @@ function runTest(channelOptions) {
                 });
                 it('log', () => {
                     console.log('Finished: ' + JSON.stringify(channelOptions));
-                });        
+                });
             });
         });
     });
