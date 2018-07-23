@@ -15,7 +15,7 @@ function fillOptionsWithDefaults(options) {
     if (!options.idb) options.idb = {};
     //  after this time the messages get deleted
     if (!options.idb.ttl) options.idb.ttl = 1000 * 45;
-    if (!options.idb.fallbackInterval) options.idb.fallbackInterval = 50;
+    if (!options.idb.fallbackInterval) options.idb.fallbackInterval = 150;
 
     // localstorage
     if (!options.localstorage) options.localstorage = {};

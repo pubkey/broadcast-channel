@@ -508,6 +508,9 @@ function _filterMessage(msgObj, state) {
  */
 function readNewMessages(state) {
 
+    // channel already closed
+    if (state.closed) return Promise.resolve();
+
     // if no one is listening, we do not need to scan for new messages
     if (!state.messagesCallback) return Promise.resolve();
 
@@ -566,7 +569,7 @@ function canBeUsed() {
 }
 
 function averageResponseTime(options) {
-    return options.idb.fallbackInterval * 1.5;
+    return options.idb.fallbackInterval * 2;
 }
 },{"../oblivious-set":7,"../options":8,"../util.js":9,"detect-node":427}],5:[function(require,module,exports){
 'use strict';
@@ -868,7 +871,7 @@ function fillOptionsWithDefaults(options) {
     if (!options.idb) options.idb = {};
     //  after this time the messages get deleted
     if (!options.idb.ttl) options.idb.ttl = 1000 * 45;
-    if (!options.idb.fallbackInterval) options.idb.fallbackInterval = 50;
+    if (!options.idb.fallbackInterval) options.idb.fallbackInterval = 150;
 
     // localstorage
     if (!options.localstorage) options.localstorage = {};

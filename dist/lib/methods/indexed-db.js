@@ -238,6 +238,9 @@ function _filterMessage(msgObj, state) {
  */
 function readNewMessages(state) {
 
+    // channel already closed
+    if (state.closed) return Promise.resolve();
+
     // if no one is listening, we do not need to scan for new messages
     if (!state.messagesCallback) return Promise.resolve();
 
@@ -296,5 +299,5 @@ function canBeUsed() {
 }
 
 function averageResponseTime(options) {
-    return options.idb.fallbackInterval * 1.5;
+    return options.idb.fallbackInterval * 2;
 }
