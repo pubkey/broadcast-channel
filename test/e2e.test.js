@@ -57,7 +57,9 @@ fixture`Example page`
             // console.log(JSON.stringify(out));
 
             // make a console.log so travis does not terminate because of no output
-                console.log('LeaderElection(' + methodType + ') still no success');
+
+            const iframeAmount = await Selector('#leader-iframes iframe').count;
+            console.log('LeaderElection(' + methodType + ') still no success (' + iframeAmount + ' iframes left)');
 
             return value === 'SUCCESS';
         }, 0, 1000);
