@@ -32,7 +32,7 @@
     "test": "npm run test:node && npm run test:browser && npm run test:e2e",
     "test:node": "npm run build && mocha ./test/index.test.js -b --timeout 6000 --exit",
     "test:browser": "npm run build && karma start ./config/karma.conf.js --single-run",
-    "test:e2e": "concurrently \"npm run docs:serve\" \"sleep 5 && testcafe all test/e2e.test.js\" --kill-others --success first",
+    "test:e2e": "concurrently \"npm run docs:serve\" \"sleep 5 && testcafe -b && testcafe all test/e2e.test.js\" --kill-others --success first",
     "test:typings": "npm run build && mocha ./test/typings.test.js -b --timeout 12000 --exit",
     "test:performance": "npm run build && mocha ./test/performance.test.js -b --timeout 24000 --exit",
     "size:prewebpack": "npm run build && cross-env NODE_ENV=build webpack --config ./config/webpack.config.js",
