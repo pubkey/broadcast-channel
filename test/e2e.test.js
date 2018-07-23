@@ -63,5 +63,6 @@ fixture`Example page`
 
             return value === 'SUCCESS';
         }, 0, 1000);
+        console.log('LeaderElection(' + methodType + ') DONE');
     });
 });
