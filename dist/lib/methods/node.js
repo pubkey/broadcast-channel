@@ -83,9 +83,7 @@ var createSocketEventEmitter = exports.createSocketEventEmitter = function () {
                         pathToSocket = socketPath(channelName, readerUuid);
                         emitter = new events.EventEmitter();
                         server = net.createServer(function (stream) {
-                            stream.on('end', function () {
-                                // console.log('server: end');
-                            });
+                            stream.on('end', function () {});
 
                             stream.on('data', function (msg) {
                                 emitter.emit('data', msg.toString());
@@ -99,9 +97,7 @@ var createSocketEventEmitter = exports.createSocketEventEmitter = function () {
                         });
 
                     case 5:
-                        server.on('connection', function () {
-                            // console.log('server: Client connected.');
-                        });
+                        server.on('connection', function () {});
 
                         return _context2.abrupt('return', {
                             path: pathToSocket,
@@ -781,15 +777,6 @@ function readMessage(messageObj) {
 var type = exports.type = 'node';
 
 function _filterMessage(msgObj, state) {
-
-    /*    console.log('_filterMessage()');
-        console.dir(msgObj);
-        console.log(msgObj.senderUuid === state.uuid);
-        console.log(state.emittedMessagesIds.has(msgObj.token));
-        console.log(!state.messagesCallback);
-        console.log(msgObj.time < state.messagesCallbackTime);
-        console.log(msgObj.time < state.time);*/
-
     if (msgObj.senderUuid === state.uuid) return false; // not send by own
     if (state.emittedMessagesIds.has(msgObj.token)) return false; // not already emitted
     if (!state.messagesCallback) return false; // no listener
@@ -890,7 +877,6 @@ function emitOverFastPath(state, msgObj, messageJson) {
     others.filter(function (otherState) {
         return _filterMessage(checkObj, otherState);
     }).forEach(function (otherState) {
-        //  console.log('EMIT OVER FAST PATH');
         otherState.messagesCallback(messageJson);
     });
 }

@@ -174,11 +174,6 @@ function _startListening(channel) {
 
         var listenerFn = function listenerFn(msgObj) {
             channel._addEventListeners[msgObj.type].forEach(function (obj) {
-                /*
-                console.log('got message for ' + channel._state.uuid);
-                console.log('... message time:' + channel._state.uuid + ' - ' + msgObj.time);
-                console.log('listener time:' + channel._state.uuid + ' - ' + obj.time);
-                */
                 if (msgObj.time >= obj.time) {
                     obj.fn(msgObj.data);
                 }

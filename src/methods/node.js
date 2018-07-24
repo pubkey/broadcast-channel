@@ -144,7 +144,6 @@ export async function createSocketEventEmitter(channelName, readerUuid) {
     const server = net
         .createServer(stream => {
             stream.on('end', function () {
-                // console.log('server: end');
             });
 
             stream.on('data', function (msg) {
@@ -158,7 +157,6 @@ export async function createSocketEventEmitter(channelName, readerUuid) {
         });
     });
     server.on('connection', () => {
-        // console.log('server: Client connected.');
     });
 
     return {
@@ -349,15 +347,6 @@ export async function create(channelName, options = {}) {
 }
 
 export function _filterMessage(msgObj, state) {
-
-    /*    console.log('_filterMessage()');
-        console.dir(msgObj);
-        console.log(msgObj.senderUuid === state.uuid);
-        console.log(state.emittedMessagesIds.has(msgObj.token));
-        console.log(!state.messagesCallback);
-        console.log(msgObj.time < state.messagesCallbackTime);
-        console.log(msgObj.time < state.time);*/
-
     if (msgObj.senderUuid === state.uuid) return false; // not send by own
     if (state.emittedMessagesIds.has(msgObj.token)) return false; // not already emitted
     if (!state.messagesCallback) return false; // no listener
@@ -514,7 +503,6 @@ export function emitOverFastPath(state, msgObj, messageJson) {
     others
         .filter(otherState => _filterMessage(checkObj, otherState))
         .forEach(otherState => {
-            //  console.log('EMIT OVER FAST PATH');
             otherState.messagesCallback(messageJson);
         });
 }
