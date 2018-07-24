@@ -120,7 +120,7 @@ Create a channel and an elector.
 
 ```js
 const BroadcastChannel = require('broadcast-channel');
-const LeaderElection = require('leader-election');
+const LeaderElection = require('broadcast-channel/leader-election');
 const channel = new BroadcastChannel('foobar');
 const elector = LeaderElection.create(channel);
 ```
@@ -128,7 +128,7 @@ const elector = LeaderElection.create(channel);
 Wait until the elector becomes leader.
 
 ```js
-const LeaderElection = require('leader-election');
+const LeaderElection = require('broadcast-channel/leader-election');
 const elector = LeaderElection.create(channel);
 elector.awaitLeadership().then(()=> {
   console.log('this tab is now leader');
