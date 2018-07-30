@@ -3,7 +3,7 @@ import {
     randomToken
 } from '../util.js';
 
-import unload from 'unload';
+import * as unload from 'unload';
 
 const LeaderElection = function (channel, options) {
     this._channel = channel;
@@ -139,7 +139,7 @@ LeaderElection.prototype = {
         this._listeners.forEach(listener => this._channel.removeEventListener('internal', listener));
         this._intervals.forEach(interval => clearInterval(interval));
         this._unloads.forEach(uFn => {
-            uFn();
+            uFn.remove();
         });
         return this._sendMessage('death');
     },

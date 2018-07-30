@@ -205,3 +205,33 @@ AFTER: {
 }
 
 -----------------------------------------
+
+## no default import
+npm run build:size
+BEFORE: 112358
+AFTER : 112401
+
+
+## only use async/await when needed
+BEFORE: 112401
+AFTER : 111582
+
+
+-----------------------------------------
+new unload module
+
+BEFORE: {
+  "openClose": 765.1154530011117,
+  "sendRecieve": {
+    "parallel": 259.89112799987197,
+    "series": 4052.1648419983685
+  }
+}
+
+AFTER: {
+  "openClose": 672.2327830009162,
+  "sendRecieve": {
+    "parallel": 250.701522000134,
+    "series": 4001.1675169989467
+  }
+}

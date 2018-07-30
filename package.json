@@ -63,7 +63,7 @@
     "js-sha3": "0.7.0",
     "microseconds": "0.1.0",
     "nano-time": "1.0.0",
-    "unload": "1.3.9"
+    "unload": "2.0.0"
   },
   "devDependencies": {
     "@types/core-js": "2.5.0",

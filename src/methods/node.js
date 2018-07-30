@@ -16,7 +16,7 @@ import {
 } from 'js-sha3';
 
 import isNode from 'detect-node';
-import unload from 'unload';
+const unload = require('unload');
 
 import {
     fillOptionsWithDefaults
@@ -520,8 +520,9 @@ export function close(channelState) {
     channelState.emittedMessagesIds.clear();
     OTHER_INSTANCES[channelState.channelName] = OTHER_INSTANCES[channelState.channelName].filter(o => o !== channelState);
 
-    if (typeof channelState.removeUnload === 'function')
-        channelState.removeUnload();
+    if (channelState.removeUnload) {
+        channelState.removeUnload.remove();
+    }
 
     /**
      * the server get closed lazy because others might still write on it
