@@ -16,7 +16,7 @@ import micro from 'nano-time';
 import { sha3_224 } from 'js-sha3';
 
 import isNode from 'detect-node';
-import unload from 'unload';
+var unload = require('unload');
 
 import { fillOptionsWithDefaults } from '../options';
 
@@ -833,7 +833,9 @@ export function close(channelState) {
         return o !== channelState;
     });
 
-    if (typeof channelState.removeUnload === 'function') channelState.removeUnload();
+    if (channelState.removeUnload) {
+        channelState.removeUnload.remove();
+    }
 
     /**
      * the server get closed lazy because others might still write on it

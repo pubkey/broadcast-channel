@@ -9,9 +9,9 @@ var _util = require('../util.js');
 
 var _unload = require('unload');
 
-var _unload2 = _interopRequireDefault(_unload);
+var unload = _interopRequireWildcard(_unload);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
 
 var LeaderElection = function LeaderElection(channel, options) {
     this._channel = channel;
@@ -156,7 +156,7 @@ LeaderElection.prototype = {
             return clearInterval(interval);
         });
         this._unloads.forEach(function (uFn) {
-            uFn();
+            uFn.remove();
         });
         return this._sendMessage('death');
     },
@@ -177,7 +177,7 @@ LeaderElection.prototype = {
         var _this4 = this;
 
         this.isLeader = true;
-        var unloadFn = _unload2['default'].add(function () {
+        var unloadFn = unload.add(function () {
             return _this4.die();
         });
         this._unloads.push(unloadFn);

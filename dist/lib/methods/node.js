@@ -357,7 +357,7 @@ var create = exports.create = function () {
                             writeBlockPromise: Promise.resolve(),
                             otherReaderClients: {},
                             // ensure if process crashes, everything is cleaned up
-                            removeUnload: _unload2['default'].add(function () {
+                            removeUnload: unload.add(function () {
                                 return close(state);
                             }),
                             closed: false
@@ -669,10 +669,6 @@ var _detectNode = require('detect-node');
 
 var _detectNode2 = _interopRequireDefault(_detectNode);
 
-var _unload = require('unload');
-
-var _unload2 = _interopRequireDefault(_unload);
-
 var _options = require('../options');
 
 var _util2 = require('../util');
@@ -684,6 +680,11 @@ var _obliviousSet2 = _interopRequireDefault(_obliviousSet);
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var unload = require('unload'); /**
+                                 * this method is used in nodejs-environments.
+                                 * The ipc is handled via sockets and file-writes to the tmp-folder
+                                 */
 
 /**
  * windows sucks, so we have handle windows-type of socket-paths
@@ -697,10 +698,7 @@ function cleanPipeName(str) {
     } else {
         return str;
     }
-} /**
-   * this method is used in nodejs-environments.
-   * The ipc is handled via sockets and file-writes to the tmp-folder
-   */
+}
 
 var mkdir = util.promisify(fs.mkdir);
 var writeFile = util.promisify(fs.writeFile);
@@ -897,7 +895,9 @@ function close(channelState) {
         return o !== channelState;
     });
 
-    if (typeof channelState.removeUnload === 'function') channelState.removeUnload();
+    if (channelState.removeUnload) {
+        channelState.removeUnload.remove();
+    }
 
     /**
      * the server get closed lazy because others might still write on it

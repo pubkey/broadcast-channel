@@ -1,6 +1,6 @@
 import { sleep, randomToken } from '../util.js';
 
-import unload from 'unload';
+import * as unload from 'unload';
 
 var LeaderElection = function LeaderElection(channel, options) {
     this._channel = channel;
@@ -145,7 +145,7 @@ LeaderElection.prototype = {
             return clearInterval(interval);
         });
         this._unloads.forEach(function (uFn) {
-            uFn();
+            uFn.remove();
         });
         return this._sendMessage('death');
     },
