@@ -469,7 +469,12 @@ var REQUIRE_FUN = require;
  * so it will not get bundled in browser-builds
  */
 if (isNode) {
-    var NodeMethod = REQUIRE_FUN('./methods/node.js');
+
+    /**
+     * we use the non-transpiled code for nodejs
+     * because it runs faster
+     */
+    var NodeMethod = REQUIRE_FUN('../../src/methods/node.js');
 
     /**
      * this will be false for webpackbuilds

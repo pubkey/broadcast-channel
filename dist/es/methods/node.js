@@ -1,74 +1,7 @@
 import _regeneratorRuntime from 'babel-runtime/regenerator';
 import _asyncToGenerator from 'babel-runtime/helpers/asyncToGenerator';
-/**
- * this method is used in nodejs-environments.
- * The ipc is handled via sockets and file-writes to the tmp-folder
- */
 
-import * as util from 'util';
-import * as fs from 'fs';
-import * as os from 'os';
-import * as events from 'events';
-import * as net from 'net';
-import * as path from 'path';
-import micro from 'nano-time';
-
-import { sha3_224 } from 'js-sha3';
-
-import isNode from 'detect-node';
-var unload = require('unload');
-
-import { fillOptionsWithDefaults } from '../options';
-
-import { randomInt, randomToken } from '../util';
-
-import ObliviousSet from '../oblivious-set';
-
-/**
- * windows sucks, so we have handle windows-type of socket-paths
- * @link https://gist.github.com/domenic/2790533#gistcomment-331356
- */
-export function cleanPipeName(str) {
-    if (process.platform === 'win32' && !str.startsWith('\\\\.\\pipe\\')) {
-        str = str.replace(/^\//, '');
-        str = str.replace(/\//g, '-');
-        return '\\\\.\\pipe\\' + str;
-    } else {
-        return str;
-    }
-}
-
-var mkdir = util.promisify(fs.mkdir);
-var writeFile = util.promisify(fs.writeFile);
-var readFile = util.promisify(fs.readFile);
-var unlink = util.promisify(fs.unlink);
-var readdir = util.promisify(fs.readdir);
-
-var TMP_FOLDER_NAME = 'pubkey.broadcast-channel';
-var OTHER_INSTANCES = {};
-
-var getPathsCache = new Map();
-export function getPaths(channelName) {
-    if (!getPathsCache.has(channelName)) {
-        var folderPathBase = path.join(os.tmpdir(), TMP_FOLDER_NAME);
-        var channelPathBase = path.join(os.tmpdir(), TMP_FOLDER_NAME, sha3_224(channelName) // use hash incase of strange characters
-        );
-        var folderPathReaders = path.join(channelPathBase, 'readers');
-        var folderPathMessages = path.join(channelPathBase, 'messages');
-
-        var ret = {
-            base: folderPathBase,
-            channelBase: channelPathBase,
-            readers: folderPathReaders,
-            messages: folderPathMessages
-        };
-        getPathsCache.set(channelName, ret);
-        return ret;
-    }
-    return getPathsCache.get(channelName);
-}
-
-export var ensureFoldersExist = function () {
+var ensureFoldersExist = function () {
     var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee(channelName) {
         var paths;
         return _regeneratorRuntime.wrap(function _callee$(_context) {
@@ -120,38 +53,11 @@ export var ensureFoldersExist = function () {
     };
 }();
 
-export function socketPath(channelName, readerUuid) {
-
-    var paths = getPaths(channelName);
-    var socketPath = path.join(paths.readers, readerUuid + '.s');
-    return cleanPipeName(socketPath);
-}
-
-export function socketInfoPath(channelName, readerUuid) {
-    var paths = getPaths(channelName);
-    var socketPath = path.join(paths.readers, readerUuid + '.json');
-    return socketPath;
-}
-
-/**
- * Because it is not possible to get all socket-files in a folder,
- * when used under fucking windows,
- * we have to set a normal file so other readers know our socket exists
- */
-export function createSocketInfoFile(channelName, readerUuid) {
-    var pathToFile = socketInfoPath(channelName, readerUuid);
-    return writeFile(pathToFile, JSON.stringify({
-        time: microSeconds()
-    })).then(function () {
-        return pathToFile;
-    });
-}
-
 /**
  * creates the socket-file and subscribes to it
  * @return {{emitter: EventEmitter, server: any}}
  */
-export var createSocketEventEmitter = function () {
+var createSocketEventEmitter = function () {
     var _ref2 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee2(channelName, readerUuid) {
         var pathToSocket, emitter, server;
         return _regeneratorRuntime.wrap(function _callee2$(_context2) {
@@ -196,7 +102,7 @@ export var createSocketEventEmitter = function () {
     };
 }();
 
-export var openClientConnection = function () {
+var openClientConnection = function () {
     var _ref3 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee3(channelName, readerUuid) {
         var pathToSocket, client;
         return _regeneratorRuntime.wrap(function _callee3$(_context3) {
@@ -230,7 +136,9 @@ export var openClientConnection = function () {
  * writes the new message to the file-system
  * so other readers can find it
  */
-export var writeMessage = function () {
+
+
+var writeMessage = function () {
     var _ref4 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee4(channelName, readerUuid, messageJson) {
         var time, writeObject, token, fileName, msgPath;
         return _regeneratorRuntime.wrap(function _callee4$(_context4) {
@@ -274,7 +182,9 @@ export var writeMessage = function () {
  * returns the uuids of all readers
  * @return {string[]}
  */
-export var getReadersUuids = function () {
+
+
+var getReadersUuids = function () {
     var _ref5 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee5(channelName) {
         var readersPath, files;
         return _regeneratorRuntime.wrap(function _callee5$(_context5) {
@@ -309,7 +219,7 @@ export var getReadersUuids = function () {
     };
 }();
 
-export var messagePath = function () {
+var messagePath = function () {
     var _ref6 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee6(channelName, time, token, writerUuid) {
         var fileName, msgPath;
         return _regeneratorRuntime.wrap(function _callee6$(_context6) {
@@ -333,7 +243,7 @@ export var messagePath = function () {
     };
 }();
 
-export var getAllMessages = function () {
+var getAllMessages = function () {
     var _ref7 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee7(channelName) {
         var messagesPath, files;
         return _regeneratorRuntime.wrap(function _callee7$(_context7) {
@@ -371,24 +281,7 @@ export var getAllMessages = function () {
     };
 }();
 
-export function getSingleMessage(channelName, msgObj) {
-    var messagesPath = getPaths(channelName).messages;
-
-    return {
-        path: path.join(messagesPath, msgObj.t + '_' + msgObj.u + '_' + msgObj.to + '.json'),
-        time: msgObj.t,
-        senderUuid: msgObj.u,
-        token: msgObj.to
-    };
-}
-
-export function readMessage(messageObj) {
-    return readFile(messageObj.path, 'utf8').then(function (content) {
-        return JSON.parse(content);
-    });
-}
-
-export var cleanOldMessages = function () {
+var cleanOldMessages = function () {
     var _ref8 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee8(messageObjects, ttl) {
         var olderThen;
         return _regeneratorRuntime.wrap(function _callee8$(_context8) {
@@ -418,9 +311,7 @@ export var cleanOldMessages = function () {
     };
 }();
 
-export var type = 'node';
-
-export var create = function () {
+var create = function () {
     var _ref9 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee9(channelName) {
         var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
@@ -504,22 +395,11 @@ export var create = function () {
     };
 }();
 
-export function _filterMessage(msgObj, state) {
-    if (msgObj.senderUuid === state.uuid) return false; // not send by own
-    if (state.emittedMessagesIds.has(msgObj.token)) return false; // not already emitted
-    if (!state.messagesCallback) return false; // no listener
-    if (msgObj.time < state.messagesCallbackTime) return false; // not older then onMessageCallback
-    if (msgObj.time < state.time) return false; // msgObj is older then channel
-
-    state.emittedMessagesIds.add(msgObj.token);
-    return true;
-}
-
 /**
  * when the socket pings, so that we now new messages came,
  * run this
  */
-export var handleMessagePing = function () {
+var handleMessagePing = function () {
     var _ref11 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee10(state, msgObj) {
         var messages, useMessages;
         return _regeneratorRuntime.wrap(function _callee10$(_context10) {
@@ -602,7 +482,7 @@ export var handleMessagePing = function () {
     };
 }();
 
-export var refreshReaderClients = function () {
+var refreshReaderClients = function () {
     var _ref12 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee13(channelState) {
         var _this = this;
 
@@ -722,7 +602,131 @@ export var refreshReaderClients = function () {
     };
 }();
 
-export function postMessage(channelState, messageJson) {
+/**
+ * this method is used in nodejs-environments.
+ * The ipc is handled via sockets and file-writes to the tmp-folder
+ */
+
+var util = require('util');
+var fs = require('fs');
+var os = require('os');
+var events = require('events');
+var net = require('net');
+var path = require('path');
+var micro = require('nano-time');
+
+var sha3_224 = require('js-sha3').sha3_224;
+var isNode = require('detect-node');
+var unload = require('unload');
+
+var fillOptionsWithDefaults = require('../../dist/lib/options.js').fillOptionsWithDefaults;
+var ownUtil = require('../../dist/lib/util.js');
+var randomInt = ownUtil.randomInt;
+var randomToken = ownUtil.randomToken;
+var ObliviousSet = require('../../dist/lib/oblivious-set')['default'];
+
+/**
+ * windows sucks, so we have handle windows-type of socket-paths
+ * @link https://gist.github.com/domenic/2790533#gistcomment-331356
+ */
+function cleanPipeName(str) {
+    if (process.platform === 'win32' && !str.startsWith('\\\\.\\pipe\\')) {
+        str = str.replace(/^\//, '');
+        str = str.replace(/\//g, '-');
+        return '\\\\.\\pipe\\' + str;
+    } else {
+        return str;
+    }
+}
+
+var mkdir = util.promisify(fs.mkdir);
+var writeFile = util.promisify(fs.writeFile);
+var readFile = util.promisify(fs.readFile);
+var unlink = util.promisify(fs.unlink);
+var readdir = util.promisify(fs.readdir);
+
+var TMP_FOLDER_NAME = 'pubkey.broadcast-channel';
+var OTHER_INSTANCES = {};
+
+var getPathsCache = new Map();
+function getPaths(channelName) {
+    if (!getPathsCache.has(channelName)) {
+        var folderPathBase = path.join(os.tmpdir(), TMP_FOLDER_NAME);
+        var channelPathBase = path.join(os.tmpdir(), TMP_FOLDER_NAME, sha3_224(channelName) // use hash incase of strange characters
+        );
+        var folderPathReaders = path.join(channelPathBase, 'readers');
+        var folderPathMessages = path.join(channelPathBase, 'messages');
+
+        var ret = {
+            base: folderPathBase,
+            channelBase: channelPathBase,
+            readers: folderPathReaders,
+            messages: folderPathMessages
+        };
+        getPathsCache.set(channelName, ret);
+        return ret;
+    }
+    return getPathsCache.get(channelName);
+}
+
+function socketPath(channelName, readerUuid) {
+
+    var paths = getPaths(channelName);
+    var socketPath = path.join(paths.readers, readerUuid + '.s');
+    return cleanPipeName(socketPath);
+}
+
+function socketInfoPath(channelName, readerUuid) {
+    var paths = getPaths(channelName);
+    var socketPath = path.join(paths.readers, readerUuid + '.json');
+    return socketPath;
+}
+
+/**
+ * Because it is not possible to get all socket-files in a folder,
+ * when used under fucking windows,
+ * we have to set a normal file so other readers know our socket exists
+ */
+function createSocketInfoFile(channelName, readerUuid) {
+    var pathToFile = socketInfoPath(channelName, readerUuid);
+    return writeFile(pathToFile, JSON.stringify({
+        time: microSeconds()
+    })).then(function () {
+        return pathToFile;
+    });
+}
+
+function getSingleMessage(channelName, msgObj) {
+    var messagesPath = getPaths(channelName).messages;
+
+    return {
+        path: path.join(messagesPath, msgObj.t + '_' + msgObj.u + '_' + msgObj.to + '.json'),
+        time: msgObj.t,
+        senderUuid: msgObj.u,
+        token: msgObj.to
+    };
+}
+
+function readMessage(messageObj) {
+    return readFile(messageObj.path, 'utf8').then(function (content) {
+        return JSON.parse(content);
+    });
+}
+
+var type = 'node';
+
+function _filterMessage(msgObj, state) {
+    if (msgObj.senderUuid === state.uuid) return false; // not send by own
+    if (state.emittedMessagesIds.has(msgObj.token)) return false; // not already emitted
+    if (!state.messagesCallback) return false; // no listener
+    if (msgObj.time < state.messagesCallbackTime) return false; // not older then onMessageCallback
+    if (msgObj.time < state.time) return false; // msgObj is older then channel
+
+    state.emittedMessagesIds.add(msgObj.token);
+    return true;
+}
+
+function postMessage(channelState, messageJson) {
     var _this2 = this;
 
     var writePromise = writeMessage(channelState.channelName, channelState.uuid, messageJson);
@@ -798,7 +802,7 @@ export function postMessage(channelState, messageJson) {
  * This might not happen often in production
  * but will speed up things when this module is used in unit-tests.
  */
-export function emitOverFastPath(state, msgObj, messageJson) {
+function emitOverFastPath(state, msgObj, messageJson) {
     if (!state.options.node.useFastPath) return; // disabled
     var others = OTHER_INSTANCES[state.channelName].filter(function (s) {
         return s !== state;
@@ -817,7 +821,7 @@ export function emitOverFastPath(state, msgObj, messageJson) {
     });
 }
 
-export function onMessage(channelState, fn) {
+function onMessage(channelState, fn) {
     var time = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : microSeconds();
 
     channelState.messagesCallbackTime = time;
@@ -825,7 +829,7 @@ export function onMessage(channelState, fn) {
     handleMessagePing(channelState);
 }
 
-export function close(channelState) {
+function close(channelState) {
     if (channelState.closed) return;
     channelState.closed = true;
     channelState.emittedMessagesIds.clear();
@@ -856,14 +860,44 @@ export function close(channelState) {
     });
 }
 
-export function canBeUsed() {
+function canBeUsed() {
     return isNode;
 }
 
-export function averageResponseTime() {
+function averageResponseTime() {
     return 50;
 }
 
-export function microSeconds() {
+function microSeconds() {
     return parseInt(micro.microseconds());
 }
+
+module.exports = {
+    cleanPipeName: cleanPipeName,
+    getPaths: getPaths,
+    ensureFoldersExist: ensureFoldersExist,
+    socketPath: socketPath,
+    socketInfoPath: socketInfoPath,
+    createSocketInfoFile: createSocketInfoFile,
+    createSocketEventEmitter: createSocketEventEmitter,
+    openClientConnection: openClientConnection,
+    writeMessage: writeMessage,
+    getReadersUuids: getReadersUuids,
+    messagePath: messagePath,
+    getAllMessages: getAllMessages,
+    getSingleMessage: getSingleMessage,
+    readMessage: readMessage,
+    cleanOldMessages: cleanOldMessages,
+    type: type,
+    create: create,
+    _filterMessage: _filterMessage,
+    handleMessagePing: handleMessagePing,
+    refreshReaderClients: refreshReaderClients,
+    postMessage: postMessage,
+    emitOverFastPath: emitOverFastPath,
+    onMessage: onMessage,
+    close: close,
+    canBeUsed: canBeUsed,
+    averageResponseTime: averageResponseTime,
+    microSeconds: microSeconds
+};
