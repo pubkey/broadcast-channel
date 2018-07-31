@@ -1,6 +1,6 @@
 {
   "name": "broadcast-channel",
-  "version": "1.2.10",
+  "version": "1.2.11",
   "description": "A BroadcastChannel implementation that works with new browsers, older browsers and Node.js",
   "homepage": "https://github.com/pubkey/broadcast-channel#readme",
   "keywords": [
@@ -63,16 +63,16 @@
     "js-sha3": "0.7.0",
     "microseconds": "0.1.0",
     "nano-time": "1.0.0",
-    "unload": "2.0.0"
+    "unload": "2.0.1"
   },
   "devDependencies": {
-    "@types/core-js": "2.5.0",
     "@babel/types": "7.0.0-beta.51",
+    "@types/core-js": "2.5.0",
     "assert": "1.4.1",
     "async-test-util": "1.6.1",
     "babel-cli": "6.26.0",
     "babel-core": "6.26.3",
-    "babel-eslint": "8.2.5",
+    "babel-eslint": "8.2.6",
     "babel-loader": "7.1.5",
     "babel-plugin-transform-async-to-generator": "6.24.1",
     "babel-plugin-transform-class-properties": "6.24.1",
@@ -93,14 +93,14 @@
     "browserify": "16.2.2",
     "child-process-promise": "2.2.1",
     "clone": "2.1.1",
-    "concurrently": "3.6.0",
+    "concurrently": "3.6.1",
     "convert-hrtime": "2.0.0",
     "copyfiles": "2.0.0",
     "cross-env": "5.2.0",
-    "eslint": "5.1.0",
+    "eslint": "5.2.0",
     "gzip-size-cli": "3.0.0",
     "http-server": "0.11.1",
-    "karma": "2.0.4",
+    "karma": "2.0.5",
     "karma-babel-preprocessor": "7.0.0",
     "karma-browserify": "5.3.0",
     "karma-chrome-launcher": "2.2.0",
@@ -120,9 +120,9 @@
     "testcafe": "0.20.4",
     "testcafe-hammerhead": "14.1.1",
     "ts-node": "7.0.0",
-    "typescript": "2.9.2",
-    "webpack": "4.16.0",
-    "webpack-cli": "3.0.8"
+    "typescript": "3.0.1",
+    "webpack": "4.16.3",
+    "webpack-cli": "3.1.0"
   },
   "browser": {
     "./dist/es/methods/node.js": false,

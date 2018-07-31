@@ -1,6 +1,6 @@
 import { sleep, randomToken } from '../util.js';
 
-import * as unload from 'unload';
+import unload from 'unload';
 
 var LeaderElection = function LeaderElection(channel, options) {
     this._channel = channel;

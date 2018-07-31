@@ -228,9 +228,9 @@ var _util = require('../util.js');
 
 var _unload = require('unload');
 
-var unload = _interopRequireWildcard(_unload);
+var _unload2 = _interopRequireDefault(_unload);
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj['default'] = obj; return newObj; } }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 var LeaderElection = function LeaderElection(channel, options) {
     this._channel = channel;
@@ -396,7 +396,7 @@ LeaderElection.prototype = {
         var _this4 = this;
 
         this.isLeader = true;
-        var unloadFn = unload.add(function () {
+        var unloadFn = _unload2['default'].add(function () {
             return _this4.die();
         });
         this._unloads.push(unloadFn);
@@ -9105,6 +9105,13 @@ function removeAll() {
 function getSize() {
     return LISTENERS.size;
 }
+
+exports['default'] = {
+    add: add,
+    runAll: runAll,
+    removeAll: removeAll,
+    getSize: getSize
+};
 },{"./browser.js":407,"./node.js":17,"babel-runtime/helpers/typeof":16,"detect-node":406}],409:[function(require,module,exports){
 'use strict';
 

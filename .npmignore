@@ -6,6 +6,7 @@ test_tmp/
 tmp/
 .babelrc
 .editorconfig
+.eslintignore
 .eslintrc.json
 .gitignore
 .travis.yml
@@ -13,3 +14,4 @@ ISSUE_TEMPLATE.md
 PULL_REQUEST_TEMPLATE.md
 
 log.txt
+perf.txt

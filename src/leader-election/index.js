@@ -3,7 +3,7 @@ import {
     randomToken
 } from '../util.js';
 
-import * as unload from 'unload';
+import unload from 'unload';
 
 const LeaderElection = function (channel, options) {
     this._channel = channel;
