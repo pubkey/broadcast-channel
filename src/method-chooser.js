@@ -18,6 +18,11 @@ const REQUIRE_FUN = require;
  * so it will not get bundled in browser-builds
  */
 if (isNode) {
+
+    /**
+     * we use the non-transpiled code for nodejs
+     * because it runs faster
+     */
     const NodeMethod = REQUIRE_FUN('../../src/methods/node.js');
 
     /**
