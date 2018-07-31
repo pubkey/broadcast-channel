@@ -235,3 +235,22 @@ AFTER: {
     "series": 4001.1675169989467
   }
 }
+
+-----------------------------------------
+use native node-code without transpilation
+
+BEFORE: {
+  "openClose": 733.8300310000777,
+  "sendRecieve": {
+    "parallel": 245.27187200076878,
+    "series": 3865.821045000106
+  }
+}
+
+AFTER: {
+  "openClose": 577.4335329998285,
+  "sendRecieve": {
+    "parallel": 226.03592699952424,
+    "series": 4163.729206999764
+  }
+}

@@ -18,7 +18,7 @@ const REQUIRE_FUN = require;
  * so it will not get bundled in browser-builds
  */
 if (isNode) {
-    const NodeMethod = REQUIRE_FUN('./methods/node.js');
+    const NodeMethod = REQUIRE_FUN('../../src/methods/node.js');
 
     /**
      * this will be false for webpackbuilds
