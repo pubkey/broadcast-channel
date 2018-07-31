@@ -7,7 +7,7 @@ describe('unit/node.method.test.js', () => {
      * do not run in browser-tests
      */
     if (!isNode) return;
-    const NodeMethod = require('../../dist/lib/methods/node.js');
+    const NodeMethod = require('../../src/methods/node.js');
 
     it('init', () => {
         process.setMaxListeners(0);

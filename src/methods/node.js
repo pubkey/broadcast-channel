@@ -15,7 +15,7 @@ const sha3_224 = require('js-sha3').sha3_224;
 const isNode = require('detect-node');
 const unload = require('unload');
 
-const fillOptionsWithDefaults = require('../../dist/lib/options').fillOptionsWithDefaults;
+const fillOptionsWithDefaults = require('../../dist/lib/options.js').fillOptionsWithDefaults;
 const ownUtil = require('../../dist/lib/util.js');
 const randomInt = ownUtil.randomInt;
 const randomToken = ownUtil.randomToken;
