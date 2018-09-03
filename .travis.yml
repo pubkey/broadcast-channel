@@ -14,12 +14,12 @@ before_install:
 
 script:
 - travis_retry npm install --depth 0 --silent
-- npm run lint
-- npm run build
 - travis_retry npm run test:node
 - travis_retry npm run test:browser
 - travis_retry npm run test:e2e:travis
 - travis_retry npm run test:performance
+- npm run build
+- npm run lint
 - npm run test:typings
 - npm run size:webpack
 - npm run size:browserify

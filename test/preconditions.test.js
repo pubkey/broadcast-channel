@@ -30,7 +30,7 @@ describe('preconditions.test.js', () => {
 
         const subPath = path.join(
             basePath,
-            '8774632fea54ed06c29fb87748cd50a0bbb24430017e8fad9300257c'
+            'a8774632fea54ed06c29fb87748cd50a0bbb24430017e8fad9300257c'
         );
         console.log('create subPath path:' + subPath);
         await mkdir(subPath).catch(() => null);
