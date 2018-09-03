@@ -110,7 +110,7 @@ describe('unit/node.method.test.js', () => {
 
             const socket1 = await NodeMethod.createSocketEventEmitter(channelName, AsyncTestUtil.randomString(6));
 
-            await AsyncTestUtil.wait(1000); // lets try waiting a bit
+            await AsyncTestUtil.wait(2000); // lets try waiting a bit
 
             const socket2 = await NodeMethod.createSocketEventEmitter(channelName, AsyncTestUtil.randomString(6));
 
