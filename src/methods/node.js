@@ -148,10 +148,10 @@ function createSocketInfoFile(channelName, readerUuid) {
  * @return {{emitter: EventEmitter, server: any}}
  */
 async function createSocketEventEmitter(channelName, readerUuid) {
-    console.log('createSocketEventEmitter(' + channelName + ')');
+    console.log('createSocketEventEmitter(channelName: ' + channelName + '; readerUuid: ' + readerUuid + ')');
     const pathToSocket = socketPath(channelName, readerUuid);
 
-    console.log('createSocketEventEmitter(' + channelName + '): pathToSocket: ' + pathToSocket);
+    console.log('createSocketEventEmitter(' + readerUuid + '): pathToSocket: ' + pathToSocket);
 
     const emitter = new events.EventEmitter();
     const server = net
@@ -161,12 +161,23 @@ async function createSocketEventEmitter(channelName, readerUuid) {
             stream.on('data', function(msg) {
                 emitter.emit('data', msg.toString());
             });
+
         });
 
+    server.on('error', err => {
+        console.log('createSocketEventEmitter(readerUuid: ' + readerUuid + '): server.on.(error): ' + err.code);
+        console.dir(err);
+        throw err;
+    });
+
     await new Promise((resolve, reject) => {
+
         server.listen(pathToSocket, (err, res) => {
-            if (err) reject(err);
-            else resolve(res);
+            if (err) {
+                console.log('createSocketEventEmitter(readerUuid: ' + readerUuid + '): server.listen failed with: ');
+                console.dir(err);
+                reject(err);
+            } else resolve(res);
         });
     });
     server.on('connection', () => {});

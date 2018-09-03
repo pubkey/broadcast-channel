@@ -108,7 +108,7 @@ describe('unit/node.method.test.js', () => {
             const channelName = AsyncTestUtil.randomString(12);
             await NodeMethod.ensureFoldersExist(channelName);
             const sockets = await Promise.all(
-                new Array(3).fill(0)
+                new Array(2).fill(0)
                 .map(async () => {
                     const readerUuid = AsyncTestUtil.randomString(6);
                     const socket = await NodeMethod.createSocketEventEmitter(channelName, readerUuid);
