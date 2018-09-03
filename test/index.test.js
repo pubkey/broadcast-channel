@@ -5,6 +5,7 @@ if (!isNode) {
     console.dir = obj => console.log(JSON.stringify(obj, null, 2));
 }
 
+require('./preconditions.test');
 require('./unit.test');
 require('./integration.test');
 require('./issues.test');
