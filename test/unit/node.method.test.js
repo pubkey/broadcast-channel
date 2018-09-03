@@ -35,6 +35,22 @@ describe('unit/node.method.test.js', () => {
             await NodeMethod.ensureFoldersExist(channelName);
         });
     });
+    describe('.clearNodeFolder()', () => {
+        it('should remove the folder', async () => {
+            const fs = require('fs');
+            const channelName = AsyncTestUtil.randomString(12);
+            await NodeMethod.ensureFoldersExist(channelName);
+
+            const paths = NodeMethod.getPaths(channelName);
+            const exists = fs.existsSync(paths.base);
+            assert.ok(exists);
+
+            await NodeMethod.clearNodeFolder();
+
+            const exists2 = fs.existsSync(paths.base);
+            assert.equal(exists2, false);
+        });
+    });
     describe('.createSocketInfoFile()', () => {
         it('should create the file', async () => {
             const channelName = AsyncTestUtil.randomString(12);
@@ -112,12 +128,12 @@ describe('unit/node.method.test.js', () => {
 
             const sockets = await Promise.all(
                 new Array(5).fill(0)
-                    .map(() => AsyncTestUtil.randomString(6))
-                    .map(async (readerUuid) => {
-                        await NodeMethod.createSocketInfoFile(channelName, readerUuid);
-                        const s = await NodeMethod.createSocketEventEmitter(channelName, readerUuid);
-                        return s;
-                    })
+                .map(() => AsyncTestUtil.randomString(6))
+                .map(async (readerUuid) => {
+                    await NodeMethod.createSocketInfoFile(channelName, readerUuid);
+                    const s = await NodeMethod.createSocketEventEmitter(channelName, readerUuid);
+                    return s;
+                })
             );
 
             const uuids = await NodeMethod.getReadersUuids(channelName);
@@ -195,7 +211,7 @@ describe('unit/node.method.test.js', () => {
             // write 5 messages
             await Promise.all(
                 new Array(5).fill(0)
-                    .map(() => NodeMethod.writeMessage(channelName, readerUuid, messageJson))
+                .map(() => NodeMethod.writeMessage(channelName, readerUuid, messageJson))
             );
 
             // w8 until they time out
@@ -333,7 +349,7 @@ describe('unit/node.method.test.js', () => {
         });
     });
     describe('other', () => {
-        it('should have cleaned up the messages', async function () {
+        it('should have cleaned up the messages', async function() {
             this.timeout(1000 * 20); // slow on windows
             const channelOptions = {
                 node: {
@@ -350,7 +366,7 @@ describe('unit/node.method.test.js', () => {
             // send 100 messages
             await Promise.all(
                 new Array(100).fill(0)
-                    .map(() => NodeMethod.postMessage(channelStateOwn, msgJson))
+                .map(() => NodeMethod.postMessage(channelStateOwn, msgJson))
             );
 
             // w8 until ttl has reached
@@ -359,7 +375,7 @@ describe('unit/node.method.test.js', () => {
             // send 100 messages again to trigger cleanup
             await Promise.all(
                 new Array(100).fill(0)
-                    .map(() => NodeMethod.postMessage(channelStateOwn, msgJson))
+                .map(() => NodeMethod.postMessage(channelStateOwn, msgJson))
             );
 
             // ensure only the last 100 messages are here
@@ -404,15 +420,15 @@ describe('unit/node.method.test.js', () => {
             const channelName = AsyncTestUtil.randomString(12);
             const readers = await Promise.all(
                 new Array(50).fill(0)
-                    .map(async () => {
-                        const channelState = await NodeMethod.create(channelName);
-                        const emitted = [];
-                        NodeMethod.onMessage(channelState, msg => emitted.push(msg), new Date().getMilliseconds());
-                        return {
-                            channelState,
-                            emitted
-                        };
-                    })
+                .map(async () => {
+                    const channelState = await NodeMethod.create(channelName);
+                    const emitted = [];
+                    NodeMethod.onMessage(channelState, msg => emitted.push(msg), new Date().getMilliseconds());
+                    return {
+                        channelState,
+                        emitted
+                    };
+                })
             );
 
             const senderState = await NodeMethod.create(channelName);
@@ -420,9 +436,9 @@ describe('unit/node.method.test.js', () => {
             // send 100 messages
             await Promise.all(
                 new Array(100).fill(0)
-                    .map(() => NodeMethod.postMessage(senderState, {
-                        foo: 'bar'
-                    }))
+                .map(() => NodeMethod.postMessage(senderState, {
+                    foo: 'bar'
+                }))
             );
 
             await AsyncTestUtil.waitUntil(() => {
@@ -449,8 +465,8 @@ describe('unit/node.method.test.js', () => {
 
             const otherStates = await Promise.all(
                 new Array(10)
-                    .fill(0)
-                    .map(() => NodeMethod.create(channelName))
+                .fill(0)
+                .map(() => NodeMethod.create(channelName))
             );
 
             NodeMethod.refreshReaderClients(channelStateOwn);

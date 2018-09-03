@@ -10,7 +10,7 @@ const events = require('events');
 const net = require('net');
 const path = require('path');
 const micro = require('nano-time');
-
+const rimraf = require('rimraf');
 const sha3_224 = require('js-sha3').sha3_224;
 const isNode = require('detect-node');
 const unload = require('unload');
@@ -44,11 +44,13 @@ const writeFile = util.promisify(fs.writeFile);
 const readFile = util.promisify(fs.readFile);
 const unlink = util.promisify(fs.unlink);
 const readdir = util.promisify(fs.readdir);
+const removeDir = util.promisify(rimraf);
 
 const TMP_FOLDER_NAME = 'pubkey.broadcast-channel';
 const OTHER_INSTANCES = {};
 
 const getPathsCache = new Map();
+
 function getPaths(channelName) {
     if (!getPathsCache.has(channelName)) {
         const folderPathBase = path.join(
@@ -86,10 +88,25 @@ async function ensureFoldersExist(channelName) {
     await mkdir(paths.base).catch(() => null);
     await mkdir(paths.channelBase).catch(() => null);
     await Promise.all([
-        await mkdir(paths.readers).catch(() => null),
-        await mkdir(paths.messages).catch(() => null)
+        mkdir(paths.readers).catch(() => null),
+        mkdir(paths.messages).catch(() => null)
     ]);
 }
+
+/**
+ * removes the tmp-folder
+ * @return {Promise<true>}
+ */
+async function clearNodeFolder() {
+    const paths = getPaths('foobar');
+    const removePath = paths.base;
+    if (!removePath || removePath === '' || removePath === '/') {
+        throw new Error('BroadcastChannel.clearNodeFolder(): path is wrong');
+    }
+    await removeDir(paths.base);
+    return true;
+}
+
 
 function socketPath(channelName, readerUuid) {
 
@@ -136,10 +153,9 @@ async function createSocketEventEmitter(channelName, readerUuid) {
     const emitter = new events.EventEmitter();
     const server = net
         .createServer(stream => {
-            stream.on('end', function () {
-            });
+            stream.on('end', function() {});
 
-            stream.on('data', function (msg) {
+            stream.on('data', function(msg) {
                 emitter.emit('data', msg.toString());
             });
         });
@@ -149,8 +165,7 @@ async function createSocketEventEmitter(channelName, readerUuid) {
             res();
         });
     });
-    server.on('connection', () => {
-    });
+    server.on('connection', () => {});
 
     return {
         path: pathToSocket,
@@ -272,8 +287,8 @@ async function cleanOldMessages(messageObjects, ttl) {
     const olderThen = Date.now() - ttl;
     await Promise.all(
         messageObjects
-            .filter(obj => (obj.time / 1000) < olderThen)
-            .map(obj => unlink(obj.path).catch(() => null))
+        .filter(obj => (obj.time / 1000) < olderThen)
+        .map(obj => unlink(obj.path).catch(() => null))
     );
 }
 
@@ -374,7 +389,7 @@ async function handleMessagePing(state, msgObj) {
 
     const useMessages = messages
         .filter(msgObj => _filterMessage(msgObj, state))
-        .sort((msgObjA, msgObjB) => msgObjA.time - msgObjB.time); // sort by time    
+        .sort((msgObjA, msgObjB) => msgObjA.time - msgObjB.time); // sort by time
 
 
     // if no listener or message, so not do anything
@@ -383,9 +398,9 @@ async function handleMessagePing(state, msgObj) {
     // read contents
     await Promise.all(
         useMessages
-            .map(
-                msgObj => readMessage(msgObj).then(content => msgObj.content = content)
-            )
+        .map(
+            msgObj => readMessage(msgObj).then(content => msgObj.content = content)
+        )
     );
 
     useMessages.forEach(msgObj => {
@@ -408,24 +423,24 @@ async function refreshReaderClients(channelState) {
         .forEach(async (readerUuid) => {
             try {
                 await channelState.otherReaderClients[readerUuid].destroy();
-            } catch (err) { }
+            } catch (err) {}
             delete channelState.otherReaderClients[readerUuid];
         });
 
     await Promise.all(
         otherReaders
-            .filter(readerUuid => readerUuid !== channelState.uuid) // not own
-            .filter(readerUuid => !channelState.otherReaderClients[readerUuid]) // not already has client
-            .map(async (readerUuid) => {
-                try {
-                    if (channelState.closed) return;
-                    const client = await openClientConnection(channelState.channelName, readerUuid);
-                    channelState.otherReaderClients[readerUuid] = client;
-                } catch (err) {
-                    // this might throw if the other channel is closed at the same time when this one is running refresh
-                    // so we do not throw an error
-                }
-            })
+        .filter(readerUuid => readerUuid !== channelState.uuid) // not own
+        .filter(readerUuid => !channelState.otherReaderClients[readerUuid]) // not already has client
+        .map(async (readerUuid) => {
+            try {
+                if (channelState.closed) return;
+                const client = await openClientConnection(channelState.channelName, readerUuid);
+                channelState.otherReaderClients[readerUuid] = client;
+            } catch (err) {
+                // this might throw if the other channel is closed at the same time when this one is running refresh
+                // so we do not throw an error
+            }
+        })
     );
 }
 
@@ -452,12 +467,12 @@ function postMessage(channelState, messageJson) {
 
         await Promise.all(
             Object.values(channelState.otherReaderClients)
-                .filter(client => client.writable) // client might have closed in between
-                .map(client => {
-                    return new Promise(res => {
-                        client.write(pingStr, res);
-                    });
-                })
+            .filter(client => client.writable) // client might have closed in between
+            .map(client => {
+                return new Promise(res => {
+                    client.write(pingStr, res);
+                });
+            })
         );
 
         /**
@@ -466,7 +481,8 @@ function postMessage(channelState, messageJson) {
          * only if random-int matches, we clean up old messages
          */
         if (randomInt(0, 20) === 0) {
-            /* await */ getAllMessages(channelState.channelName)
+            /* await */
+            getAllMessages(channelState.channelName)
                 .then(allMessages => cleanOldMessages(allMessages, channelState.options.node.ttl));
         }
 
@@ -548,6 +564,7 @@ module.exports = {
     cleanPipeName,
     getPaths,
     ensureFoldersExist,
+    clearNodeFolder,
     socketPath,
     socketInfoPath,
     createSocketInfoFile,

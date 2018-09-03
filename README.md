@@ -38,7 +38,7 @@ This API behaves similar to the [javascript-standard](https://developer.mozilla.
 npm install --save broadcast-channel
 ```
 
-Create a channel in one tab/process and send a message.
+#### Create a channel in one tab/process and send a message.
 
 ```js
 const BroadcastChannel = require('broadcast-channel');
@@ -46,7 +46,7 @@ const channel = new BroadcastChannel('foobar');
 channel.postMessage('I am not alone');
 ```
 
-Create a channel with the same name in another tab/process and recieve messages.
+#### Create a channel with the same name in another tab/process and recieve messages.
 
 ```js
 const BroadcastChannel = require('broadcast-channel');
@@ -56,7 +56,7 @@ channel.onmessage = msg => console.dir(msg);
 ```
 
 
-Add and remove multiple eventlisteners
+#### Add and remove multiple eventlisteners
 
 ```js
 const BroadcastChannel = require('broadcast-channel');
@@ -69,13 +69,13 @@ channel.addEventListener('message', handler);
 channel.removeEventListener('message', handler);
 ```
 
-Close the channel if you do not need it anymore.
+#### Close the channel if you do not need it anymore.
 
 ```js
 channel.close();
 ```
 
-Set options when creating a channel (optional):
+#### Set options when creating a channel (optional):
 
 ```js
 const options = {
@@ -85,7 +85,7 @@ const options = {
 const channel = new BroadcastChannel('foobar', options);
 ```
 
-Create a typed channel in typescript:
+#### Create a typed channel in typescript:
 
 ```typescript
 import BroadcastChannel from 'broadcast-channel';
@@ -96,6 +96,17 @@ const channel: BroadcastChannel<Message> = new BroadcastChannel('foobar');
 channel.postMessage({
   foo: 'bar'
 });
+```
+
+
+#### Clear tmp-folder:
+When used in NodeJs, the BroadcastChannel will communicate with other processes over filesystem based sockets.
+When you create a huge amount of channels, like you would do when running unit tests, you might get problems because there are too many folders in the tmp-directory. Calling `BroadcastChannel.clearNodeFolder()` will clear the tmp-folder and it is recommended to run this at the beginning of your test-suite.
+
+```javascript
+import BroadcastChannel from 'broadcast-channel';
+const hasRun = await BroadcastChannel.clearNodeFolder();
+console.log(hasRun); // > true on NodeJs, false on Browsers
 ```
 
 ## Methods:

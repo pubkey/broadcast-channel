@@ -335,6 +335,16 @@ function runTest(channelOptions) {
                     channel.close();
                 });
             });
+            describe('.clearNodeFolder()', () => {
+                it('should run or now throw at browsers', async () => {
+                    const hasRun = await BroadcastChannel.clearNodeFolder();
+                    if (isNode) {
+                        assert.equal(hasRun, true);
+                    } else {
+                        assert.equal(hasRun, false);
+                    }
+                });
+            });
             describe('other', () => {
                 it('should prefer localstorage if webWorkerSupport: false', async () => {
                     if (isNode) return;

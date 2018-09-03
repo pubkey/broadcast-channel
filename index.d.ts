@@ -44,6 +44,9 @@ declare class BroadcastChannel<T = any> {
     // not defined in the offical standard
     addEventListener(type: EventType, handler: OnMessageHandler<T>): void;
     removeEventListener(type: EventType, handler: OnMessageHandler<T>): void;
+
+    // statics
+    static clearNodeFolder(opts?: BroadcastChannelOptions): Promise<boolean>;
 }
 
 export default BroadcastChannel;

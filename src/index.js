@@ -12,7 +12,7 @@ import {
 
 
 
-const BroadcastChannel = function (name, options) {
+const BroadcastChannel = function(name, options) {
     this.name = name;
     this.options = fillOptionsWithDefaults(options);
     this.method = chooseMethod(this.options);
@@ -40,6 +40,23 @@ const BroadcastChannel = function (name, options) {
     _prepareChannel(this);
 };
 
+// STATICS
+
+/**
+ * clears the tmp-folder if is node
+ * @return {Promise<boolean>} true if has run, false if not node
+ */
+BroadcastChannel.clearNodeFolder = function(options) {
+    options = fillOptionsWithDefaults(options);
+    const method = chooseMethod(options);
+    if (method.type === 'node') {
+        return method.clearNodeFolder().then(() => true);
+    } else {
+        return Promise.resolve(false);
+    }
+};
+
+// PROTOTYPE
 BroadcastChannel.prototype = {
     _post(type, msg) {
         const time = this.method.microSeconds();
@@ -145,6 +162,7 @@ function _addListenerObject(channel, type, obj) {
     channel._addEventListeners[type].push(obj);
     _startListening(channel);
 }
+
 function _removeListenerObject(channel, type, obj) {
     channel._addEventListeners[type] = channel._addEventListeners[type].filter(o => o !== obj);
     _stopListening(channel);

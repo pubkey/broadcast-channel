@@ -56,6 +56,18 @@ describe('typings.test.ts', () => {
             assert.ok(thrown);
         });
     });
+    describe('statics', () => {
+        it('.clearNodeFolder()', async () => {
+            const code = `
+                (async()=>{
+                    let b: boolean = false;
+                    b = await BroadcastChannel.clearNodeFolder();
+                })();
+            `;
+            await transpileCode(code);
+        });
+
+    });
     describe('non-typed channel', () => {
         it('should be ok to create post and recieve', async () => {
             const code = `
@@ -64,7 +76,7 @@ describe('typings.test.ts', () => {
 
                     const emitted: any[] = [];
                     channel.onmessage = msg => emitted.push(msg);
-                    await channel.postMessage({foo: 'bar'});    
+                    await channel.postMessage({foo: 'bar'});
                 })();
             `;
             await transpileCode(code);
@@ -76,7 +88,7 @@ describe('typings.test.ts', () => {
 
                     const emitted: any[] = [];
                     channel.onmessage = {};
-                    await channel.postMessage({foo: 'bar'});    
+                    await channel.postMessage({foo: 'bar'});
                 })();
             `;
             await AsyncTestUtil.assertThrows(
@@ -89,7 +101,7 @@ describe('typings.test.ts', () => {
             const code = `
                 (async()=>{
                     const channel = new BroadcastChannel<Message>('foobar');
-                    await channel.postMessage({foo: 'bar'});    
+                    await channel.postMessage({foo: 'bar'});
                 })();
             `;
             await transpileCode(code);
@@ -111,7 +123,7 @@ describe('typings.test.ts', () => {
             const code = `
                 (async()=>{
                     const channel = new BroadcastChannel<Message>('foobar');
-                    await channel.postMessage({x: 42});    
+                    await channel.postMessage({x: 42});
                 })();
             `;
             await AsyncTestUtil.assertThrows(
