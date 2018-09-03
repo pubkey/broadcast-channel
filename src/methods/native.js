@@ -46,7 +46,14 @@ export function onMessage(channelState, fn, time) {
 export function canBeUsed() {
     if (isNode) return false;
 
-    if (typeof BroadcastChannel === 'function') return true;
+    if (typeof BroadcastChannel === 'function') {
+        if (BroadcastChannel._pubkey) {
+            throw new Error(
+                'BroadcastChannel: Do not overwrite window.BroadcastChannel with this module, this is not a polyfill'
+            );
+        }
+        return true;
+    } else return false;
 }
 
 

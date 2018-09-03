@@ -26,7 +26,6 @@ describe('unit/localstorage.method.test.js', () => {
             const ls = LocalstorageMethod.getLocalStorage();
             const key = LocalstorageMethod.storageKey(channelState.channelName);
             const value = JSON.parse(ls.getItem(key));
-            console.dir(value);
             assert.equal(value.data.foo, 'bar');
         });
         it('should fire an event', async () => {

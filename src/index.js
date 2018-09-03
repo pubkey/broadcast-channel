@@ -43,6 +43,13 @@ const BroadcastChannel = function(name, options) {
 // STATICS
 
 /**
+ * used to identify if someone overwrites
+ * window.BroadcastChannel with this
+ * See methods/native.js
+ */
+BroadcastChannel._pubkey = true;
+
+/**
  * clears the tmp-folder if is node
  * @return {Promise<boolean>} true if has run, false if not node
  */
