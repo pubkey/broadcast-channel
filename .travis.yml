@@ -1,16 +1,20 @@
 language: node_js
-sudo:            required
+sudo: required
 os:
   - linux
   - osx
 node_js:
   - "10.6.0"
-before_install:
-  - export CHROME_BIN=chromium-browser
-  - export DISPLAY=:99.0;
-  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then sh -e /etc/init.d/xvfb start; fi
-  - if [ "${TRAVIS_OS_NAME}" = "osx" ]; then ( sudo Xvfb :99 -ac -screen 0 1024x768x8; echo ok )& fi
-  - sleep 3 # give xvfb some time to start
+
+addons:
+  chrome: stable
+
+#before_install:
+#  - export CHROME_BIN=chromium-browser
+#  - export DISPLAY=:99.0;
+#  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then sh -e /etc/init.d/xvfb start; fi
+#  - if [ "${TRAVIS_OS_NAME}" = "osx" ]; then ( sudo Xvfb :99 -ac -screen 0 1024x768x8; echo ok )& fi
+#  - sleep 3 # give xvfb some time to start
 
 script:
 - travis_retry npm install --depth 0 --silent
