@@ -27,12 +27,10 @@ const ObliviousSet = require('../../dist/lib/oblivious-set').default;
  * @link https://gist.github.com/domenic/2790533#gistcomment-331356
  */
 function cleanPipeName(str) {
-    console.log('cleanPipeName(): ' + str);
     if (
         process.platform === 'win32' &&
         !str.startsWith('\\\\.\\pipe\\')
     ) {
-        console.log('cleanPipeName(): is win32');
         str = str.replace(/^\//, '');
         str = str.replace(/\//g, '-');
         return '\\\\.\\pipe\\' + str;
@@ -157,10 +155,7 @@ function createSocketInfoFile(channelName, readerUuid) {
  * @return {{emitter: EventEmitter, server: any}}
  */
 async function createSocketEventEmitter(channelName, readerUuid) {
-    console.log('createSocketEventEmitter(channelName: ' + channelName + '; readerUuid: ' + readerUuid + ')');
     const pathToSocket = socketPath(channelName, readerUuid);
-
-    console.log('createSocketEventEmitter(' + readerUuid + '): pathToSocket: ' + pathToSocket);
 
     const emitter = new events.EventEmitter();
     const server = net
@@ -171,20 +166,11 @@ async function createSocketEventEmitter(channelName, readerUuid) {
             });
         });
 
-    server.on('error', err => {
-        console.log('createSocketEventEmitter(readerUuid: ' + readerUuid + '): server.on.(error): ' + err.code);
-        console.dir(err);
-        throw err;
-    });
-
     await new Promise((resolve, reject) => {
 
         server.listen(pathToSocket, (err, res) => {
-            if (err) {
-                console.log('createSocketEventEmitter(readerUuid: ' + readerUuid + '): server.listen failed with: ');
-                console.dir(err);
-                reject(err);
-            } else resolve(res);
+            if (err) reject(err);
+            else resolve(res);
         });
     });
     server.on('connection', () => {});
