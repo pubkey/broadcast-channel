@@ -6,21 +6,18 @@ os:
 node_js:
   - "10.6.0"
 
-addons:
-  chrome: stable
-
-#before_install:
-#  - export CHROME_BIN=chromium-browser
-#  - export DISPLAY=:99.0;
-#  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then sh -e /etc/init.d/xvfb start; fi
-#  - if [ "${TRAVIS_OS_NAME}" = "osx" ]; then ( sudo Xvfb :99 -ac -screen 0 1024x768x8; echo ok )& fi
-#  - sleep 3 # give xvfb some time to start
+before_install:
+  - export CHROME_BIN=chromium-browser
+  - export DISPLAY=:99.0;
+  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then sh -e /etc/init.d/xvfb start; fi
+  - if [ "${TRAVIS_OS_NAME}" = "osx" ]; then ( sudo Xvfb :99 -ac -screen 0 1024x768x8; echo ok )& fi
+  - sleep 3 # give xvfb some time to start
 
 script:
 - travis_retry npm install --depth 0 --silent
 - travis_retry npm run test:node
-- travis_retry npm run test:browser
-- travis_retry npm run test:e2e:travis
+- if [ "${TRAVIS_OS_NAME}" = "linux" ]; travis_retry npm run test:browser fi
+- if [ "${TRAVIS_OS_NAME}" = "linux" ]; travis_retry npm run test:e2e:travis fi
 - travis_retry npm run test:performance
 - npm run build
 - npm run lint
