@@ -16,8 +16,8 @@ before_install:
 script:
 - travis_retry npm install --depth 0 --silent
 - travis_retry npm run test:node
-- if [ "${TRAVIS_OS_NAME}" = "linux" ]; travis_retry npm run test:browser fi
-- if [ "${TRAVIS_OS_NAME}" = "linux" ]; travis_retry npm run test:e2e:travis fi
+- if [ "${TRAVIS_OS_NAME}" = "linux" ]; then travis_retry npm run test:browser fi
+- if [ "${TRAVIS_OS_NAME}" = "linux" ]; then travis_retry npm run test:e2e:travis fi
 - travis_retry npm run test:performance
 - npm run build
 - npm run lint
