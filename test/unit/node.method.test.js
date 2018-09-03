@@ -102,6 +102,9 @@ describe('unit/node.method.test.js', () => {
             socket.server.close();
         });
         it('should be able to call createSocketEventEmitter() in parallel', async () => {
+            await AsyncTestUtil.wait(200);
+            console.log('-'.repeat(25));
+
             const channelName = AsyncTestUtil.randomString(12);
             await NodeMethod.ensureFoldersExist(channelName);
             const sockets = await Promise.all(

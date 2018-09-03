@@ -161,9 +161,10 @@ async function createSocketEventEmitter(channelName, readerUuid) {
             });
         });
 
-    await new Promise(res => {
-        server.listen(pathToSocket, () => {
-            res();
+    await new Promise((resolve, reject) => {
+        server.listen(pathToSocket, (err, res) => {
+            if(err) reject(err);
+            else resolve(res);
         });
     });
     server.on('connection', () => {});
