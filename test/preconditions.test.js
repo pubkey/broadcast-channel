@@ -22,14 +22,29 @@ describe('preconditions.test.js', () => {
         // create sub-folder in tmp
         const basePath = path.join(
             os.tmpdir(),
-            'bc-precondition-sockets'
+            'pubkey.precondition-sockets'
         );
+        console.log('create base path:' + basePath);
         await mkdir(basePath).catch(() => null);
 
-        // create server 1
-        const server1Path = path.join(
+        const subPath = path.join(
             basePath,
-            'test1.s'
+            '8774632fea54ed06c29fb87748cd50a0bbb24430017e8fad9300257c'
+        );
+        console.log('create subPath path:' + subPath);
+        await mkdir(subPath).catch(() => null);
+
+        const readerPath = path.join(
+            subPath,
+            'readers'
+        );
+        console.log('create readerPath path:' + readerPath);
+        await mkdir(readerPath).catch(() => null);
+
+        console.log('# create server 1');
+        const server1Path = path.join(
+            readerPath,
+            'asdf1.s'
         );
         console.log('server1Path: ' + server1Path);
         const server1 = net
@@ -57,10 +72,10 @@ describe('preconditions.test.js', () => {
         // w8 a bit
         await AsyncTestUtil.wait(2000);
 
-        // create server 2
+        console.log('# create server 2');
         const server2Path = path.join(
-            basePath,
-            'test2.s'
+            readerPath,
+            'asdf2.s'
         );
         console.log('server2Path: ' + server2Path);
         const server2 = net
