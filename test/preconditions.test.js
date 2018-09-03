@@ -11,6 +11,7 @@ const os = require('os');
 const net = require('net');
 const fs = require('fs');
 const util = require('util');
+const assert = require('assert');
 
 const mkdir = util.promisify(fs.mkdir);
 
@@ -40,6 +41,11 @@ describe('preconditions.test.js', () => {
         );
         console.log('create readerPath path:' + readerPath);
         await mkdir(readerPath).catch(() => null);
+
+        console.log('check readers path:');
+        const exists = fs.existsSync(readerPath);
+        assert.ok(exists);
+
 
         console.log('# create server 1');
         const server1Path = path.join(
