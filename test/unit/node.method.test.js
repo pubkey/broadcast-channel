@@ -109,6 +109,9 @@ describe('unit/node.method.test.js', () => {
             await NodeMethod.ensureFoldersExist(channelName);
 
             const socket1 = await NodeMethod.createSocketEventEmitter(channelName, AsyncTestUtil.randomString(6));
+
+            await AsyncTestUtil.wait(1000); // lets try waiting a bit
+
             const socket2 = await NodeMethod.createSocketEventEmitter(channelName, AsyncTestUtil.randomString(6));
 
             socket1.server.close();
