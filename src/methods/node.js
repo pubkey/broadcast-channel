@@ -27,10 +27,12 @@ const ObliviousSet = require('../../dist/lib/oblivious-set').default;
  * @link https://gist.github.com/domenic/2790533#gistcomment-331356
  */
 function cleanPipeName(str) {
+    console.log('cleanPipeName(): ' + str);
     if (
         process.platform === 'win32' &&
         !str.startsWith('\\\\.\\pipe\\')
     ) {
+        console.log('cleanPipeName(): is win32');
         str = str.replace(/^\//, '');
         str = str.replace(/\//g, '-');
         return '\\\\.\\pipe\\' + str;
@@ -163,7 +165,7 @@ async function createSocketEventEmitter(channelName, readerUuid) {
 
     await new Promise((resolve, reject) => {
         server.listen(pathToSocket, (err, res) => {
-            if(err) reject(err);
+            if (err) reject(err);
             else resolve(res);
         });
     });
