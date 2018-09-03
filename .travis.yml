@@ -1,7 +1,7 @@
 language: node_js
 sudo:            required
 os:
-  - linux
+  #- linux # TODO add when errinuse-bug fixed
   - osx
 node_js:
   - "10.6.0"

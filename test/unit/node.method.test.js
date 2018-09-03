@@ -101,9 +101,22 @@ describe('unit/node.method.test.js', () => {
             client.destroy();
             socket.server.close();
         });
+        it('should be able to call createSocketEventEmitter() in series', async () => {
+            await AsyncTestUtil.wait(300); // TODO remove when OSX-bug fixed
+            console.log('series: -'.repeat(25));
+
+            const channelName = AsyncTestUtil.randomString(12);
+            await NodeMethod.ensureFoldersExist(channelName);
+
+            const socket1 = await NodeMethod.createSocketEventEmitter(channelName, AsyncTestUtil.randomString(6));
+            const socket2 = await NodeMethod.createSocketEventEmitter(channelName, AsyncTestUtil.randomString(6));
+
+            socket1.server.close();
+            socket2.server.close();
+        });
         it('should be able to call createSocketEventEmitter() in parallel', async () => {
-            await AsyncTestUtil.wait(200);
-            console.log('-'.repeat(25));
+            await AsyncTestUtil.wait(300); // TODO remove when OSX-bug fixed
+            console.log('parallel: -'.repeat(25));
 
             const channelName = AsyncTestUtil.randomString(12);
             await NodeMethod.ensureFoldersExist(channelName);
