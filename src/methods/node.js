@@ -46,20 +46,18 @@ const unlink = util.promisify(fs.unlink);
 const readdir = util.promisify(fs.readdir);
 const removeDir = util.promisify(rimraf);
 
-const TMP_FOLDER_NAME = 'pubkey.broadcast-channel';
 const OTHER_INSTANCES = {};
-
+const TMP_FOLDER_NAME = 'pubkey.broadcast-channel';
+const TMP_FOLDER_BASE = path.join(
+    os.tmpdir(),
+    TMP_FOLDER_NAME
+);
 const getPathsCache = new Map();
 
 function getPaths(channelName) {
     if (!getPathsCache.has(channelName)) {
-        const folderPathBase = path.join(
-            os.tmpdir(),
-            TMP_FOLDER_NAME
-        );
         const channelPathBase = path.join(
-            os.tmpdir(),
-            TMP_FOLDER_NAME,
+            TMP_FOLDER_BASE,
             sha3_224(channelName) // use hash incase of strange characters
         );
         const folderPathReaders = path.join(
@@ -72,7 +70,7 @@ function getPaths(channelName) {
         );
 
         const ret = {
-            base: folderPathBase,
+            base: TMP_FOLDER_BASE,
             channelBase: channelPathBase,
             readers: folderPathReaders,
             messages: folderPathMessages

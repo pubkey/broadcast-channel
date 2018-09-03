@@ -12,6 +12,12 @@ const elapsedTime = before => {
 };
 
 describe('performance.test.js', () => {
+    it('clear tmp-folder', async () => {
+        await BroadcastChannel.clearNodeFolder();
+    });
+    it('wait a bit for jit etc..', async () => {
+        await AsyncTestUtil.wait(2000);
+    });
     it('open/close channels', async () => {
         const channelName = AsyncTestUtil.randomString(10);
 

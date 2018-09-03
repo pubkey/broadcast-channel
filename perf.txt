@@ -254,3 +254,28 @@ AFTER: {
     "series": 4163.729206999764
   }
 }
+
+
+-----------------------------------------
+CACHE tmp-folder:
+BEFORE: {
+  "openClose": 611.5843779994175,
+  "sendRecieve": {
+    "parallel": 229.9967109998688,
+    "series": 4040.1850410001352
+  }
+}
+{
+  "openClose": 586.3366490006447,
+  "sendRecieve": {
+    "parallel": 237.4793659998104,
+    "series": 3972.603798000142
+  }
+}
+AFTER: {
+  "openClose": 563.7609900003299,
+  "sendRecieve": {
+    "parallel": 233.5304539995268,
+    "series": 3869.6750210002065
+  }
+}
