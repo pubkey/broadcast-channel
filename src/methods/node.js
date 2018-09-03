@@ -157,11 +157,9 @@ async function createSocketEventEmitter(channelName, readerUuid) {
     const server = net
         .createServer(stream => {
             stream.on('end', function() {});
-
             stream.on('data', function(msg) {
                 emitter.emit('data', msg.toString());
             });
-
         });
 
     server.on('error', err => {
