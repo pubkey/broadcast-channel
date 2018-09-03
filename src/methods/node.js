@@ -146,7 +146,10 @@ function createSocketInfoFile(channelName, readerUuid) {
  * @return {{emitter: EventEmitter, server: any}}
  */
 async function createSocketEventEmitter(channelName, readerUuid) {
+    console.log('createSocketEventEmitter(' + channelName + ')');
     const pathToSocket = socketPath(channelName, readerUuid);
+
+    console.log('createSocketEventEmitter(' + channelName + '): pathToSocket: ' + pathToSocket);
 
     const emitter = new events.EventEmitter();
     const server = net

@@ -101,6 +101,18 @@ describe('unit/node.method.test.js', () => {
             client.destroy();
             socket.server.close();
         });
+        it('should be able to call createSocketEventEmitter() in parallel', async () => {
+            const channelName = AsyncTestUtil.randomString(12);
+            const sockets = await Promise.all(
+                new Array(3).fill(0)
+                .map(async () => {
+                    const readerUuid = AsyncTestUtil.randomString(6);
+                    const socket = await NodeMethod.createSocketEventEmitter(channelName, readerUuid);
+                    return socket;
+                })
+            );
+            sockets.forEach(socket => socket.server.close());
+        });
     });
     describe('.writeMessage()', () => {
         it('should write the message', async () => {
