@@ -49,7 +49,7 @@ const readdir = util.promisify(fs.readdir);
 const removeDir = util.promisify(rimraf);
 
 const OTHER_INSTANCES = {};
-const TMP_FOLDER_NAME = 'pubkey.broadcast-channel';
+const TMP_FOLDER_NAME = 'pubkey.bc';
 const TMP_FOLDER_BASE = path.join(
     os.tmpdir(),
     TMP_FOLDER_NAME
@@ -58,13 +58,22 @@ const getPathsCache = new Map();
 
 function getPaths(channelName) {
     if (!getPathsCache.has(channelName)) {
+
+        const channelHash = sha3_224(channelName); // use hash incase of strange characters
+        /**
+         * because the lenght of socket-paths is limited, we use only the first 20 chars
+         * and also start with A to ensure we do not start with a number
+         * @link https://serverfault.com/questions/641347/check-if-a-path-exceeds-maximum-for-unix-domain-socket
+         */
+        const channelFolder = 'A' + channelHash.substring(0, 20);
+
         const channelPathBase = path.join(
             TMP_FOLDER_BASE,
-            sha3_224(channelName) // use hash incase of strange characters
+            channelFolder
         );
         const folderPathReaders = path.join(
             channelPathBase,
-            'readers'
+            'rdrs'
         );
         const folderPathMessages = path.join(
             channelPathBase,

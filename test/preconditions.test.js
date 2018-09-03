@@ -44,6 +44,7 @@ describe('preconditions.test.js', () => {
 
         console.log('check readers path:');
         const exists = fs.existsSync(readerPath);
+        console.dir(exists);
         assert.ok(exists);
 
 
