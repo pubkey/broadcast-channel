@@ -56,6 +56,32 @@ var BroadcastChannel = function BroadcastChannel(name, options) {
     _prepareChannel(this);
 };
 
+// STATICS
+
+/**
+ * used to identify if someone overwrites
+ * window.BroadcastChannel with this
+ * See methods/native.js
+ */
+BroadcastChannel._pubkey = true;
+
+/**
+ * clears the tmp-folder if is node
+ * @return {Promise<boolean>} true if has run, false if not node
+ */
+BroadcastChannel.clearNodeFolder = function (options) {
+    options = (0, _options.fillOptionsWithDefaults)(options);
+    var method = (0, _methodChooser.chooseMethod)(options);
+    if (method.type === 'node') {
+        return method.clearNodeFolder().then(function () {
+            return true;
+        });
+    } else {
+        return Promise.resolve(false);
+    }
+};
+
+// PROTOTYPE
 BroadcastChannel.prototype = {
     _post: function _post(type, msg) {
         var _this = this;
@@ -161,6 +187,7 @@ function _addListenerObject(channel, type, obj) {
     channel._addEventListeners[type].push(obj);
     _startListening(channel);
 }
+
 function _removeListenerObject(channel, type, obj) {
     channel._addEventListeners[type] = channel._addEventListeners[type].filter(function (o) {
         return o !== obj;
@@ -794,7 +821,12 @@ function onMessage(channelState, fn, time) {
 function canBeUsed() {
     if (isNode) return false;
 
-    if (typeof BroadcastChannel === 'function') return true;
+    if (typeof BroadcastChannel === 'function') {
+        if (BroadcastChannel._pubkey) {
+            throw new Error('BroadcastChannel: Do not overwrite window.BroadcastChannel with this module, this is not a polyfill');
+        }
+        return true;
+    } else return false;
 }
 
 function averageResponseTime() {
@@ -8861,15 +8893,9 @@ require('./modules/web.dom.iterable');
 module.exports = require('./modules/_core');
 
 },{"./modules/_core":124,"./modules/es6.array.copy-within":230,"./modules/es6.array.every":231,"./modules/es6.array.fill":232,"./modules/es6.array.filter":233,"./modules/es6.array.find":235,"./modules/es6.array.find-index":234,"./modules/es6.array.for-each":236,"./modules/es6.array.from":237,"./modules/es6.array.index-of":238,"./modules/es6.array.is-array":239,"./modules/es6.array.iterator":240,"./modules/es6.array.join":241,"./modules/es6.array.last-index-of":242,"./modules/es6.array.map":243,"./modules/es6.array.of":244,"./modules/es6.array.reduce":246,"./modules/es6.array.reduce-right":245,"./modules/es6.array.slice":247,"./modules/es6.array.some":248,"./modules/es6.array.sort":249,"./modules/es6.array.species":250,"./modules/es6.date.now":251,"./modules/es6.date.to-iso-string":252,"./modules/es6.date.to-json":253,"./modules/es6.date.to-primitive":254,"./modules/es6.date.to-string":255,"./modules/es6.function.bind":256,"./modules/es6.function.has-instance":257,"./modules/es6.function.name":258,"./modules/es6.map":259,"./modules/es6.math.acosh":260,"./modules/es6.math.asinh":261,"./modules/es6.math.atanh":262,"./modules/es6.math.cbrt":263,"./modules/es6.math.clz32":264,"./modules/es6.math.cosh":265,"./modules/es6.math.expm1":266,"./modules/es6.math.fround":267,"./modules/es6.math.hypot":268,"./modules/es6.math.imul":269,"./modules/es6.math.log10":270,"./modules/es6.math.log1p":271,"./modules/es6.math.log2":272,"./modules/es6.math.sign":273,"./modules/es6.math.sinh":274,"./modules/es6.math.tanh":275,"./modules/es6.math.trunc":276,"./modules/es6.number.constructor":277,"./modules/es6.number.epsilon":278,"./modules/es6.number.is-finite":279,"./modules/es6.number.is-integer":280,"./modules/es6.number.is-nan":281,"./modules/es6.number.is-safe-integer":282,"./modules/es6.number.max-safe-integer":283,"./modules/es6.number.min-safe-integer":284,"./modules/es6.number.parse-float":285,"./modules/es6.number.parse-int":286,"./modules/es6.number.to-fixed":287,"./modules/es6.number.to-precision":288,"./modules/es6.object.assign":289,"./modules/es6.object.create":290,"./modules/es6.object.define-properties":291,"./modules/es6.object.define-property":292,"./modules/es6.object.freeze":293,"./modules/es6.object.get-own-property-descriptor":294,"./modules/es6.object.get-own-property-names":295,"./modules/es6.object.get-prototype-of":296,"./modules/es6.object.is":300,"./modules/es6.object.is-extensible":297,"./modules/es6.object.is-frozen":298,"./modules/es6.object.is-sealed":299,"./modules/es6.object.keys":301,"./modules/es6.object.prevent-extensions":302,"./modules/es6.object.seal":303,"./modules/es6.object.set-prototype-of":304,"./modules/es6.object.to-string":305,"./modules/es6.parse-float":306,"./modules/es6.parse-int":307,"./modules/es6.promise":308,"./modules/es6.reflect.apply":309,"./modules/es6.reflect.construct":310,"./modules/es6.reflect.define-property":311,"./modules/es6.reflect.delete-property":312,"./modules/es6.reflect.enumerate":313,"./modules/es6.reflect.get":316,"./modules/es6.reflect.get-own-property-descriptor":314,"./modules/es6.reflect.get-prototype-of":315,"./modules/es6.reflect.has":317,"./modules/es6.reflect.is-extensible":318,"./modules/es6.reflect.own-keys":319,"./modules/es6.reflect.prevent-extensions":320,"./modules/es6.reflect.set":322,"./modules/es6.reflect.set-prototype-of":321,"./modules/es6.regexp.constructor":323,"./modules/es6.regexp.flags":324,"./modules/es6.regexp.match":325,"./modules/es6.regexp.replace":326,"./modules/es6.regexp.search":327,"./modules/es6.regexp.split":328,"./modules/es6.regexp.to-string":329,"./modules/es6.set":330,"./modules/es6.string.anchor":331,"./modules/es6.string.big":332,"./modules/es6.string.blink":333,"./modules/es6.string.bold":334,"./modules/es6.string.code-point-at":335,"./modules/es6.string.ends-with":336,"./modules/es6.string.fixed":337,"./modules/es6.string.fontcolor":338,"./modules/es6.string.fontsize":339,"./modules/es6.string.from-code-point":340,"./modules/es6.string.includes":341,"./modules/es6.string.italics":342,"./modules/es6.string.iterator":343,"./modules/es6.string.link":344,"./modules/es6.string.raw":345,"./modules/es6.string.repeat":346,"./modules/es6.string.small":347,"./modules/es6.string.starts-with":348,"./modules/es6.string.strike":349,"./modules/es6.string.sub":350,"./modules/es6.string.sup":351,"./modules/es6.string.trim":352,"./modules/es6.symbol":353,"./modules/es6.typed.array-buffer":354,"./modules/es6.typed.data-view":355,"./modules/es6.typed.float32-array":356,"./modules/es6.typed.float64-array":357,"./modules/es6.typed.int16-array":358,"./modules/es6.typed.int32-array":359,"./modules/es6.typed.int8-array":360,"./modules/es6.typed.uint16-array":361,"./modules/es6.typed.uint32-array":362,"./modules/es6.typed.uint8-array":363,"./modules/es6.typed.uint8-clamped-array":364,"./modules/es6.weak-map":365,"./modules/es6.weak-set":366,"./modules/es7.array.flat-map":367,"./modules/es7.array.flatten":368,"./modules/es7.array.includes":369,"./modules/es7.asap":370,"./modules/es7.error.is-error":371,"./modules/es7.global":372,"./modules/es7.map.from":373,"./modules/es7.map.of":374,"./modules/es7.map.to-json":375,"./modules/es7.math.clamp":376,"./modules/es7.math.deg-per-rad":377,"./modules/es7.math.degrees":378,"./modules/es7.math.fscale":379,"./modules/es7.math.iaddh":380,"./modules/es7.math.imulh":381,"./modules/es7.math.isubh":382,"./modules/es7.math.rad-per-deg":383,"./modules/es7.math.radians":384,"./modules/es7.math.scale":385,"./modules/es7.math.signbit":386,"./modules/es7.math.umulh":387,"./modules/es7.object.define-getter":388,"./modules/es7.object.define-setter":389,"./modules/es7.object.entries":390,"./modules/es7.object.get-own-property-descriptors":391,"./modules/es7.object.lookup-getter":392,"./modules/es7.object.lookup-setter":393,"./modules/es7.object.values":394,"./modules/es7.observable":395,"./modules/es7.promise.finally":396,"./modules/es7.promise.try":397,"./modules/es7.reflect.define-metadata":398,"./modules/es7.reflect.delete-metadata":399,"./modules/es7.reflect.get-metadata":401,"./modules/es7.reflect.get-metadata-keys":400,"./modules/es7.reflect.get-own-metadata":403,"./modules/es7.reflect.get-own-metadata-keys":402,"./modules/es7.reflect.has-metadata":404,"./modules/es7.reflect.has-own-metadata":405,"./modules/es7.reflect.metadata":406,"./modules/es7.set.from":407,"./modules/es7.set.of":408,"./modules/es7.set.to-json":409,"./modules/es7.string.at":410,"./modules/es7.string.match-all":411,"./modules/es7.string.pad-end":412,"./modules/es7.string.pad-start":413,"./modules/es7.string.trim-left":414,"./modules/es7.string.trim-right":415,"./modules/es7.symbol.async-iterator":416,"./modules/es7.symbol.observable":417,"./modules/es7.system.global":418,"./modules/es7.weak-map.from":419,"./modules/es7.weak-map.of":420,"./modules/es7.weak-set.from":421,"./modules/es7.weak-set.of":422,"./modules/web.dom.iterable":423,"./modules/web.immediate":424,"./modules/web.timers":425}],427:[function(require,module,exports){
-(function (global){
 module.exports = false;
 
-// Only Node.JS has a process variable that is of [[Class]] process
-try {
- module.exports = Object.prototype.toString.call(global.process) === '[object process]' 
-} catch(e) {}
 
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],428:[function(require,module,exports){
 /**
  * Copyright (c) 2014-present, Facebook, Inc.

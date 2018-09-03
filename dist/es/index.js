@@ -32,6 +32,32 @@ var BroadcastChannel = function BroadcastChannel(name, options) {
     _prepareChannel(this);
 };
 
+// STATICS
+
+/**
+ * used to identify if someone overwrites
+ * window.BroadcastChannel with this
+ * See methods/native.js
+ */
+BroadcastChannel._pubkey = true;
+
+/**
+ * clears the tmp-folder if is node
+ * @return {Promise<boolean>} true if has run, false if not node
+ */
+BroadcastChannel.clearNodeFolder = function (options) {
+    options = fillOptionsWithDefaults(options);
+    var method = chooseMethod(options);
+    if (method.type === 'node') {
+        return method.clearNodeFolder().then(function () {
+            return true;
+        });
+    } else {
+        return Promise.resolve(false);
+    }
+};
+
+// PROTOTYPE
 BroadcastChannel.prototype = {
     _post: function _post(type, msg) {
         var _this = this;
@@ -137,6 +163,7 @@ function _addListenerObject(channel, type, obj) {
     channel._addEventListeners[type].push(obj);
     _startListening(channel);
 }
+
 function _removeListenerObject(channel, type, obj) {
     channel._addEventListeners[type] = channel._addEventListeners[type].filter(function (o) {
         return o !== obj;
