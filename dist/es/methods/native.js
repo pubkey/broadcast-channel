@@ -41,7 +41,12 @@ export function onMessage(channelState, fn, time) {
 }
 
 export function canBeUsed() {
-    if (isNode) return false;
+
+    /**
+     * in the electron-renderer, isNode will be true even if we are in browser-context
+     * so we also check if window is undefined
+     */
+    if (isNode && typeof window === 'undefined') return false;
 
     if (typeof BroadcastChannel === 'function') {
         if (BroadcastChannel._pubkey) {
