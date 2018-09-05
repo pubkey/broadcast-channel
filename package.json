@@ -31,6 +31,7 @@
   "scripts": {
     "test": "npm run test:node && npm run test:browser && npm run test:e2e",
     "test:node": "npm run build && mocha ./test/index.test.js -b --timeout 6000 --exit",
+    "test:node:loop": "npm run test:node && npm run test:node:loop",
     "test:browser": "npm run build && karma start ./config/karma.conf.js --single-run",
     "test:e2e": "concurrently \"npm run docs:serve\" \"sleep 5 && testcafe -b && testcafe all test/e2e.test.js\" --kill-others --success first",
     "test:e2e:travis": "concurrently \"npm run docs:serve\" \"sleep 5 && testcafe -b && testcafe chrome test/e2e.test.js && testcafe chromium test/e2e.test.js && testcafe firefox test/e2e.test.js\" --kill-others --success first",

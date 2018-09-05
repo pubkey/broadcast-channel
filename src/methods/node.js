@@ -56,7 +56,6 @@ const getPathsCache = new Map();
 
 function getPaths(channelName) {
     if (!getPathsCache.has(channelName)) {
-
         const channelHash = sha3_224(channelName); // use hash incase of strange characters
         /**
          * because the lenght of socket-paths is limited, we use only the first 20 chars
@@ -90,9 +89,15 @@ function getPaths(channelName) {
     return getPathsCache.get(channelName);
 }
 
-async function ensureFoldersExist(channelName) {
-    const paths = getPaths(channelName);
-    await mkdir(paths.base).catch(() => null);
+let ENSURE_BASE_FOLDER_EXISTS_PROMISE = null;
+async function ensureFoldersExist(channelName, paths) {
+    paths = paths || getPaths(channelName);
+
+    if (!ENSURE_BASE_FOLDER_EXISTS_PROMISE) {
+        ENSURE_BASE_FOLDER_EXISTS_PROMISE = mkdir(paths.base).catch(() => null);
+    }
+    await ENSURE_BASE_FOLDER_EXISTS_PROMISE;
+
     await mkdir(paths.channelBase).catch(() => null);
     await Promise.all([
         mkdir(paths.readers).catch(() => null),
@@ -110,14 +115,15 @@ async function clearNodeFolder() {
     if (!removePath || removePath === '' || removePath === '/') {
         throw new Error('BroadcastChannel.clearNodeFolder(): path is wrong');
     }
+    ENSURE_BASE_FOLDER_EXISTS_PROMISE = null;
     await removeDir(paths.base);
+    ENSURE_BASE_FOLDER_EXISTS_PROMISE = null;
     return true;
 }
 
 
-function socketPath(channelName, readerUuid) {
-
-    const paths = getPaths(channelName);
+function socketPath(channelName, readerUuid, paths) {
+    paths = paths || getPaths(channelName);
     const socketPath = path.join(
         paths.readers,
         readerUuid + '.s'
@@ -125,8 +131,8 @@ function socketPath(channelName, readerUuid) {
     return cleanPipeName(socketPath);
 }
 
-function socketInfoPath(channelName, readerUuid) {
-    const paths = getPaths(channelName);
+function socketInfoPath(channelName, readerUuid, paths) {
+    paths = paths || getPaths(channelName);
     const socketPath = path.join(
         paths.readers,
         readerUuid + '.json'
@@ -140,8 +146,8 @@ function socketInfoPath(channelName, readerUuid) {
  * when used under fucking windows,
  * we have to set a normal file so other readers know our socket exists
  */
-function createSocketInfoFile(channelName, readerUuid) {
-    const pathToFile = socketInfoPath(channelName, readerUuid);
+function createSocketInfoFile(channelName, readerUuid, paths) {
+    const pathToFile = socketInfoPath(channelName, readerUuid, paths);
     return writeFile(
         pathToFile,
         JSON.stringify({
@@ -154,8 +160,8 @@ function createSocketInfoFile(channelName, readerUuid) {
  * creates the socket-file and subscribes to it
  * @return {{emitter: EventEmitter, server: any}}
  */
-async function createSocketEventEmitter(channelName, readerUuid) {
-    const pathToSocket = socketPath(channelName, readerUuid);
+async function createSocketEventEmitter(channelName, readerUuid, paths) {
+    const pathToSocket = socketPath(channelName, readerUuid, paths);
 
     const emitter = new events.EventEmitter();
     const server = net
@@ -167,13 +173,11 @@ async function createSocketEventEmitter(channelName, readerUuid) {
         });
 
     await new Promise((resolve, reject) => {
-
         server.listen(pathToSocket, (err, res) => {
             if (err) reject(err);
             else resolve(res);
         });
     });
-    server.on('connection', () => {});
 
     return {
         path: pathToSocket,
@@ -198,8 +202,10 @@ async function openClientConnection(channelName, readerUuid) {
 /**
  * writes the new message to the file-system
  * so other readers can find it
+ * @return {Promise}
  */
-async function writeMessage(channelName, readerUuid, messageJson) {
+function writeMessage(channelName, readerUuid, messageJson, paths) {
+    paths = paths || getPaths(channelName);
     const time = microSeconds();
     const writeObject = {
         uuid: readerUuid,
@@ -211,29 +217,30 @@ async function writeMessage(channelName, readerUuid, messageJson) {
     const fileName = time + '_' + readerUuid + '_' + token + '.json';
 
     const msgPath = path.join(
-        getPaths(channelName).messages,
+        paths.messages,
         fileName
     );
 
-    await writeFile(
+    return writeFile(
         msgPath,
         JSON.stringify(writeObject)
-    );
-
-    return {
-        time,
-        uuid: readerUuid,
-        token,
-        path: msgPath
-    };
+    ).then(() => {
+        return {
+            time,
+            uuid: readerUuid,
+            token,
+            path: msgPath
+        };
+    });
 }
 
 /**
  * returns the uuids of all readers
  * @return {string[]}
  */
-async function getReadersUuids(channelName) {
-    const readersPath = getPaths(channelName).readers;
+async function getReadersUuids(channelName, paths) {
+    paths = paths || getPaths(channelName);
+    const readersPath = paths.readers;
     const files = await readdir(readersPath);
 
     return files
@@ -252,8 +259,9 @@ async function messagePath(channelName, time, token, writerUuid) {
     return msgPath;
 }
 
-async function getAllMessages(channelName) {
-    const messagesPath = getPaths(channelName).messages;
+async function getAllMessages(channelName, paths) {
+    paths = paths || getPaths(channelName);
+    const messagesPath = paths.messages;
     const files = await readdir(messagesPath);
     return files.map(file => {
         const fileName = file.split('.')[0];
@@ -271,12 +279,12 @@ async function getAllMessages(channelName) {
     });
 }
 
-function getSingleMessage(channelName, msgObj) {
-    const messagesPath = getPaths(channelName).messages;
+function getSingleMessage(channelName, msgObj, paths) {
+    paths = paths || getPaths(channelName);
 
     return {
         path: path.join(
-            messagesPath,
+            paths.messages,
             msgObj.t + '_' + msgObj.u + '_' + msgObj.to + '.json'
         ),
         time: msgObj.t,
@@ -304,10 +312,15 @@ async function cleanOldMessages(messageObjects, ttl) {
 
 const type = 'node';
 
+/**
+ * creates a new channelState
+ * @return {Promise<any>}
+ */
 async function create(channelName, options = {}) {
     options = fillOptionsWithDefaults(options);
     const time = microSeconds();
-    await ensureFoldersExist(channelName);
+    const paths = getPaths(channelName);
+    const ensureFolderExistsPromise = ensureFoldersExist(channelName, paths);
     const uuid = randomToken(10);
 
     const state = {
@@ -315,6 +328,7 @@ async function create(channelName, options = {}) {
         channelName,
         options,
         uuid,
+        paths,
         // contains all messages that have been emitted before
         emittedMessagesIds: new ObliviousSet(options.node.ttl * 2),
         messagesCallbackTime: null,
@@ -330,12 +344,13 @@ async function create(channelName, options = {}) {
     if (!OTHER_INSTANCES[channelName]) OTHER_INSTANCES[channelName] = [];
     OTHER_INSTANCES[channelName].push(state);
 
+    await ensureFolderExistsPromise;
     const [
         socketEE,
         infoFilePath
     ] = await Promise.all([
-        createSocketEventEmitter(channelName, uuid),
-        createSocketInfoFile(channelName, uuid),
+        createSocketEventEmitter(channelName, uuid, paths),
+        createSocketInfoFile(channelName, uuid, paths),
         refreshReaderClients(state)
     ]);
     state.socketEE = socketEE;
@@ -387,11 +402,11 @@ async function handleMessagePing(state, msgObj) {
     let messages;
     if (!msgObj) {
         // get all
-        messages = await getAllMessages(state.channelName);
+        messages = await getAllMessages(state.channelName, state.paths);
     } else {
         // get single message
         messages = [
-            getSingleMessage(state.channelName, msgObj)
+            getSingleMessage(state.channelName, msgObj, state.paths)
         ];
     }
 
@@ -421,49 +436,56 @@ async function handleMessagePing(state, msgObj) {
     });
 }
 
-async function refreshReaderClients(channelState) {
-    // ensure we have subscribed to all readers
-    const otherReaders = await getReadersUuids(channelState.channelName);
+/**
+ * ensures that the channelState is connected with all other readers
+ * @return {Promise<void>}
+ */
+function refreshReaderClients(channelState) {
+    return getReadersUuids(channelState.channelName, channelState.paths)
+        .then(otherReaders => {
+            // remove subscriptions to closed readers
+            Object.keys(channelState.otherReaderClients)
+                .filter(readerUuid => !otherReaders.includes(readerUuid))
+                .forEach(async (readerUuid) => {
+                    try {
+                        await channelState.otherReaderClients[readerUuid].destroy();
+                    } catch (err) {}
+                    delete channelState.otherReaderClients[readerUuid];
+                });
 
-    // remove subscriptions to closed readers
-    Object.keys(channelState.otherReaderClients)
-        .filter(readerUuid => !otherReaders.includes(readerUuid))
-        .forEach(async (readerUuid) => {
-            try {
-                await channelState.otherReaderClients[readerUuid].destroy();
-            } catch (err) {}
-            delete channelState.otherReaderClients[readerUuid];
+            // add new readers
+            return Promise.all(
+                otherReaders
+                .filter(readerUuid => readerUuid !== channelState.uuid) // not own
+                .filter(readerUuid => !channelState.otherReaderClients[readerUuid]) // not already has client
+                .map(async (readerUuid) => {
+                    try {
+                        if (channelState.closed) return;
+                        const client = await openClientConnection(channelState.channelName, readerUuid);
+                        channelState.otherReaderClients[readerUuid] = client;
+                    } catch (err) {
+                        // this might throw if the other channel is closed at the same time when this one is running refresh
+                        // so we do not throw an error
+                    }
+                })
+            );
         });
-
-    await Promise.all(
-        otherReaders
-        .filter(readerUuid => readerUuid !== channelState.uuid) // not own
-        .filter(readerUuid => !channelState.otherReaderClients[readerUuid]) // not already has client
-        .map(async (readerUuid) => {
-            try {
-                if (channelState.closed) return;
-                const client = await openClientConnection(channelState.channelName, readerUuid);
-                channelState.otherReaderClients[readerUuid] = client;
-            } catch (err) {
-                // this might throw if the other channel is closed at the same time when this one is running refresh
-                // so we do not throw an error
-            }
-        })
-    );
 }
 
+/**
+ * post a message to the other readers
+ * @return {Promise<void>}
+ */
 function postMessage(channelState, messageJson) {
-
     const writePromise = writeMessage(
         channelState.channelName,
         channelState.uuid,
-        messageJson
+        messageJson,
+        channelState.paths
     );
-
     channelState.writeBlockPromise = channelState.writeBlockPromise.then(async () => {
 
-        // w8 to ticks to let the buffer flush
-        await new Promise(res => setTimeout(res, 0));
+        // w8 one tick to let the buffer flush
         await new Promise(res => setTimeout(res, 0));
 
         const [msgObj] = await Promise.all([
@@ -473,7 +495,7 @@ function postMessage(channelState, messageJson) {
         emitOverFastPath(channelState, msgObj, messageJson);
         const pingStr = '{"t":' + msgObj.time + ',"u":"' + msgObj.uuid + '","to":"' + msgObj.token + '"}|';
 
-        await Promise.all(
+        const writeToReadersPromise = Promise.all(
             Object.values(channelState.otherReaderClients)
             .filter(client => client.writable) // client might have closed in between
             .map(client => {
@@ -490,12 +512,11 @@ function postMessage(channelState, messageJson) {
          */
         if (randomInt(0, 20) === 0) {
             /* await */
-            getAllMessages(channelState.channelName)
+            getAllMessages(channelState.channelName, channelState.paths)
                 .then(allMessages => cleanOldMessages(allMessages, channelState.options.node.ttl));
         }
 
-        // emit to own eventEmitter
-        // channelState.socketEE.emitter.emit('data', JSON.parse(JSON.stringify(messageJson)));
+        return writeToReadersPromise;
     });
 
     return channelState.writeBlockPromise;

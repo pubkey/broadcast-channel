@@ -279,3 +279,21 @@ AFTER: {
     "series": 3869.6750210002065
   }
 }
+
+-----------------------------------------
+CACHE ensure-folder exists:
+BEFORE:{
+  "openClose": 583.2204679995775,
+  "sendRecieve": {
+    "parallel": 206.64538500085473,
+    "series": 3861.489134998992
+  }
+}
+
+AFTER: {
+  "openClose": 544.0778630003333,
+  "sendRecieve": {
+    "parallel": 220.51885700039566,
+    "series": 2255.5608139988035
+  }
+}
