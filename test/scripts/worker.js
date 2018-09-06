@@ -2,13 +2,13 @@
 /**
  * used in the test-docs as web-worker
  */
-require('babel-polyfill');
+require('@babel/polyfill');
 var BroadcastChannel = require('../../');
 
 // overwrite console.log
 try {
     var logBefore = console.log;
-    //    console.log = function (str) { logBefore('worker: ' + str); }    
+    //    console.log = function (str) { logBefore('worker: ' + str); }
 } catch (err) {
     // does not work in IE11
 }

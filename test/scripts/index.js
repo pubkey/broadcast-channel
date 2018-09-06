@@ -2,7 +2,7 @@
 /**
  * used in docs/index.html
  */
-require('babel-polyfill');
+require('@babel/polyfill');
 var BroadcastChannel = require('../../');
 import {
     getParameterByName

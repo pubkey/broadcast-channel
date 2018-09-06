@@ -2,7 +2,7 @@
 /**
  * used in docs/iframe.html
  */
-require('babel-polyfill');
+require('@babel/polyfill');
 import {
     getParameterByName
 } from './util.js';
