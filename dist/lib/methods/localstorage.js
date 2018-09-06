@@ -15,6 +15,10 @@ exports.onMessage = onMessage;
 exports.canBeUsed = canBeUsed;
 exports.averageResponseTime = averageResponseTime;
 
+var _detectNode = require('detect-node');
+
+var _detectNode2 = _interopRequireDefault(_detectNode);
+
 var _obliviousSet = require('../oblivious-set');
 
 var _obliviousSet2 = _interopRequireDefault(_obliviousSet);
@@ -33,7 +37,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'd
  * @link https://caniuse.com/#feat=indexeddb
  */
 
-var isNode = require('detect-node');
 var microSeconds = exports.microSeconds = _util.microSeconds;
 
 var KEY_PREFIX = 'pubkey.broadcastChannel-';
@@ -151,7 +154,7 @@ function onMessage(channelState, fn, time) {
 }
 
 function canBeUsed() {
-    if (isNode) return false;
+    if (_detectNode2['default']) return false;
     var ls = getLocalStorage();
 
     if (!ls) return false;
@@ -161,3 +164,14 @@ function canBeUsed() {
 function averageResponseTime() {
     return 120;
 }
+
+exports['default'] = {
+    create: create,
+    close: close,
+    onMessage: onMessage,
+    postMessage: postMessage,
+    canBeUsed: canBeUsed,
+    type: type,
+    averageResponseTime: averageResponseTime,
+    microSeconds: microSeconds
+};

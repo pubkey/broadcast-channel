@@ -1,8 +1,8 @@
-var isNode = require('detect-node');
+import isNode from 'detect-node';
 
-var NativeMethod = require('./methods/native.js');
-var IndexeDbMethod = require('./methods/indexed-db.js');
-var LocalstorageMethod = require('./methods/localstorage.js');
+import NativeMethod from './methods/native.js';
+import IndexeDbMethod from './methods/indexed-db.js';
+import LocalstorageMethod from './methods/localstorage.js';
 
 // order is important
 var METHODS = [NativeMethod, // fastest

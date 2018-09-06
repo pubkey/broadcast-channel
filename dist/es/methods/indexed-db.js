@@ -4,7 +4,7 @@
  * @link https://github.com/w3c/IndexedDB/issues/51
  */
 
-var isNode = require('detect-node');
+import isNode from 'detect-node';
 
 import { sleep, randomInt, randomToken, microSeconds as micro } from '../util.js';
 
@@ -274,3 +274,14 @@ export function canBeUsed() {
 export function averageResponseTime(options) {
     return options.idb.fallbackInterval * 2;
 }
+
+export default {
+    create: create,
+    close: close,
+    onMessage: onMessage,
+    postMessage: postMessage,
+    canBeUsed: canBeUsed,
+    type: type,
+    averageResponseTime: averageResponseTime,
+    microSeconds: microSeconds
+};

@@ -19,6 +19,10 @@ exports.onMessage = onMessage;
 exports.canBeUsed = canBeUsed;
 exports.averageResponseTime = averageResponseTime;
 
+var _detectNode = require('detect-node');
+
+var _detectNode2 = _interopRequireDefault(_detectNode);
+
 var _util = require('../util.js');
 
 var _obliviousSet = require('../oblivious-set');
@@ -34,8 +38,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'd
  * There is currently no observerAPI for idb
  * @link https://github.com/w3c/IndexedDB/issues/51
  */
-
-var isNode = require('detect-node');
 
 var microSeconds = exports.microSeconds = _util.microSeconds;
 
@@ -291,7 +293,7 @@ function onMessage(channelState, fn, time) {
 }
 
 function canBeUsed() {
-    if (isNode) return false;
+    if (_detectNode2['default']) return false;
     var idb = getIdb();
 
     if (!idb) return false;
@@ -301,3 +303,14 @@ function canBeUsed() {
 function averageResponseTime(options) {
     return options.idb.fallbackInterval * 2;
 }
+
+exports['default'] = {
+    create: create,
+    close: close,
+    onMessage: onMessage,
+    postMessage: postMessage,
+    canBeUsed: canBeUsed,
+    type: type,
+    averageResponseTime: averageResponseTime,
+    microSeconds: microSeconds
+};

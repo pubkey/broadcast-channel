@@ -479,15 +479,28 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 exports.chooseMethod = chooseMethod;
-var isNode = require('detect-node');
 
-var NativeMethod = require('./methods/native.js');
-var IndexeDbMethod = require('./methods/indexed-db.js');
-var LocalstorageMethod = require('./methods/localstorage.js');
+var _detectNode = require('detect-node');
+
+var _detectNode2 = _interopRequireDefault(_detectNode);
+
+var _native = require('./methods/native.js');
+
+var _native2 = _interopRequireDefault(_native);
+
+var _indexedDb = require('./methods/indexed-db.js');
+
+var _indexedDb2 = _interopRequireDefault(_indexedDb);
+
+var _localstorage = require('./methods/localstorage.js');
+
+var _localstorage2 = _interopRequireDefault(_localstorage);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 // order is important
-var METHODS = [NativeMethod, // fastest
-IndexeDbMethod, LocalstorageMethod];
+var METHODS = [_native2['default'], // fastest
+_indexedDb2['default'], _localstorage2['default']];
 
 var REQUIRE_FUN = require;
 
@@ -495,7 +508,7 @@ var REQUIRE_FUN = require;
  * The NodeMethod is loaded lazy
  * so it will not get bundled in browser-builds
  */
-if (isNode) {
+if (_detectNode2['default']) {
 
     /**
      * we use the non-transpiled code for nodejs
@@ -522,7 +535,7 @@ function chooseMethod(options) {
     }
 
     var chooseMethods = METHODS;
-    if (!options.webWorkerSupport && !isNode) {
+    if (!options.webWorkerSupport && !_detectNode2['default']) {
         // prefer localstorage over idb when no webworker-support needed
         chooseMethods = METHODS.filter(function (m) {
             return m.type !== 'idb';
@@ -558,6 +571,10 @@ exports.onMessage = onMessage;
 exports.canBeUsed = canBeUsed;
 exports.averageResponseTime = averageResponseTime;
 
+var _detectNode = require('detect-node');
+
+var _detectNode2 = _interopRequireDefault(_detectNode);
+
 var _util = require('../util.js');
 
 var _obliviousSet = require('../oblivious-set');
@@ -573,8 +590,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'd
  * There is currently no observerAPI for idb
  * @link https://github.com/w3c/IndexedDB/issues/51
  */
-
-var isNode = require('detect-node');
 
 var microSeconds = exports.microSeconds = _util.microSeconds;
 
@@ -830,7 +845,7 @@ function onMessage(channelState, fn, time) {
 }
 
 function canBeUsed() {
-    if (isNode) return false;
+    if (_detectNode2['default']) return false;
     var idb = getIdb();
 
     if (!idb) return false;
@@ -840,6 +855,17 @@ function canBeUsed() {
 function averageResponseTime(options) {
     return options.idb.fallbackInterval * 2;
 }
+
+exports['default'] = {
+    create: create,
+    close: close,
+    onMessage: onMessage,
+    postMessage: postMessage,
+    canBeUsed: canBeUsed,
+    type: type,
+    averageResponseTime: averageResponseTime,
+    microSeconds: microSeconds
+};
 },{"../oblivious-set":9,"../options":10,"../util.js":11,"detect-node":406}],7:[function(require,module,exports){
 'use strict';
 
@@ -857,6 +883,10 @@ exports.close = close;
 exports.onMessage = onMessage;
 exports.canBeUsed = canBeUsed;
 exports.averageResponseTime = averageResponseTime;
+
+var _detectNode = require('detect-node');
+
+var _detectNode2 = _interopRequireDefault(_detectNode);
 
 var _obliviousSet = require('../oblivious-set');
 
@@ -876,7 +906,6 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'd
  * @link https://caniuse.com/#feat=indexeddb
  */
 
-var isNode = require('detect-node');
 var microSeconds = exports.microSeconds = _util.microSeconds;
 
 var KEY_PREFIX = 'pubkey.broadcastChannel-';
@@ -994,7 +1023,7 @@ function onMessage(channelState, fn, time) {
 }
 
 function canBeUsed() {
-    if (isNode) return false;
+    if (_detectNode2['default']) return false;
     var ls = getLocalStorage();
 
     if (!ls) return false;
@@ -1004,6 +1033,17 @@ function canBeUsed() {
 function averageResponseTime() {
     return 120;
 }
+
+exports['default'] = {
+    create: create,
+    close: close,
+    onMessage: onMessage,
+    postMessage: postMessage,
+    canBeUsed: canBeUsed,
+    type: type,
+    averageResponseTime: averageResponseTime,
+    microSeconds: microSeconds
+};
 },{"../oblivious-set":9,"../options":10,"../util":11,"detect-node":406}],8:[function(require,module,exports){
 'use strict';
 
@@ -1018,9 +1058,13 @@ exports.onMessage = onMessage;
 exports.canBeUsed = canBeUsed;
 exports.averageResponseTime = averageResponseTime;
 
+var _detectNode = require('detect-node');
+
+var _detectNode2 = _interopRequireDefault(_detectNode);
+
 var _util = require('../util');
 
-var isNode = require('detect-node');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 var microSeconds = exports.microSeconds = _util.microSeconds;
 
@@ -1066,7 +1110,7 @@ function canBeUsed() {
      * in the electron-renderer, isNode will be true even if we are in browser-context
      * so we also check if window is undefined
      */
-    if (isNode && typeof window === 'undefined') return false;
+    if (_detectNode2['default'] && typeof window === 'undefined') return false;
 
     if (typeof BroadcastChannel === 'function') {
         if (BroadcastChannel._pubkey) {
@@ -1079,6 +1123,17 @@ function canBeUsed() {
 function averageResponseTime() {
     return 100;
 }
+
+exports['default'] = {
+    create: create,
+    close: close,
+    onMessage: onMessage,
+    postMessage: postMessage,
+    canBeUsed: canBeUsed,
+    type: type,
+    averageResponseTime: averageResponseTime,
+    microSeconds: microSeconds
+};
 },{"../util":11,"detect-node":406}],9:[function(require,module,exports){
 "use strict";
 

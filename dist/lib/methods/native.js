@@ -11,9 +11,13 @@ exports.onMessage = onMessage;
 exports.canBeUsed = canBeUsed;
 exports.averageResponseTime = averageResponseTime;
 
+var _detectNode = require('detect-node');
+
+var _detectNode2 = _interopRequireDefault(_detectNode);
+
 var _util = require('../util');
 
-var isNode = require('detect-node');
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 var microSeconds = exports.microSeconds = _util.microSeconds;
 
@@ -59,7 +63,7 @@ function canBeUsed() {
      * in the electron-renderer, isNode will be true even if we are in browser-context
      * so we also check if window is undefined
      */
-    if (isNode && typeof window === 'undefined') return false;
+    if (_detectNode2['default'] && typeof window === 'undefined') return false;
 
     if (typeof BroadcastChannel === 'function') {
         if (BroadcastChannel._pubkey) {
@@ -72,3 +76,14 @@ function canBeUsed() {
 function averageResponseTime() {
     return 100;
 }
+
+exports['default'] = {
+    create: create,
+    close: close,
+    onMessage: onMessage,
+    postMessage: postMessage,
+    canBeUsed: canBeUsed,
+    type: type,
+    averageResponseTime: averageResponseTime,
+    microSeconds: microSeconds
+};

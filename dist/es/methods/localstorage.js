@@ -6,7 +6,7 @@
  * @link https://caniuse.com/#feat=indexeddb
  */
 
-var isNode = require('detect-node');
+import isNode from 'detect-node';
 import ObliviousSet from '../oblivious-set';
 
 import { fillOptionsWithDefaults } from '../options';
@@ -140,3 +140,14 @@ export function canBeUsed() {
 export function averageResponseTime() {
     return 120;
 }
+
+export default {
+    create: create,
+    close: close,
+    onMessage: onMessage,
+    postMessage: postMessage,
+    canBeUsed: canBeUsed,
+    type: type,
+    averageResponseTime: averageResponseTime,
+    microSeconds: microSeconds
+};
