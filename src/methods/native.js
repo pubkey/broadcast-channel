@@ -1,4 +1,4 @@
-const isNode = require('detect-node');
+import isNode from 'detect-node';
 
 import {
     randomToken,
@@ -65,3 +65,14 @@ export function canBeUsed() {
 export function averageResponseTime() {
     return 100;
 }
+
+export default {
+    create,
+    close,
+    onMessage,
+    postMessage,
+    canBeUsed,
+    type,
+    averageResponseTime,
+    microSeconds
+};
