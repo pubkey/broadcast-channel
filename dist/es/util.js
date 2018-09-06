@@ -2,40 +2,38 @@
  * returns true if the given object is a promise
  */
 export function isPromise(obj) {
-    if (obj && typeof obj.then === 'function') {
-        return true;
-    } else {
-        return false;
-    }
+  if (obj && typeof obj.then === 'function') {
+    return true;
+  } else {
+    return false;
+  }
 }
-
 export function sleep(time) {
-    if (!time) time = 0;
-    return new Promise(function (res) {
-        return setTimeout(res, time);
-    });
+  if (!time) time = 0;
+  return new Promise(function (res) {
+    return setTimeout(res, time);
+  });
 }
-
 export function randomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1) + min);
+  return Math.floor(Math.random() * (max - min + 1) + min);
 }
-
 /**
  * https://stackoverflow.com/a/1349426/3443137
  */
+
 export function randomToken(length) {
-    if (!length) length = 5;
-    var text = '';
-    var possible = 'abcdefghijklmnopqrstuvwxzy0123456789';
+  if (!length) length = 5;
+  var text = '';
+  var possible = 'abcdefghijklmnopqrstuvwxzy0123456789';
 
-    for (var i = 0; i < length; i++) {
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }return text;
+  for (var i = 0; i < length; i++) {
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+  }
+
+  return text;
 }
-
 var lastMs = 0;
 var additional = 0;
-
 /**
  * returns the current time in micro-seconds,
  * WARNING: This is a pseudo-function
@@ -43,14 +41,16 @@ var additional = 0;
  * This is enough in browsers, and this function will not be used in nodejs.
  * The main reason for this hack is to ensure that BroadcastChannel behaves equal to production when it is used in fast-running unit tests.
  */
+
 export function microSeconds() {
-    var ms = new Date().getTime();
-    if (ms === lastMs) {
-        additional++;
-        return ms * 1000 + additional;
-    } else {
-        lastMs = ms;
-        additional = 0;
-        return ms * 1000;
-    }
+  var ms = new Date().getTime();
+
+  if (ms === lastMs) {
+    additional++;
+    return ms * 1000 + additional;
+  } else {
+    lastMs = ms;
+    additional = 0;
+    return ms * 1000;
+  }
 }

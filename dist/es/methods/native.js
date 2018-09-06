@@ -1,72 +1,62 @@
 import isNode from 'detect-node';
-
 import { randomToken, microSeconds as micro } from '../util';
-
 export var microSeconds = micro;
-
 export var type = 'native';
-
 export function create(channelName, options) {
-    if (!options) options = {};
-    var state = {
-        uuid: randomToken(10),
-        channelName: channelName,
-        options: options,
-        messagesCallback: null,
-        bc: new BroadcastChannel(channelName),
-        subscriberFunctions: []
-    };
+  if (!options) options = {};
+  var state = {
+    uuid: randomToken(10),
+    channelName: channelName,
+    options: options,
+    messagesCallback: null,
+    bc: new BroadcastChannel(channelName),
+    subscriberFunctions: []
+  };
 
-    state.bc.onmessage = function (msg) {
-        if (state.messagesCallback) {
-            state.messagesCallback(msg.data);
-        }
-    };
+  state.bc.onmessage = function (msg) {
+    if (state.messagesCallback) {
+      state.messagesCallback(msg.data);
+    }
+  };
 
-    return state;
+  return state;
 }
-
 export function close(channelState) {
-    channelState.bc.close();
-    channelState.subscriberFunctions = [];
+  channelState.bc.close();
+  channelState.subscriberFunctions = [];
 }
-
 export function postMessage(channelState, messageJson) {
-    channelState.bc.postMessage(messageJson, false);
+  channelState.bc.postMessage(messageJson, false);
 }
-
 export function onMessage(channelState, fn, time) {
-    channelState.messagesCallbackTime = time;
-    channelState.messagesCallback = fn;
+  channelState.messagesCallbackTime = time;
+  channelState.messagesCallback = fn;
 }
-
 export function canBeUsed() {
+  /**
+   * in the electron-renderer, isNode will be true even if we are in browser-context
+   * so we also check if window is undefined
+   */
+  if (isNode && typeof window === 'undefined') return false;
 
-    /**
-     * in the electron-renderer, isNode will be true even if we are in browser-context
-     * so we also check if window is undefined
-     */
-    if (isNode && typeof window === 'undefined') return false;
+  if (typeof BroadcastChannel === 'function') {
+    if (BroadcastChannel._pubkey) {
+      throw new Error('BroadcastChannel: Do not overwrite window.BroadcastChannel with this module, this is not a polyfill');
+    }
 
-    if (typeof BroadcastChannel === 'function') {
-        if (BroadcastChannel._pubkey) {
-            throw new Error('BroadcastChannel: Do not overwrite window.BroadcastChannel with this module, this is not a polyfill');
-        }
-        return true;
-    } else return false;
+    return true;
+  } else return false;
 }
-
 export function averageResponseTime() {
-    return 100;
+  return 100;
 }
-
 export default {
-    create: create,
-    close: close,
-    onMessage: onMessage,
-    postMessage: postMessage,
-    canBeUsed: canBeUsed,
-    type: type,
-    averageResponseTime: averageResponseTime,
-    microSeconds: microSeconds
+  create: create,
+  close: close,
+  onMessage: onMessage,
+  postMessage: postMessage,
+  canBeUsed: canBeUsed,
+  type: type,
+  averageResponseTime: averageResponseTime,
+  microSeconds: microSeconds
 };
