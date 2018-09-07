@@ -49,7 +49,8 @@
     "build:worker": "browserify test_tmp/scripts/worker.js > docs/worker.js",
     "build:iframe": "browserify test_tmp/scripts/iframe.js > docs/iframe.js",
     "build:leader-iframe": "browserify test_tmp/scripts/leader-iframe.js > docs/leader-iframe.js",
-    "build": "npm run clear && concurrently \"npm run build:es6\" \"npm run build:es5\" \"npm run build:test\" && concurrently \"npm run build:browser\" \"npm run build:worker\" \"npm run build:iframe\" \"npm run build:leader-iframe\"",
+    "build:leader-crown": "browserify test_tmp/scripts/leader-crown.js > docs/leader-crown.js",
+    "build": "npm run clear && concurrently \"npm run build:es6\" \"npm run build:es5\" \"npm run build:test\" && concurrently \"npm run build:browser\" \"npm run build:worker\" \"npm run build:iframe\" \"npm run build:leader-iframe\" \"npm run build:leader-crown\"",
     "build:min": "uglifyjs --compress --mangle --output dist/lib/browserify.min.js -- dist/lib/browserify.index.js",
     "docs:only": "http-server ./docs --silent",
     "docs:serve": "npm run build && npm run docs:only"
