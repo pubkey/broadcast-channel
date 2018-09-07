@@ -618,8 +618,14 @@ function canBeUsed() {
     return isNode;
 }
 
+/**
+ * on node we use a relatively height averageResponseTime,
+ * because the file-io might be in use.
+ * Also it is more important that the leader-election is reliable,
+ * then to have a fast election.
+ */
 function averageResponseTime() {
-    return 50;
+    return 200;
 }
 
 function microSeconds() {
