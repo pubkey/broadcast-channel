@@ -185,16 +185,20 @@ function cleanOldMessages(db, ttl) {
 
 function create(channelName, options) {
   options = (0, _options.fillOptionsWithDefaults)(options);
-  var uuid = (0, _util.randomToken)(10);
   return createDatabase(channelName).then(function (db) {
     var state = {
       closed: false,
       lastCursorId: 0,
       channelName: channelName,
       options: options,
-      uuid: uuid,
-      // contains all messages that have been emitted before
-      emittedMessagesIds: new _obliviousSet["default"](options.idb.ttl * 2),
+      uuid: (0, _util.randomToken)(10),
+
+      /**
+       * emittedMessagesIds
+       * contains all messages that have been emitted before
+       * @type {ObliviousSet}
+       */
+      eMIs: new _obliviousSet["default"](options.idb.ttl * 2),
       // ensures we do not read messages in parrallel
       writeBlockPromise: Promise.resolve(),
       messagesCallback: null,
@@ -225,7 +229,7 @@ function _readLoop(state) {
 function _filterMessage(msgObj, state) {
   if (msgObj.uuid === state.uuid) return false; // send by own
 
-  if (state.emittedMessagesIds.has(msgObj.id)) return false; // already emitted
+  if (state.eMIs.has(msgObj.id)) return false; // already emitted
 
   if (msgObj.data.time < state.messagesCallbackTime) return false; // older then onMessageCallback
 
@@ -256,7 +260,7 @@ function readNewMessages(state) {
 
     useMessages.forEach(function (msgObj) {
       if (state.messagesCallback) {
-        state.emittedMessagesIds.add(msgObj.id);
+        state.eMIs.add(msgObj.id);
         state.messagesCallback(msgObj.data);
       }
     });

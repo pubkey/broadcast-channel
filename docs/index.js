@@ -504,16 +504,20 @@ function cleanOldMessages(db, ttl) {
 
 function create(channelName, options) {
   options = (0, _options.fillOptionsWithDefaults)(options);
-  var uuid = (0, _util.randomToken)(10);
   return createDatabase(channelName).then(function (db) {
     var state = {
       closed: false,
       lastCursorId: 0,
       channelName: channelName,
       options: options,
-      uuid: uuid,
-      // contains all messages that have been emitted before
-      emittedMessagesIds: new _obliviousSet["default"](options.idb.ttl * 2),
+      uuid: (0, _util.randomToken)(10),
+
+      /**
+       * emittedMessagesIds
+       * contains all messages that have been emitted before
+       * @type {ObliviousSet}
+       */
+      eMIs: new _obliviousSet["default"](options.idb.ttl * 2),
       // ensures we do not read messages in parrallel
       writeBlockPromise: Promise.resolve(),
       messagesCallback: null,
@@ -544,7 +548,7 @@ function _readLoop(state) {
 function _filterMessage(msgObj, state) {
   if (msgObj.uuid === state.uuid) return false; // send by own
 
-  if (state.emittedMessagesIds.has(msgObj.id)) return false; // already emitted
+  if (state.eMIs.has(msgObj.id)) return false; // already emitted
 
   if (msgObj.data.time < state.messagesCallbackTime) return false; // older then onMessageCallback
 
@@ -575,7 +579,7 @@ function readNewMessages(state) {
 
     useMessages.forEach(function (msgObj) {
       if (state.messagesCallback) {
-        state.emittedMessagesIds.add(msgObj.id);
+        state.eMIs.add(msgObj.id);
         state.messagesCallback(msgObj.data);
       }
     });
@@ -750,27 +754,30 @@ function create(channelName, options) {
     throw new Error('BroadcastChannel: localstorage cannot be used');
   }
 
-  var startTime = new Date().getTime();
-  var uuid = (0, _util.randomToken)(10); // contains all messages that have been emitted before
+  var uuid = (0, _util.randomToken)(10);
+  /**
+   * eMIs
+   * contains all messages that have been emitted before
+   * @type {ObliviousSet}
+   */
 
-  var emittedMessagesIds = new _obliviousSet["default"](options.localstorage.removeTimeout);
+  var eMIs = new _obliviousSet["default"](options.localstorage.removeTimeout);
   var state = {
-    startTime: startTime,
     channelName: channelName,
-    options: options,
     uuid: uuid,
-    emittedMessagesIds: emittedMessagesIds
+    eMIs: eMIs // emittedMessagesIds
+
   };
   state.listener = addStorageEventListener(channelName, function (msgObj) {
     if (!state.messagesCallback) return; // no listener
 
     if (msgObj.uuid === uuid) return; // own message
 
-    if (!msgObj.token || emittedMessagesIds.has(msgObj.token)) return; // already emitted
+    if (!msgObj.token || eMIs.has(msgObj.token)) return; // already emitted
 
     if (msgObj.data.time && msgObj.data.time < state.messagesCallbackTime) return; // too old
 
-    emittedMessagesIds.add(msgObj.token);
+    eMIs.add(msgObj.token);
     state.messagesCallback(msgObj.data);
   });
   return state;
@@ -832,15 +839,12 @@ exports.microSeconds = microSeconds;
 var type = 'native';
 exports.type = type;
 
-function create(channelName, options) {
-  if (!options) options = {};
+function create(channelName) {
   var state = {
-    uuid: (0, _util.randomToken)(10),
-    channelName: channelName,
-    options: options,
     messagesCallback: null,
     bc: new BroadcastChannel(channelName),
-    subscriberFunctions: []
+    subFns: [] // subscriberFunctions
+
   };
 
   state.bc.onmessage = function (msg) {
@@ -854,7 +858,7 @@ function create(channelName, options) {
 
 function close(channelState) {
   channelState.bc.close();
-  channelState.subscriberFunctions = [];
+  channelState.subFns = [];
 }
 
 function postMessage(channelState, messageJson) {
@@ -903,11 +907,12 @@ exports["default"] = _default;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports._removeTooOldValues = _removeTooOldValues;
 exports["default"] = void 0;
 
 /**
- * 
- * 
+ *
+ *
  */
 var ObliviousSet = function ObliviousSet(ttl) {
   this.ttl = ttl;
@@ -917,36 +922,37 @@ var ObliviousSet = function ObliviousSet(ttl) {
 };
 
 ObliviousSet.prototype = {
-  _removeTooOldValues: function _removeTooOldValues() {
-    var olderThen = now() - this.ttl;
-    var iterator = this.set[Symbol.iterator]();
-
-    while (true) {
-      var value = iterator.next().value;
-      if (!value) return; // no more elements
-
-      var time = this.timeMap.get(value);
-
-      if (time < olderThen) {
-        this.timeMap["delete"](value);
-        this.set["delete"](value);
-      } else {
-        // we reached a value that is not old enough
-        return;
-      }
-    }
-  },
   add: function add(value) {
     this.timeMap.set(value, now());
     this.set.add(value);
 
-    this._removeTooOldValues();
+    _removeTooOldValues(this);
   },
   clear: function clear() {
     this.set.clear();
     this.timeMap.clear();
   }
 };
+
+function _removeTooOldValues(obliviousSet) {
+  var olderThen = now() - obliviousSet.ttl;
+  var iterator = obliviousSet.set[Symbol.iterator]();
+
+  while (true) {
+    var value = iterator.next().value;
+    if (!value) return; // no more elements
+
+    var time = obliviousSet.timeMap.get(value);
+
+    if (time < olderThen) {
+      obliviousSet.timeMap["delete"](value);
+      obliviousSet.set["delete"](value);
+    } else {
+      // we reached a value that is not old enough
+      return;
+    }
+  }
+}
 
 function now() {
   return new Date().getTime();

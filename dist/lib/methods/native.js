@@ -22,15 +22,12 @@ exports.microSeconds = microSeconds;
 var type = 'native';
 exports.type = type;
 
-function create(channelName, options) {
-  if (!options) options = {};
+function create(channelName) {
   var state = {
-    uuid: (0, _util.randomToken)(10),
-    channelName: channelName,
-    options: options,
     messagesCallback: null,
     bc: new BroadcastChannel(channelName),
-    subscriberFunctions: []
+    subFns: [] // subscriberFunctions
+
   };
 
   state.bc.onmessage = function (msg) {
@@ -44,7 +41,7 @@ function create(channelName, options) {
 
 function close(channelState) {
   channelState.bc.close();
-  channelState.subscriberFunctions = [];
+  channelState.subFns = [];
 }
 
 function postMessage(channelState, messageJson) {

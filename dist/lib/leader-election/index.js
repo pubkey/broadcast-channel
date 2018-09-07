@@ -99,11 +99,13 @@ LeaderElection.prototype = {
     return ret;
   },
   awaitLeadership: function awaitLeadership() {
-    if (!this._awaitLeadershipPromise) {
-      this._awaitLeadershipPromise = _awaitLeadershipOnce(this);
+    if (
+    /* _awaitLeadershipPromise */
+    !this._aLP) {
+      this._aLP = _awaitLeadershipOnce(this);
     }
 
-    return this._awaitLeadershipPromise;
+    return this._aLP;
   },
   die: function die() {
     var _this2 = this;

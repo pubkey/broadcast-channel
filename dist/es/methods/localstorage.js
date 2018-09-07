@@ -88,27 +88,30 @@ export function create(channelName, options) {
     throw new Error('BroadcastChannel: localstorage cannot be used');
   }
 
-  var startTime = new Date().getTime();
-  var uuid = randomToken(10); // contains all messages that have been emitted before
+  var uuid = randomToken(10);
+  /**
+   * eMIs
+   * contains all messages that have been emitted before
+   * @type {ObliviousSet}
+   */
 
-  var emittedMessagesIds = new ObliviousSet(options.localstorage.removeTimeout);
+  var eMIs = new ObliviousSet(options.localstorage.removeTimeout);
   var state = {
-    startTime: startTime,
     channelName: channelName,
-    options: options,
     uuid: uuid,
-    emittedMessagesIds: emittedMessagesIds
+    eMIs: eMIs // emittedMessagesIds
+
   };
   state.listener = addStorageEventListener(channelName, function (msgObj) {
     if (!state.messagesCallback) return; // no listener
 
     if (msgObj.uuid === uuid) return; // own message
 
-    if (!msgObj.token || emittedMessagesIds.has(msgObj.token)) return; // already emitted
+    if (!msgObj.token || eMIs.has(msgObj.token)) return; // already emitted
 
     if (msgObj.data.time && msgObj.data.time < state.messagesCallbackTime) return; // too old
 
-    emittedMessagesIds.add(msgObj.token);
+    eMIs.add(msgObj.token);
     state.messagesCallback(msgObj.data);
   });
   return state;
