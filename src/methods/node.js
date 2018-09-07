@@ -78,7 +78,6 @@ function getPaths(channelName) {
         );
 
         const ret = {
-            base: TMP_FOLDER_BASE,
             channelBase: channelPathBase,
             readers: folderPathReaders,
             messages: folderPathMessages
@@ -90,13 +89,17 @@ function getPaths(channelName) {
 }
 
 let ENSURE_BASE_FOLDER_EXISTS_PROMISE = null;
+async function ensureBaseFolderExists() {
+    if (!ENSURE_BASE_FOLDER_EXISTS_PROMISE) {
+        ENSURE_BASE_FOLDER_EXISTS_PROMISE = mkdir(TMP_FOLDER_BASE).catch(() => null);
+    }
+    return ENSURE_BASE_FOLDER_EXISTS_PROMISE;
+}
+
 async function ensureFoldersExist(channelName, paths) {
     paths = paths || getPaths(channelName);
 
-    if (!ENSURE_BASE_FOLDER_EXISTS_PROMISE) {
-        ENSURE_BASE_FOLDER_EXISTS_PROMISE = mkdir(paths.base).catch(() => null);
-    }
-    await ENSURE_BASE_FOLDER_EXISTS_PROMISE;
+    await ensureBaseFolderExists();
 
     await mkdir(paths.channelBase).catch(() => null);
     await Promise.all([
@@ -110,13 +113,11 @@ async function ensureFoldersExist(channelName, paths) {
  * @return {Promise<true>}
  */
 async function clearNodeFolder() {
-    const paths = getPaths('foobar');
-    const removePath = paths.base;
-    if (!removePath || removePath === '' || removePath === '/') {
+    if (!TMP_FOLDER_BASE || TMP_FOLDER_BASE === '' || TMP_FOLDER_BASE === '/') {
         throw new Error('BroadcastChannel.clearNodeFolder(): path is wrong');
     }
     ENSURE_BASE_FOLDER_EXISTS_PROMISE = null;
-    await removeDir(paths.base);
+    await removeDir(TMP_FOLDER_BASE);
     ENSURE_BASE_FOLDER_EXISTS_PROMISE = null;
     return true;
 }
@@ -157,6 +158,35 @@ function createSocketInfoFile(channelName, readerUuid, paths) {
 }
 
 /**
+ * returns the amount of channel-folders in the tmp-directory
+ * @return {Promise<number>}
+ */
+async function countChannelFolders() {
+    await ensureBaseFolderExists();
+    const folders = await readdir(TMP_FOLDER_BASE);
+    return folders.length;
+}
+
+
+async function connectionError(originalError) {
+    const count = await countChannelFolders();
+
+    // we only show the augmented message if there are more then 30 channels
+    // because we then assume that BroadcastChannel is used in unit-tests
+    if (count < 30) return originalError;
+
+    const addObj = {};
+    Object.entries(originalError).forEach(([k, v]) => addObj[k] = v);
+    const text = 'BroadcastChannel.create(): error: ' +
+        'This might happen if you have created to many channels, ' +
+        'like when you use BroadcastChannel in unit-tests.' +
+        'Try using BroadcastChannel.clearNodeFolder() to clear the tmp-folder before each test.' +
+        'See https://github.com/pubkey/broadcast-channel#clear-tmp-folder';
+    const newError = new Error(text + ': ' + JSON.stringify(addObj, null, 2));
+    return newError;
+}
+
+/**
  * creates the socket-file and subscribes to it
  * @return {{emitter: EventEmitter, server: any}}
  */
@@ -173,9 +203,16 @@ async function createSocketEventEmitter(channelName, readerUuid, paths) {
         });
 
     await new Promise((resolve, reject) => {
-        server.listen(pathToSocket, (err, res) => {
-            if (err) reject(err);
-            else resolve(res);
+        server.on('error', async (err) => {
+            const useErr = await connectionError(err);
+            reject(useErr);
+        });
+
+        server.listen(pathToSocket, async (err, res) => {
+            if (err) {
+                const useErr = await connectionError(err);
+                reject(useErr);
+            } else resolve(res);
         });
     });
 
@@ -590,6 +627,7 @@ function microSeconds() {
 }
 
 module.exports = {
+    TMP_FOLDER_BASE,
     cleanPipeName,
     getPaths,
     ensureFoldersExist,
@@ -597,6 +635,7 @@ module.exports = {
     socketPath,
     socketInfoPath,
     createSocketInfoFile,
+    countChannelFolders,
     createSocketEventEmitter,
     openClientConnection,
     writeMessage,

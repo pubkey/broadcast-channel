@@ -59,12 +59,11 @@
   ],
   "dependencies": {
     "@babel/runtime": "7.0.0",
-    "custom-idle-queue": "2.0.1",
     "detect-node": "2.0.4",
-    "rimraf": "2.6.2",
     "js-sha3": "0.8.0",
     "microseconds": "0.1.0",
     "nano-time": "1.0.0",
+    "rimraf": "2.6.2",
     "unload": "2.0.1"
   },
   "devDependencies": {
@@ -104,12 +103,12 @@
     "karma-opera-launcher": "1.0.0",
     "karma-safari-launcher": "1.0.0",
     "mocha": "5.2.0",
-    "node": "10.9.0",
+    "node": "10.10.0",
     "pre-commit": "1.2.2",
     "random-int": "1.0.0",
     "random-token": "0.0.8",
     "testcafe": "0.22.0",
-    "testcafe-hammerhead": "14.2.6",
+    "testcafe-hammerhead": "14.2.7",
     "ts-node": "7.0.1",
     "typescript": "3.0.3",
     "watchify": "3.11.0",

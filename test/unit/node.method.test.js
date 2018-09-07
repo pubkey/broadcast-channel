@@ -41,13 +41,12 @@ describe('unit/node.method.test.js', () => {
             const channelName = AsyncTestUtil.randomString(12);
             await NodeMethod.ensureFoldersExist(channelName);
 
-            const paths = NodeMethod.getPaths(channelName);
-            const exists = fs.existsSync(paths.base);
+            const exists = fs.existsSync(NodeMethod.TMP_FOLDER_BASE);
             assert.ok(exists);
 
             await NodeMethod.clearNodeFolder();
 
-            const exists2 = fs.existsSync(paths.base);
+            const exists2 = fs.existsSync(NodeMethod.TMP_FOLDER_BASE);
             assert.equal(exists2, false);
         });
     });
@@ -62,6 +61,18 @@ describe('unit/node.method.test.js', () => {
 
             const exists = require('fs').existsSync(path);
             assert.ok(exists);
+        });
+    });
+    describe('.countChannelFolders()', () => {
+        it('should have the correct amount', async () => {
+            await NodeMethod.clearNodeFolder();
+            const amount1 = await NodeMethod.countChannelFolders();
+            assert.equal(amount1, 0);
+
+            const channelName = AsyncTestUtil.randomString(12);
+            await NodeMethod.ensureFoldersExist(channelName);
+            const amount2 = await NodeMethod.countChannelFolders();
+            assert.equal(amount2, 1);
         });
     });
     describe('.createSocketEventEmitter()', () => {
@@ -123,6 +134,60 @@ describe('unit/node.method.test.js', () => {
                 })
             );
             sockets.forEach(socket => socket.server.close());
+        });
+        it('should throw an augmented error when there are many created channels', async () => {
+            await NodeMethod.clearNodeFolder();
+            const channelName = AsyncTestUtil.randomString(12);
+            const readerUuid = AsyncTestUtil.randomString(6);
+
+            // ensure we have more then 30 channel-folders
+            const sockets = await Promise.all(
+                new Array(35).fill(0)
+                .map(async () => {
+                    const uid = AsyncTestUtil.randomString(6);
+                    const cN = AsyncTestUtil.randomString(12);
+                    await NodeMethod.ensureFoldersExist(cN);
+                    return NodeMethod.createSocketEventEmitter(cN, uid);
+                })
+            );
+
+            await NodeMethod.ensureFoldersExist(channelName);
+            const r1 = await NodeMethod.createSocketEventEmitter(channelName, readerUuid);
+
+            /**
+             * to provoke a connection-error to the socket,
+             * the same readerUuid is used
+             */
+            await AsyncTestUtil.assertThrows(
+                () => NodeMethod.createSocketEventEmitter(channelName, readerUuid),
+                Error,
+                'clearNodeFolder'
+            );
+
+            r1.server.close();
+            sockets.forEach(socket => socket.server.close());
+        });
+        it('should NOT throw an augmented error when there are NOT many created channels', async () => {
+            await NodeMethod.clearNodeFolder();
+            const channelName = AsyncTestUtil.randomString(12);
+            const readerUuid = AsyncTestUtil.randomString(6);
+
+            await NodeMethod.ensureFoldersExist(channelName);
+            const r1 = await NodeMethod.createSocketEventEmitter(channelName, readerUuid);
+
+            let hasThrown = false;
+            /**
+             * to provoke a connection-error to the socket,
+             * the same readerUuid is used
+             */
+            try {
+                await NodeMethod.createSocketEventEmitter(channelName, readerUuid);
+            } catch (err) {
+                hasThrown = true;
+                assert.ok(!err.toString().includes('clearNodeFolder'));
+            }
+            assert.ok(hasThrown);
+            r1.server.close();
         });
     });
     describe('.writeMessage()', () => {
