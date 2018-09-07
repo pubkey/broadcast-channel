@@ -2,6 +2,7 @@ const AsyncTestUtil = require('async-test-util');
 const assert = require('assert');
 
 const ObliviousSet = require('../../dist/lib/oblivious-set.js').default;
+const ObliviousSetAll = require('../../dist/lib/oblivious-set.js');
 
 describe('unit/oblivious-set.test.js', () => {
     it('create, add, has, get, clear', () => {
@@ -20,7 +21,7 @@ describe('unit/oblivious-set.test.js', () => {
         assert.ok(set.has('foobar'));
 
         await AsyncTestUtil.wait(200);
-        set._removeTooOldValues();
+        ObliviousSetAll._removeTooOldValues(set);
         const has = set.has('foobar');
         assert.equal(false, has);
     });
@@ -30,7 +31,7 @@ describe('unit/oblivious-set.test.js', () => {
         assert.ok(set.has('foobar'));
 
         await AsyncTestUtil.wait(50);
-        set._removeTooOldValues();
+        ObliviousSetAll._removeTooOldValues(set);
         assert.ok(set.has('foobar'));
     });
     it('should clear the value after its ttl', async () => {

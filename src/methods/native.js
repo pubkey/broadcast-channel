@@ -1,7 +1,6 @@
 import isNode from 'detect-node';
 
 import {
-    randomToken,
     microSeconds as micro
 } from '../util';
 
@@ -9,15 +8,11 @@ export const microSeconds = micro;
 
 export const type = 'native';
 
-export function create(channelName, options) {
-    if (!options) options = {};
+export function create(channelName) {
     const state = {
-        uuid: randomToken(10),
-        channelName,
-        options,
         messagesCallback: null,
         bc: new BroadcastChannel(channelName),
-        subscriberFunctions: []
+        subFns: [] // subscriberFunctions
     };
 
     state.bc.onmessage = msg => {
@@ -31,7 +26,7 @@ export function create(channelName, options) {
 
 export function close(channelState) {
     channelState.bc.close();
-    channelState.subscriberFunctions = [];
+    channelState.subFns = [];
 }
 
 export function postMessage(channelState, messageJson) {

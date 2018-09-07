@@ -11,7 +11,6 @@ import {
 } from './options.js';
 
 
-
 const BroadcastChannel = function(name, options) {
     this.name = name;
     this.options = fillOptionsWithDefaults(options);

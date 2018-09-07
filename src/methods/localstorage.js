@@ -100,18 +100,19 @@ export function create(channelName, options) {
         throw new Error('BroadcastChannel: localstorage cannot be used');
     }
 
-    const startTime = new Date().getTime();
     const uuid = randomToken(10);
 
-    // contains all messages that have been emitted before
-    const emittedMessagesIds = new ObliviousSet(options.localstorage.removeTimeout);
+    /**
+     * eMIs
+     * contains all messages that have been emitted before
+     * @type {ObliviousSet}
+     */
+    const eMIs = new ObliviousSet(options.localstorage.removeTimeout);
 
     const state = {
-        startTime,
         channelName,
-        options,
         uuid,
-        emittedMessagesIds
+        eMIs // emittedMessagesIds
     };
 
 
@@ -120,10 +121,10 @@ export function create(channelName, options) {
         (msgObj) => {
             if (!state.messagesCallback) return; // no listener
             if (msgObj.uuid === uuid) return; // own message
-            if (!msgObj.token || emittedMessagesIds.has(msgObj.token)) return; // already emitted
+            if (!msgObj.token || eMIs.has(msgObj.token)) return; // already emitted
             if (msgObj.data.time && msgObj.data.time < state.messagesCallbackTime) return; // too old
 
-            emittedMessagesIds.add(msgObj.token);
+            eMIs.add(msgObj.token);
             state.messagesCallback(msgObj.data);
         }
     );
