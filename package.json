@@ -65,7 +65,7 @@
     "microseconds": "0.1.0",
     "nano-time": "1.0.0",
     "rimraf": "2.6.2",
-    "unload": "2.0.1"
+    "unload": "2.0.2"
   },
   "devDependencies": {
     "@babel/cli": "7.1.0",
