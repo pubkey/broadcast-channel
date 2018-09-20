@@ -13,14 +13,45 @@ before_install:
   - if [ "${TRAVIS_OS_NAME}" = "osx" ]; then ( sudo Xvfb :99 -ac -screen 0 1024x768x8; echo ok )& fi
   - sleep 3 # give xvfb some time to start
 
-script:
-- travis_retry npm install --depth 0 --silent
-- travis_retry npm run test:node
-- if [ "${TRAVIS_OS_NAME}" = "linux" ]; then ( travis_retry npm run test:browser ) fi
-- if [ "${TRAVIS_OS_NAME}" = "linux" ]; then ( travis_retry npm run test:e2e:travis ) fi
-- travis_retry npm run test:performance
-- npm run build
-- npm run lint
-- npm run test:typings
-- npm run size:webpack
-- npm run size:browserify
+
+stages:
+  - install
+  - build
+  - format
+  - size
+  - test
+
+jobs:
+  include:
+    - stage: install
+      script: travis_retry npm install --depth 0 --silent
+
+    - stage: build
+      script: npm run build
+
+    - stage: format
+      script: travis_retry npm run lint
+      env: LABEL=format:lint
+    - stage: format
+      script: npm run test:typings
+      env: LABEL=format:typings
+
+    - stage: size
+      script: npm run size:webpack
+      env: LABEL=size:webpack
+    - stage: size
+      script: npm run size:browserify
+      env: LABEL=size:browserify
+
+    - stage: test
+      script: travis_retry npm run test:node
+      env: LABEL=test:node
+    - stage: test
+      script: if [ "${TRAVIS_OS_NAME}" = "linux" ]; then ( travis_retry npm run test:browser ) fi
+      env: LABEL=test:browser
+    - stage: test
+      script: if [ "${TRAVIS_OS_NAME}" = "linux" ]; then ( travis_retry npm run test:e2e:travis ) fi
+      env: LABEL=test:e2e
+    - stage: test
+      script: travis_retry npm run test:performance
+      env: LABEL=test:performance

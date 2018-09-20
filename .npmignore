@@ -4,7 +4,7 @@ docs/
 test/
 test_tmp/
 tmp/
-.babelrc
+babel.config.js
 .editorconfig
 .eslintignore
 .eslintrc.json
