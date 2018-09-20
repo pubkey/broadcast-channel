@@ -47,9 +47,11 @@ jobs:
       script: travis_retry npm run test:node
       env: LABEL=test:node
     - stage: tests
+      os: linux
       script: if [ "${TRAVIS_OS_NAME}" = "linux" ]; then ( travis_retry npm run test:browser ) fi
       env: LABEL=test:browser
     - stage: tests
+      os: linux
       script: if [ "${TRAVIS_OS_NAME}" = "linux" ]; then ( travis_retry npm run test:e2e:travis ) fi
       env: LABEL=test:e2e
     - stage: tests
