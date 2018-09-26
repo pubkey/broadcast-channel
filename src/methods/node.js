@@ -44,6 +44,7 @@ const writeFile = util.promisify(fs.writeFile);
 const readFile = util.promisify(fs.readFile);
 const unlink = util.promisify(fs.unlink);
 const readdir = util.promisify(fs.readdir);
+const chmod = util.promisify(fs.chmod);
 const removeDir = util.promisify(rimraf);
 
 const OTHER_INSTANCES = {};
@@ -106,6 +107,14 @@ async function ensureFoldersExist(channelName, paths) {
         mkdir(paths.readers).catch(() => null),
         mkdir(paths.messages).catch(() => null)
     ]);
+
+    // set permissions so other users can use the same channel
+    const chmodValue = '777';
+    await Promise.all([
+        chmod(paths.channelBase, chmodValue),
+        chmod(paths.readers, chmodValue),
+        chmod(paths.messages, chmodValue)
+    ]).catch(() => null);
 }
 
 /**
