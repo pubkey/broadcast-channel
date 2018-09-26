@@ -56,6 +56,7 @@ var writeFile = util.promisify(fs.writeFile);
 var readFile = util.promisify(fs.readFile);
 var unlink = util.promisify(fs.unlink);
 var readdir = util.promisify(fs.readdir);
+var chmod = util.promisify(fs.chmod);
 var removeDir = util.promisify(rimraf);
 var OTHER_INSTANCES = {};
 var TMP_FOLDER_NAME = 'pubkey.bc';
@@ -133,6 +134,7 @@ function _ensureFoldersExist() {
   _ensureFoldersExist = _asyncToGenerator(
   /*#__PURE__*/
   _regeneratorRuntime.mark(function _callee5(channelName, paths) {
+    var chmodValue;
     return _regeneratorRuntime.wrap(function _callee5$(_context5) {
       while (1) {
         switch (_context5.prev = _context5.next) {
@@ -156,6 +158,14 @@ function _ensureFoldersExist() {
             })]);
 
           case 7:
+            // set permissions so other users can use the same channel
+            chmodValue = '777';
+            _context5.next = 10;
+            return Promise.all([chmod(paths.channelBase, chmodValue), chmod(paths.readers, chmodValue), chmod(paths.messages, chmodValue)])["catch"](function () {
+              return null;
+            });
+
+          case 10:
           case "end":
             return _context5.stop();
         }
