@@ -395,6 +395,16 @@ function runTest(channelOptions) {
                     otherChannel.close();
                 });
             });
+            describe('ISSUES', () => {
+                it('#6 premature closing of the channel should not throw', async () => {
+                    const channels = [];
+                    for (let i = 0; i < 10; i++) {
+                        const channel = new BroadcastChannel(AsyncTestUtil.randomString(12), channelOptions);
+                        unload.runAll();
+                        channels.push(channel);
+                    }
+                });
+            });
         });
         describe('LeaderElection', () => {
             describe('.create()', () => {

@@ -614,12 +614,14 @@ function close(channelState) {
      */
     setTimeout(() => channelState.socketEE.server.close(), 200);
 
-    channelState.socketEE.emitter.removeAllListeners();
+    if (channelState.socketEE)
+        channelState.socketEE.emitter.removeAllListeners();
 
     Object.values(channelState.otherReaderClients)
         .forEach(client => client.destroy());
 
-    unlink(channelState.infoFilePath).catch(() => null);
+    if (channelState.infoFilePath)
+        unlink(channelState.infoFilePath).catch(() => null);
 }
 
 
