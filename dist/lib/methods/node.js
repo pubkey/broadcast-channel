@@ -1087,11 +1087,11 @@ function close(channelState) {
   setTimeout(function () {
     return channelState.socketEE.server.close();
   }, 200);
-  channelState.socketEE.emitter.removeAllListeners();
+  if (channelState.socketEE) channelState.socketEE.emitter.removeAllListeners();
   Object.values(channelState.otherReaderClients).forEach(function (client) {
     return client.destroy();
   });
-  unlink(channelState.infoFilePath)["catch"](function () {
+  if (channelState.infoFilePath) unlink(channelState.infoFilePath)["catch"](function () {
     return null;
   });
 }
