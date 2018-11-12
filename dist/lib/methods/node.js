@@ -469,15 +469,16 @@ function _openClientConnection() {
           case 0:
             pathToSocket = socketPath(channelName, readerUuid);
             client = new net.Socket();
-            _context12.next = 4;
-            return new Promise(function (res) {
-              client.connect(pathToSocket, res);
-            });
+            return _context12.abrupt("return", new Promise(function (res, rej) {
+              client.connect(pathToSocket, function () {
+                return res(client);
+              });
+              client.on('error', function (err) {
+                return rej(err);
+              });
+            }));
 
-          case 4:
-            return _context12.abrupt("return", client);
-
-          case 5:
+          case 3:
           case "end":
             return _context12.stop();
         }
@@ -942,25 +943,34 @@ function refreshReaderClients(channelState) {
                 return _context2.abrupt("return");
 
               case 3:
-                _context2.next = 5;
+                _context2.prev = 3;
+                _context2.next = 6;
                 return openClientConnection(channelState.channelName, readerUuid);
 
-              case 5:
+              case 6:
                 client = _context2.sent;
                 channelState.otherReaderClients[readerUuid] = client;
-                _context2.next = 11;
+                _context2.next = 12;
                 break;
 
-              case 9:
-                _context2.prev = 9;
-                _context2.t0 = _context2["catch"](0);
+              case 10:
+                _context2.prev = 10;
+                _context2.t0 = _context2["catch"](3);
 
-              case 11:
+              case 12:
+                _context2.next = 16;
+                break;
+
+              case 14:
+                _context2.prev = 14;
+                _context2.t1 = _context2["catch"](0);
+
+              case 16:
               case "end":
                 return _context2.stop();
             }
           }
-        }, _callee2, this, [[0, 9]]);
+        }, _callee2, this, [[0, 14], [3, 10]]);
       }));
 
       return function (_x23) {
@@ -1091,9 +1101,12 @@ function close(channelState) {
   Object.values(channelState.otherReaderClients).forEach(function (client) {
     return client.destroy();
   });
-  if (channelState.infoFilePath) unlink(channelState.infoFilePath)["catch"](function () {
-    return null;
-  });
+
+  if (channelState.infoFilePath) {
+    try {
+      fs.unlinkSync(channelState.infoFilePath);
+    } catch (err) {}
+  }
 }
 
 function canBeUsed() {
