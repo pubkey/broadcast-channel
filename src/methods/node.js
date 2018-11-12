@@ -235,13 +235,13 @@ async function createSocketEventEmitter(channelName, readerUuid, paths) {
 async function openClientConnection(channelName, readerUuid) {
     const pathToSocket = socketPath(channelName, readerUuid);
     const client = new net.Socket();
-    await new Promise(res => {
+    return new Promise((res, rej) => {
         client.connect(
             pathToSocket,
-            res
+            () => res(client)
         );
+        client.on('error', err => rej(err));
     });
-    return client;
 }
 
 
@@ -507,8 +507,13 @@ function refreshReaderClients(channelState) {
                 .map(async (readerUuid) => {
                     try {
                         if (channelState.closed) return;
-                        const client = await openClientConnection(channelState.channelName, readerUuid);
-                        channelState.otherReaderClients[readerUuid] = client;
+                        try {
+                            const client = await openClientConnection(channelState.channelName, readerUuid);
+                            channelState.otherReaderClients[readerUuid] = client;
+                        } catch (err) {
+                            // this can throw when the cleanup of another channel was interrupted
+                            // or the socket-file does not exits yet
+                        }
                     } catch (err) {
                         // this might throw if the other channel is closed at the same time when this one is running refresh
                         // so we do not throw an error
@@ -620,8 +625,11 @@ function close(channelState) {
     Object.values(channelState.otherReaderClients)
         .forEach(client => client.destroy());
 
-    if (channelState.infoFilePath)
-        unlink(channelState.infoFilePath).catch(() => null);
+    if (channelState.infoFilePath) {
+        try {
+            fs.unlinkSync(channelState.infoFilePath);
+        } catch (err) {}
+    }
 }
 
 
