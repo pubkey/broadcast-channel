@@ -1,7 +1,16 @@
 import BroadcastChannel from '../';
 
 export type LeaderElectionOptions = {
+    /**
+     * This value decides how often instances will renegotiate who is leader.
+     * Probably should be at least 2x bigger than responseTime.
+     */
     fallbackInterval?: number;
+    /**
+     * This timer value is used when resolving which instance should be leader.
+     * In case when your application elects more than one leader increase this value.
+     */
+    responseTime?: number;
 };
 
 

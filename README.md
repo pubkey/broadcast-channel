@@ -150,6 +150,19 @@ elector.awaitLeadership().then(()=> {
 })
 ```
 
+If more than one tab is becoming leader adjust `LeaderElectionOptions` configuration.
+
+```js
+const LeaderElection = require('broadcast-channel/leader-election');
+const elector = LeaderElection.create(channel, {
+  fallbackInterval: 2000, // optional configuration for how often will renegotiation for leader occur
+  responseTime: 1000, // optional configuration for how long will instances have to respond
+});
+elector.awaitLeadership().then(()=> {
+  console.log('this tab is now leader');
+})
+```
+
 Let the leader die. (automatically happens if the tab is closed or the process exits).
 
 ```js
