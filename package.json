@@ -111,7 +111,7 @@
     "random-token": "0.0.8",
     "testcafe": "0.23.3",
     "testcafe-hammerhead": "14.4.12",
-    "ts-node": "8.0.2",
+    "ts-node": "7.0.1",
     "typescript": "3.3.1",
     "watchify": "3.11.0",
     "webpack": "4.29.0",
