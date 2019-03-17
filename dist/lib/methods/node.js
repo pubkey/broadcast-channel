@@ -121,7 +121,7 @@ function _ensureBaseFolderExists() {
             return _context4.stop();
         }
       }
-    }, _callee4, this);
+    }, _callee4);
   }));
   return _ensureBaseFolderExists.apply(this, arguments);
 }
@@ -175,7 +175,7 @@ function _ensureFoldersExist() {
             return _context5.stop();
         }
       }
-    }, _callee5, this);
+    }, _callee5);
   }));
   return _ensureFoldersExist.apply(this, arguments);
 }
@@ -213,7 +213,7 @@ function _clearNodeFolder() {
             return _context6.stop();
         }
       }
-    }, _callee6, this);
+    }, _callee6);
   }));
   return _clearNodeFolder.apply(this, arguments);
 }
@@ -279,7 +279,7 @@ function _countChannelFolders() {
             return _context7.stop();
         }
       }
-    }, _callee7, this);
+    }, _callee7);
   }));
   return _countChannelFolders.apply(this, arguments);
 }
@@ -331,7 +331,7 @@ function _connectionError() {
             return _context8.stop();
         }
       }
-    }, _callee8, this);
+    }, _callee8);
   }));
   return _connectionError.apply(this, arguments);
 }
@@ -382,7 +382,7 @@ function _createSocketEventEmitter() {
                           return _context9.stop();
                       }
                     }
-                  }, _callee9, this);
+                  }, _callee9);
                 }));
 
                 return function (_x24) {
@@ -422,7 +422,7 @@ function _createSocketEventEmitter() {
                           return _context10.stop();
                       }
                     }
-                  }, _callee10, this);
+                  }, _callee10);
                 }));
 
                 return function (_x25, _x26) {
@@ -443,7 +443,7 @@ function _createSocketEventEmitter() {
             return _context11.stop();
         }
       }
-    }, _callee11, this);
+    }, _callee11);
   }));
   return _createSocketEventEmitter.apply(this, arguments);
 }
@@ -483,7 +483,7 @@ function _openClientConnection() {
             return _context12.stop();
         }
       }
-    }, _callee12, this);
+    }, _callee12);
   }));
   return _openClientConnection.apply(this, arguments);
 }
@@ -548,7 +548,7 @@ function _getReadersUuids() {
             return _context13.stop();
         }
       }
-    }, _callee13, this);
+    }, _callee13);
   }));
   return _getReadersUuids.apply(this, arguments);
 }
@@ -575,7 +575,7 @@ function _messagePath() {
             return _context14.stop();
         }
       }
-    }, _callee14, this);
+    }, _callee14);
   }));
   return _messagePath.apply(this, arguments);
 }
@@ -616,7 +616,7 @@ function _getAllMessages() {
             return _context15.stop();
         }
       }
-    }, _callee15, this);
+    }, _callee15);
   }));
   return _getAllMessages.apply(this, arguments);
 }
@@ -665,7 +665,7 @@ function _cleanOldMessages() {
             return _context16.stop();
         }
       }
-    }, _callee16, this);
+    }, _callee16);
   }));
   return _cleanOldMessages.apply(this, arguments);
 }
@@ -762,7 +762,7 @@ function _create() {
             return _context17.stop();
         }
       }
-    }, _callee17, this);
+    }, _callee17);
   }));
   return _create.apply(this, arguments);
 }
@@ -868,7 +868,7 @@ function _handleMessagePing() {
             return _context18.stop();
         }
       }
-    }, _callee18, this);
+    }, _callee18);
   }));
   return _handleMessagePing.apply(this, arguments);
 }
@@ -908,7 +908,7 @@ function refreshReaderClients(channelState) {
                 return _context.stop();
             }
           }
-        }, _callee, this, [[0, 5]]);
+        }, _callee, null, [[0, 5]]);
       }));
 
       return function (_x22) {
@@ -970,7 +970,7 @@ function refreshReaderClients(channelState) {
                 return _context2.stop();
             }
           }
-        }, _callee2, this, [[0, 14], [3, 10]]);
+        }, _callee2, null, [[0, 14], [3, 10]]);
       }));
 
       return function (_x23) {
@@ -1040,7 +1040,7 @@ function postMessage(channelState, messageJson) {
             return _context3.stop();
         }
       }
-    }, _callee3, this);
+    }, _callee3);
   })));
   return channelState.writeBlockPromise;
 }
