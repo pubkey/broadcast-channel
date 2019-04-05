@@ -103,14 +103,16 @@ channel.postMessage({
 When used in NodeJs, the BroadcastChannel will communicate with other processes over filesystem based sockets.
 When you create a huge amount of channels, like you would do when running unit tests, you might get problems because there are too many folders in the tmp-directory. Calling `BroadcastChannel.clearNodeFolder()` will clear the tmp-folder and it is recommended to run this at the beginning of your test-suite.
 
-```jest
+```typescript
+// jest
 beforeAll(async () => {
   const hasRun = await BroadcastChannel.clearNodeFolder();
   console.log(hasRun); // > true on NodeJs, false on Browsers
 })
 ```
 
-```Mocha
+```typescript
+// mocha
 before(async () => {
   const hasRun = await BroadcastChannel.clearNodeFolder();
   console.log(hasRun); // > true on NodeJs, false on Browsers
