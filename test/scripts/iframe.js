@@ -19,6 +19,7 @@ console.log = function (str) { logBefore('iframe: ' + str); }
 var channel = new BroadcastChannel(channelName, {
     type: methodType
 });
+console.log('created channel with type ' + methodType);
 var msgContainer = document.getElementById('messages');
 channel.onmessage = function (msg) {
     console.log('recieved message(' + msg.step + ') from ' + msg.from + ': ' + JSON.stringify(msg));

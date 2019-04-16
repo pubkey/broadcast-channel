@@ -8284,6 +8284,7 @@ console.log = function (str) {
 var channel = new BroadcastChannel(channelName, {
   type: methodType
 });
+console.log('created channel with type ' + methodType);
 var msgContainer = document.getElementById('messages');
 
 channel.onmessage = function (msg) {
