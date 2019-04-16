@@ -32,8 +32,6 @@ This behaves similar to the [BroadcastChannel-API](https://developer.mozilla.org
 
 ## Using the BroadcastChannel
 
-This API behaves similar to the [javascript-standard](https://developer.mozilla.org/en-US/docs/Web/API/Broadcast_Channel_API).
-
 ```bash
 npm install --save broadcast-channel
 ```
