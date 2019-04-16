@@ -8270,6 +8270,8 @@ var _util = require("./util.js");
  */
 require('@babel/polyfill');
 
+var msgContainer = document.getElementById('messages');
+
 var BroadcastChannel = require('../../');
 
 var channelName = (0, _util.getParameterByName)('channelName');
@@ -8281,19 +8283,25 @@ console.log = function (str) {
   logBefore('iframe: ' + str);
 };
 
+function logToDom(str) {
+  var textnode = document.createTextNode(str);
+  var lineBreak = document.createElement('br');
+  msgContainer.appendChild(textnode);
+  msgContainer.appendChild(lineBreak);
+}
+
 var channel = new BroadcastChannel(channelName, {
   type: methodType
 });
-console.log('created channel with type ' + methodType);
-var msgContainer = document.getElementById('messages');
+logToDom('created channel with type ' + methodType);
 
 channel.onmessage = function (msg) {
-  console.log('recieved message(' + msg.step + ') from ' + msg.from + ': ' + JSON.stringify(msg));
-  var textnode = document.createTextNode(JSON.stringify(msg) + '</br>');
-  msgContainer.appendChild(textnode);
+  logToDom('message:');
+  logToDom('recieved message(' + msg.step + ') from ' + msg.from + ': ');
+  logToDom(JSON.stringify(msg));
 
   if (!msg.answer) {
-    console.log('answer back(' + msg.step + ')');
+    logToDom('answer back(' + msg.step + ')');
     channel.postMessage({
       answer: true,
       from: 'iframe',

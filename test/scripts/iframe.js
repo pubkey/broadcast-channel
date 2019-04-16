@@ -7,6 +7,8 @@ import {
     getParameterByName
 } from './util.js';
 
+var msgContainer = document.getElementById('messages');
+
 var BroadcastChannel = require('../../');
 
 const channelName = getParameterByName('channelName');
@@ -15,20 +17,26 @@ const methodType = getParameterByName('methodType');
 // overwrite console.log
 const logBefore = console.log;
 console.log = function (str) { logBefore('iframe: ' + str); }
+function logToDom(str){
+    var textnode = document.createTextNode(str);
+    var lineBreak = document.createElement('br');
+    msgContainer.appendChild(textnode);
+    msgContainer.appendChild(lineBreak);
+}
 
 var channel = new BroadcastChannel(channelName, {
     type: methodType
 });
-console.log('created channel with type ' + methodType);
-var msgContainer = document.getElementById('messages');
-channel.onmessage = function (msg) {
-    console.log('recieved message(' + msg.step + ') from ' + msg.from + ': ' + JSON.stringify(msg));
 
-    var textnode = document.createTextNode(JSON.stringify(msg) + '</br>');
-    msgContainer.appendChild(textnode);
+logToDom('created channel with type ' + methodType);
+
+channel.onmessage = function (msg) {
+    logToDom('message:');
+    logToDom('recieved message(' + msg.step + ') from ' + msg.from + ': ');
+    logToDom(JSON.stringify(msg));
 
     if (!msg.answer) {
-        console.log('answer back(' + msg.step + ')');
+        logToDom('answer back(' + msg.step + ')');
         channel.postMessage({
             answer: true,
             from: 'iframe',
