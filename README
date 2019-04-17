@@ -26,11 +26,11 @@
             alt="follow on Twitter"></a>
 </p>
 
-<br/>
+![demo.gif](docs/files/demo.gif)
 
 * * *
 
-A BroadcastChannel allows simple communication between browsing contexts with the same origin or different NodeJs processes.
+A BroadcastChannel that allows you to send data between different browser-tabs or nodejs-processes.
 
 ## Using the BroadcastChannel
 

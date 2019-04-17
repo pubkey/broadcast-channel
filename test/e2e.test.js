@@ -3,7 +3,7 @@ import {
 } from 'testcafe';
 import AsyncTestUtil from 'async-test-util';
 
-const BASE_PAGE = 'http://127.0.0.1:8080/';
+const BASE_PAGE = 'http://127.0.0.1:8080/e2e.html';
 
 fixture`Example page`
     .page`http://127.0.0.1:8080/`;

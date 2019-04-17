@@ -20,7 +20,7 @@
             alt="follow on Twitter"></a>
 </p>
 
-<br/>
+![demo.gif](docs/files/demo.gif)
 
 * * *
 
