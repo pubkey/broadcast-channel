@@ -1,0 +1,58 @@
+<!--
+    This is a different readme file which will be published to npm
+    @link https://stackoverflow.com/a/52683086
+
+    The problem was that googled indexed the npm-site instead of the github site
+-->
+
+<p align="center">
+  <a href="https://github.com/pubkey/broadcast-channel">
+    <img src="./docs/files/icon.png" width="150px" />
+  </a>
+</p>
+
+<h1 align="center">BroadcastChannel</h1>
+<p align="center">
+  <strong>A BroadcastChannel that works in old browsers, new browsers, WebWorkers and NodeJs</strong>
+  <br/>
+  <span>+ LeaderElection over the channels</span>
+</p>
+
+<p align="center">
+    <a alt="travis" href="https://travis-ci.org/pubkey/broadcast-channel">
+        <img src="https://travis-ci.org/pubkey/broadcast-channel.svg?branch=master" /></a>
+    <a href="https://twitter.com/pubkeypubkey">
+        <img src="https://img.shields.io/twitter/follow/pubkeypubkey.svg?style=social&logo=twitter"
+            alt="follow on Twitter"></a>
+</p>
+
+<br/>
+
+* * *
+
+A BroadcastChannel allows simple communication between browsing contexts with the same origin or different NodeJs processes.
+
+## Using the BroadcastChannel
+
+```bash
+npm install --save broadcast-channel
+```
+
+#### Create a channel in one tab/process and send a message.
+
+```js
+const BroadcastChannel = require('broadcast-channel');
+const channel = new BroadcastChannel('foobar');
+channel.postMessage('I am not alone');
+```
+
+#### Create a channel with the same name in another tab/process and recieve messages.
+
+```js
+const BroadcastChannel = require('broadcast-channel');
+const channel = new BroadcastChannel('foobar');
+channel.onmessage = msg => console.dir(msg);
+// > 'I am not alone'
+```
+
+# [READ THE FULL DOCUMENTATION ON GITHUB](https://github.com/pubkey/broadcast-channel)
