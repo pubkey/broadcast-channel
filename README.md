@@ -199,7 +199,7 @@ This module is optimised for:
 
 
 ## Browser Support
-I have tested this in all browsers that I could find. For ie8 and ie9 you must transpile the code before you can use this. If you want to know if this works with your browser, [open the demo page](https://pubkey.github.io/broadcast-channel/).
+I have tested this in all browsers that I could find. For ie8 and ie9 you must transpile the code before you can use this. If you want to know if this works with your browser, [open the demo page](https://pubkey.github.io/broadcast-channel/e2e.html).
 
 ## Thanks
 Thanks to [Hemanth.HM](https://github.com/hemanth) for the module name.
