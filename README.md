@@ -7,9 +7,9 @@
 
 <h1 align="center">BroadcastChannel</h1>
 <p align="center">
-  <strong>A BroadcastChannel that works in old browsers, new browsers, WebWorkers and NodeJs</strong>
+  <strong>A BroadcastChannel to send data between different browser-tabs or nodejs-processes</strong>
   <br/>
-  <span>+ LeaderElection over the channels</span>
+  <span>+ LeaderElection over the channels</span><br />
 </p>
 
 <p align="center">
@@ -24,11 +24,12 @@
 
 * * *
 
-A BroadcastChannel allows simple communication between browsing contexts with the same origin or different NodeJs processes.
+A BroadcastChannel that allows you to send data between different browser-tabs or nodejs-processes.
 
-This implementation works with old browsers, new browsers, WebWorkers and NodeJs. You can use it to send messages between multiple browser-tabs, iframes, WebWorkers and NodeJs-processes.
+- It works completely **client-side** and **offline**.
+- Tested on **old browsers**, **new browsers**, **WebWorkers**, **Iframes** and **NodeJs**
 
-This behaves similar to the [BroadcastChannel-API](https://developer.mozilla.org/en-US/docs/Web/API/Broadcast_Channel_API) which is currently not featured in all browsers.
+This behaves similar to the [BroadcastChannel-API](https://developer.mozilla.org/en-US/docs/Web/API/Broadcast_Channel_API) which is currently only featured in [some browsers](https://caniuse.com/#feat=broadcastchannel).
 
 ## Using the BroadcastChannel
 
