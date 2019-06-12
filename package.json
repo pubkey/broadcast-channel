@@ -53,6 +53,8 @@
     "build:leader-iframe": "browserify test_tmp/scripts/leader-iframe.js > docs/leader-iframe.js",
     "build": "npm run clear && concurrently \"npm run build:es6\" \"npm run build:es5\" \"npm run build:test\" && concurrently \"npm run build:index\" \"npm run build:browser\" \"npm run build:worker\" \"npm run build:iframe\" \"npm run build:leader-iframe\"",
     "build:min": "uglifyjs --compress --mangle --output dist/lib/browserify.min.js -- dist/lib/browserify.index.js",
+    "build:lib-browser": "browserify dist/lib/browserify.min.js > dist/lib/browser.js",
+    "build:lib-browser:min": "uglifyjs --compress --mangle --output dist/lib/browser.min.js -- dist/lib/browser.js",
     "docs:only": "http-server ./docs --silent",
     "docs:serve": "npm run build && echo \"Open http://localhost:8080/\" && npm run docs:only"
   },
