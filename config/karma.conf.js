@@ -63,12 +63,17 @@ const configuration = {
     processKillTimeout: 24000,
     customLaunchers: {
         Chrome_travis_ci: {
-            base: 'Chrome',
+            base: 'ChromeHeadless',
             flags: ['--no-sandbox']
         }
     },
     singleRun: true
 };
+
+if (process.env.TRAVIS) {
+    configuration.browsers = ['Chrome_travis_ci'];
+    configuration.concurrency = 1;
+}
 
 module.exports = function (config) {
     config.set(configuration);
