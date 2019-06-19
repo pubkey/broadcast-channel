@@ -11,6 +11,7 @@ services:
 
 addons:
   chrome: stable
+  firefox: "49.0"
 
 script:
 - travis_retry npm install --depth 0 --silent
