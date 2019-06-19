@@ -6,17 +6,11 @@ os:
 node_js:
   - "10.9.0"
 
-before_install:
-  - export CHROME_BIN=chromium-browser
-  - export DISPLAY=:99.0;
-  - if [ "${TRAVIS_OS_NAME}" = "osx" ]; then ( sudo Xvfb :99 -ac -screen 0 1024x768x8; echo ok )& fi
-  - sleep 3 # give xvfb some time to start
+services:
+  - xvfb
 
 addons:
   chrome: stable
-
-services:
-  - xvfb
 
 script:
 - travis_retry npm install --depth 0 --silent
