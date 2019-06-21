@@ -11,7 +11,7 @@
   <br/>
   <span>+ LeaderElection over the channels</span><br />
 </p>
-
+ 
 <p align="center">
     <a alt="travis" href="https://travis-ci.org/pubkey/broadcast-channel">
         <img src="https://travis-ci.org/pubkey/broadcast-channel.svg?branch=master" /></a>
