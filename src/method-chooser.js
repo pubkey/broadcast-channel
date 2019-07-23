@@ -1,8 +1,9 @@
-import isNode from 'detect-node';
-
 import NativeMethod from './methods/native.js';
 import IndexeDbMethod from './methods/indexed-db.js';
 import LocalstorageMethod from './methods/localstorage.js';
+import {
+    isNode
+} from './util';
 
 // order is important
 const METHODS = [

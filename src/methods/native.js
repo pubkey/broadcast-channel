@@ -1,7 +1,6 @@
-import isNode from 'detect-node';
-
 import {
-    microSeconds as micro
+    microSeconds as micro,
+    isNode
 } from '../util';
 
 export const microSeconds = micro;

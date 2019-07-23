@@ -4,13 +4,12 @@
  * @link https://github.com/w3c/IndexedDB/issues/51
  */
 
-import isNode from 'detect-node';
-
 import {
     sleep,
     randomInt,
     randomToken,
-    microSeconds as micro
+    microSeconds as micro,
+    isNode
 } from '../util.js';
 
 export const microSeconds = micro;

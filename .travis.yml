@@ -24,3 +24,4 @@ script:
 - npm run test:typings
 - npm run size:webpack
 - npm run size:browserify
+- npm run size:rollup

@@ -21,7 +21,6 @@ const randomInt = ownUtil.randomInt;
 const randomToken = ownUtil.randomToken;
 const ObliviousSet = require('../../dist/lib/oblivious-set').default;
 
-
 /**
  * windows sucks, so we have handle windows-type of socket-paths
  * @link https://gist.github.com/domenic/2790533#gistcomment-331356

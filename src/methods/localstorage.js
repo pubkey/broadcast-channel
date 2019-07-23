@@ -6,7 +6,6 @@
  * @link https://caniuse.com/#feat=indexeddb
  */
 
-import isNode from 'detect-node';
 import ObliviousSet from '../oblivious-set';
 
 import {
@@ -16,7 +15,8 @@ import {
 import {
     sleep,
     randomToken,
-    microSeconds as micro
+    microSeconds as micro,
+    isNode
 } from '../util';
 
 export const microSeconds = micro;
