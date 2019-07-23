@@ -106,7 +106,6 @@ export function getMessagesHigherThen(db, lastCursorId) {
             const cursor = ev.target.result;
             if (cursor) {
                 ret.push(cursor.value);
-                //alert("Name for SSN " + cursor.key + " is " + cursor.value.name);
                 cursor.continue();
             } else {
                 res(ret);
@@ -214,7 +213,7 @@ function _filterMessage(msgObj, state) {
 function readNewMessages(state) {
 
     // channel already closed
-    if(state.closed) return Promise.resolve();
+    if (state.closed) return Promise.resolve();
 
     // if no one is listening, we do not need to scan for new messages
     if (!state.messagesCallback) return Promise.resolve();
@@ -222,6 +221,12 @@ function readNewMessages(state) {
     return getMessagesHigherThen(state.db, state.lastCursorId)
         .then(newerMessages => {
             const useMessages = newerMessages
+                /**
+                 * there is a bug in iOS where the msgObj can be undefined some times
+                 * so we filter them out
+                 * @link https://github.com/pubkey/broadcast-channel/issues/19
+                 */
+                .filter(msgObj => !!msgObj)
                 .map(msgObj => {
                     if (msgObj.id > state.lastCursorId) {
                         state.lastCursorId = msgObj.id;
@@ -256,7 +261,8 @@ export function postMessage(channelState, messageJson) {
         ))
         .then(() => {
             if (randomInt(0, 10) === 0) {
-                /* await (do not await) */ cleanOldMessages(
+                /* await (do not await) */
+                cleanOldMessages(
                     channelState.db,
                     channelState.options.idb.ttl
                 );
