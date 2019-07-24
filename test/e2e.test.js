@@ -18,9 +18,13 @@ fixture`Example page`
 ].forEach(methodType => {
     test.page(BASE_PAGE + '?methodType=' + methodType + '&autoStart=startBroadcastChannel')('test(BroadcastChannel) with method: ' + methodType, async () => {
         console.log('##### START BroadcastChannel TEST WITH ' + methodType);
-        const stateContainer = Selector('#state');
 
         await AsyncTestUtil.waitUntil(async () => {
+            const stateContainer = Selector('#state');
+            if(!stateContainer) {
+                console.log('stateContainer is null');
+                return false;
+            }
             console.log('stateContainer:');
             console.dir(stateContainer);
             const value = await stateContainer.innerText;
