@@ -25,8 +25,8 @@ fixture`Example page`
             const stateContainer = Selector('#state');
             const exists = await stateContainer.exists;
             if (!exists) {
-                /*
                 console.log('stateContainer not exists');
+                /*
                 const out = await t.getBrowserConsoleMessages();
                 console.log('out:');
                 console.log(JSON.stringify(out));
