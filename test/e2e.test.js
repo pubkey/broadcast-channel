@@ -11,8 +11,8 @@ fixture`Example page`
 
 // BroadcastChannel
 [
-    'idb',
     'native',
+    'idb',
     'localstorage',
     'default'
 ].forEach(methodType => {
@@ -21,12 +21,13 @@ fixture`Example page`
 
         await AsyncTestUtil.waitUntil(async () => {
             const stateContainer = Selector('#state');
-            if(!stateContainer) {
-                console.log('stateContainer is null');
+            const exists = await stateContainer.exists;
+            if (!exists) {
+                console.log('stateContainer not exists');
                 return false;
+            } else {
+                console.log('stateContainer exists');
             }
-            console.log('stateContainer:');
-            console.dir(stateContainer);
             const value = await stateContainer.innerText;
             //       console.log(value);
 
@@ -45,8 +46,8 @@ fixture`Example page`
 
 // LeaderElection
 [
-    'idb',
     'native',
+    'idb',
     'localstorage',
     'default'
 ].forEach(methodType => {
