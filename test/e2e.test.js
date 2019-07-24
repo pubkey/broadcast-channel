@@ -26,6 +26,9 @@ fixture`Example page`
             const exists = await stateContainer.exists;
             if (!exists) {
                 console.log('stateContainer not exists');
+                const out = await t.getBrowserConsoleMessages();
+                console.log('out:');
+                console.log(JSON.stringify(out));
                 return false;
             } else {
                 console.log('stateContainer exists');
@@ -33,9 +36,6 @@ fixture`Example page`
             const value = await stateContainer.innerText;
             //       console.log(value);
 
-            // const out = await t.getBrowserConsoleMessages();
-            // console.log('out:');
-            // console.log(JSON.stringify(out));
 
             // make a console.log so travis does not terminate because of no output
             console.log('BroadcastChannel(' + methodType + ') still no success');
