@@ -21,6 +21,8 @@ fixture`Example page`
         const stateContainer = Selector('#state');
 
         await AsyncTestUtil.waitUntil(async () => {
+            console.log('stateContainer:');
+            console.dir(stateContainer);
             const value = await stateContainer.innerText;
             //       console.log(value);
 
