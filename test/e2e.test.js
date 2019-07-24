@@ -19,6 +19,8 @@ fixture`Example page`
     test.page(BASE_PAGE + '?methodType=' + methodType + '&autoStart=startBroadcastChannel')('test(BroadcastChannel) with method: ' + methodType, async () => {
         console.log('##### START BroadcastChannel TEST WITH ' + methodType);
 
+        await AsyncTestUtil.wait(500);
+
         await AsyncTestUtil.waitUntil(async () => {
             const stateContainer = Selector('#state');
             const exists = await stateContainer.exists;
