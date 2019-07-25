@@ -16,7 +16,13 @@ export type LeaderElectionOptions = {
 
 export declare class LeaderElector {
 
+    /**
+     * IMPORTANT: The leader election is lazy,
+     * it will not start before you call awaitLeadership()
+     * so isLeader will never become true then
+     */
     readonly isLeader: boolean;
+
     readonly isDead: boolean;
     readonly token: string;
 
