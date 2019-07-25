@@ -3,8 +3,7 @@
  * There is currently no observerAPI for idb
  * @link https://github.com/w3c/IndexedDB/issues/51
  */
-import isNode from 'detect-node';
-import { sleep, randomInt, randomToken, microSeconds as micro } from '../util.js';
+import { sleep, randomInt, randomToken, microSeconds as micro, isNode } from '../util.js';
 export var microSeconds = micro;
 import ObliviousSet from '../oblivious-set';
 import { fillOptionsWithDefaults } from '../options';
@@ -95,8 +94,7 @@ export function getMessagesHigherThen(db, lastCursorId) {
       var cursor = ev.target.result;
 
       if (cursor) {
-        ret.push(cursor.value); //alert("Name for SSN " + cursor.key + " is " + cursor.value.name);
-
+        ret.push(cursor.value);
         cursor["continue"]();
       } else {
         res(ret);
@@ -208,7 +206,15 @@ function readNewMessages(state) {
 
   if (!state.messagesCallback) return Promise.resolve();
   return getMessagesHigherThen(state.db, state.lastCursorId).then(function (newerMessages) {
-    var useMessages = newerMessages.map(function (msgObj) {
+    var useMessages = newerMessages
+    /**
+     * there is a bug in iOS where the msgObj can be undefined some times
+     * so we filter them out
+     * @link https://github.com/pubkey/broadcast-channel/issues/19
+     */
+    .filter(function (msgObj) {
+      return !!msgObj;
+    }).map(function (msgObj) {
       if (msgObj.id > state.lastCursorId) {
         state.lastCursorId = msgObj.id;
       }

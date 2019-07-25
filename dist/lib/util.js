@@ -8,6 +8,7 @@ exports.sleep = sleep;
 exports.randomInt = randomInt;
 exports.randomToken = randomToken;
 exports.microSeconds = microSeconds;
+exports.isNode = void 0;
 
 /**
  * returns true if the given object is a promise
@@ -69,3 +70,12 @@ function microSeconds() {
     return ms * 1000;
   }
 }
+/**
+ * copied from the 'detect-node' npm module
+ * We cannot use the module directly because it causes problems with rollup
+ * @link https://github.com/iliakan/detect-node/blob/master/index.js
+ */
+
+
+var isNode = Object.prototype.toString.call(typeof process !== 'undefined' ? process : 0) === '[object process]';
+exports.isNode = isNode;

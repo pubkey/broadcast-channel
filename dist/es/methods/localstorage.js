@@ -5,10 +5,9 @@
  * @link https://caniuse.com/#feat=namevalue-storage
  * @link https://caniuse.com/#feat=indexeddb
  */
-import isNode from 'detect-node';
 import ObliviousSet from '../oblivious-set';
 import { fillOptionsWithDefaults } from '../options';
-import { sleep, randomToken, microSeconds as micro } from '../util';
+import { sleep, randomToken, microSeconds as micro, isNode } from '../util';
 export var microSeconds = micro;
 var KEY_PREFIX = 'pubkey.broadcastChannel-';
 export var type = 'localstorage';

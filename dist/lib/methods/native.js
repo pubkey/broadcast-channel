@@ -1,7 +1,5 @@
 "use strict";
 
-var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
-
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -12,8 +10,6 @@ exports.onMessage = onMessage;
 exports.canBeUsed = canBeUsed;
 exports.averageResponseTime = averageResponseTime;
 exports["default"] = exports.type = exports.microSeconds = void 0;
-
-var _detectNode = _interopRequireDefault(require("detect-node"));
 
 var _util = require("../util");
 
@@ -58,7 +54,7 @@ function canBeUsed() {
    * in the electron-renderer, isNode will be true even if we are in browser-context
    * so we also check if window is undefined
    */
-  if (_detectNode["default"] && typeof window === 'undefined') return false;
+  if (_util.isNode && typeof window === 'undefined') return false;
 
   if (typeof BroadcastChannel === 'function') {
     if (BroadcastChannel._pubkey) {

@@ -1,5 +1,4 @@
-import isNode from 'detect-node';
-import { microSeconds as micro } from '../util';
+import { microSeconds as micro, isNode } from '../util';
 export var microSeconds = micro;
 export var type = 'native';
 export function create(channelName) {

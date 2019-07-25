@@ -7,13 +7,13 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.chooseMethod = chooseMethod;
 
-var _detectNode = _interopRequireDefault(require("detect-node"));
-
 var _native = _interopRequireDefault(require("./methods/native.js"));
 
 var _indexedDb = _interopRequireDefault(require("./methods/indexed-db.js"));
 
 var _localstorage = _interopRequireDefault(require("./methods/localstorage.js"));
+
+var _util = require("./util");
 
 // order is important
 var METHODS = [_native["default"], // fastest
@@ -24,7 +24,7 @@ var REQUIRE_FUN = require;
  * so it will not get bundled in browser-builds
  */
 
-if (_detectNode["default"]) {
+if (_util.isNode) {
   /**
    * we use the non-transpiled code for nodejs
    * because it runs faster
@@ -51,7 +51,7 @@ function chooseMethod(options) {
 
   var chooseMethods = METHODS;
 
-  if (!options.webWorkerSupport && !_detectNode["default"]) {
+  if (!options.webWorkerSupport && !_util.isNode) {
     // prefer localstorage over idb when no webworker-support needed
     chooseMethods = METHODS.filter(function (m) {
       return m.type !== 'idb';

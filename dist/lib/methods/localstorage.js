@@ -17,8 +17,6 @@ exports.canBeUsed = canBeUsed;
 exports.averageResponseTime = averageResponseTime;
 exports["default"] = exports.type = exports.microSeconds = void 0;
 
-var _detectNode = _interopRequireDefault(require("detect-node"));
-
 var _obliviousSet = _interopRequireDefault(require("../oblivious-set"));
 
 var _options = require("../options");
@@ -158,7 +156,7 @@ function onMessage(channelState, fn, time) {
 }
 
 function canBeUsed() {
-  if (_detectNode["default"]) return false;
+  if (_util.isNode) return false;
   var ls = getLocalStorage();
   if (!ls) return false;
   return true;

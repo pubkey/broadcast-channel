@@ -21,8 +21,6 @@ exports.canBeUsed = canBeUsed;
 exports.averageResponseTime = averageResponseTime;
 exports["default"] = exports.type = exports.microSeconds = void 0;
 
-var _detectNode = _interopRequireDefault(require("detect-node"));
-
 var _util = require("../util.js");
 
 var _obliviousSet = _interopRequireDefault(require("../oblivious-set"));
@@ -129,8 +127,7 @@ function getMessagesHigherThen(db, lastCursorId) {
       var cursor = ev.target.result;
 
       if (cursor) {
-        ret.push(cursor.value); //alert("Name for SSN " + cursor.key + " is " + cursor.value.name);
-
+        ret.push(cursor.value);
         cursor["continue"]();
       } else {
         res(ret);
@@ -246,7 +243,15 @@ function readNewMessages(state) {
 
   if (!state.messagesCallback) return Promise.resolve();
   return getMessagesHigherThen(state.db, state.lastCursorId).then(function (newerMessages) {
-    var useMessages = newerMessages.map(function (msgObj) {
+    var useMessages = newerMessages
+    /**
+     * there is a bug in iOS where the msgObj can be undefined some times
+     * so we filter them out
+     * @link https://github.com/pubkey/broadcast-channel/issues/19
+     */
+    .filter(function (msgObj) {
+      return !!msgObj;
+    }).map(function (msgObj) {
       if (msgObj.id > state.lastCursorId) {
         state.lastCursorId = msgObj.id;
       }
@@ -292,7 +297,7 @@ function onMessage(channelState, fn, time) {
 }
 
 function canBeUsed() {
-  if (_detectNode["default"]) return false;
+  if (_util.isNode) return false;
   var idb = getIdb();
   if (!idb) return false;
   return true;
