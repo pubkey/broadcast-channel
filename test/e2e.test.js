@@ -8,6 +8,20 @@ const BASE_PAGE = 'http://127.0.0.1:8080/e2e.html';
 fixture`Example page`
     .page`http://127.0.0.1:8080/`;
 
+/**
+ * Checks if there where errors on the browser console.
+ * If yes, this will kill the process
+ */
+async function assertNoErrors(t) {
+    const logs = await t.getBrowserConsoleMessages();
+    console.log('logs:');
+    console.dir(logs);
+    if (logs.error.length > 0) {
+        console.log('assertNoErrors got ' + logs.error.length + ' errors:');
+        console.dir(logs.error);
+        process.kill(process.pid);
+    }
+}
 
 // BroadcastChannel
 [
@@ -16,12 +30,13 @@ fixture`Example page`
     'localstorage',
     'default'
 ].forEach(methodType => {
-    test.page(BASE_PAGE + '?methodType=' + methodType + '&autoStart=startBroadcastChannel')('test(BroadcastChannel) with method: ' + methodType, async () => {
+    test.page(BASE_PAGE + '?methodType=' + methodType + '&autoStart=startBroadcastChannel')('test(BroadcastChannel) with method: ' + methodType, async (t) => {
         console.log('##### START BroadcastChannel TEST WITH ' + methodType);
 
         await AsyncTestUtil.wait(500);
 
         await AsyncTestUtil.waitUntil(async () => {
+            await assertNoErrors(t);
             const stateContainer = Selector('#state');
             const exists = await stateContainer.exists;
             if (!exists) {

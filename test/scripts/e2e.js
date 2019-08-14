@@ -104,7 +104,7 @@ window.startBroadcastChannel = async function () {
         useWorker = true;
         const worker = new Worker('worker.js?t=' + rand);
         worker.onerror = event => {
-            throw new Error('worker: ' + event.message + " (" + event.filename + ":" + event.lineno + ")");
+           console.error('worker: ' + event.message + " (" + event.filename + ":" + event.lineno + ")");
         };
         await new Promise(res => {
             worker.addEventListener('message', e => {
@@ -196,7 +196,7 @@ const removeLeaderIframe = async (leaderFramesCache) => {
         }, 50));
     }
     if (leaders.length > 1) {
-        throw new Error('LeaderElection: There is more then one leader!');
+        console.error('LeaderElection: There is more then one leader!');
     }
     // remove iframe
     leaders[0].parentNode.removeChild(leaders[0]);
