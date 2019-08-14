@@ -91,7 +91,8 @@ channel.onmessage = function (msg) {
 };
 
 window.startBroadcastChannel = async function () {
-    stateContainer.innerHTML = 'running..'
+    console.log('window.startBroadcastChannel()');
+    stateContainer.innerHTML = 'running..';
     const rand = new Date().getTime();
 
     // load iframe
@@ -143,6 +144,7 @@ window.startBroadcastChannel = async function () {
 
 // LEADER-ELECTION
 window.startLeaderElection = async function () {
+    console.log('window.startLeaderElection()');
 
     stateContainer.innerHTML = 'running..'
 
