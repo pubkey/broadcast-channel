@@ -70,11 +70,12 @@ async function assertNoErrors(t) {
     'localstorage',
     'default'
 ].forEach(methodType => {
-    test.page(BASE_PAGE + '?methodType=' + methodType + '&autoStart=startLeaderElection')('test(LeaderElection) with method: ' + methodType, async () => {
+    test.page(BASE_PAGE + '?methodType=' + methodType + '&autoStart=startLeaderElection')('test(LeaderElection) with method: ' + methodType, async (t) => {
         console.log('##### START LeaderElection TEST WITH ' + methodType);
-        const stateContainer = Selector('#state');
 
         await AsyncTestUtil.waitUntil(async () => {
+            await assertNoErrors(t);
+            const stateContainer = Selector('#state');
             const value = await stateContainer.innerText;
             //       console.log(value);
 
