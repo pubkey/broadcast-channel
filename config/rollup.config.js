@@ -1,4 +1,3 @@
-import resolve from 'rollup-plugin-node-resolve';
 import { uglify } from 'rollup-plugin-uglify';
 
 export default {
@@ -10,7 +9,6 @@ export default {
         file: './test_tmp/rollup.bundle.js'
     },
     plugins: [
-        resolve(),
         uglify()
     ]
 };

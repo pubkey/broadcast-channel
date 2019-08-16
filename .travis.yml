@@ -31,13 +31,13 @@ jobs:
     
     - stage: build size
       script: npm run size:webpack
-      env: LABEL=test:webpack
+      env: LABEL=size:webpack
     - stage: build size
       script: npm run size:browserify
-      env: LABEL=test:browserify
+      env: LABEL=size:browserify
     - stage: build size
       script: npm run size:rollup
-      env: LABEL=test:rollup
+      env: LABEL=size:rollup
 
     - stage: code format
       script: npm run lint
