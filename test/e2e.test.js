@@ -32,9 +32,6 @@ async function assertNoErrors(t) {
 ].forEach(methodType => {
     test.page(BASE_PAGE + '?methodType=' + methodType + '&autoStart=startBroadcastChannel')('test(BroadcastChannel) with method: ' + methodType, async (t) => {
         console.log('##### START BroadcastChannel TEST WITH ' + methodType);
-
-        await AsyncTestUtil.wait(500);
-
         await AsyncTestUtil.waitUntil(async () => {
             await assertNoErrors(t);
             const stateContainer = Selector('#state');
@@ -77,14 +74,8 @@ async function assertNoErrors(t) {
             await assertNoErrors(t);
             const stateContainer = Selector('#state');
             const value = await stateContainer.innerText;
-            //       console.log(value);
-
-            // const out = await t.getBrowserConsoleMessages();
-            // console.log('out:');
-            // console.log(JSON.stringify(out));
 
             // make a console.log so travis does not terminate because of no output
-
             const iframeAmount = await Selector('#leader-iframes iframe').count;
             console.log('LeaderElection(' + methodType + ') still no success (' + iframeAmount + ' iframes left)');
 
