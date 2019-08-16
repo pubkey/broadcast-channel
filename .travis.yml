@@ -14,15 +14,47 @@ addons:
   chrome: stable
   firefox: latest
 
-script:
-- travis_retry npm install --depth 0 --silent
-- npm run build
-- travis_retry npm run test:node
-- if [ "${TRAVIS_OS_NAME}" = "linux" ]; then ( travis_retry npm run test:browser ) fi
-- if [ "${TRAVIS_OS_NAME}" = "linux" ]; then ( sleep 10 && travis_retry npm run test:e2e:travis ) fi
-- travis_retry npm run test:performance
-- npm run lint
-- npm run test:typings
-- npm run size:webpack
-- npm run size:browserify
-- npm run size:rollup
+stages:
+  - install
+  - build
+  - build size
+  - code format
+  - tests
+
+jobs:
+  include:
+    - stage: install
+      script: travis_retry npm install --depth 0 --silent
+    
+    - stage: build
+      script: npm run build
+    
+    - stage: build size
+      script: npm run size:webpack
+      env: LABEL=test:webpack
+    - stage: build size
+      script: npm run size:browserify
+      env: LABEL=test:browserify
+    - stage: build size
+      script: npm run size:rollup
+      env: LABEL=test:rollup
+
+    - stage: code format
+      script: npm run lint
+      env: LABEL=lint
+    - stage: code format
+      script: npm run test:typings
+      env: LABEL=test:typings
+
+    - stage: tests
+      script: npm run test:node
+      env: LABEL=test:node
+    - stage: tests
+      script: if [ "${TRAVIS_OS_NAME}" = "linux" ]; then ( travis_retry npm run test:browser ) fi
+      env: LABEL=test:browser
+    - stage: tests
+      script: travis_retry npm run test:performance
+      env: LABEL=run test:performance
+    - stage: tests
+      script: if [ "${TRAVIS_OS_NAME}" = "linux" ]; then ( sleep 10 && travis_retry npm run test:e2e:travis ) fi
+      env: LABEL=test:e2e
