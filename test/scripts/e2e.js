@@ -2,9 +2,7 @@
 /**
  * used in docs/e2e.html
  */
-console.log('import babel polyfill');
 require('@babel/polyfill');
-console.log('import broadcast-channel');
 var BroadcastChannel = require('../../');
 import {
     getParameterByName
@@ -12,6 +10,7 @@ import {
 
 
 function run() {
+    console.log('run()');
 
     var methodType = getParameterByName('methodType');
     if (!methodType || methodType === '' || methodType === 'default') methodType = undefined;
