@@ -32,6 +32,7 @@ async function assertNoErrors(t) {
 ].forEach(methodType => {
     test.page(BASE_PAGE + '?methodType=' + methodType + '&autoStart=startBroadcastChannel')('test(BroadcastChannel) with method: ' + methodType, async (t) => {
         console.log('##### START BroadcastChannel TEST WITH ' + methodType);
+        await assertNoErrors(t);
         await AsyncTestUtil.waitUntil(async () => {
             await assertNoErrors(t);
             const stateContainer = Selector('#state');
@@ -69,6 +70,7 @@ async function assertNoErrors(t) {
 ].forEach(methodType => {
     test.page(BASE_PAGE + '?methodType=' + methodType + '&autoStart=startLeaderElection')('test(LeaderElection) with method: ' + methodType, async (t) => {
         console.log('##### START LeaderElection TEST WITH ' + methodType);
+        await assertNoErrors(t);
 
         await AsyncTestUtil.waitUntil(async () => {
             await assertNoErrors(t);
