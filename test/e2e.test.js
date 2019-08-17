@@ -3,10 +3,10 @@ import {
 } from 'testcafe';
 import AsyncTestUtil from 'async-test-util';
 
-const BASE_PAGE = 'http://127.0.0.1:8080/e2e.html';
+const BASE_PAGE = 'http://localhost:8080/e2e.html';
 
 fixture`Example page`
-    .page`http://127.0.0.1:8080/`;
+    .page`http://localhost:8080/`;
 
 /**
  * Checks if there where errors on the browser console.
