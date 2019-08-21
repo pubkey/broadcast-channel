@@ -19,7 +19,7 @@ stages:
   - build
   - build size
   - code format
-  - all tests
+  - checks
 
 jobs:
   include:
@@ -46,15 +46,15 @@ jobs:
       script: npm run test:typings
       env: LABEL=test:typings
 
-    - stage: all tests
+    - stage: checks
       script: npm run test:node
       env: LABEL=test:node
-    - stage: all tests
+    - stage: checks
       script: if [ "${TRAVIS_OS_NAME}" = "linux" ]; then ( travis_retry npm run test:browser ) fi
       env: LABEL=test:browser
-    - stage: all tests
+    - stage: checks
       script: travis_retry npm run test:performance
       env: LABEL=run test:performance
-    - stage: all tests
+    - stage: checks
       script: if [ "${TRAVIS_OS_NAME}" = "linux" ]; then ( sleep 10 && travis_retry npm run test:e2e:travis ) fi
       env: LABEL=test:e2e
