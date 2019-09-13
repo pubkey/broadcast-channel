@@ -28,7 +28,7 @@ export const type = 'localstorage';
  * copied from crosstab
  * @link https://github.com/tejacques/crosstab/blob/master/src/crosstab.js#L32
  */
-export function getLocalStorage() {
+export function getLocalStorage(checkIfWritable = false) {
     let localStorage;
     if (typeof window === 'undefined') return null;
     try {
@@ -39,15 +39,18 @@ export function getLocalStorage() {
         // if cookies are disabled. See
         // https://bugzilla.mozilla.org/show_bug.cgi?id=1028153
     }
-    try {
-        const key = '__broadcastchannel_check';
-        localStorage.setItem(key, 'works');
-        localStorage.removeItem(key);
-    } catch (e) {
-        // Safari 10 in private mode will not allow write access to local
-        // storage and fail with a QuotaExceededError. See
-        // https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API#Private_Browsing_Incognito_modes
-        return null;
+
+    if (checkIfWritable) {
+        try {
+            const key = '__broadcastchannel_check';
+            localStorage.setItem(key, 'works');
+            localStorage.removeItem(key);
+        } catch (e) {
+            // Safari 10 in private mode will not allow write access to local
+            // storage and fail with a QuotaExceededError. See
+            // https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API#Private_Browsing_Incognito_modes
+            return null;
+        }
     }
 
     return localStorage;
@@ -73,7 +76,7 @@ export function postMessage(channelState, messageJson) {
                 uuid: channelState.uuid
             };
             const value = JSON.stringify(writeObj);
-            localStorage.setItem(key, value);
+            getLocalStorage().setItem(key, value);
 
             /**
              * StorageEvent does not fire the 'storage' event
@@ -155,7 +158,7 @@ export function onMessage(channelState, fn, time) {
 
 export function canBeUsed() {
     if (isNode) return false;
-    const ls = getLocalStorage();
+    const ls = getLocalStorage(true);
 
     if (!ls) return false;
     return true;
