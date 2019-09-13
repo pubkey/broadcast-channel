@@ -62,7 +62,7 @@ export function postMessage(channelState, messageJson) {
                 uuid: channelState.uuid
             };
             const value = JSON.stringify(writeObj);
-            localStorage.setItem(key, value);
+            getLocalStorage().setItem(key, value);
 
             /**
              * StorageEvent does not fire the 'storage' event
@@ -147,6 +147,18 @@ export function canBeUsed() {
     const ls = getLocalStorage();
 
     if (!ls) return false;
+
+    try {
+        const key = '__broadcastchannel_check';
+        ls.setItem(key, 'works');
+        ls.removeItem(key);
+    } catch (e) {
+        // Safari 10 in private mode will not allow write access to local
+        // storage and fail with a QuotaExceededError. See
+        // https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API#Private_Browsing_Incognito_modes
+        return false;
+    }
+
     return true;
 }
 
