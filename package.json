@@ -1,13 +1,12 @@
 {
   "name": "broadcast-channel",
   "version": "2.2.0",
-  "description": "A BroadcastChannel shim/polyfill that works in New Browsers, Old Browsers, WebWorkers and NodeJs",
+  "description": "A BroadcastChannel that works in New Browsers, Old Browsers, WebWorkers and NodeJs, but cannot be used as a polyfill",
   "homepage": "https://github.com/pubkey/broadcast-channel#readme",
   "keywords": [
     "broadcast-channel",
     "broadcastchannel",
     "broadcast",
-    "polyfill",
     "localstorage",
     "indexeddb",
     "postMessage",
