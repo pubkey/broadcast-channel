@@ -20,7 +20,7 @@
     "url": "git+https://github.com/pubkey/broadcast-channel.git"
   },
   "author": "pubkey",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/pubkey/broadcast-channel/issues"
   },
