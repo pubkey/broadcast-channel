@@ -1,7 +1,7 @@
 {
   "name": "broadcast-channel",
   "version": "2.2.0",
-  "description": "A BroadcastChannel shim/polyfill that works in New Browsers, Old Browsers, WebWorkers and NodeJs",
+  "description": "A BroadcastChannel that works in New Browsers, Old Browsers, WebWorkers and NodeJs",
   "homepage": "https://github.com/pubkey/broadcast-channel#readme",
   "keywords": [
     "broadcast-channel",
