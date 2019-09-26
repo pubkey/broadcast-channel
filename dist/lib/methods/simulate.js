@@ -15,33 +15,34 @@ var _util = require("../util");
 
 var microSeconds = _util.microSeconds;
 exports.microSeconds = microSeconds;
-var type = 'native';
+var type = 'simulate';
 exports.type = type;
+var SIMULATE_CHANNELS = new Set();
 
 function create(channelName) {
   var state = {
-    messagesCallback: null,
-    bc: new BroadcastChannel(channelName),
-    subFns: [] // subscriberFunctions
-
+    name: channelName,
+    messagesCallback: null
   };
-
-  state.bc.onmessage = function (msg) {
-    if (state.messagesCallback) {
-      state.messagesCallback(msg.data);
-    }
-  };
-
+  SIMULATE_CHANNELS.add(state);
   return state;
 }
 
 function close(channelState) {
-  channelState.bc.close();
-  channelState.subFns = [];
+  SIMULATE_CHANNELS["delete"](channelState);
 }
 
 function postMessage(channelState, messageJson) {
-  channelState.bc.postMessage(messageJson, false);
+  var channelArray = Array.from(SIMULATE_CHANNELS);
+  channelArray.filter(function (channel) {
+    return channel.name === channelState.name;
+  }).filter(function (channel) {
+    return channel !== channelState;
+  }).filter(function (channel) {
+    return !!channel.messagesCallback;
+  }).forEach(function (channel) {
+    return channel.messagesCallback(messageJson);
+  });
 }
 
 function onMessage(channelState, fn) {
@@ -49,23 +50,11 @@ function onMessage(channelState, fn) {
 }
 
 function canBeUsed() {
-  /**
-   * in the electron-renderer, isNode will be true even if we are in browser-context
-   * so we also check if window is undefined
-   */
-  if (_util.isNode && typeof window === 'undefined') return false;
-
-  if (typeof BroadcastChannel === 'function') {
-    if (BroadcastChannel._pubkey) {
-      throw new Error('BroadcastChannel: Do not overwrite window.BroadcastChannel with this module, this is not a polyfill');
-    }
-
-    return true;
-  } else return false;
+  return true;
 }
 
 function averageResponseTime() {
-  return 100;
+  return 5;
 }
 
 var _default = {

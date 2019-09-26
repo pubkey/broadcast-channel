@@ -3,52 +3,51 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports._removeTooOldValues = _removeTooOldValues;
 exports["default"] = void 0;
 
 /**
- *
- *
+ * this is a set which automatically forgets
+ * a given entry when a new entry is set and the ttl
+ * of the old one is over
+ * @constructor
  */
 var ObliviousSet = function ObliviousSet(ttl) {
-  this.ttl = ttl;
-  this.set = new Set();
-  this.timeMap = new Map();
-  this.has = this.set.has.bind(this.set);
-};
+  var set = new Set();
+  var timeMap = new Map();
+  this.has = set.has.bind(set);
 
-ObliviousSet.prototype = {
-  add: function add(value) {
-    this.timeMap.set(value, now());
-    this.set.add(value);
+  this.add = function (value) {
+    timeMap.set(value, now());
+    set.add(value);
 
-    _removeTooOldValues(this);
-  },
-  clear: function clear() {
-    this.set.clear();
-    this.timeMap.clear();
-  }
-};
+    _removeTooOldValues();
+  };
 
-function _removeTooOldValues(obliviousSet) {
-  var olderThen = now() - obliviousSet.ttl;
-  var iterator = obliviousSet.set[Symbol.iterator]();
+  this.clear = function () {
+    set.clear();
+    timeMap.clear();
+  };
 
-  while (true) {
-    var value = iterator.next().value;
-    if (!value) return; // no more elements
+  function _removeTooOldValues() {
+    var olderThen = now() - ttl;
+    var iterator = set[Symbol.iterator]();
 
-    var time = obliviousSet.timeMap.get(value);
+    while (true) {
+      var value = iterator.next().value;
+      if (!value) return; // no more elements
 
-    if (time < olderThen) {
-      obliviousSet.timeMap["delete"](value);
-      obliviousSet.set["delete"](value);
-    } else {
-      // we reached a value that is not old enough
-      return;
+      var time = timeMap.get(value);
+
+      if (time < olderThen) {
+        timeMap["delete"](value);
+        set["delete"](value);
+      } else {
+        // we reached a value that is not old enough
+        return;
+      }
     }
   }
-}
+};
 
 function now() {
   return new Date().getTime();

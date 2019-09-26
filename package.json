@@ -1,6 +1,6 @@
 {
   "name": "broadcast-channel",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "A BroadcastChannel that works in New Browsers, Old Browsers, WebWorkers and NodeJs",
   "homepage": "https://github.com/pubkey/broadcast-channel#readme",
   "keywords": [
@@ -63,8 +63,8 @@
     "lint"
   ],
   "dependencies": {
-    "@babel/runtime": "7.6.2",
-    "detect-node": "2.0.4",
+    "@babel/runtime": "^7.6.2",
+    "detect-node": "^2.0.4",
     "js-sha3": "0.8.0",
     "microseconds": "0.1.0",
     "nano-time": "1.0.0",

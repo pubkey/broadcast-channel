@@ -4,6 +4,11 @@ import { fillOptionsWithDefaults } from './options.js';
 
 var BroadcastChannel = function BroadcastChannel(name, options) {
   this.name = name;
+
+  if (ENFORCED_OPTIONS) {
+    options = ENFORCED_OPTIONS;
+  }
+
   this.options = fillOptionsWithDefaults(options);
   this.method = chooseMethod(this.options); // isListening
 
@@ -63,6 +68,17 @@ BroadcastChannel.clearNodeFolder = function (options) {
   } else {
     return Promise.resolve(false);
   }
+};
+/**
+ * if set, this method is enforced,
+ * no mather what the options are
+ */
+
+
+var ENFORCED_OPTIONS;
+
+BroadcastChannel.enforceOptions = function (options) {
+  ENFORCED_OPTIONS = options;
 }; // PROTOTYPE
 
 

@@ -23,7 +23,7 @@ var _index = _interopRequireDefault(require("./index.js"));
  * var BroadcastChannel = require('broadcast-channel');
  */
 module.exports = _index["default"];
-},{"./index.js":3,"@babel/runtime/helpers/interopRequireDefault":13}],3:[function(require,module,exports){
+},{"./index.js":3,"@babel/runtime/helpers/interopRequireDefault":14}],3:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -39,6 +39,11 @@ var _options = require("./options.js");
 
 var BroadcastChannel = function BroadcastChannel(name, options) {
   this.name = name;
+
+  if (ENFORCED_OPTIONS) {
+    options = ENFORCED_OPTIONS;
+  }
+
   this.options = (0, _options.fillOptionsWithDefaults)(options);
   this.method = (0, _methodChooser.chooseMethod)(this.options); // isListening
 
@@ -98,6 +103,17 @@ BroadcastChannel.clearNodeFolder = function (options) {
   } else {
     return Promise.resolve(false);
   }
+};
+/**
+ * if set, this method is enforced,
+ * no mather what the options are
+ */
+
+
+var ENFORCED_OPTIONS;
+
+BroadcastChannel.enforceOptions = function (options) {
+  ENFORCED_OPTIONS = options;
 }; // PROTOTYPE
 
 
@@ -257,7 +273,7 @@ function _stopListening(channel) {
 
 var _default = BroadcastChannel;
 exports["default"] = _default;
-},{"./method-chooser.js":6,"./options.js":11,"./util.js":12}],4:[function(require,module,exports){
+},{"./method-chooser.js":6,"./options.js":12,"./util.js":13}],4:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -269,7 +285,7 @@ var _index = _interopRequireDefault(require("./index.js"));
  * we use this for the non-module-build
  */
 module.exports = _index["default"];
-},{"./index.js":5,"@babel/runtime/helpers/interopRequireDefault":13}],5:[function(require,module,exports){
+},{"./index.js":5,"@babel/runtime/helpers/interopRequireDefault":14}],5:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -514,7 +530,7 @@ var _default = {
   create: create
 };
 exports["default"] = _default;
-},{"../util.js":12,"@babel/runtime/helpers/interopRequireDefault":13,"unload":19}],6:[function(require,module,exports){
+},{"../util.js":13,"@babel/runtime/helpers/interopRequireDefault":14,"unload":19}],6:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -530,11 +546,13 @@ var _indexedDb = _interopRequireDefault(require("./methods/indexed-db.js"));
 
 var _localstorage = _interopRequireDefault(require("./methods/localstorage.js"));
 
+var _simulate = _interopRequireDefault(require("./methods/simulate.js"));
+
 var _util = require("./util");
 
 // order is important
 var METHODS = [_native["default"], // fastest
-_indexedDb["default"], _localstorage["default"]];
+_indexedDb["default"], _localstorage["default"], _simulate["default"]];
 var REQUIRE_FUN = require;
 /**
  * The NodeMethod is loaded lazy
@@ -553,7 +571,8 @@ if (_util.isNode) {
    */
 
   if (typeof NodeMethod.canBeUsed === 'function') {
-    METHODS.push(NodeMethod);
+    // must be first so it's chosen by default
+    METHODS.unshift(NodeMethod);
   }
 }
 
@@ -565,24 +584,29 @@ function chooseMethod(options) {
     });
     if (!ret) throw new Error('method-type ' + options.type + ' not found');else return ret;
   }
+  /**
+   * if no webworker support is needed,
+   * remove idb from the list so that localstorage is been chosen
+   */
+
 
   var chooseMethods = METHODS;
 
   if (!options.webWorkerSupport && !_util.isNode) {
-    // prefer localstorage over idb when no webworker-support needed
     chooseMethods = METHODS.filter(function (m) {
       return m.type !== 'idb';
     });
   }
 
   var useMethod = chooseMethods.find(function (method) {
-    return method.canBeUsed();
+    // do never choose the simulate method if not explicitly set
+    return method.type !== 'simulate' && method.canBeUsed();
   });
   if (!useMethod) throw new Error('No useable methode found:' + JSON.stringify(METHODS.map(function (m) {
     return m.type;
   })));else return useMethod;
 }
-},{"./methods/indexed-db.js":7,"./methods/localstorage.js":8,"./methods/native.js":9,"./util":12,"@babel/runtime/helpers/interopRequireDefault":13}],7:[function(require,module,exports){
+},{"./methods/indexed-db.js":7,"./methods/localstorage.js":8,"./methods/native.js":9,"./methods/simulate.js":10,"./util":13,"@babel/runtime/helpers/interopRequireDefault":14}],7:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -903,7 +927,7 @@ var _default = {
   microSeconds: microSeconds
 };
 exports["default"] = _default;
-},{"../oblivious-set":10,"../options":11,"../util.js":12,"@babel/runtime/helpers/interopRequireDefault":13}],8:[function(require,module,exports){
+},{"../oblivious-set":11,"../options":12,"../util.js":13,"@babel/runtime/helpers/interopRequireDefault":14}],8:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -982,7 +1006,7 @@ function postMessage(channelState, messageJson) {
         uuid: channelState.uuid
       };
       var value = JSON.stringify(writeObj);
-      localStorage.setItem(key, value);
+      getLocalStorage().setItem(key, value);
       /**
        * StorageEvent does not fire the 'storage' event
        * in the window that changes the state of the local storage.
@@ -1065,6 +1089,18 @@ function canBeUsed() {
   if (_util.isNode) return false;
   var ls = getLocalStorage();
   if (!ls) return false;
+
+  try {
+    var key = '__broadcastchannel_check';
+    ls.setItem(key, 'works');
+    ls.removeItem(key);
+  } catch (e) {
+    // Safari 10 in private mode will not allow write access to local
+    // storage and fail with a QuotaExceededError. See
+    // https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API#Private_Browsing_Incognito_modes
+    return false;
+  }
+
   return true;
 }
 
@@ -1083,7 +1119,7 @@ var _default = {
   microSeconds: microSeconds
 };
 exports["default"] = _default;
-},{"../oblivious-set":10,"../options":11,"../util":12,"@babel/runtime/helpers/interopRequireDefault":13}],9:[function(require,module,exports){
+},{"../oblivious-set":11,"../options":12,"../util":13,"@babel/runtime/helpers/interopRequireDefault":14}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1130,8 +1166,7 @@ function postMessage(channelState, messageJson) {
   channelState.bc.postMessage(messageJson, false);
 }
 
-function onMessage(channelState, fn, time) {
-  channelState.messagesCallbackTime = time;
+function onMessage(channelState, fn) {
   channelState.messagesCallback = fn;
 }
 
@@ -1166,58 +1201,128 @@ var _default = {
   microSeconds: microSeconds
 };
 exports["default"] = _default;
-},{"../util":12}],10:[function(require,module,exports){
+},{"../util":13}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports._removeTooOldValues = _removeTooOldValues;
+exports.create = create;
+exports.close = close;
+exports.postMessage = postMessage;
+exports.onMessage = onMessage;
+exports.canBeUsed = canBeUsed;
+exports.averageResponseTime = averageResponseTime;
+exports["default"] = exports.type = exports.microSeconds = void 0;
+
+var _util = require("../util");
+
+var microSeconds = _util.microSeconds;
+exports.microSeconds = microSeconds;
+var type = 'simulate';
+exports.type = type;
+var SIMULATE_CHANNELS = new Set();
+
+function create(channelName) {
+  var state = {
+    name: channelName,
+    messagesCallback: null
+  };
+  SIMULATE_CHANNELS.add(state);
+  return state;
+}
+
+function close(channelState) {
+  SIMULATE_CHANNELS["delete"](channelState);
+}
+
+function postMessage(channelState, messageJson) {
+  var channelArray = Array.from(SIMULATE_CHANNELS);
+  channelArray.filter(function (channel) {
+    return channel.name === channelState.name;
+  }).filter(function (channel) {
+    return channel !== channelState;
+  }).filter(function (channel) {
+    return !!channel.messagesCallback;
+  }).forEach(function (channel) {
+    return channel.messagesCallback(messageJson);
+  });
+}
+
+function onMessage(channelState, fn) {
+  channelState.messagesCallback = fn;
+}
+
+function canBeUsed() {
+  return true;
+}
+
+function averageResponseTime() {
+  return 5;
+}
+
+var _default = {
+  create: create,
+  close: close,
+  onMessage: onMessage,
+  postMessage: postMessage,
+  canBeUsed: canBeUsed,
+  type: type,
+  averageResponseTime: averageResponseTime,
+  microSeconds: microSeconds
+};
+exports["default"] = _default;
+},{"../util":13}],11:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports["default"] = void 0;
 
 /**
- *
- *
+ * this is a set which automatically forgets
+ * a given entry when a new entry is set and the ttl
+ * of the old one is over
+ * @constructor
  */
 var ObliviousSet = function ObliviousSet(ttl) {
-  this.ttl = ttl;
-  this.set = new Set();
-  this.timeMap = new Map();
-  this.has = this.set.has.bind(this.set);
-};
+  var set = new Set();
+  var timeMap = new Map();
+  this.has = set.has.bind(set);
 
-ObliviousSet.prototype = {
-  add: function add(value) {
-    this.timeMap.set(value, now());
-    this.set.add(value);
+  this.add = function (value) {
+    timeMap.set(value, now());
+    set.add(value);
 
-    _removeTooOldValues(this);
-  },
-  clear: function clear() {
-    this.set.clear();
-    this.timeMap.clear();
-  }
-};
+    _removeTooOldValues();
+  };
 
-function _removeTooOldValues(obliviousSet) {
-  var olderThen = now() - obliviousSet.ttl;
-  var iterator = obliviousSet.set[Symbol.iterator]();
+  this.clear = function () {
+    set.clear();
+    timeMap.clear();
+  };
 
-  while (true) {
-    var value = iterator.next().value;
-    if (!value) return; // no more elements
+  function _removeTooOldValues() {
+    var olderThen = now() - ttl;
+    var iterator = set[Symbol.iterator]();
 
-    var time = obliviousSet.timeMap.get(value);
+    while (true) {
+      var value = iterator.next().value;
+      if (!value) return; // no more elements
 
-    if (time < olderThen) {
-      obliviousSet.timeMap["delete"](value);
-      obliviousSet.set["delete"](value);
-    } else {
-      // we reached a value that is not old enough
-      return;
+      var time = timeMap.get(value);
+
+      if (time < olderThen) {
+        timeMap["delete"](value);
+        set["delete"](value);
+      } else {
+        // we reached a value that is not old enough
+        return;
+      }
     }
   }
-}
+};
 
 function now() {
   return new Date().getTime();
@@ -1225,7 +1330,7 @@ function now() {
 
 var _default = ObliviousSet;
 exports["default"] = _default;
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1253,7 +1358,7 @@ function fillOptionsWithDefaults(options) {
   if (typeof options.node.useFastPath === 'undefined') options.node.useFastPath = true;
   return options;
 }
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 (function (process){
 "use strict";
 
@@ -1337,7 +1442,7 @@ function microSeconds() {
 var isNode = Object.prototype.toString.call(typeof process !== 'undefined' ? process : 0) === '[object process]';
 exports.isNode = isNode;
 }).call(this,require('_process'))
-},{"_process":17}],13:[function(require,module,exports){
+},{"_process":17}],14:[function(require,module,exports){
 function _interopRequireDefault(obj) {
   return obj && obj.__esModule ? obj : {
     "default": obj
@@ -1345,24 +1450,6 @@ function _interopRequireDefault(obj) {
 }
 
 module.exports = _interopRequireDefault;
-},{}],14:[function(require,module,exports){
-function _typeof2(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof2 = function _typeof2(obj) { return typeof obj; }; } else { _typeof2 = function _typeof2(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof2(obj); }
-
-function _typeof(obj) {
-  if (typeof Symbol === "function" && _typeof2(Symbol.iterator) === "symbol") {
-    module.exports = _typeof = function _typeof(obj) {
-      return _typeof2(obj);
-    };
-  } else {
-    module.exports = _typeof = function _typeof(obj) {
-      return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : _typeof2(obj);
-    };
-  }
-
-  return _typeof(obj);
-}
-
-module.exports = _typeof;
 },{}],15:[function(require,module,exports){
 
 },{}],16:[function(require,module,exports){
@@ -1613,8 +1700,6 @@ exports.removeAll = removeAll;
 exports.getSize = getSize;
 exports["default"] = void 0;
 
-var _typeof2 = _interopRequireDefault(require("@babel/runtime/helpers/typeof"));
-
 var _detectNode = _interopRequireDefault(require("detect-node"));
 
 var _browser = _interopRequireDefault(require("./browser.js"));
@@ -1633,7 +1718,7 @@ function startListening() {
 
 function add(fn) {
   startListening();
-  if (typeof fn !== 'function') throw new Error('The "listener" argument must be of type Function. Received type ' + (0, _typeof2["default"])(fn));
+  if (typeof fn !== 'function') throw new Error('Listener is no function');
   LISTENERS.add(fn);
   var addReturn = {
     remove: function remove() {
@@ -1671,4 +1756,4 @@ var _default = {
   getSize: getSize
 };
 exports["default"] = _default;
-},{"./browser.js":18,"./node.js":15,"@babel/runtime/helpers/interopRequireDefault":13,"@babel/runtime/helpers/typeof":14,"detect-node":16}]},{},[1]);
+},{"./browser.js":18,"./node.js":15,"@babel/runtime/helpers/interopRequireDefault":14,"detect-node":16}]},{},[1]);
