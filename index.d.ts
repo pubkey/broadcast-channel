@@ -1,4 +1,4 @@
-declare type MethodType = 'node' | 'idb' | 'native' | 'localstorage';
+declare type MethodType = 'node' | 'idb' | 'native' | 'localstorage' | 'simulate';
 
 
 
@@ -47,6 +47,7 @@ declare class BroadcastChannel<T = any> {
 
     // statics
     static clearNodeFolder(opts?: BroadcastChannelOptions): Promise<boolean>;
+    static enforceOptions(opts?: BroadcastChannelOptions | false | null): void;
 }
 
 export default BroadcastChannel;

@@ -1,6 +1,8 @@
 import NativeMethod from './methods/native.js';
 import IndexeDbMethod from './methods/indexed-db.js';
 import LocalstorageMethod from './methods/localstorage.js';
+import SimulateMethod from './methods/simulate.js';
+
 import {
     isNode
 } from './util';
@@ -9,7 +11,8 @@ import {
 const METHODS = [
     NativeMethod, // fastest
     IndexeDbMethod,
-    LocalstorageMethod
+    LocalstorageMethod,
+    SimulateMethod
 ];
 
 const REQUIRE_FUN = require;
@@ -31,7 +34,8 @@ if (isNode) {
      * which will shim the node-method with an empty object {}
      */
     if (typeof NodeMethod.canBeUsed === 'function') {
-        METHODS.push(NodeMethod);
+        // must be first so it's chosen by default
+        METHODS.unshift(NodeMethod);
     }
 }
 
@@ -44,13 +48,19 @@ export function chooseMethod(options) {
         else return ret;
     }
 
+    /**
+     * if no webworker support is needed,
+     * remove idb from the list so that localstorage is been chosen
+     */
     let chooseMethods = METHODS;
     if (!options.webWorkerSupport && !isNode) {
-        // prefer localstorage over idb when no webworker-support needed
         chooseMethods = METHODS.filter(m => m.type !== 'idb');
     }
 
-    const useMethod = chooseMethods.find(method => method.canBeUsed());
+    const useMethod = chooseMethods.find(method => {
+        // do never choose the simulate method if not explicitly set
+        return method.type !== 'simulate' && method.canBeUsed();
+    });
     if (!useMethod)
         throw new Error('No useable methode found:' + JSON.stringify(METHODS.map(m => m.type)));
     else

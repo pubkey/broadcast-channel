@@ -32,8 +32,7 @@ export function postMessage(channelState, messageJson) {
     channelState.bc.postMessage(messageJson, false);
 }
 
-export function onMessage(channelState, fn, time) {
-    channelState.messagesCallbackTime = time;
+export function onMessage(channelState, fn) {
     channelState.messagesCallback = fn;
 }
 

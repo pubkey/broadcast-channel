@@ -11,9 +11,14 @@ import {
 } from './options.js';
 
 
-const BroadcastChannel = function(name, options) {
+const BroadcastChannel = function (name, options) {
     this.name = name;
+
+    if (ENFORCED_OPTIONS) {
+        options = ENFORCED_OPTIONS;
+    }
     this.options = fillOptionsWithDefaults(options);
+
     this.method = chooseMethod(this.options);
 
     // isListening
@@ -61,7 +66,7 @@ BroadcastChannel._pubkey = true;
  * clears the tmp-folder if is node
  * @return {Promise<boolean>} true if has run, false if not node
  */
-BroadcastChannel.clearNodeFolder = function(options) {
+BroadcastChannel.clearNodeFolder = function (options) {
     options = fillOptionsWithDefaults(options);
     const method = chooseMethod(options);
     if (method.type === 'node') {
@@ -70,6 +75,16 @@ BroadcastChannel.clearNodeFolder = function(options) {
         return Promise.resolve(false);
     }
 };
+
+/**
+ * if set, this method is enforced,
+ * no mather what the options are
+ */
+let ENFORCED_OPTIONS;
+BroadcastChannel.enforceOptions = function (options) {
+    ENFORCED_OPTIONS = options;
+};
+
 
 // PROTOTYPE
 BroadcastChannel.prototype = {

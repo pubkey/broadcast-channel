@@ -327,10 +327,14 @@ function runTest(channelOptions) {
             });
             describe('.type', () => {
                 it('should get a type', async () => {
-                    const channel = new BroadcastChannel(AsyncTestUtil.randomString(12), channelOptions);
+                    const channel = new BroadcastChannel(
+                        AsyncTestUtil.randomString(12),
+                        channelOptions
+                    );
                     const type = channel.type;
                     assert.equal(typeof type, 'string');
                     assert.notEqual(type, '');
+                    assert.equal(channel.type, channelOptions.type);
 
                     channel.close();
                 });
@@ -343,6 +347,31 @@ function runTest(channelOptions) {
                     } else {
                         assert.equal(hasRun, false);
                     }
+                });
+            });
+            describe('.enforceOptions()', () => {
+                it('should enforce the simulate method, even when ' + channelOptions.type + ' is set', async () => {
+                    BroadcastChannel.enforceOptions({
+                        type: 'simulate'
+                    });
+                    const channel = new BroadcastChannel(
+                        AsyncTestUtil.randomString(12),
+                        channelOptions
+                    );
+
+                    assert.equal(channel.type, 'simulate');
+
+                    channel.close();
+                });
+                it('should redo the enforcement when null is given', async () => {
+                    BroadcastChannel.enforceOptions(null);
+                    const channel = new BroadcastChannel(
+                        AsyncTestUtil.randomString(12),
+                        channelOptions
+                    );
+                    assert.equal(channel.type, channelOptions.type);
+
+                    channel.close();
                 });
             });
             describe('other', () => {
@@ -599,7 +628,11 @@ function runTest(channelOptions) {
     });
 }
 
-const useOptions = [];
+const useOptions = [
+    {
+        type: 'simulate'
+    }
+];
 
 if (isNode) {
     useOptions.push({

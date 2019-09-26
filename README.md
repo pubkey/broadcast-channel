@@ -95,6 +95,22 @@ channel.postMessage({
 });
 ```
 
+#### Enforce a options globally
+
+When you use this module in a test-suite, it is recommended to enforce the fast `simulate` method on all channels so your tests run faster. You can do this with `enforceOptions()`. If you set this, all channels have the enforced options, no mather what options are given in the constructor.
+
+```typescript
+import BroadcastChannel from 'broadcast-channel';
+
+// enforce this config for all channels
+BroadcastChannel.enforceOptions({
+  type: 'simulate'
+});
+
+// reset the enforcement
+BroadcastChannel.enforceOptions(null);
+```
+
 
 #### Clear tmp-folder:
 When used in NodeJs, the BroadcastChannel will communicate with other processes over filesystem based sockets.
@@ -127,6 +143,7 @@ Depending in which environment this is used, a proper method is automatically se
 | **IndexedDB**    | [Browsers with WebWorkers](https://caniuse.com/#feat=indexeddb) | If there is no native BroadcastChannel support, the IndexedDB method is used because it supports messaging between browser-tabs, iframes and WebWorkers |
 | **LocalStorage** | [Older Browsers](https://caniuse.com/#feat=namevalue-storage)   | In older browsers that do not support IndexedDb, a localstorage-method is used                                                                          |
 | **Sockets**      | NodeJs                                                          | In NodeJs the communication is handled by sockets that send each other messages                                                                         |
+| **Simulate**      | none per default                                                          | This method simulates the behavior of the other methods but only runs in the current process without sharing data between processes. Use this method in your test-suite because it is much faster.                                                                  |
 
 
 
