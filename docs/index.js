@@ -1228,15 +1228,20 @@ function close(channelState) {
 }
 
 function postMessage(channelState, messageJson) {
-  var channelArray = Array.from(SIMULATE_CHANNELS);
-  channelArray.filter(function (channel) {
-    return channel.name === channelState.name;
-  }).filter(function (channel) {
-    return channel !== channelState;
-  }).filter(function (channel) {
-    return !!channel.messagesCallback;
-  }).forEach(function (channel) {
-    return channel.messagesCallback(messageJson);
+  return new Promise(function (res) {
+    return setTimeout(function () {
+      var channelArray = Array.from(SIMULATE_CHANNELS);
+      channelArray.filter(function (channel) {
+        return channel.name === channelState.name;
+      }).filter(function (channel) {
+        return channel !== channelState;
+      }).filter(function (channel) {
+        return !!channel.messagesCallback;
+      }).forEach(function (channel) {
+        return channel.messagesCallback(messageJson);
+      });
+      res();
+    }, 5);
   });
 }
 
