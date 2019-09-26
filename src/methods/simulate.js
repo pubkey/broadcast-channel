@@ -23,12 +23,15 @@ export function close(channelState) {
 }
 
 export function postMessage(channelState, messageJson) {
-    const channelArray = Array.from(SIMULATE_CHANNELS);
-    channelArray
-        .filter(channel => channel.name === channelState.name)
-        .filter(channel => channel !== channelState)
-        .filter(channel => !!channel.messagesCallback)
-        .forEach(channel => channel.messagesCallback(messageJson));
+    return new Promise(res => setTimeout(() => {
+        const channelArray = Array.from(SIMULATE_CHANNELS);
+        channelArray
+            .filter(channel => channel.name === channelState.name)
+            .filter(channel => channel !== channelState)
+            .filter(channel => !!channel.messagesCallback)
+            .forEach(channel => channel.messagesCallback(messageJson));
+        res();
+    }, 5));
 }
 
 export function onMessage(channelState, fn) {
