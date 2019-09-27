@@ -15,8 +15,6 @@ const METHODS = [
     SimulateMethod
 ];
 
-const REQUIRE_FUN = require;
-
 /**
  * The NodeMethod is loaded lazy
  * so it will not get bundled in browser-builds
@@ -27,7 +25,13 @@ if (isNode) {
      * we use the non-transpiled code for nodejs
      * because it runs faster
      */
-    const NodeMethod = REQUIRE_FUN('../../src/methods/node.js');
+    const NodeMethod = require(
+        '../../src/methods/' +
+        // use this hack so that browserify and others
+        // do not import the node-method by default
+        // when bundling.
+        'node.js'
+    );
 
     /**
      * this will be false for webpackbuilds
