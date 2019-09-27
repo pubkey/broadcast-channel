@@ -6,7 +6,7 @@ import { isNode } from './util'; // order is important
 
 var METHODS = [NativeMethod, // fastest
 IndexeDbMethod, LocalstorageMethod, SimulateMethod];
-var REQUIRE_FUN = require;
+
 /**
  * The NodeMethod is loaded lazy
  * so it will not get bundled in browser-builds
@@ -17,7 +17,7 @@ if (isNode) {
    * we use the non-transpiled code for nodejs
    * because it runs faster
    */
-  var NodeMethod = REQUIRE_FUN('../../src/methods/node.js');
+  var NodeMethod = require('../../src/methods/node.js');
   /**
    * this will be false for webpackbuilds
    * which will shim the node-method with an empty object {}
