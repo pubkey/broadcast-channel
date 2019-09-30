@@ -5,8 +5,7 @@ import SimulateMethod from './methods/simulate.js';
 import { isNode } from './util'; // order is important
 
 var METHODS = [NativeMethod, // fastest
-IndexeDbMethod, LocalstorageMethod, SimulateMethod];
-var REQUIRE_FUN = require;
+IndexeDbMethod, LocalstorageMethod];
 /**
  * The NodeMethod is loaded lazy
  * so it will not get bundled in browser-builds
@@ -17,21 +16,29 @@ if (isNode) {
    * we use the non-transpiled code for nodejs
    * because it runs faster
    */
-  var NodeMethod = REQUIRE_FUN('../../src/methods/node.js');
+  var NodeMethod = require('../../src/methods/' + // use this hack so that browserify and others
+  // do not import the node-method by default
+  // when bundling.
+  'node.js');
   /**
    * this will be false for webpackbuilds
    * which will shim the node-method with an empty object {}
    */
 
+
   if (typeof NodeMethod.canBeUsed === 'function') {
-    // must be first so it's chosen by default
-    METHODS.unshift(NodeMethod);
+    METHODS.push(NodeMethod);
   }
 }
 
 export function chooseMethod(options) {
   // directly chosen
   if (options.type) {
+    if (options.type === 'simulate') {
+      // only use simulate-method if directly chosen
+      return SimulateMethod;
+    }
+
     var ret = METHODS.find(function (m) {
       return m.type === options.type;
     });
@@ -52,8 +59,7 @@ export function chooseMethod(options) {
   }
 
   var useMethod = chooseMethods.find(function (method) {
-    // do never choose the simulate method if not explicitly set
-    return method.type !== 'simulate' && method.canBeUsed();
+    return method.canBeUsed();
   });
   if (!useMethod) throw new Error('No useable methode found:' + JSON.stringify(METHODS.map(function (m) {
     return m.type;
