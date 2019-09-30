@@ -11,8 +11,7 @@ import {
 const METHODS = [
     NativeMethod, // fastest
     IndexeDbMethod,
-    LocalstorageMethod,
-    SimulateMethod
+    LocalstorageMethod
 ];
 
 /**
@@ -38,8 +37,7 @@ if (isNode) {
      * which will shim the node-method with an empty object {}
      */
     if (typeof NodeMethod.canBeUsed === 'function') {
-        // must be first so it's chosen by default
-        METHODS.unshift(NodeMethod);
+        METHODS.push(NodeMethod);
     }
 }
 
@@ -47,6 +45,10 @@ if (isNode) {
 export function chooseMethod(options) {
     // directly chosen
     if (options.type) {
+        if (options.type === 'simulate') {
+            // only use simulate-method if directly chosen
+            return SimulateMethod;
+        }
         const ret = METHODS.find(m => m.type === options.type);
         if (!ret) throw new Error('method-type ' + options.type + ' not found');
         else return ret;
@@ -61,10 +63,7 @@ export function chooseMethod(options) {
         chooseMethods = METHODS.filter(m => m.type !== 'idb');
     }
 
-    const useMethod = chooseMethods.find(method => {
-        // do never choose the simulate method if not explicitly set
-        return method.type !== 'simulate' && method.canBeUsed();
-    });
+    const useMethod = chooseMethods.find(method => method.canBeUsed());
     if (!useMethod)
         throw new Error('No useable methode found:' + JSON.stringify(METHODS.map(m => m.type)));
     else
