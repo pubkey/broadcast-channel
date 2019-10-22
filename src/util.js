@@ -10,6 +10,18 @@ export function isPromise(obj) {
     }
 }
 
+export function checkIsIframe() {
+    let currentWindow;
+
+    try {
+        currentWindow = window.self !== window.top;
+    } catch (error) {
+        currentWindow = true;
+    }
+
+    return currentWindow;
+}
+
 export function sleep(time) {
     if (!time) time = 0;
     return new Promise(res => setTimeout(res, time));

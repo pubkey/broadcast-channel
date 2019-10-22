@@ -4,7 +4,8 @@ import LocalstorageMethod from './methods/localstorage.js';
 import SimulateMethod from './methods/simulate.js';
 
 import {
-    isNode
+    isNode,
+    checkIsIframe
 } from './util';
 
 // order is important
@@ -56,10 +57,12 @@ export function chooseMethod(options) {
 
     /**
      * if no webworker support is needed,
+     * or is iframe(Safari doesn't like indexeddb from an iframe of a third party origin),
      * remove idb from the list so that localstorage is been chosen
      */
     let chooseMethods = METHODS;
-    if (!options.webWorkerSupport && !isNode) {
+    const isIframe = checkIsIframe();
+    if ((!options.webWorkerSupport || isIframe) && !isNode) {
         chooseMethods = METHODS.filter(m => m.type !== 'idb');
     }
 
