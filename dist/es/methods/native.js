@@ -43,7 +43,7 @@ export function canBeUsed() {
   } else return false;
 }
 export function averageResponseTime() {
-  return 100;
+  return 150;
 }
 export default {
   create: create,

@@ -927,7 +927,7 @@ function canBeUsed() {
 }
 
 function averageResponseTime() {
-  return 100;
+  return 150;
 }
 
 var _default = {
@@ -1503,7 +1503,7 @@ module.exports = function (it) {
 };
 
 },{"./_is-object":42}],32:[function(require,module,exports){
-var core = module.exports = { version: '2.6.9' };
+var core = module.exports = { version: '2.6.10' };
 if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
 
 },{}],33:[function(require,module,exports){

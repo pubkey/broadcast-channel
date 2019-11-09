@@ -1193,7 +1193,7 @@ function canBeUsed() {
 }
 
 function averageResponseTime() {
-  return 100;
+  return 150;
 }
 
 var _default = {
