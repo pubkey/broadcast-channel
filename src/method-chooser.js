@@ -43,13 +43,15 @@ if (isNode) {
 
 
 export function chooseMethod(options) {
+    let chooseMethods = [].concat(options.methods, METHODS).filter(Boolean);
+
     // directly chosen
     if (options.type) {
         if (options.type === 'simulate') {
             // only use simulate-method if directly chosen
             return SimulateMethod;
         }
-        const ret = METHODS.find(m => m.type === options.type);
+        const ret = chooseMethods.find(m => m.type === options.type);
         if (!ret) throw new Error('method-type ' + options.type + ' not found');
         else return ret;
     }
@@ -58,9 +60,8 @@ export function chooseMethod(options) {
      * if no webworker support is needed,
      * remove idb from the list so that localstorage is been chosen
      */
-    let chooseMethods = METHODS;
     if (!options.webWorkerSupport && !isNode) {
-        chooseMethods = METHODS.filter(m => m.type !== 'idb');
+        chooseMethods = chooseMethods.filter(m => m.type !== 'idb');
     }
 
     const useMethod = chooseMethods.find(method => method.canBeUsed());

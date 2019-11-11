@@ -1,6 +1,5 @@
-export function fillOptionsWithDefaults(options) {
-    if(!options) options = {};
-    options = JSON.parse(JSON.stringify(options));
+export function fillOptionsWithDefaults(originalOptions = {}) {
+    const options = JSON.parse(JSON.stringify(originalOptions));
 
     // main
     if (typeof options.webWorkerSupport === 'undefined') options.webWorkerSupport = true;
@@ -15,6 +14,9 @@ export function fillOptionsWithDefaults(options) {
     // localstorage
     if (!options.localstorage) options.localstorage = {};
     if (!options.localstorage.removeTimeout) options.localstorage.removeTimeout = 1000 * 60;
+
+    // custom methods
+    if (originalOptions.methods) options.methods = originalOptions.methods;
 
     // node
     if (!options.node) options.node = {};
