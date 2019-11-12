@@ -1,0 +1,13 @@
+{
+  "extends": [
+    "config:base"
+  ],
+  "statusCheckVerify": true,
+  "ignoreDeps": [],
+  "automerge": true,
+  "major": {
+    "automerge": false
+  },
+  "rebaseStalePrs": true,
+  "prHourlyLimit": 4
+}
