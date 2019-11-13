@@ -100,15 +100,15 @@ channel.postMessage({
 When you use this module in a test-suite, it is recommended to enforce the fast `simulate` method on all channels so your tests run faster. You can do this with `enforceOptions()`. If you set this, all channels have the enforced options, no mather what options are given in the constructor.
 
 ```typescript
-import { BroadcastChannel } from 'broadcast-channel';
+import { enforceOptions } from 'broadcast-channel';
 
 // enforce this config for all channels
-BroadcastChannel.enforceOptions({
+enforceOptions({
   type: 'simulate'
 });
 
 // reset the enforcement
-BroadcastChannel.enforceOptions(null);
+enforceOptions(null);
 ```
 
 
