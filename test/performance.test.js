@@ -1,6 +1,7 @@
 const AsyncTestUtil = require('async-test-util');
 const {
-    BroadcastChannel
+    BroadcastChannel,
+    clearNodeFolder
 } = require('../');
 
 const benchmark = {
@@ -15,7 +16,7 @@ const elapsedTime = before => {
 
 describe('performance.test.js', () => {
     it('clear tmp-folder', async () => {
-        await BroadcastChannel.clearNodeFolder();
+        await clearNodeFolder();
     });
     it('wait a bit for jit etc..', async () => {
         await AsyncTestUtil.wait(2000);
