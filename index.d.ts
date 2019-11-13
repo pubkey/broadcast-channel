@@ -7,8 +7,20 @@ interface BroadcastChannelEventMap {
     "messageerror": MessageEvent;
 }
 
+export interface BroadcastMethod<State = object> {
+  type: string;
+  microSeconds(): number;
+  create(channelName: string, options: BroadcastChannelOptions): Promise<State> | State;
+  close(channelState: State): void;
+  onMessage(channelState: State, callback: (args: any) => void): void;
+  postMessage(channelState: State, message: any): Promise<any>;
+  canBeUsed(): boolean;
+  averageResponseTime(): number;
+}
+
 export type BroadcastChannelOptions = {
     type?: MethodType,
+    methods?: BroadcastMethod[] | BroadcastMethod,
     webWorkerSupport?: boolean;
     prepareDelay?: number;
     node?: {
