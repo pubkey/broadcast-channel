@@ -29,7 +29,7 @@
   "module": "./dist/es/index.js",
   "types": "index.d.ts",
   "scripts": {
-    "test": "npm run test:node && npm run test:browser && npm run test:e2e",
+    "test:all": "npm run test:node && npm run test:browser && npm run test:e2e",
     "test:node": "npm run build && mocha ./test/index.test.js -b --timeout 6000 --exit",
     "test:node:loop": "npm run test:node && npm run test:node:loop",
     "test:browser": "npm run build && karma start ./config/karma.conf.js --single-run",
