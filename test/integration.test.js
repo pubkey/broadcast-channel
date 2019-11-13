@@ -3,8 +3,10 @@ const assert = require('assert');
 const isNode = require('detect-node');
 const clone = require('clone');
 const unload = require('unload');
-const BroadcastChannel = require('../');
-const LeaderElection = require('../leader-election');
+const {
+    BroadcastChannel,
+    createLeaderElection
+} = require('../');
 
 /**
  * we run this test once per method
@@ -440,7 +442,7 @@ function runTest(channelOptions) {
                 it('should create an elector', () => {
                     const channelName = AsyncTestUtil.randomString(12);
                     const channel = new BroadcastChannel(channelName, channelOptions);
-                    LeaderElection.create(channel);
+                    createLeaderElection(channel);
                     channel.close();
                 });
             });
@@ -448,7 +450,7 @@ function runTest(channelOptions) {
                 it('should elect single elector as leader', async () => {
                     const channelName = AsyncTestUtil.randomString(12);
                     const channel = new BroadcastChannel(channelName, channelOptions);
-                    const elector = LeaderElection.create(channel);
+                    const elector = createLeaderElection(channel);
 
                     await elector.applyOnce();
                     assert.ok(elector.isLeader);
@@ -459,8 +461,8 @@ function runTest(channelOptions) {
                     const channelName = AsyncTestUtil.randomString(12);
                     const channel = new BroadcastChannel(channelName, channelOptions);
                     const channel2 = new BroadcastChannel(channelName, channelOptions);
-                    const elector = LeaderElection.create(channel);
-                    const elector2 = LeaderElection.create(channel2);
+                    const elector = createLeaderElection(channel);
+                    const elector2 = createLeaderElection(channel2);
 
                     await Promise.all([
                         elector.applyOnce(),
@@ -479,7 +481,7 @@ function runTest(channelOptions) {
                     const channelName = AsyncTestUtil.randomString(12);
                     const clients = new Array(20).fill(0).map(() => {
                         const channel = new BroadcastChannel(channelName, channelOptions);
-                        const elector = LeaderElection.create(channel);
+                        const elector = createLeaderElection(channel);
                         return {
                             channel,
                             elector
@@ -501,8 +503,8 @@ function runTest(channelOptions) {
                     const channelName = AsyncTestUtil.randomString(12);
                     const channel = new BroadcastChannel(channelName, channelOptions);
                     const channel2 = new BroadcastChannel(channelName, channelOptions);
-                    const elector = LeaderElection.create(channel);
-                    const elector2 = LeaderElection.create(channel2);
+                    const elector = createLeaderElection(channel);
+                    const elector2 = createLeaderElection(channel2);
 
                     await elector.applyOnce();
 
@@ -519,8 +521,8 @@ function runTest(channelOptions) {
                     const channelName = AsyncTestUtil.randomString(12);
                     const channel = new BroadcastChannel(channelName, channelOptions);
                     const channel2 = new BroadcastChannel(channelName, channelOptions);
-                    const elector = LeaderElection.create(channel);
-                    const elector2 = LeaderElection.create(channel2);
+                    const elector = createLeaderElection(channel);
+                    const elector2 = createLeaderElection(channel2);
 
                     await elector.applyOnce();
                     await channel.close();
@@ -539,7 +541,7 @@ function runTest(channelOptions) {
 
                     const channelName = AsyncTestUtil.randomString(12);
                     const channel = new BroadcastChannel(channelName, channelOptions);
-                    const elector = LeaderElection.create(channel);
+                    const elector = createLeaderElection(channel);
                     await elector.awaitLeadership();
 
                     await channel.close();
@@ -553,7 +555,7 @@ function runTest(channelOptions) {
                 it('should resolve when elector becomes leader', async () => {
                     const channelName = AsyncTestUtil.randomString(12);
                     const channel = new BroadcastChannel(channelName, channelOptions);
-                    const elector = LeaderElection.create(channel);
+                    const elector = createLeaderElection(channel);
 
                     await elector.awaitLeadership();
 
@@ -563,8 +565,8 @@ function runTest(channelOptions) {
                     const channelName = AsyncTestUtil.randomString(12);
                     const channel = new BroadcastChannel(channelName, channelOptions);
                     const channel2 = new BroadcastChannel(channelName, channelOptions);
-                    const elector = LeaderElection.create(channel);
-                    const elector2 = LeaderElection.create(channel2);
+                    const elector = createLeaderElection(channel);
+                    const elector2 = createLeaderElection(channel2);
 
                     await elector.awaitLeadership();
 
@@ -582,8 +584,8 @@ function runTest(channelOptions) {
                     const channelName = AsyncTestUtil.randomString(12);
                     const channel = new BroadcastChannel(channelName, channelOptions);
                     const channel2 = new BroadcastChannel(channelName, channelOptions);
-                    const elector = LeaderElection.create(channel);
-                    const elector2 = LeaderElection.create(channel2);
+                    const elector = createLeaderElection(channel);
+                    const elector2 = createLeaderElection(channel2);
 
                     await elector.awaitLeadership();
 
@@ -603,8 +605,8 @@ function runTest(channelOptions) {
                     const channelName = AsyncTestUtil.randomString(12);
                     const channel = new BroadcastChannel(channelName, channelOptions);
                     const channel2 = new BroadcastChannel(channelName, channelOptions);
-                    const elector = LeaderElection.create(channel);
-                    const elector2 = LeaderElection.create(channel2);
+                    const elector = createLeaderElection(channel);
+                    const elector2 = createLeaderElection(channel2);
 
                     await elector.awaitLeadership();
 

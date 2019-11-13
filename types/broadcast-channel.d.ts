@@ -8,14 +8,14 @@ interface BroadcastChannelEventMap {
 }
 
 export interface BroadcastMethod<State = object> {
-  type: string;
-  microSeconds(): number;
-  create(channelName: string, options: BroadcastChannelOptions): Promise<State> | State;
-  close(channelState: State): void;
-  onMessage(channelState: State, callback: (args: any) => void): void;
-  postMessage(channelState: State, message: any): Promise<any>;
-  canBeUsed(): boolean;
-  averageResponseTime(): number;
+    type: string;
+    microSeconds(): number;
+    create(channelName: string, options: BroadcastChannelOptions): Promise<State> | State;
+    close(channelState: State): void;
+    onMessage(channelState: State, callback: (args: any) => void): void;
+    postMessage(channelState: State, message: any): Promise<any>;
+    canBeUsed(): boolean;
+    averageResponseTime(): number;
 }
 
 export type BroadcastChannelOptions = {
@@ -42,7 +42,7 @@ declare type OnMessageHandler<T> = ((this: BroadcastChannel, ev: T) => any) | nu
  * @link https://html.spec.whatwg.org/multipage/web-messaging.html#broadcasting-to-other-browsing-contexts
  * @link https://github.com/Microsoft/TypeScript/blob/master/src/lib/webworker.generated.d.ts#L325
  */
-declare class BroadcastChannel<T = any> {
+export class BroadcastChannel<T = any> {
     constructor(name: string, opts?: BroadcastChannelOptions);
     readonly name: string;
     readonly options: BroadcastChannelOptions;
@@ -57,9 +57,7 @@ declare class BroadcastChannel<T = any> {
     addEventListener(type: EventType, handler: OnMessageHandler<T>): void;
     removeEventListener(type: EventType, handler: OnMessageHandler<T>): void;
 
-    // statics
-    static clearNodeFolder(opts?: BroadcastChannelOptions): Promise<boolean>;
-    static enforceOptions(opts?: BroadcastChannelOptions | false | null): void;
 }
-
-export default BroadcastChannel;
+// statics
+export function clearNodeFolder(opts?: BroadcastChannelOptions): Promise<boolean>;
+export function enforceOptions(opts?: BroadcastChannelOptions | false | null): void;

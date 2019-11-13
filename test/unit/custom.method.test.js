@@ -1,6 +1,8 @@
 const AsyncTestUtil = require('async-test-util');
 const assert = require('assert');
-const BroadcastChannel = require('../../');
+const {
+    BroadcastChannel
+} = require('../../');
 
 describe('unit/custom.method.test.js', () => {
     describe('custom methods', () => {

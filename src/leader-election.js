@@ -1,7 +1,7 @@
 import {
     sleep,
     randomToken
-} from '../util.js';
+} from './util.js';
 
 import unload from 'unload';
 
@@ -190,7 +190,7 @@ function fillOptionsWithDefaults(options, channel) {
     return options;
 }
 
-export function create(channel, options) {
+export function createLeaderElection(channel, options) {
     if (channel._leaderElector) {
         throw new Error('BroadcastChannel already has a leader-elector');
     }
@@ -202,8 +202,3 @@ export function create(channel, options) {
     channel._leaderElector = elector;
     return elector;
 }
-
-
-export default {
-    create
-};

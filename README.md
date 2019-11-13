@@ -38,7 +38,7 @@ npm install --save broadcast-channel
 #### Create a channel in one tab/process and send a message.
 
 ```js
-const BroadcastChannel = require('broadcast-channel');
+const { BroadcastChannel } = require('broadcast-channel');
 const channel = new BroadcastChannel('foobar');
 channel.postMessage('I am not alone');
 ```
@@ -46,7 +46,7 @@ channel.postMessage('I am not alone');
 #### Create a channel with the same name in another tab/process and recieve messages.
 
 ```js
-const BroadcastChannel = require('broadcast-channel');
+const { BroadcastChannel } = require('broadcast-channel');
 const channel = new BroadcastChannel('foobar');
 channel.onmessage = msg => console.dir(msg);
 // > 'I am not alone'
@@ -56,7 +56,7 @@ channel.onmessage = msg => console.dir(msg);
 #### Add and remove multiple eventlisteners
 
 ```js
-const BroadcastChannel = require('broadcast-channel');
+const { BroadcastChannel } = require('broadcast-channel');
 const channel = new BroadcastChannel('foobar');
 
 const handler = msg => console.log(msg);
@@ -85,7 +85,7 @@ const channel = new BroadcastChannel('foobar', options);
 #### Create a typed channel in typescript:
 
 ```typescript
-import BroadcastChannel from 'broadcast-channel';
+import { BroadcastChannel } from 'broadcast-channel';
 declare type Message = {
   foo: string;
 };
@@ -100,7 +100,7 @@ channel.postMessage({
 When you use this module in a test-suite, it is recommended to enforce the fast `simulate` method on all channels so your tests run faster. You can do this with `enforceOptions()`. If you set this, all channels have the enforced options, no mather what options are given in the constructor.
 
 ```typescript
-import BroadcastChannel from 'broadcast-channel';
+import { BroadcastChannel } from 'broadcast-channel';
 
 // enforce this config for all channels
 BroadcastChannel.enforceOptions({
@@ -117,17 +117,19 @@ When used in NodeJs, the BroadcastChannel will communicate with other processes 
 When you create a huge amount of channels, like you would do when running unit tests, you might get problems because there are too many folders in the tmp-directory. Calling `BroadcastChannel.clearNodeFolder()` will clear the tmp-folder and it is recommended to run this at the beginning of your test-suite.
 
 ```typescript
+import { clearNodeFolder } from 'broadcast-channel';
 // jest
 beforeAll(async () => {
-  const hasRun = await BroadcastChannel.clearNodeFolder();
+  const hasRun = await clearNodeFolder();
   console.log(hasRun); // > true on NodeJs, false on Browsers
 })
 ```
 
 ```typescript
+import { clearNodeFolder } from 'broadcast-channel';
 // mocha
 before(async () => {
-  const hasRun = await BroadcastChannel.clearNodeFolder();
+  const hasRun = await clearNodeFolder();
   console.log(hasRun); // > true on NodeJs, false on Browsers
 })
 ```
@@ -159,17 +161,19 @@ In this example the leader is marked with the crown ♛:
 Create a channel and an elector.
 
 ```js
-const BroadcastChannel = require('broadcast-channel');
-const LeaderElection = require('broadcast-channel/leader-election');
+const {
+  BroadcastChannel,
+  createLeaderElection
+} = require('broadcast-channel');
 const channel = new BroadcastChannel('foobar');
-const elector = LeaderElection.create(channel);
+const elector = createLeaderElection(channel);
 ```
 
 Wait until the elector becomes leader.
 
 ```js
-const LeaderElection = require('broadcast-channel/leader-election');
-const elector = LeaderElection.create(channel);
+const { createLeaderElection } = require('broadcast-channel');
+const elector = createLeaderElection(channel);
 elector.awaitLeadership().then(()=> {
   console.log('this tab is now leader');
 })
@@ -178,8 +182,8 @@ elector.awaitLeadership().then(()=> {
 If more than one tab is becoming leader adjust `LeaderElectionOptions` configuration.
 
 ```js
-const LeaderElection = require('broadcast-channel/leader-election');
-const elector = LeaderElection.create(channel, {
+const { createLeaderElection } = require('broadcast-channel');
+const elector = createLeaderElection(channel, {
   fallbackInterval: 2000, // optional configuration for how often will renegotiation for leader occur
   responseTime: 1000, // optional configuration for how long will instances have to respond
 });
@@ -191,7 +195,7 @@ elector.awaitLeadership().then(()=> {
 Let the leader die. (automatically happens if the tab is closed or the process exits).
 
 ```js
-const elector = LeaderElection.create(channel);
+const elector = createLeaderElection(channel);
 await elector.die();
 ```
 

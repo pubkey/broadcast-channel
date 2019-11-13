@@ -1,5 +1,7 @@
 const AsyncTestUtil = require('async-test-util');
-const BroadcastChannel = require('../');
+const {
+    BroadcastChannel
+} = require('../');
 
 const benchmark = {
     openClose: {},

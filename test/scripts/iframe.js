@@ -9,7 +9,9 @@ import {
 
 var msgContainer = document.getElementById('messages');
 
-var BroadcastChannel = require('../../');
+var {
+    BroadcastChannel
+} = require('../../');
 
 const channelName = getParameterByName('channelName');
 const methodType = getParameterByName('methodType');

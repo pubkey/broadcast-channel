@@ -9,11 +9,14 @@ const AsyncTestUtil = require('async-test-util');
 describe('typings.test.ts', () => {
     const mainPath = path.join(__dirname, '../');
     const codeBase = `
-        import BroadcastChannel from '${mainPath}';
+        import { 
+            BroadcastChannel,
+            createLeaderElection,
+            clearNodeFolder
+        } from '${mainPath}';
         declare type Message = {
             foo: string;
         };
-        import LeaderElection from '${mainPath}/leader-election';
     `;
     const transpileCode = async (code) => {
         const spawn = require('child-process-promise').spawn;
@@ -30,8 +33,15 @@ describe('typings.test.ts', () => {
             '-e', codeBase + '\n' + code
         ]);
         const childProcess = promise.childProcess;
-        childProcess.stdout.on('data', data => stdout.push(data.toString()));
-        childProcess.stderr.on('data', data => stderr.push(data.toString()));
+        childProcess.stdout.on('data', data => {
+            // console.dir(data.toString());
+            stdout.push(data.toString());
+        });
+        childProcess.stderr.on('data', data => {
+            // console.log('err:');
+            // console.dir(data.toString());
+            stderr.push(data.toString());
+        });
         try {
             await promise;
         } catch (err) {
@@ -63,9 +73,9 @@ describe('typings.test.ts', () => {
     describe('statics', () => {
         it('.clearNodeFolder()', async () => {
             const code = `
-                (async()=>{
+                (async() => {
                     let b: boolean = false;
-                    b = await BroadcastChannel.clearNodeFolder();
+                    b = await clearNodeFolder();
                 })();
             `;
             await transpileCode(code);
@@ -75,24 +85,25 @@ describe('typings.test.ts', () => {
     describe('non-typed channel', () => {
         it('should be ok to create post and recieve', async () => {
             const code = `
-                (async()=>{
+                (async() => {
                     const channel = new BroadcastChannel('foobar');
-
                     const emitted: any[] = [];
                     channel.onmessage = msg => emitted.push(msg);
                     await channel.postMessage({foo: 'bar'});
+                    channel.close();
                 })();
             `;
             await transpileCode(code);
         });
         it('should not allow to set wrong onmessage', async () => {
             const code = `
-                (async()=>{
+                (async() => {
                     const channel = new BroadcastChannel('foobar');
 
                     const emitted: any[] = [];
                     channel.onmessage = {};
                     await channel.postMessage({foo: 'bar'});
+                    channel.close();
                 })();
             `;
             await AsyncTestUtil.assertThrows(
@@ -103,31 +114,34 @@ describe('typings.test.ts', () => {
     describe('typed channel', () => {
         it('should be ok to create and post', async () => {
             const code = `
-                (async()=>{
+                (async() => {
                     const channel = new BroadcastChannel<Message>('foobar');
                     await channel.postMessage({foo: 'bar'});
+                    channel.close();
                 })();
             `;
             await transpileCode(code);
         });
         it('should be ok to recieve', async () => {
             const code = `
-                (async()=>{
+                (async() => {
                     const channel: BroadcastChannel<Message> = new BroadcastChannel('foobar');
                     const emitted: Message[] = [];
                     channel.onmessage = msg => {
                         const f: string = msg.foo;
                         emitted.push(msg);
                     };
+                    channel.close();
                 })();
             `;
             await transpileCode(code);
         });
         it('should not allow to post wrong message', async () => {
             const code = `
-                (async()=>{
+                (async() => {
                     const channel = new BroadcastChannel<Message>('foobar');
                     await channel.postMessage({x: 42});
+                    channel.close();
                 })();
             `;
             await AsyncTestUtil.assertThrows(
@@ -138,11 +152,12 @@ describe('typings.test.ts', () => {
     describe('LeaderElection', () => {
         it('call all methods', async () => {
             const code = `
-                (async()=>{
+                (async() => {
                     const channel = new BroadcastChannel<Message>('foobar');
-                    const elector = LeaderElection.create(channel, {});
+                    const elector = createLeaderElection(channel, {});
                     await elector.awaitLeadership();
                     await elector.die();
+                    channel.close();
                 })();
             `;
             await transpileCode(code);

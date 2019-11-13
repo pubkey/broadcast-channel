@@ -1,5 +1,7 @@
 const isNode = require('detect-node');
-const BroadcastChannel = require('../');
+const {
+    BroadcastChannel
+} = require('../');
 const AsyncTestUtil = require('async-test-util');
 
 describe('issues.test.js', () => {

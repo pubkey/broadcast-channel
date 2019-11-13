@@ -3,7 +3,9 @@
  * used in the test-docs as web-worker
  */
 require('@babel/polyfill');
-var BroadcastChannel = require('../../');
+var {
+    BroadcastChannel
+} = require('../../');
 
 // overwrite console.log
 try {

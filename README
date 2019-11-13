@@ -2,7 +2,7 @@
     This is a different readme file which will be published to npm
     @link https://stackoverflow.com/a/52683086
 
-    The problem was that googled indexed the npm-site instead of the github site
+    The problem was that google indexed the npm-site instead of the github site
 -->
 
 <p align="center">
@@ -31,28 +31,6 @@
 * * *
 
 A BroadcastChannel that allows you to send data between different browser-tabs or nodejs-processes.
+And a LeaderElection over the channels.
 
-## Using the BroadcastChannel
-
-```bash
-npm install --save broadcast-channel
-```
-
-#### Create a channel in one tab/process and send a message.
-
-```js
-const BroadcastChannel = require('broadcast-channel');
-const channel = new BroadcastChannel('foobar');
-channel.postMessage('I am not alone');
-```
-
-#### Create a channel with the same name in another tab/process and recieve messages.
-
-```js
-const BroadcastChannel = require('broadcast-channel');
-const channel = new BroadcastChannel('foobar');
-channel.onmessage = msg => console.dir(msg);
-// > 'I am not alone'
-```
-
-# [READ THE FULL DOCUMENTATION ON GITHUB](https://github.com/pubkey/broadcast-channel)
+# [Read the full documentation on github](https://github.com/pubkey/broadcast-channel)

@@ -1,7 +1,9 @@
 /**
  * a simple test which just checks if the basics work
  */
-const BroadcastChannel = require('../');
+const {
+    BroadcastChannel
+} = require('../');
 
 async function run() {
     const channelName = 'simpleTestChannel';

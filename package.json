@@ -27,7 +27,8 @@
   "main": "./dist/lib/index.es5.js",
   "jsnext:main": "./dist/es/index.js",
   "module": "./dist/es/index.js",
-  "types": "index.d.ts",
+  "sideEffects": false,
+  "types": "./types/index.d.ts",
   "scripts": {
     "test": "echo \"RUN ALL:\" && npm run test:node && npm run test:browser && npm run test:e2e",
     "test:node": "npm run build && mocha ./test/index.test.js -b --timeout 6000 --exit",
@@ -118,7 +119,6 @@
     "testcafe-hammerhead": "14.11.0",
     "ts-node": "8.5.0",
     "typescript": "3.7.2",
-    "uglifyjs-webpack-plugin": "2.2.0",
     "watchify": "3.11.1",
     "webpack": "4.41.2",
     "webpack-cli": "3.3.10"

@@ -10,8 +10,10 @@ import {
     getParameterByName
 } from './util.js';
 
-var BroadcastChannel = require('../../');
-var LeaderElection = require('../../leader-election');
+var {
+    BroadcastChannel,
+    createLeaderElection
+} = require('../../');
 
 const channelName = getParameterByName('channelName');
 const methodType = getParameterByName('methodType');
@@ -25,7 +27,7 @@ var channel = new BroadcastChannel(channelName, {
     type: methodType
 });
 
-var elector = LeaderElection.create(channel);
+var elector = createLeaderElection(channel);
 
 boxEl.innerHTML = 'start election';
 console.log('leader-iframe ('+elector.token+'): start leader-election');

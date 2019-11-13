@@ -1,26 +1,12 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 "use strict";
 
-var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
-
-var _index = _interopRequireDefault(require("./index.js"));
-
-/**
- * because babel can only export on default-attribute,
- * we use this for the non-module-build
- * this ensures that users do not have to use
- * var BroadcastChannel = require('broadcast-channel').default;
- * but
- * var BroadcastChannel = require('broadcast-channel');
- */
-module.exports = _index["default"];
-},{"./index.js":2,"@babel/runtime/helpers/interopRequireDefault":15}],2:[function(require,module,exports){
-"use strict";
-
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports["default"] = void 0;
+exports.clearNodeFolder = clearNodeFolder;
+exports.enforceOptions = enforceOptions;
+exports.BroadcastChannel = void 0;
 
 var _util = require("./util.js");
 
@@ -77,13 +63,14 @@ var BroadcastChannel = function BroadcastChannel(name, options) {
  */
 
 
+exports.BroadcastChannel = BroadcastChannel;
 BroadcastChannel._pubkey = true;
 /**
  * clears the tmp-folder if is node
  * @return {Promise<boolean>} true if has run, false if not node
  */
 
-BroadcastChannel.clearNodeFolder = function (options) {
+function clearNodeFolder(options) {
   options = (0, _options.fillOptionsWithDefaults)(options);
   var method = (0, _methodChooser.chooseMethod)(options);
 
@@ -94,7 +81,7 @@ BroadcastChannel.clearNodeFolder = function (options) {
   } else {
     return Promise.resolve(false);
   }
-};
+}
 /**
  * if set, this method is enforced,
  * no mather what the options are
@@ -103,9 +90,9 @@ BroadcastChannel.clearNodeFolder = function (options) {
 
 var ENFORCED_OPTIONS;
 
-BroadcastChannel.enforceOptions = function (options) {
+function enforceOptions(options) {
   ENFORCED_OPTIONS = options;
-}; // PROTOTYPE
+} // PROTOTYPE
 
 
 BroadcastChannel.prototype = {
@@ -261,22 +248,60 @@ function _stopListening(channel) {
     channel.method.onMessage(channel._state, null, time);
   }
 }
-
-var _default = BroadcastChannel;
-exports["default"] = _default;
-},{"./method-chooser.js":5,"./options.js":11,"./util.js":12}],3:[function(require,module,exports){
+},{"./method-chooser.js":5,"./options.js":11,"./util.js":12}],2:[function(require,module,exports){
 "use strict";
 
-var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
-
-var _index = _interopRequireDefault(require("./index.js"));
+var _index = require("./index.js");
 
 /**
  * because babel can only export on default-attribute,
  * we use this for the non-module-build
+ * this ensures that users do not have to use
+ * var BroadcastChannel = require('broadcast-channel').default;
+ * but
+ * var BroadcastChannel = require('broadcast-channel');
  */
-module.exports = _index["default"];
-},{"./index.js":4,"@babel/runtime/helpers/interopRequireDefault":15}],4:[function(require,module,exports){
+module.exports = {
+  BroadcastChannel: _index.BroadcastChannel,
+  createLeaderElection: _index.createLeaderElection,
+  clearNodeFolder: _index.clearNodeFolder,
+  enforceOptions: _index.enforceOptions
+};
+},{"./index.js":3}],3:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+Object.defineProperty(exports, "BroadcastChannel", {
+  enumerable: true,
+  get: function get() {
+    return _broadcastChannel.BroadcastChannel;
+  }
+});
+Object.defineProperty(exports, "clearNodeFolder", {
+  enumerable: true,
+  get: function get() {
+    return _broadcastChannel.clearNodeFolder;
+  }
+});
+Object.defineProperty(exports, "enforceOptions", {
+  enumerable: true,
+  get: function get() {
+    return _broadcastChannel.enforceOptions;
+  }
+});
+Object.defineProperty(exports, "createLeaderElection", {
+  enumerable: true,
+  get: function get() {
+    return _leaderElection.createLeaderElection;
+  }
+});
+
+var _broadcastChannel = require("./broadcast-channel");
+
+var _leaderElection = require("./leader-election");
+},{"./broadcast-channel":1,"./leader-election":4}],4:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -284,10 +309,9 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.create = create;
-exports["default"] = void 0;
+exports.createLeaderElection = createLeaderElection;
 
-var _util = require("../util.js");
+var _util = require("./util.js");
 
 var _unload = _interopRequireDefault(require("unload"));
 
@@ -501,7 +525,7 @@ function fillOptionsWithDefaults(options, channel) {
   return options;
 }
 
-function create(channel, options) {
+function createLeaderElection(channel, options) {
   if (channel._leaderElector) {
     throw new Error('BroadcastChannel already has a leader-elector');
   }
@@ -516,12 +540,7 @@ function create(channel, options) {
   channel._leaderElector = elector;
   return elector;
 }
-
-var _default = {
-  create: create
-};
-exports["default"] = _default;
-},{"../util.js":12,"@babel/runtime/helpers/interopRequireDefault":15,"unload":325}],5:[function(require,module,exports){
+},{"./util.js":12,"@babel/runtime/helpers/interopRequireDefault":15,"unload":325}],5:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -8972,9 +8991,9 @@ var _util = require("./util.js");
  */
 require('@babel/polyfill');
 
-var BroadcastChannel = require('../../');
-
-var LeaderElection = require('../../leader-election');
+var _require = require('../../'),
+    BroadcastChannel = _require.BroadcastChannel,
+    createLeaderElection = _require.createLeaderElection;
 
 var channelName = (0, _util.getParameterByName)('channelName');
 var methodType = (0, _util.getParameterByName)('methodType');
@@ -8989,7 +9008,7 @@ console.log = function (str) {
 var channel = new BroadcastChannel(channelName, {
   type: methodType
 });
-var elector = LeaderElection.create(channel);
+var elector = createLeaderElection(channel);
 boxEl.innerHTML = 'start election';
 console.log('leader-iframe (' + elector.token + '): start leader-election');
 elector.awaitLeadership().then(function () {
@@ -8997,7 +9016,7 @@ elector.awaitLeadership().then(function () {
   boxEl.innerHTML = 'Leader';
   document.title = '♛ Leader';
 });
-},{"../../":1,"../../leader-election":3,"./util.js":327,"@babel/polyfill":13}],327:[function(require,module,exports){
+},{"../../":2,"./util.js":327,"@babel/polyfill":13}],327:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
