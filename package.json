@@ -117,7 +117,7 @@
     "testcafe": "1.6.1",
     "testcafe-hammerhead": "14.11.0",
     "ts-node": "7.0.1",
-    "typescript": "3.6.3",
+    "typescript": "3.7.2",
     "uglifyjs-webpack-plugin": "2.2.0",
     "watchify": "3.11.1",
     "webpack": "4.41.2",
