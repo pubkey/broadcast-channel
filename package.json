@@ -1,6 +1,6 @@
 {
   "name": "broadcast-channel",
-  "version": "2.3.3",
+  "version": "2.3.4",
   "description": "A BroadcastChannel that works in New Browsers, Old Browsers, WebWorkers and NodeJs",
   "homepage": "https://github.com/pubkey/broadcast-channel#readme",
   "keywords": [
@@ -29,7 +29,7 @@
   "module": "./dist/es/index.js",
   "types": "index.d.ts",
   "scripts": {
-    "test:all": "npm run test:node && npm run test:browser && npm run test:e2e",
+    "test:all": "echo \"RUN ALL:\" && npm run test:node && npm run test:browser && npm run test:e2e",
     "test:node": "npm run build && mocha ./test/index.test.js -b --timeout 6000 --exit",
     "test:node:loop": "npm run test:node && npm run test:node:loop",
     "test:browser": "npm run build && karma start ./config/karma.conf.js --single-run",

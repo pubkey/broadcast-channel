@@ -46,14 +46,15 @@ if (_util.isNode) {
 }
 
 function chooseMethod(options) {
-  // directly chosen
+  var chooseMethods = [].concat(options.methods, METHODS).filter(Boolean); // directly chosen
+
   if (options.type) {
     if (options.type === 'simulate') {
       // only use simulate-method if directly chosen
       return _simulate["default"];
     }
 
-    var ret = METHODS.find(function (m) {
+    var ret = chooseMethods.find(function (m) {
       return m.type === options.type;
     });
     if (!ret) throw new Error('method-type ' + options.type + ' not found');else return ret;
@@ -64,10 +65,8 @@ function chooseMethod(options) {
    */
 
 
-  var chooseMethods = METHODS;
-
   if (!options.webWorkerSupport && !_util.isNode) {
-    chooseMethods = METHODS.filter(function (m) {
+    chooseMethods = chooseMethods.filter(function (m) {
       return m.type !== 'idb';
     });
   }
