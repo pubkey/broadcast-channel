@@ -50,7 +50,7 @@ jobs:
       script: npm run test:node
       env: LABEL=test:node
     - stage: checks
-      script: if [ "${TRAVIS_OS_NAME}" = "linux" ]; then ( travis_retry npm run test:browser ) fi
+      script: travis_retry npm run test:browser
       env: LABEL=test:browser
     - stage: checks
       script: travis_retry npm run test:performance

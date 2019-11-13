@@ -42,6 +42,7 @@ const configuration = {
         'karma-firefox-launcher',
         'karma-ie-launcher',
         'karma-opera-launcher',
+        'karma-safari-launcher',
         'karma-detect-browsers'
     ],
 

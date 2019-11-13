@@ -9,5 +9,5 @@
     "automerge": false
   },
   "rebaseStalePrs": true,
-  "prHourlyLimit": 4
+  "prHourlyLimit": 2
 }
