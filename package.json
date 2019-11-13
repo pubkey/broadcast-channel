@@ -109,7 +109,7 @@
     "mocha": "6.2.0",
     "node": "11.13.0",
     "pre-commit": "1.2.2",
-    "random-int": "2.0.0",
+    "random-int": "2.0.1",
     "random-token": "0.0.8",
     "rollup": "1.21.4",
     "rollup-plugin-node-resolve": "5.2.0",
