@@ -204,8 +204,8 @@ async function createSocketEventEmitter(channelName, readerUuid, paths) {
     const emitter = new events.EventEmitter();
     const server = net
         .createServer(stream => {
-            stream.on('end', function() {});
-            stream.on('data', function(msg) {
+            stream.on('end', function () { });
+            stream.on('data', function (msg) {
                 emitter.emit('data', msg.toString());
             });
         });
@@ -348,8 +348,8 @@ async function cleanOldMessages(messageObjects, ttl) {
     const olderThen = Date.now() - ttl;
     await Promise.all(
         messageObjects
-        .filter(obj => (obj.time / 1000) < olderThen)
-        .map(obj => unlink(obj.path).catch(() => null))
+            .filter(obj => (obj.time / 1000) < olderThen)
+            .map(obj => unlink(obj.path).catch(() => null))
     );
 }
 
@@ -466,9 +466,9 @@ async function handleMessagePing(state, msgObj) {
     // read contents
     await Promise.all(
         useMessages
-        .map(
-            msgObj => readMessage(msgObj).then(content => msgObj.content = content)
-        )
+            .map(
+                msgObj => readMessage(msgObj).then(content => msgObj.content = content)
+            )
     );
 
     useMessages.forEach(msgObj => {
@@ -494,30 +494,30 @@ function refreshReaderClients(channelState) {
                 .forEach(async (readerUuid) => {
                     try {
                         await channelState.otherReaderClients[readerUuid].destroy();
-                    } catch (err) {}
+                    } catch (err) { }
                     delete channelState.otherReaderClients[readerUuid];
                 });
 
             // add new readers
             return Promise.all(
                 otherReaders
-                .filter(readerUuid => readerUuid !== channelState.uuid) // not own
-                .filter(readerUuid => !channelState.otherReaderClients[readerUuid]) // not already has client
-                .map(async (readerUuid) => {
-                    try {
-                        if (channelState.closed) return;
+                    .filter(readerUuid => readerUuid !== channelState.uuid) // not own
+                    .filter(readerUuid => !channelState.otherReaderClients[readerUuid]) // not already has client
+                    .map(async (readerUuid) => {
                         try {
-                            const client = await openClientConnection(channelState.channelName, readerUuid);
-                            channelState.otherReaderClients[readerUuid] = client;
+                            if (channelState.closed) return;
+                            try {
+                                const client = await openClientConnection(channelState.channelName, readerUuid);
+                                channelState.otherReaderClients[readerUuid] = client;
+                            } catch (err) {
+                                // this can throw when the cleanup of another channel was interrupted
+                                // or the socket-file does not exits yet
+                            }
                         } catch (err) {
-                            // this can throw when the cleanup of another channel was interrupted
-                            // or the socket-file does not exits yet
+                            // this might throw if the other channel is closed at the same time when this one is running refresh
+                            // so we do not throw an error
                         }
-                    } catch (err) {
-                        // this might throw if the other channel is closed at the same time when this one is running refresh
-                        // so we do not throw an error
-                    }
-                })
+                    })
             );
         });
 }
@@ -547,12 +547,12 @@ function postMessage(channelState, messageJson) {
 
         const writeToReadersPromise = Promise.all(
             Object.values(channelState.otherReaderClients)
-            .filter(client => client.writable) // client might have closed in between
-            .map(client => {
-                return new Promise(res => {
-                    client.write(pingStr, res);
-                });
-            })
+                .filter(client => client.writable) // client might have closed in between
+                .map(client => {
+                    return new Promise(res => {
+                        client.write(pingStr, res);
+                    });
+                })
         );
 
         /**
@@ -627,7 +627,7 @@ function close(channelState) {
     if (channelState.infoFilePath) {
         try {
             fs.unlinkSync(channelState.infoFilePath);
-        } catch (err) {}
+        } catch (err) { }
     }
 }
 

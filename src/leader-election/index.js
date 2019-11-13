@@ -5,7 +5,7 @@ import {
 
 import unload from 'unload';
 
-const LeaderElection = function(channel, options) {
+const LeaderElection = function (channel, options) {
     this._channel = channel;
     this._options = options;
 
@@ -86,7 +86,7 @@ LeaderElection.prototype = {
 
     awaitLeadership() {
         if (
-            /* _awaitLeadershipPromise */ 
+            /* _awaitLeadershipPromise */
             !this._aLP
         ) {
             this._aLP = _awaitLeadershipOnce(this);
