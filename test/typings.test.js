@@ -19,11 +19,15 @@ describe('typings.test.ts', () => {
         const spawn = require('child-process-promise').spawn;
         const stdout = [];
         const stderr = [];
+
+        const tsConfig = {
+            target: 'es6',
+            strict: true,
+            isolatedModules: false
+        };
         const promise = spawn('ts-node', [
-            '--no-cache',
-            '--compilerOptions', '{"target":"es6", "strict": true, "strictNullChecks": true}',
-            //'--type-check',
-            '-p', codeBase + '\n' + code
+            '--compiler-options', JSON.stringify(tsConfig),
+            '-e', codeBase + '\n' + code
         ]);
         const childProcess = promise.childProcess;
         childProcess.stdout.on('data', data => stdout.push(data.toString()));
