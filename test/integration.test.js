@@ -5,7 +5,9 @@ const clone = require('clone');
 const unload = require('unload');
 const {
     BroadcastChannel,
-    createLeaderElection
+    createLeaderElection,
+    clearNodeFolder,
+    enforceOptions
 } = require('../');
 
 /**
@@ -343,7 +345,7 @@ function runTest(channelOptions) {
             });
             describe('.clearNodeFolder()', () => {
                 it('should run or now throw at browsers', async () => {
-                    const hasRun = await BroadcastChannel.clearNodeFolder();
+                    const hasRun = await clearNodeFolder();
                     if (isNode) {
                         assert.equal(hasRun, true);
                     } else {
@@ -353,7 +355,7 @@ function runTest(channelOptions) {
             });
             describe('.enforceOptions()', () => {
                 it('should enforce the simulate method, even when ' + channelOptions.type + ' is set', async () => {
-                    BroadcastChannel.enforceOptions({
+                    enforceOptions({
                         type: 'simulate'
                     });
                     const channel = new BroadcastChannel(
@@ -366,7 +368,7 @@ function runTest(channelOptions) {
                     channel.close();
                 });
                 it('should redo the enforcement when null is given', async () => {
-                    BroadcastChannel.enforceOptions(null);
+                    enforceOptions(null);
                     const channel = new BroadcastChannel(
                         AsyncTestUtil.randomString(12),
                         channelOptions

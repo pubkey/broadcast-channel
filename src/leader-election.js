@@ -11,7 +11,7 @@ const LeaderElection = function (channel, options) {
 
     this.isLeader = false;
     this.isDead = false;
-    this.token = randomToken(10);
+    this.token = randomToken();
 
     this._isApl = false; // _isApplying
     this._reApply = false;

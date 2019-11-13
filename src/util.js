@@ -20,17 +20,10 @@ export function randomInt(min, max) {
 }
 
 /**
- * https://stackoverflow.com/a/1349426/3443137
+ * https://stackoverflow.com/a/8084248
  */
-export function randomToken(length) {
-    if (!length) length = 5;
-    let text = '';
-    const possible = 'abcdefghijklmnopqrstuvwxzy0123456789';
-
-    for (let i = 0; i < length; i++)
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-
-    return text;
+export function randomToken() {
+    return Math.random().toString(36).substring(2);
 }
 
 

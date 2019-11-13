@@ -166,7 +166,7 @@ export function create(channelName, options) {
             lastCursorId: 0,
             channelName,
             options,
-            uuid: randomToken(10),
+            uuid: randomToken(),
             /**
              * emittedMessagesIds
              * contains all messages that have been emitted before

@@ -258,7 +258,7 @@ function writeMessage(channelName, readerUuid, messageJson, paths) {
         data: messageJson
     };
 
-    const token = randomToken(12);
+    const token = randomToken();
     const fileName = time + '_' + readerUuid + '_' + token + '.json';
 
     const msgPath = path.join(
@@ -366,7 +366,7 @@ async function create(channelName, options = {}) {
     const time = microSeconds();
     const paths = getPaths(channelName);
     const ensureFolderExistsPromise = ensureFoldersExist(channelName, paths);
-    const uuid = randomToken(10);
+    const uuid = randomToken();
 
     const state = {
         time,
