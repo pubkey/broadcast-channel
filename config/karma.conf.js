@@ -26,7 +26,7 @@ const configuration = {
             console.log('availableBrowser:');
             console.dir(availableBrowser);
             const browsers = availableBrowser
-                .filter(b => !['PhantomJS', 'FirefoxAurora', 'FirefoxNightly', 'Safari'].includes(b))
+                .filter(b => !['PhantomJS', 'FirefoxAurora', 'FirefoxNightly'].includes(b))
                 .map(b => {
                     if (process.env.TRAVIS && b === 'Chrome') return 'Chrome_travis_ci';
                     else return b;

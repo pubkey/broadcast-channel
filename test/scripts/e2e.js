@@ -43,8 +43,6 @@ function run() {
     document.getElementById('user-agent').innerHTML = navigator.userAgent;
 
     var startTime;
-    console.log('++++++');
-    console.log(typeof BroadcastChannel);
     var channel = new BroadcastChannel('foobar', {
         type: methodType
     });

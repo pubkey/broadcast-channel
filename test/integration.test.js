@@ -15,7 +15,6 @@ const {
  */
 function runTest(channelOptions) {
     describe('integration.test.js (' + JSON.stringify(channelOptions) + ')', () => {
-
         describe('BroadcastChannel', () => {
             describe('.constructor()', () => {
                 it('asdf', () => {
@@ -652,9 +651,13 @@ if (isNode) {
         }
     });
 } else {
-    useOptions.push({
-        type: 'native'
-    });
+    if (window.BroadcastChannel) {
+        useOptions.push({
+            type: 'native'
+        });
+    } else {
+        console.log('skip native option since windonw.BroadcastChannel is undefined');
+    }
     useOptions.push({
         type: 'idb'
     });

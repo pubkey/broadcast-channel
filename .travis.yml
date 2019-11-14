@@ -56,5 +56,5 @@ jobs:
       script: travis_retry npm run test:performance
       env: LABEL=run test:performance
     - stage: checks
-      script: if [ "${TRAVIS_OS_NAME}" = "linux" ]; then ( sleep 10 && travis_retry npm run test:e2e:travis ) fi
+      script: if [ "${TRAVIS_OS_NAME}" = "linux" ]; then ( sleep 10 && travis_retry npm run test:e2e ) fi
       env: LABEL=test:e2e
