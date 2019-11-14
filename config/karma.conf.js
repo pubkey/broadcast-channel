@@ -23,8 +23,10 @@ const configuration = {
         postDetection: function (availableBrowser) {
             // return ['Chrome']; // comment in to test specific browser
             // return ['Firefox']; // comment in to test specific browser
+            console.log('availableBrowser:');
+            console.dir(availableBrowser);
             const browsers = availableBrowser
-                .filter(b => !['PhantomJS', 'FirefoxAurora', 'FirefoxNightly'].includes(b))
+                .filter(b => !['PhantomJS', 'FirefoxAurora', 'FirefoxNightly', 'Safari'].includes(b))
                 .map(b => {
                     if (process.env.TRAVIS && b === 'Chrome') return 'Chrome_travis_ci';
                     else return b;
