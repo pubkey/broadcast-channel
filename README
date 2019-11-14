@@ -19,8 +19,6 @@
 </p>
 
 <p align="center">
-    <a alt="travis" href="https://travis-ci.org/pubkey/broadcast-channel">
-        <img src="https://travis-ci.org/pubkey/broadcast-channel.svg?branch=master" /></a>
     <a href="https://twitter.com/pubkeypubkey">
         <img src="https://img.shields.io/twitter/follow/pubkeypubkey.svg?style=social&logo=twitter"
             alt="follow on Twitter"></a>
