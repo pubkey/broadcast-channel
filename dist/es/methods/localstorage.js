@@ -43,7 +43,7 @@ export function postMessage(channelState, messageJson) {
     sleep().then(function () {
       var key = storageKey(channelState.channelName);
       var writeObj = {
-        token: randomToken(10),
+        token: randomToken(),
         time: new Date().getTime(),
         data: messageJson,
         uuid: channelState.uuid
@@ -87,7 +87,7 @@ export function create(channelName, options) {
     throw new Error('BroadcastChannel: localstorage cannot be used');
   }
 
-  var uuid = randomToken(10);
+  var uuid = randomToken();
   /**
    * eMIs
    * contains all messages that have been emitted before

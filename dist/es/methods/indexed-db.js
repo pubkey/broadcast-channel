@@ -151,7 +151,7 @@ export function create(channelName, options) {
       lastCursorId: 0,
       channelName: channelName,
       options: options,
-      uuid: randomToken(10),
+      uuid: randomToken(),
 
       /**
        * emittedMessagesIds

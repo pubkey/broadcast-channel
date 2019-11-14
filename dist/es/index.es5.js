@@ -6,5 +6,10 @@
  * but
  * var BroadcastChannel = require('broadcast-channel');
  */
-import BroadcastChannel from './index.js';
-module.exports = BroadcastChannel;
+import { BroadcastChannel, createLeaderElection, clearNodeFolder, enforceOptions } from './index.js';
+module.exports = {
+  BroadcastChannel: BroadcastChannel,
+  createLeaderElection: createLeaderElection,
+  clearNodeFolder: clearNodeFolder,
+  enforceOptions: enforceOptions
+};

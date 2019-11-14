@@ -1,4 +1,4 @@
-import { sleep, randomToken } from '../util.js';
+import { sleep, randomToken } from './util.js';
 import unload from 'unload';
 
 var LeaderElection = function LeaderElection(channel, options) {
@@ -6,7 +6,7 @@ var LeaderElection = function LeaderElection(channel, options) {
   this._options = options;
   this.isLeader = false;
   this.isDead = false;
-  this.token = randomToken(10);
+  this.token = randomToken();
   this._isApl = false; // _isApplying
 
   this._reApply = false; // things to clean up
@@ -210,7 +210,7 @@ function fillOptionsWithDefaults(options, channel) {
   return options;
 }
 
-export function create(channel, options) {
+export function createLeaderElection(channel, options) {
   if (channel._leaderElector) {
     throw new Error('BroadcastChannel already has a leader-elector');
   }
@@ -225,6 +225,3 @@ export function create(channel, options) {
   channel._leaderElector = elector;
   return elector;
 }
-export default {
-  create: create
-};
