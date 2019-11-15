@@ -10,6 +10,7 @@ babel.config.js
 .eslintrc.json
 .gitignore
 .travis.yml
+renovate.json
 ISSUE_TEMPLATE.md
 PULL_REQUEST_TEMPLATE.md
 
