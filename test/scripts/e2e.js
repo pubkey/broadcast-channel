@@ -13,6 +13,7 @@ import {
 
 function run() {
     console.log('run()');
+    console.log('navigator.userAgent: ' + navigator.userAgent);
 
     var methodType = getParameterByName('methodType');
     if (!methodType || methodType === '' || methodType === 'default') methodType = undefined;
