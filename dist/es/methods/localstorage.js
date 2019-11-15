@@ -141,7 +141,15 @@ export function canBeUsed() {
   return true;
 }
 export function averageResponseTime() {
-  return 120;
+  var defaultTime = 120;
+  var userAgent = navigator.userAgent.toLowerCase();
+
+  if (userAgent.includes('safari') && !userAgent.includes('chrome')) {
+    // safari is much slower so this time is higher
+    return defaultTime * 2;
+  }
+
+  return defaultTime;
 }
 export default {
   create: create,

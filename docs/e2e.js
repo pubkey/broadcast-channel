@@ -1120,7 +1120,15 @@ function canBeUsed() {
 }
 
 function averageResponseTime() {
-  return 120;
+  var defaultTime = 120;
+  var userAgent = navigator.userAgent.toLowerCase();
+
+  if (userAgent.includes('safari') && !userAgent.includes('chrome')) {
+    // safari is much slower so this time is higher
+    return defaultTime * 2;
+  }
+
+  return defaultTime;
 }
 
 var _default = {
@@ -9033,6 +9041,7 @@ var _require = require('../../'),
 
 function run() {
   console.log('run()');
+  console.log('navigator.userAgent: ' + navigator.userAgent);
   var methodType = (0, _util.getParameterByName)('methodType');
   if (!methodType || methodType === '' || methodType === 'default') methodType = undefined;
   console.log('methodType: ' + methodType);
@@ -9049,9 +9058,10 @@ function run() {
 
   if (methodType) {
     selectEl.value = methodType;
-  }
+  } // do not increase this too much because it will cause a timeout in the CI
 
-  var TEST_MESSAGES = 50;
+
+  var TEST_MESSAGES = 25;
   var body = document.getElementById('body');
   var msgContainer = document.getElementById('messages');
   var rightContainer = document.getElementById('right');
