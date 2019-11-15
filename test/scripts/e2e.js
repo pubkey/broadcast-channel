@@ -32,7 +32,9 @@ function run() {
         selectEl.value = methodType;
     }
 
-    var TEST_MESSAGES = 50;
+    // do not increase this too much because it will cause a timeout in the CI
+    var TEST_MESSAGES = 25;
+
     var body = document.getElementById('body');
     var msgContainer = document.getElementById('messages');
     var rightContainer = document.getElementById('right');
