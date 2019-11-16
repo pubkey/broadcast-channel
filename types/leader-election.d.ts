@@ -1,4 +1,4 @@
-import BroadcastChannel from '../';
+import { BroadcastChannel } from './broadcast-channel';
 
 export type LeaderElectionOptions = {
     /**
