@@ -1,6 +1,6 @@
 {
   "name": "broadcast-channel",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "A BroadcastChannel that works in New Browsers, Old Browsers, WebWorkers and NodeJs",
   "homepage": "https://github.com/pubkey/broadcast-channel#readme",
   "keywords": [
