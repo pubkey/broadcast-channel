@@ -33,7 +33,7 @@ export type BroadcastChannelOptions = {
     };
 };
 
-declare type EventType = 'message' | 'error' | 'internal';
+declare type EventType = 'message' | 'internal';
 
 declare type OnMessageHandler<T> = ((this: BroadcastChannel, ev: T) => any) | null;
 
