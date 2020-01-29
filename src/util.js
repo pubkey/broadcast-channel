@@ -49,7 +49,6 @@ export function microSeconds() {
     }
 }
 
-
 /**
  * copied from the 'detect-node' npm module
  * We cannot use the module directly because it causes problems with rollup
