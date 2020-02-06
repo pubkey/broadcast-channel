@@ -54,4 +54,9 @@ export function microSeconds() {
  * We cannot use the module directly because it causes problems with rollup
  * @link https://github.com/iliakan/detect-node/blob/master/index.js
  */
-export const isNode = Object.prototype.toString.call(typeof process !== 'undefined' ? process : 0) === '[object process]';
+export const isNodeOrElectron = Object.prototype.toString.call(typeof process !== 'undefined' ? process : 0) === '[object process]';
+
+const versions = isNodeOrElectron && process.versions;
+export const isElectronBrowser = versions && versions.electron && versions.chrome;
+
+export const isNode = isNodeOrElectron && !isElectronBrowser;
