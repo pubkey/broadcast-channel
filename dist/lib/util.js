@@ -8,7 +8,7 @@ exports.sleep = sleep;
 exports.randomInt = randomInt;
 exports.randomToken = randomToken;
 exports.microSeconds = microSeconds;
-exports.isNode = void 0;
+exports.isNode = exports.isElectronBrowser = exports.isNodeOrElectron = void 0;
 
 /**
  * returns true if the given object is a promise
@@ -66,8 +66,17 @@ function microSeconds() {
  * copied from the 'detect-node' npm module
  * We cannot use the module directly because it causes problems with rollup
  * @link https://github.com/iliakan/detect-node/blob/master/index.js
+ * But the problem was that electron-chrome was also detected as node-js,
+ * so we do additional stuff
+ * @link https://github.com/pubkey/broadcast-channel/pull/93
+ * @link https://github.com/electron/electron/issues/2288#issuecomment-123226816
  */
 
 
-var isNode = Object.prototype.toString.call(typeof process !== 'undefined' ? process : 0) === '[object process]';
+var isNodeOrElectron = Object.prototype.toString.call(typeof process !== 'undefined' ? process : 0) === '[object process]';
+exports.isNodeOrElectron = isNodeOrElectron;
+var versions = isNodeOrElectron && process.versions;
+var isElectronBrowser = versions && versions.electron && versions.chrome;
+exports.isElectronBrowser = isElectronBrowser;
+var isNode = isNodeOrElectron && !isElectronBrowser;
 exports.isNode = isNode;
