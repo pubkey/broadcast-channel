@@ -66,7 +66,7 @@
     "@babel/runtime": "^7.7.2",
     "detect-node": "^2.0.4",
     "js-sha3": "0.8.0",
-    "microseconds": "0.1.0",
+    "microseconds": "0.2.0",
     "nano-time": "1.0.0",
     "rimraf": "3.0.1",
     "unload": "2.2.0"
