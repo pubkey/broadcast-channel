@@ -121,7 +121,7 @@
     "typescript": "3.7.5",
     "watchify": "3.11.1",
     "webpack": "4.41.5",
-    "webpack-cli": "3.3.10"
+    "webpack-cli": "3.3.11"
   },
   "browser": {
     "./src/methods/node.js": false,
