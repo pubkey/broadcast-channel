@@ -179,7 +179,7 @@ export function create(channelName, options) {
 
 function _readLoop(state) {
   if (state.closed) return;
-  return readNewMessages(state).then(function () {
+  readNewMessages(state).then(function () {
     return sleep(state.options.idb.fallbackInterval);
   }).then(function () {
     return _readLoop(state);
