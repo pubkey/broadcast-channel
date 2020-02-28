@@ -665,9 +665,13 @@ exports.type = type;
 
 function getIdb() {
   if (typeof indexedDB !== 'undefined') return indexedDB;
-  if (typeof window.mozIndexedDB !== 'undefined') return window.mozIndexedDB;
-  if (typeof window.webkitIndexedDB !== 'undefined') return window.webkitIndexedDB;
-  if (typeof window.msIndexedDB !== 'undefined') return window.msIndexedDB;
+
+  if (typeof window !== 'undefined') {
+    if (typeof window.mozIndexedDB !== 'undefined') return window.mozIndexedDB;
+    if (typeof window.webkitIndexedDB !== 'undefined') return window.webkitIndexedDB;
+    if (typeof window.msIndexedDB !== 'undefined') return window.msIndexedDB;
+  }
+
   return false;
 }
 
@@ -9130,11 +9134,7 @@ function run() {
     }
   };
 
-  window.startBroadcastChannel =
-  /*#__PURE__*/
-  (0, _asyncToGenerator2["default"])(
-  /*#__PURE__*/
-  _regenerator["default"].mark(function _callee() {
+  window.startBroadcastChannel = /*#__PURE__*/(0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee() {
     var rand, worker;
     return _regenerator["default"].wrap(function _callee$(_context) {
       while (1) {
@@ -9202,11 +9202,7 @@ function run() {
     }, _callee);
   })); // LEADER-ELECTION
 
-  window.startLeaderElection =
-  /*#__PURE__*/
-  (0, _asyncToGenerator2["default"])(
-  /*#__PURE__*/
-  _regenerator["default"].mark(function _callee2() {
+  window.startLeaderElection = /*#__PURE__*/(0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee2() {
     var FRAMES_COUNT, rand, frameSrc, leaderIframes, leaderFramesCache, amountTime;
     return _regenerator["default"].wrap(function _callee2$(_context2) {
       while (1) {
@@ -9270,12 +9266,8 @@ function run() {
     }, _callee2);
   }));
 
-  var removeLeaderIframe =
-  /*#__PURE__*/
-  function () {
-    var _ref3 = (0, _asyncToGenerator2["default"])(
-    /*#__PURE__*/
-    _regenerator["default"].mark(function _callee3(leaderFramesCache) {
+  var removeLeaderIframe = /*#__PURE__*/function () {
+    var _ref3 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3(leaderFramesCache) {
       var leaders;
       return _regenerator["default"].wrap(function _callee3$(_context3) {
         while (1) {

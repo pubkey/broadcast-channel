@@ -674,9 +674,13 @@ exports.type = type;
 
 function getIdb() {
   if (typeof indexedDB !== 'undefined') return indexedDB;
-  if (typeof window.mozIndexedDB !== 'undefined') return window.mozIndexedDB;
-  if (typeof window.webkitIndexedDB !== 'undefined') return window.webkitIndexedDB;
-  if (typeof window.msIndexedDB !== 'undefined') return window.msIndexedDB;
+
+  if (typeof window !== 'undefined') {
+    if (typeof window.mozIndexedDB !== 'undefined') return window.mozIndexedDB;
+    if (typeof window.webkitIndexedDB !== 'undefined') return window.webkitIndexedDB;
+    if (typeof window.msIndexedDB !== 'undefined') return window.msIndexedDB;
+  }
+
   return false;
 }
 
