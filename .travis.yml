@@ -3,7 +3,9 @@ sudo: required
 cache: false
 os:
   - linux
-  - osx
+
+  #- osx TODO this is broken please
+
 node_js:
   - "12.7.0"
 
@@ -58,3 +60,6 @@ jobs:
     - stage: checks
       script: if [ "${TRAVIS_OS_NAME}" = "linux" ]; then ( sleep 10 && travis_retry npm run test:e2e ) fi
       env: LABEL=test:e2e
+    - stage: checks
+      script: npm run build && (cd ./test-electron && travis_retry npm install --depth 0 --silent && travis_retry npm run test)
+      env: LABEL=test:electron
