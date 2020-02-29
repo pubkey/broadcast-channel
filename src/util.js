@@ -53,14 +53,5 @@ export function microSeconds() {
  * copied from the 'detect-node' npm module
  * We cannot use the module directly because it causes problems with rollup
  * @link https://github.com/iliakan/detect-node/blob/master/index.js
- * But the problem was that electron-chrome was also detected as node-js,
- * so we do additional stuff
- * @link https://github.com/pubkey/broadcast-channel/pull/93
- * @link https://github.com/electron/electron/issues/2288#issuecomment-123226816
  */
-export const isNodeOrElectron = Object.prototype.toString.call(typeof process !== 'undefined' ? process : 0) === '[object process]';
-
-const versions = isNodeOrElectron && process.versions;
-export const isElectronBrowser = versions && versions.electron && versions.chrome;
-
-export const isNode = isNodeOrElectron && !isElectronBrowser;
+export const isNode = Object.prototype.toString.call(typeof process !== 'undefined' ? process : 0) === '[object process]';
