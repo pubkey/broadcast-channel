@@ -3,6 +3,7 @@ config/
 docs/
 test/
 test_tmp/
+test-electron/
 tmp/
 babel.config.js
 .editorconfig
