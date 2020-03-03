@@ -17,7 +17,7 @@
     "broadcast-channel": "../"
   },
   "devDependencies": {
-    "mocha": "7.0.1",
+    "mocha": "7.1.0",
     "node": "12.16.1",
     "spectron": "8.0.0"
   }
