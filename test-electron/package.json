@@ -18,7 +18,7 @@
   },
   "devDependencies": {
     "mocha": "7.1.0",
-    "node": "13.9.0",
+    "node": "13.10.1",
     "spectron": "10.0.1"
   }
 }
