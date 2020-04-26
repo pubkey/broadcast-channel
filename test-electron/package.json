@@ -17,7 +17,7 @@
     "melanke-watchjs": "1.5.2"
   },
   "devDependencies": {
-    "mocha": "7.1.1",
+    "mocha": "7.1.2",
     "node": "13.13.0",
     "spectron": "10.0.1"
   }
