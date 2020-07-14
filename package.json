@@ -116,7 +116,7 @@
     "rollup-plugin-node-resolve": "5.2.0",
     "rollup-plugin-uglify": "6.0.4",
     "testcafe": "1.8.8",
-    "testcafe-hammerhead": "16.2.9",
+    "testcafe-hammerhead": "17.1.11",
     "ts-node": "8.10.2",
     "typescript": "3.9.6",
     "watchify": "3.11.1",
