@@ -152,6 +152,21 @@ describe('unit/indexed-db.method.test.js', () => {
                 await IndexedDbMethod.close(channelState1);
                 await IndexedDbMethod.close(channelState2);
             });
+            it('should handle close events', async () => {
+                let callbackCount = 0;
+                const channelName = AsyncTestUtil.randomString(10);
+                const channelState = await IndexedDbMethod.create(channelName, {
+                    idb: {
+                        onclose: () => callbackCount++,
+                    }
+                });
+                assert.ok(channelState);
+
+                // The `onclose` event is not fired if the database connection is closed normally using `IDBDatabase.close()`
+                channelState.db.dispatchEvent(new Event('close'));
+                assert.equal(callbackCount, 1);
+                IndexedDbMethod.close(channelState);
+            });
         });
         describe('.postMessage()', () => {
             it('should not crash', async () => {
