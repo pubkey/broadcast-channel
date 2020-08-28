@@ -30,6 +30,7 @@ export type BroadcastChannelOptions = {
     idb?: {
         ttl?: number;
         fallbackInterval?: number;
+        onclose?: () => void;
     };
 };
 

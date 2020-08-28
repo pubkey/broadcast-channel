@@ -11,7 +11,7 @@
   <br/>
   <span>+ LeaderElection over the channels</span><br />
 </p>
- 
+
 <p align="center">
     <a href="https://twitter.com/pubkeypubkey">
         <img src="https://img.shields.io/twitter/follow/pubkeypubkey.svg?style=social&logo=twitter"
@@ -134,6 +134,35 @@ before(async () => {
 })
 ```
 
+#### Handling IndexedDB onclose events
+
+IndexedDB databases can close unexpectedly for various reasons. This could happen, for example, if the underlying storage is removed or if the user clears the database in the browser's history preferences. Most often we have seen this happen in Mobile Safari. By default, we let the connection close and stop polling for changes. If you would like to continue listening you should close BroadcastChannel and create a new one.
+
+Example of how you might do this:
+
+```typescript
+const { BroadcastChannel } = require('broadcast-channel');
+
+let channel;
+
+const createChannel = () => {
+  channel = new BroadcastChannel(CHANNEL_NAME, {
+    idb: {
+      onclose: () => {
+        // the onclose event is just the IndexedDB closing.
+        // you should also close the channel before creating
+        // a new one.
+        channel.close();
+        createChannel();
+      },
+    },
+  });
+
+  channel.onmessage = message => {
+    // handle message
+  };
+};
+```
 
 ## Methods:
 
