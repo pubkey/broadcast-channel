@@ -96,7 +96,7 @@
     "eslint": "7.8.1",
     "gzip-size-cli": "3.0.0",
     "http-server": "0.12.3",
-    "karma": "5.2.1",
+    "karma": "5.2.2",
     "karma-babel-preprocessor": "8.0.1",
     "karma-browserify": "7.0.0",
     "karma-chrome-launcher": "3.1.0",
