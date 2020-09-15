@@ -207,10 +207,22 @@ function create(channelName, options) {
       db: db
     };
     /**
+     * Handle abrupt closes that do not originate from db.close().
+     * This could happen, for example, if the underlying storage is
+     * removed or if the user clears the database in the browser's
+     * history preferences.
+     */
+
+    db.onclose = function () {
+      state.closed = true;
+      if (options.idb.onclose) options.idb.onclose();
+    };
+    /**
      * if service-workers are used,
      * we have no 'storage'-event if they post a message,
      * therefore we also have to set an interval
      */
+
 
     _readLoop(state);
 

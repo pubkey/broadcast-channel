@@ -307,9 +307,9 @@ function _connectionError() {
 
           case 5:
             addObj = {};
-            Object.entries(originalError).forEach(function (_ref5) {
-              var k = _ref5[0],
-                  v = _ref5[1];
+            Object.entries(originalError).forEach(function (_ref4) {
+              var k = _ref4[0],
+                  v = _ref4[1];
               return addObj[k] = v;
             });
             text = 'BroadcastChannel.create(): error: ' + 'This might happen if you have created to many channels, ' + 'like when you use BroadcastChannel in unit-tests.' + 'Try using BroadcastChannel.clearNodeFolder() to clear the tmp-folder before each test.' + 'See https://github.com/pubkey/broadcast-channel#clear-tmp-folder';
@@ -348,7 +348,7 @@ function _createSocketEventEmitter() {
             _context11.next = 5;
             return new Promise(function (resolve, reject) {
               server.on('error', /*#__PURE__*/function () {
-                var _ref6 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee9(err) {
+                var _ref5 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee9(err) {
                   var useErr;
                   return _regenerator["default"].wrap(function _callee9$(_context9) {
                     while (1) {
@@ -370,11 +370,11 @@ function _createSocketEventEmitter() {
                 }));
 
                 return function (_x24) {
-                  return _ref6.apply(this, arguments);
+                  return _ref5.apply(this, arguments);
                 };
               }());
               server.listen(pathToSocket, /*#__PURE__*/function () {
-                var _ref7 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee10(err, res) {
+                var _ref6 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee10(err, res) {
                   var useErr;
                   return _regenerator["default"].wrap(function _callee10$(_context10) {
                     while (1) {
@@ -406,7 +406,7 @@ function _createSocketEventEmitter() {
                 }));
 
                 return function (_x25, _x26) {
-                  return _ref7.apply(this, arguments);
+                  return _ref6.apply(this, arguments);
                 };
               }());
             });
@@ -658,7 +658,7 @@ function _create() {
         ensureFolderExistsPromise,
         uuid,
         state,
-        _ref8,
+        _yield$Promise$all2,
         socketEE,
         infoFilePath,
         _args17 = arguments;
@@ -702,9 +702,9 @@ function _create() {
             return Promise.all([createSocketEventEmitter(channelName, uuid, paths), createSocketInfoFile(channelName, uuid, paths), refreshReaderClients(state)]);
 
           case 13:
-            _ref8 = _context17.sent;
-            socketEE = _ref8[0];
-            infoFilePath = _ref8[1];
+            _yield$Promise$all2 = _context17.sent;
+            socketEE = _yield$Promise$all2[0];
+            infoFilePath = _yield$Promise$all2[1];
             state.socketEE = socketEE;
             state.infoFilePath = infoFilePath; // when new message comes in, we read it and emit it
 
@@ -946,7 +946,7 @@ function refreshReaderClients(channelState) {
 function postMessage(channelState, messageJson) {
   var writePromise = writeMessage(channelState.channelName, channelState.uuid, messageJson, channelState.paths);
   channelState.writeBlockPromise = channelState.writeBlockPromise.then( /*#__PURE__*/(0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3() {
-    var _ref4, msgObj, pingStr, writeToReadersPromise;
+    var _yield$Promise$all, msgObj, pingStr, writeToReadersPromise;
 
     return _regenerator["default"].wrap(function _callee3$(_context3) {
       while (1) {
@@ -962,8 +962,8 @@ function postMessage(channelState, messageJson) {
             return Promise.all([writePromise, refreshReaderClients(channelState)]);
 
           case 4:
-            _ref4 = _context3.sent;
-            msgObj = _ref4[0];
+            _yield$Promise$all = _context3.sent;
+            msgObj = _yield$Promise$all[0];
             emitOverFastPath(channelState, msgObj, messageJson);
             pingStr = '{"t":' + msgObj.time + ',"u":"' + msgObj.uuid + '","to":"' + msgObj.token + '"}|';
             writeToReadersPromise = Promise.all(Object.values(channelState.otherReaderClients).filter(function (client) {
