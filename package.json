@@ -118,7 +118,7 @@
     "testcafe": "1.9.2",
     "testcafe-hammerhead": "17.1.18",
     "ts-node": "9.0.0",
-    "typescript": "4.0.2",
+    "typescript": "4.0.3",
     "watchify": "3.11.1",
     "webpack": "4.44.2",
     "webpack-cli": "3.3.12"
