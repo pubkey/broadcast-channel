@@ -1407,7 +1407,7 @@ function fillOptionsWithDefaults() {
   return options;
 }
 },{}],12:[function(require,module,exports){
-(function (process){
+(function (process){(function (){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1481,7 +1481,7 @@ function microSeconds() {
 
 var isNode = Object.prototype.toString.call(typeof process !== 'undefined' ? process : 0) === '[object process]';
 exports.isNode = isNode;
-}).call(this,require('_process'))
+}).call(this)}).call(this,require('_process'))
 },{"_process":322}],13:[function(require,module,exports){
 "use strict";
 
