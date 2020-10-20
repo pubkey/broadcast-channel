@@ -602,6 +602,10 @@ function onMessage(channelState, fn, time = microSeconds()) {
     handleMessagePing(channelState);
 }
 
+/**
+ * closes the channel
+ * @return {Promise}
+ */
 function close(channelState) {
     if (channelState.closed) return;
     channelState.closed = true;
@@ -612,23 +616,29 @@ function close(channelState) {
         channelState.removeUnload.remove();
     }
 
-    /**
-     * the server get closed lazy because others might still write on it
-     * and have not found out that the infoFile was deleted
-     */
-    setTimeout(() => channelState.socketEE.server.close(), 200);
+    return new Promise((res) => {
 
-    if (channelState.socketEE)
-        channelState.socketEE.emitter.removeAllListeners();
+        if (channelState.socketEE)
+            channelState.socketEE.emitter.removeAllListeners();
 
-    Object.values(channelState.otherReaderClients)
-        .forEach(client => client.destroy());
+        Object.values(channelState.otherReaderClients)
+            .forEach(client => client.destroy());
 
-    if (channelState.infoFilePath) {
-        try {
-            fs.unlinkSync(channelState.infoFilePath);
-        } catch (err) { }
-    }
+        if (channelState.infoFilePath) {
+            try {
+                fs.unlinkSync(channelState.infoFilePath);
+            } catch (err) { }
+        }
+
+        /**
+         * the server get closed lazy because others might still write on it
+         * and have not found out that the infoFile was deleted
+         */
+        setTimeout(() => {
+            channelState.socketEE.server.close();
+            res();
+        }, 200);
+    });
 }
 
 
