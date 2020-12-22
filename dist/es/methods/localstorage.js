@@ -1,3 +1,28 @@
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getLocalStorage = getLocalStorage;
+exports.storageKey = storageKey;
+exports.postMessage = postMessage;
+exports.addStorageEventListener = addStorageEventListener;
+exports.removeStorageEventListener = removeStorageEventListener;
+exports.create = create;
+exports.close = close;
+exports.onMessage = onMessage;
+exports.canBeUsed = canBeUsed;
+exports.averageResponseTime = averageResponseTime;
+exports["default"] = exports.type = exports.microSeconds = void 0;
+
+var _obliviousSet = _interopRequireDefault(require("../oblivious-set"));
+
+var _options = require("../options");
+
+var _util = require("../util");
+
 /**
  * A localStorage-only method which uses localstorage and its 'storage'-event
  * This does not work inside of webworkers because they have no access to locastorage
@@ -5,18 +30,18 @@
  * @link https://caniuse.com/#feat=namevalue-storage
  * @link https://caniuse.com/#feat=indexeddb
  */
-import ObliviousSet from '../oblivious-set';
-import { fillOptionsWithDefaults } from '../options';
-import { sleep, randomToken, microSeconds as micro, isNode } from '../util';
-export var microSeconds = micro;
+var microSeconds = _util.microSeconds;
+exports.microSeconds = microSeconds;
 var KEY_PREFIX = 'pubkey.broadcastChannel-';
-export var type = 'localstorage';
+var type = 'localstorage';
 /**
  * copied from crosstab
  * @link https://github.com/tejacques/crosstab/blob/master/src/crosstab.js#L32
  */
 
-export function getLocalStorage() {
+exports.type = type;
+
+function getLocalStorage() {
   var localStorage;
   if (typeof window === 'undefined') return null;
 
@@ -30,7 +55,8 @@ export function getLocalStorage() {
 
   return localStorage;
 }
-export function storageKey(channelName) {
+
+function storageKey(channelName) {
   return KEY_PREFIX + channelName;
 }
 /**
@@ -38,12 +64,13 @@ export function storageKey(channelName) {
 * and fires the storage-event so other readers can find it
 */
 
-export function postMessage(channelState, messageJson) {
+
+function postMessage(channelState, messageJson) {
   return new Promise(function (res) {
-    sleep().then(function () {
+    (0, _util.sleep)().then(function () {
       var key = storageKey(channelState.channelName);
       var writeObj = {
-        token: randomToken(),
+        token: (0, _util.randomToken)(),
         time: new Date().getTime(),
         data: messageJson,
         uuid: channelState.uuid
@@ -65,7 +92,8 @@ export function postMessage(channelState, messageJson) {
     });
   });
 }
-export function addStorageEventListener(channelName, fn) {
+
+function addStorageEventListener(channelName, fn) {
   var key = storageKey(channelName);
 
   var listener = function listener(ev) {
@@ -77,24 +105,26 @@ export function addStorageEventListener(channelName, fn) {
   window.addEventListener('storage', listener);
   return listener;
 }
-export function removeStorageEventListener(listener) {
+
+function removeStorageEventListener(listener) {
   window.removeEventListener('storage', listener);
 }
-export function create(channelName, options) {
-  options = fillOptionsWithDefaults(options);
+
+function create(channelName, options) {
+  options = (0, _options.fillOptionsWithDefaults)(options);
 
   if (!canBeUsed()) {
     throw new Error('BroadcastChannel: localstorage cannot be used');
   }
 
-  var uuid = randomToken();
+  var uuid = (0, _util.randomToken)();
   /**
    * eMIs
    * contains all messages that have been emitted before
    * @type {ObliviousSet}
    */
 
-  var eMIs = new ObliviousSet(options.localstorage.removeTimeout);
+  var eMIs = new _obliviousSet["default"](options.localstorage.removeTimeout);
   var state = {
     channelName: channelName,
     uuid: uuid,
@@ -115,15 +145,18 @@ export function create(channelName, options) {
   });
   return state;
 }
-export function close(channelState) {
+
+function close(channelState) {
   removeStorageEventListener(channelState.listener);
 }
-export function onMessage(channelState, fn, time) {
+
+function onMessage(channelState, fn, time) {
   channelState.messagesCallbackTime = time;
   channelState.messagesCallback = fn;
 }
-export function canBeUsed() {
-  if (isNode) return false;
+
+function canBeUsed() {
+  if (_util.isNode) return false;
   var ls = getLocalStorage();
   if (!ls) return false;
 
@@ -140,7 +173,8 @@ export function canBeUsed() {
 
   return true;
 }
-export function averageResponseTime() {
+
+function averageResponseTime() {
   var defaultTime = 120;
   var userAgent = navigator.userAgent.toLowerCase();
 
@@ -151,7 +185,8 @@ export function averageResponseTime() {
 
   return defaultTime;
 }
-export default {
+
+var _default = {
   create: create,
   close: close,
   onMessage: onMessage,
@@ -161,3 +196,4 @@ export default {
   averageResponseTime: averageResponseTime,
   microSeconds: microSeconds
 };
+exports["default"] = _default;
