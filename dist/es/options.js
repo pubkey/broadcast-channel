@@ -1,4 +1,11 @@
-export function fillOptionsWithDefaults() {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.fillOptionsWithDefaults = fillOptionsWithDefaults;
+
+function fillOptionsWithDefaults() {
   var originalOptions = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   var options = JSON.parse(JSON.stringify(originalOptions)); // main
 

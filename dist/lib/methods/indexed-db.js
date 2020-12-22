@@ -9,7 +9,7 @@ exports.getIdb = getIdb;
 exports.createDatabase = createDatabase;
 exports.writeMessage = writeMessage;
 exports.getAllMessages = getAllMessages;
-exports.getMessagesHigherThen = getMessagesHigherThen;
+exports.getMessagesHigherThan = getMessagesHigherThan;
 exports.removeMessageById = removeMessageById;
 exports.getOldMessages = getOldMessages;
 exports.cleanOldMessages = cleanOldMessages;
@@ -122,12 +122,11 @@ function getAllMessages(db) {
   });
 }
 
-function getMessagesHigherThen(db, lastCursorId) {
+function getMessagesHigherThan(db, lastCursorId) {
   var objectStore = db.transaction(OBJECT_STORE_ID).objectStore(OBJECT_STORE_ID);
   var ret = [];
-  var keyRangeValue = IDBKeyRange.bound(lastCursorId + 1, Infinity);
   return new Promise(function (res) {
-    objectStore.openCursor(keyRangeValue).onsuccess = function (ev) {
+    objectStore.openCursor(lastCursorId + 1).onsuccess = function (ev) {
       var cursor = ev.target.result;
 
       if (cursor) {
@@ -258,7 +257,7 @@ function readNewMessages(state) {
   if (state.closed) return Promise.resolve(); // if no one is listening, we do not need to scan for new messages
 
   if (!state.messagesCallback) return Promise.resolve();
-  return getMessagesHigherThen(state.db, state.lastCursorId).then(function (newerMessages) {
+  return getMessagesHigherThan(state.db, state.lastCursorId).then(function (newerMessages) {
     var useMessages = newerMessages
     /**
      * there is a bug in iOS where the msgObj can be undefined some times

@@ -99,12 +99,11 @@ export function getAllMessages(db) {
     });
 }
 
-export function getMessagesHigherThen(db, lastCursorId) {
+export function getMessagesHigherThan(db, lastCursorId) {
     const objectStore = db.transaction(OBJECT_STORE_ID).objectStore(OBJECT_STORE_ID);
     const ret = [];
-    const keyRangeValue = IDBKeyRange.bound(lastCursorId + 1, Infinity);
     return new Promise(res => {
-        objectStore.openCursor(keyRangeValue).onsuccess = ev => {
+        objectStore.openCursor(lastCursorId + 1).onsuccess = ev => {
             const cursor = ev.target.result;
             if (cursor) {
                 ret.push(cursor.value);
@@ -232,7 +231,7 @@ function readNewMessages(state) {
     // if no one is listening, we do not need to scan for new messages
     if (!state.messagesCallback) return Promise.resolve();
 
-    return getMessagesHigherThen(state.db, state.lastCursorId)
+    return getMessagesHigherThan(state.db, state.lastCursorId)
         .then(newerMessages => {
             const useMessages = newerMessages
                 /**
