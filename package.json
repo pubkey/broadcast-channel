@@ -91,7 +91,7 @@
     "clone": "2.1.2",
     "concurrently": "5.3.0",
     "convert-hrtime": "3.0.0",
-    "copyfiles": "2.4.0",
+    "copyfiles": "2.4.1",
     "cross-env": "7.0.2",
     "eslint": "7.13.0",
     "gzip-size-cli": "4.0.0",
