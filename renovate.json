@@ -9,5 +9,8 @@
     "automerge": false
   },
   "rebaseStalePrs": true,
-  "prHourlyLimit": 2
+  "prHourlyLimit": 2,
+  "ignorePaths": [
+    "test-electron/package.json"
+  ]
 }
