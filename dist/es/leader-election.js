@@ -1,12 +1,22 @@
-import { sleep, randomToken } from './util.js';
-import unload from 'unload';
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.createLeaderElection = createLeaderElection;
+
+var _util = require("./util.js");
+
+var _unload = _interopRequireDefault(require("unload"));
 
 var LeaderElection = function LeaderElection(channel, options) {
   this._channel = channel;
   this._options = options;
   this.isLeader = false;
   this.isDead = false;
-  this.token = randomToken();
+  this.token = (0, _util.randomToken)();
   this._isApl = false; // _isApplying
 
   this._reApply = false; // things to clean up
@@ -57,12 +67,12 @@ LeaderElection.prototype = {
 
     var ret = _sendMessage(this, 'apply') // send out that this one is applying
     .then(function () {
-      return sleep(_this._options.responseTime);
+      return (0, _util.sleep)(_this._options.responseTime);
     }) // let others time to respond
     .then(function () {
       if (stopCriteria) return Promise.reject(new Error());else return _sendMessage(_this, 'apply');
     }).then(function () {
-      return sleep(_this._options.responseTime);
+      return (0, _util.sleep)(_this._options.responseTime);
     }) // let others time to respond
     .then(function () {
       if (stopCriteria) return Promise.reject(new Error());else return _sendMessage(_this);
@@ -176,7 +186,8 @@ function _sendMessage(leaderElector, action) {
 
 function _beLeader(leaderElector) {
   leaderElector.isLeader = true;
-  var unloadFn = unload.add(function () {
+
+  var unloadFn = _unload["default"].add(function () {
     return leaderElector.die();
   });
 
@@ -210,7 +221,7 @@ function fillOptionsWithDefaults(options, channel) {
   return options;
 }
 
-export function createLeaderElection(channel, options) {
+function createLeaderElection(channel, options) {
   if (channel._leaderElector) {
     throw new Error('BroadcastChannel already has a leader-elector');
   }
