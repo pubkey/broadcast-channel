@@ -16,7 +16,7 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
-  build:
+  all:
     # The type of runner that the job will run on
     runs-on: ubuntu-18.04
 
@@ -35,6 +35,7 @@ jobs:
           path: |
             ~/.npm
             ./node_modules
+            ./test-electron/node_modules
           # invalidate cache when any package.json changes
           key: ${{ runner.os }}-npm-${{ env.cache-name }}-${{ hashFiles('**/package.json') }}
           restore-keys: |
@@ -83,4 +84,7 @@ jobs:
           run: npm run test:e2e
 
       - name: test electron
-        run: npm run build && (cd ./test-electron && npm install --depth 0 --silent && npm run test)
+        uses: GabrielBB/xvfb-action@v1
+        with:
+          working-directory: ./test-electron
+          run: npm install --depth 0 --silent && npm run test
