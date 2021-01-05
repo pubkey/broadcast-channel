@@ -759,12 +759,16 @@ function getMessagesHigherThan(db, lastCursorId) {
   var objectStore = db.transaction(OBJECT_STORE_ID).objectStore(OBJECT_STORE_ID);
   var ret = [];
   return new Promise(function (res) {
-    objectStore.openCursor(lastCursorId + 1).onsuccess = function (ev) {
+    objectStore.openCursor().onsuccess = function (ev) {
       var cursor = ev.target.result;
 
       if (cursor) {
-        ret.push(cursor.value);
-        cursor["continue"]();
+        if (cursor.value.id < lastCursorId + 1) {
+          cursor["continue"](lastCursorId + 1);
+        } else {
+          ret.push(cursor.value);
+          cursor["continue"]();
+        }
       } else {
         res(ret);
       }
