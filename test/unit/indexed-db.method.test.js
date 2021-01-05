@@ -112,7 +112,7 @@ describe('unit/indexed-db.method.test.js', () => {
             assert.equal(messagesAfter.length, 0);
         });
     });
-    describe('.getMessagesHigherThen()', () => {
+    describe('.getMessagesHigherThan()', () => {
         it('should only get messages with higher id', async () => {
             const channelName = AsyncTestUtil.randomString(10);
             const readerUuid = AsyncTestUtil.randomString(10);
@@ -128,7 +128,7 @@ describe('unit/indexed-db.method.test.js', () => {
             );
 
             // get last 5 messages
-            const lastFive = await IndexedDbMethod.getMessagesHigherThen(db, 5);
+            const lastFive = await IndexedDbMethod.getMessagesHigherThan(db, 5);
             assert.equal(lastFive.length, 5);
             assert.equal(lastFive[0].id, 6);
             assert.equal(lastFive[4].id, 10);
