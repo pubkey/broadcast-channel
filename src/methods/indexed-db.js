@@ -102,8 +102,21 @@ export function getAllMessages(db) {
 export function getMessagesHigherThan(db, lastCursorId) {
     const objectStore = db.transaction(OBJECT_STORE_ID).objectStore(OBJECT_STORE_ID);
     const ret = [];
+
+    function openCursor() {
+        // Occasionally Safari will fail on IDBKeyRange.bound, this
+        // catches that error, having it open the cursor to the first
+        // item. When it gets data it will advance to the desired key.
+        try {
+            const keyRangeValue = IDBKeyRange.bound(lastCursorId + 1, Infinity);
+            return objectStore.openCursor(keyRangeValue);
+        } catch (e) {
+            return objectStore.openCursor();
+        }
+    }
+
     return new Promise(res => {
-        objectStore.openCursor().onsuccess = ev => {
+        openCursor().onsuccess = ev => {
             const cursor = ev.target.result;
             if (cursor) {
                 if (cursor.value.id < lastCursorId + 1) {
