@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## X.X.X (comming soon)
+
+Bugfixes:
+  - fix cursor error in Safari [#420](https://github.com/pubkey/broadcast-channel/pull/420)
+
 ## 3.3.0 (20 October 2020)
 
 Bugfixes:
