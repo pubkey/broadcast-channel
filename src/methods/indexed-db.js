@@ -99,16 +99,32 @@ export function getAllMessages(db) {
     });
 }
 
-export function getMessagesHigherThen(db, lastCursorId) {
+export function getMessagesHigherThan(db, lastCursorId) {
     const objectStore = db.transaction(OBJECT_STORE_ID).objectStore(OBJECT_STORE_ID);
     const ret = [];
-    const keyRangeValue = IDBKeyRange.bound(lastCursorId + 1, Infinity);
+
+    function openCursor() {
+        // Occasionally Safari will fail on IDBKeyRange.bound, this
+        // catches that error, having it open the cursor to the first
+        // item. When it gets data it will advance to the desired key.
+        try {
+            const keyRangeValue = IDBKeyRange.bound(lastCursorId + 1, Infinity);
+            return objectStore.openCursor(keyRangeValue);
+        } catch (e) {
+            return objectStore.openCursor();
+        }
+    }
+
     return new Promise(res => {
-        objectStore.openCursor(keyRangeValue).onsuccess = ev => {
+        openCursor().onsuccess = ev => {
             const cursor = ev.target.result;
             if (cursor) {
-                ret.push(cursor.value);
-                cursor.continue();
+                if (cursor.value.id < lastCursorId + 1) {
+                    cursor.continue(lastCursorId + 1);
+                } else {
+                    ret.push(cursor.value);
+                    cursor.continue();
+                }
             } else {
                 res(ret);
             }
@@ -232,7 +248,7 @@ function readNewMessages(state) {
     // if no one is listening, we do not need to scan for new messages
     if (!state.messagesCallback) return Promise.resolve();
 
-    return getMessagesHigherThen(state.db, state.lastCursorId)
+    return getMessagesHigherThan(state.db, state.lastCursorId)
         .then(newerMessages => {
             const useMessages = newerMessages
                 /**
