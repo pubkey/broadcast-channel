@@ -1,10 +1,5 @@
-"use strict";
-
-var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
-
-var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"));
-
-var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/asyncToGenerator"));
+import _regeneratorRuntime from "@babel/runtime/regenerator";
+import _asyncToGenerator from "@babel/runtime/helpers/asyncToGenerator";
 
 /**
  * this method is used in nodejs-environments.
@@ -101,8 +96,8 @@ function ensureBaseFolderExists() {
 }
 
 function _ensureBaseFolderExists() {
-  _ensureBaseFolderExists = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee4() {
-    return _regenerator["default"].wrap(function _callee4$(_context4) {
+  _ensureBaseFolderExists = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee4() {
+    return _regeneratorRuntime.wrap(function _callee4$(_context4) {
       while (1) {
         switch (_context4.prev = _context4.next) {
           case 0:
@@ -134,9 +129,9 @@ function ensureFoldersExist(_x, _x2) {
 
 
 function _ensureFoldersExist() {
-  _ensureFoldersExist = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee5(channelName, paths) {
+  _ensureFoldersExist = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee5(channelName, paths) {
     var chmodValue;
-    return _regenerator["default"].wrap(function _callee5$(_context5) {
+    return _regeneratorRuntime.wrap(function _callee5$(_context5) {
       while (1) {
         switch (_context5.prev = _context5.next) {
           case 0:
@@ -181,8 +176,8 @@ function clearNodeFolder() {
 }
 
 function _clearNodeFolder() {
-  _clearNodeFolder = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee6() {
-    return _regenerator["default"].wrap(function _callee6$(_context6) {
+  _clearNodeFolder = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee6() {
+    return _regeneratorRuntime.wrap(function _callee6$(_context6) {
       while (1) {
         switch (_context6.prev = _context6.next) {
           case 0:
@@ -249,9 +244,9 @@ function countChannelFolders() {
 }
 
 function _countChannelFolders() {
-  _countChannelFolders = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee7() {
+  _countChannelFolders = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee7() {
     var folders;
-    return _regenerator["default"].wrap(function _callee7$(_context7) {
+    return _regeneratorRuntime.wrap(function _callee7$(_context7) {
       while (1) {
         switch (_context7.prev = _context7.next) {
           case 0:
@@ -286,9 +281,9 @@ function connectionError(_x3) {
 
 
 function _connectionError() {
-  _connectionError = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee8(originalError) {
+  _connectionError = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee8(originalError) {
     var count, addObj, text, newError;
-    return _regenerator["default"].wrap(function _callee8$(_context8) {
+    return _regeneratorRuntime.wrap(function _callee8$(_context8) {
       while (1) {
         switch (_context8.prev = _context8.next) {
           case 0:
@@ -331,9 +326,9 @@ function createSocketEventEmitter(_x4, _x5, _x6) {
 }
 
 function _createSocketEventEmitter() {
-  _createSocketEventEmitter = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee11(channelName, readerUuid, paths) {
+  _createSocketEventEmitter = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee11(channelName, readerUuid, paths) {
     var pathToSocket, emitter, server;
-    return _regenerator["default"].wrap(function _callee11$(_context11) {
+    return _regeneratorRuntime.wrap(function _callee11$(_context11) {
       while (1) {
         switch (_context11.prev = _context11.next) {
           case 0:
@@ -348,9 +343,9 @@ function _createSocketEventEmitter() {
             _context11.next = 5;
             return new Promise(function (resolve, reject) {
               server.on('error', /*#__PURE__*/function () {
-                var _ref5 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee9(err) {
+                var _ref5 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee9(err) {
                   var useErr;
-                  return _regenerator["default"].wrap(function _callee9$(_context9) {
+                  return _regeneratorRuntime.wrap(function _callee9$(_context9) {
                     while (1) {
                       switch (_context9.prev = _context9.next) {
                         case 0:
@@ -374,9 +369,9 @@ function _createSocketEventEmitter() {
                 };
               }());
               server.listen(pathToSocket, /*#__PURE__*/function () {
-                var _ref6 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee10(err, res) {
+                var _ref6 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee10(err, res) {
                   var useErr;
-                  return _regenerator["default"].wrap(function _callee10$(_context10) {
+                  return _regeneratorRuntime.wrap(function _callee10$(_context10) {
                     while (1) {
                       switch (_context10.prev = _context10.next) {
                         case 0:
@@ -439,9 +434,9 @@ function openClientConnection(_x7, _x8) {
 
 
 function _openClientConnection() {
-  _openClientConnection = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee12(channelName, readerUuid) {
+  _openClientConnection = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee12(channelName, readerUuid) {
     var pathToSocket, client;
-    return _regenerator["default"].wrap(function _callee12$(_context12) {
+    return _regeneratorRuntime.wrap(function _callee12$(_context12) {
       while (1) {
         switch (_context12.prev = _context12.next) {
           case 0:
@@ -497,9 +492,9 @@ function getReadersUuids(_x9, _x10) {
 }
 
 function _getReadersUuids() {
-  _getReadersUuids = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee13(channelName, paths) {
+  _getReadersUuids = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee13(channelName, paths) {
     var readersPath, files;
-    return _regenerator["default"].wrap(function _callee13$(_context13) {
+    return _regeneratorRuntime.wrap(function _callee13$(_context13) {
       while (1) {
         switch (_context13.prev = _context13.next) {
           case 0:
@@ -534,9 +529,9 @@ function messagePath(_x11, _x12, _x13, _x14) {
 }
 
 function _messagePath() {
-  _messagePath = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee14(channelName, time, token, writerUuid) {
+  _messagePath = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee14(channelName, time, token, writerUuid) {
     var fileName, msgPath;
-    return _regenerator["default"].wrap(function _callee14$(_context14) {
+    return _regeneratorRuntime.wrap(function _callee14$(_context14) {
       while (1) {
         switch (_context14.prev = _context14.next) {
           case 0:
@@ -559,9 +554,9 @@ function getAllMessages(_x15, _x16) {
 }
 
 function _getAllMessages() {
-  _getAllMessages = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee15(channelName, paths) {
+  _getAllMessages = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee15(channelName, paths) {
     var messagesPath, files;
-    return _regenerator["default"].wrap(function _callee15$(_context15) {
+    return _regeneratorRuntime.wrap(function _callee15$(_context15) {
       while (1) {
         switch (_context15.prev = _context15.next) {
           case 0:
@@ -614,9 +609,9 @@ function cleanOldMessages(_x17, _x18) {
 }
 
 function _cleanOldMessages() {
-  _cleanOldMessages = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee16(messageObjects, ttl) {
+  _cleanOldMessages = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee16(messageObjects, ttl) {
     var olderThen;
-    return _regenerator["default"].wrap(function _callee16$(_context16) {
+    return _regeneratorRuntime.wrap(function _callee16$(_context16) {
       while (1) {
         switch (_context16.prev = _context16.next) {
           case 0:
@@ -651,7 +646,7 @@ function create(_x19) {
 }
 
 function _create() {
-  _create = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee17(channelName) {
+  _create = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee17(channelName) {
     var options,
         time,
         paths,
@@ -663,7 +658,7 @@ function _create() {
         infoFilePath,
         _args17 = arguments;
 
-    return _regenerator["default"].wrap(function _callee17$(_context17) {
+    return _regeneratorRuntime.wrap(function _callee17$(_context17) {
       while (1) {
         switch (_context17.prev = _context17.next) {
           case 0:
@@ -765,9 +760,9 @@ function handleMessagePing(_x20, _x21) {
 
 
 function _handleMessagePing() {
-  _handleMessagePing = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee18(state, msgObj) {
+  _handleMessagePing = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee18(state, msgObj) {
     var messages, useMessages;
-    return _regenerator["default"].wrap(function _callee18$(_context18) {
+    return _regeneratorRuntime.wrap(function _callee18$(_context18) {
       while (1) {
         switch (_context18.prev = _context18.next) {
           case 0:
@@ -845,8 +840,8 @@ function refreshReaderClients(channelState) {
     Object.keys(channelState.otherReaderClients).filter(function (readerUuid) {
       return !otherReaders.includes(readerUuid);
     }).forEach( /*#__PURE__*/function () {
-      var _ref = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee(readerUuid) {
-        return _regenerator["default"].wrap(function _callee$(_context) {
+      var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee(readerUuid) {
+        return _regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
@@ -885,9 +880,9 @@ function refreshReaderClients(channelState) {
       return !channelState.otherReaderClients[readerUuid];
     }) // not already has client
     .map( /*#__PURE__*/function () {
-      var _ref2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee2(readerUuid) {
+      var _ref2 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee2(readerUuid) {
         var client;
-        return _regenerator["default"].wrap(function _callee2$(_context2) {
+        return _regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
@@ -945,10 +940,10 @@ function refreshReaderClients(channelState) {
 
 function postMessage(channelState, messageJson) {
   var writePromise = writeMessage(channelState.channelName, channelState.uuid, messageJson, channelState.paths);
-  channelState.writeBlockPromise = channelState.writeBlockPromise.then( /*#__PURE__*/(0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3() {
+  channelState.writeBlockPromise = channelState.writeBlockPromise.then( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee3() {
     var _yield$Promise$all, msgObj, pingStr, writeToReadersPromise;
 
-    return _regenerator["default"].wrap(function _callee3$(_context3) {
+    return _regeneratorRuntime.wrap(function _callee3$(_context3) {
       while (1) {
         switch (_context3.prev = _context3.next) {
           case 0:

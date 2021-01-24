@@ -1,45 +1,29 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.isPromise = isPromise;
-exports.sleep = sleep;
-exports.randomInt = randomInt;
-exports.randomToken = randomToken;
-exports.microSeconds = microSeconds;
-exports.isNode = void 0;
-
 /**
  * returns true if the given object is a promise
  */
-function isPromise(obj) {
+export function isPromise(obj) {
   if (obj && typeof obj.then === 'function') {
     return true;
   } else {
     return false;
   }
 }
-
-function sleep(time) {
+export function sleep(time) {
   if (!time) time = 0;
   return new Promise(function (res) {
     return setTimeout(res, time);
   });
 }
-
-function randomInt(min, max) {
+export function randomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 /**
  * https://stackoverflow.com/a/8084248
  */
 
-
-function randomToken() {
+export function randomToken() {
   return Math.random().toString(36).substring(2);
 }
-
 var lastMs = 0;
 var additional = 0;
 /**
@@ -50,7 +34,7 @@ var additional = 0;
  * The main reason for this hack is to ensure that BroadcastChannel behaves equal to production when it is used in fast-running unit tests.
  */
 
-function microSeconds() {
+export function microSeconds() {
   var ms = new Date().getTime();
 
   if (ms === lastMs) {
@@ -68,6 +52,4 @@ function microSeconds() {
  * @link https://github.com/iliakan/detect-node/blob/master/index.js
  */
 
-
-var isNode = Object.prototype.toString.call(typeof process !== 'undefined' ? process : 0) === '[object process]';
-exports.isNode = isNode;
+export var isNode = Object.prototype.toString.call(typeof process !== 'undefined' ? process : 0) === '[object process]';

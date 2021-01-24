@@ -1,8 +1,6 @@
-"use strict";
+var module = require('./index.es5.js');
 
-var _module = require('./index.es5.js');
-
-var BroadcastChannel = _module.BroadcastChannel;
-var createLeaderElection = _module.createLeaderElection;
+var BroadcastChannel = module.BroadcastChannel;
+var createLeaderElection = module.createLeaderElection;
 window['BroadcastChannel2'] = BroadcastChannel;
 window['createLeaderElection'] = createLeaderElection;

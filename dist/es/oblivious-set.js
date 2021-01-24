@@ -1,10 +1,3 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = void 0;
-
 /**
  * this is a set which automatically forgets
  * a given entry when a new entry is set and the ttl
@@ -53,5 +46,4 @@ function now() {
   return new Date().getTime();
 }
 
-var _default = ObliviousSet;
-exports["default"] = _default;
+export default ObliviousSet;

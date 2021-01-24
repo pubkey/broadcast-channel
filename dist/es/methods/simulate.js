@@ -1,25 +1,8 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.create = create;
-exports.close = close;
-exports.postMessage = postMessage;
-exports.onMessage = onMessage;
-exports.canBeUsed = canBeUsed;
-exports.averageResponseTime = averageResponseTime;
-exports["default"] = exports.type = exports.microSeconds = void 0;
-
-var _util = require("../util");
-
-var microSeconds = _util.microSeconds;
-exports.microSeconds = microSeconds;
-var type = 'simulate';
-exports.type = type;
+import { microSeconds as micro } from '../util';
+export var microSeconds = micro;
+export var type = 'simulate';
 var SIMULATE_CHANNELS = new Set();
-
-function create(channelName) {
+export function create(channelName) {
   var state = {
     name: channelName,
     messagesCallback: null
@@ -27,12 +10,10 @@ function create(channelName) {
   SIMULATE_CHANNELS.add(state);
   return state;
 }
-
-function close(channelState) {
+export function close(channelState) {
   SIMULATE_CHANNELS["delete"](channelState);
 }
-
-function postMessage(channelState, messageJson) {
+export function postMessage(channelState, messageJson) {
   return new Promise(function (res) {
     return setTimeout(function () {
       var channelArray = Array.from(SIMULATE_CHANNELS);
@@ -49,20 +30,16 @@ function postMessage(channelState, messageJson) {
     }, 5);
   });
 }
-
-function onMessage(channelState, fn) {
+export function onMessage(channelState, fn) {
   channelState.messagesCallback = fn;
 }
-
-function canBeUsed() {
+export function canBeUsed() {
   return true;
 }
-
-function averageResponseTime() {
+export function averageResponseTime() {
   return 5;
 }
-
-var _default = {
+export default {
   create: create,
   close: close,
   onMessage: onMessage,
@@ -72,4 +49,3 @@ var _default = {
   averageResponseTime: averageResponseTime,
   microSeconds: microSeconds
 };
-exports["default"] = _default;

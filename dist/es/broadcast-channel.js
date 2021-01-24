@@ -1,27 +1,15 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.clearNodeFolder = clearNodeFolder;
-exports.enforceOptions = enforceOptions;
-exports.BroadcastChannel = void 0;
-
-var _util = require("./util.js");
-
-var _methodChooser = require("./method-chooser.js");
-
-var _options = require("./options.js");
-
-var BroadcastChannel = function BroadcastChannel(name, options) {
+import { isPromise } from './util.js';
+import { chooseMethod } from './method-chooser.js';
+import { fillOptionsWithDefaults } from './options.js';
+export var BroadcastChannel = function BroadcastChannel(name, options) {
   this.name = name;
 
   if (ENFORCED_OPTIONS) {
     options = ENFORCED_OPTIONS;
   }
 
-  this.options = (0, _options.fillOptionsWithDefaults)(options);
-  this.method = (0, _methodChooser.chooseMethod)(this.options); // isListening
+  this.options = fillOptionsWithDefaults(options);
+  this.method = chooseMethod(this.options); // isListening
 
   this._iL = false;
   /**
@@ -61,17 +49,15 @@ var BroadcastChannel = function BroadcastChannel(name, options) {
  * See methods/native.js
  */
 
-
-exports.BroadcastChannel = BroadcastChannel;
 BroadcastChannel._pubkey = true;
 /**
  * clears the tmp-folder if is node
  * @return {Promise<boolean>} true if has run, false if not node
  */
 
-function clearNodeFolder(options) {
-  options = (0, _options.fillOptionsWithDefaults)(options);
-  var method = (0, _methodChooser.chooseMethod)(options);
+export function clearNodeFolder(options) {
+  options = fillOptionsWithDefaults(options);
+  var method = chooseMethod(options);
 
   if (method.type === 'node') {
     return method.clearNodeFolder().then(function () {
@@ -86,13 +72,10 @@ function clearNodeFolder(options) {
  * no mather what the options are
  */
 
-
 var ENFORCED_OPTIONS;
-
-function enforceOptions(options) {
+export function enforceOptions(options) {
   ENFORCED_OPTIONS = options;
 } // PROTOTYPE
-
 
 BroadcastChannel.prototype = {
   postMessage: function postMessage(msg) {
@@ -179,7 +162,7 @@ function _post(broadcastChannel, type, msg) {
 function _prepareChannel(channel) {
   var maybePromise = channel.method.create(channel.name, channel.options);
 
-  if ((0, _util.isPromise)(maybePromise)) {
+  if (isPromise(maybePromise)) {
     channel._prepP = maybePromise;
     maybePromise.then(function (s) {
       // used in tests to simulate slow runtime
