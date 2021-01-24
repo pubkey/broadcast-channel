@@ -2,6 +2,8 @@
 
 ## X.X.X (comming soon)
 
+## 3.4.0 (24 January 2021)
+
 Bugfixes:
   - fix cursor error in Safari [#420](https://github.com/pubkey/broadcast-channel/pull/420)
 
