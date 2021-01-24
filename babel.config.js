@@ -4,7 +4,8 @@ let presets = [
         {
             targets: {
                 node: 'current'
-            }
+            },
+            modules: false
         }
     ]
 ];
