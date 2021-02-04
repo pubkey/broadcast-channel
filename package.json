@@ -79,7 +79,7 @@
     "@babel/plugin-proposal-object-rest-spread": "7.12.13",
     "@babel/plugin-transform-member-expression-literals": "7.12.13",
     "@babel/plugin-transform-property-literals": "7.12.13",
-    "@babel/plugin-transform-runtime": "7.12.13",
+    "@babel/plugin-transform-runtime": "7.12.15",
     "@babel/polyfill": "7.12.1",
     "@babel/preset-env": "7.12.13",
     "@babel/types": "7.12.13",
