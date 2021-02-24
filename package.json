@@ -121,7 +121,7 @@
     "ts-node": "9.1.1",
     "typescript": "4.2.2",
     "watchify": "4.0.0",
-    "webpack": "5.24.1",
+    "webpack": "5.24.2",
     "webpack-cli": "4.5.0"
   },
   "browser": {
