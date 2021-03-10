@@ -37,16 +37,16 @@ npm install --save broadcast-channel
 
 #### Create a channel in one tab/process and send a message.
 
-```js
-const { BroadcastChannel } = require('broadcast-channel');
+```ts
+import { BroadcastChannel } from 'broadcast-channel';
 const channel = new BroadcastChannel('foobar');
 channel.postMessage('I am not alone');
 ```
 
 #### Create a channel with the same name in another tab/process and recieve messages.
 
-```js
-const { BroadcastChannel } = require('broadcast-channel');
+```ts
+import { BroadcastChannel } from 'broadcast-channel';
 const channel = new BroadcastChannel('foobar');
 channel.onmessage = msg => console.dir(msg);
 // > 'I am not alone'
@@ -55,8 +55,8 @@ channel.onmessage = msg => console.dir(msg);
 
 #### Add and remove multiple eventlisteners
 
-```js
-const { BroadcastChannel } = require('broadcast-channel');
+```ts
+import { BroadcastChannel } from 'broadcast-channel';
 const channel = new BroadcastChannel('foobar');
 
 const handler = msg => console.log(msg);
@@ -141,7 +141,7 @@ IndexedDB databases can close unexpectedly for various reasons. This could happe
 Example of how you might do this:
 
 ```typescript
-const { BroadcastChannel } = require('broadcast-channel');
+import { BroadcastChannel } from 'broadcast-channel';
 
 let channel;
 
@@ -189,11 +189,11 @@ In this example the leader is marked with the crown ♛:
 
 Create a channel and an elector.
 
-```js
-const {
+```ts
+import {
   BroadcastChannel,
   createLeaderElection
-} = require('broadcast-channel');
+} from 'broadcast-channel';
 const channel = new BroadcastChannel('foobar');
 const elector = createLeaderElection(channel);
 ```
@@ -201,7 +201,7 @@ const elector = createLeaderElection(channel);
 Wait until the elector becomes leader.
 
 ```js
-const { createLeaderElection } = require('broadcast-channel');
+import { createLeaderElection } from 'broadcast-channel';
 const elector = createLeaderElection(channel);
 elector.awaitLeadership().then(()=> {
   console.log('this tab is now leader');
@@ -211,7 +211,7 @@ elector.awaitLeadership().then(()=> {
 If more than one tab is becoming leader adjust `LeaderElectionOptions` configuration.
 
 ```js
-const { createLeaderElection } = require('broadcast-channel');
+import { createLeaderElection } from 'broadcast-channel';
 const elector = createLeaderElection(channel, {
   fallbackInterval: 2000, // optional configuration for how often will renegotiation for leader occur
   responseTime: 1000, // optional configuration for how long will instances have to respond
