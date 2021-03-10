@@ -7,7 +7,8 @@ const {
     BroadcastChannel,
     createLeaderElection,
     clearNodeFolder,
-    enforceOptions
+    enforceOptions,
+    beLeader
 } = require('../');
 
 /**
@@ -625,6 +626,56 @@ function runTest(channelOptions) {
                 });
                 it('log', () => {
                     console.log('Finished: ' + JSON.stringify(channelOptions));
+                });
+            });
+            describe('.onduplicate', () => {
+                it('should fire when duplicate leaders', async () => {
+                    const channelName = AsyncTestUtil.randomString(12);
+                    const channel = new BroadcastChannel(channelName, channelOptions);
+                    const channel2 = new BroadcastChannel(channelName, channelOptions);
+                    const elector = createLeaderElection(channel);
+                    const elector2 = createLeaderElection(channel2);
+
+                    const emitted = [];
+                    elector.onduplicate = () => {
+                        emitted.push(1);
+                    };
+                    elector2.onduplicate = () => {
+                        emitted.push(2);
+                    };
+
+                    beLeader(elector);
+                    beLeader(elector2);
+
+                    await AsyncTestUtil.waitUntil(() => emitted.length === 2);
+
+                    assert.ok(emitted.includes(1));
+                    assert.ok(emitted.includes(2));
+
+                    channel.close();
+                    channel2.close();
+                });
+                it('should NOT fire when no duplicated', async () => {
+                    const channelName = AsyncTestUtil.randomString(12);
+                    const channel = new BroadcastChannel(channelName, channelOptions);
+                    const channel2 = new BroadcastChannel(channelName, channelOptions);
+                    const elector = createLeaderElection(channel);
+                    const elector2 = createLeaderElection(channel2);
+
+                    const emitted = [];
+                    elector.onduplicate = () => emitted.push(true);
+                    elector2.onduplicate = () => emitted.push(true);
+
+                    await Promise.race([
+                        elector.awaitLeadership(),
+                        elector2.awaitLeadership()
+                    ]);
+
+                    await AsyncTestUtil.wait(150);
+                    assert.strictEqual(emitted.length, 0);
+
+                    channel.close();
+                    channel2.close();
                 });
             });
         });

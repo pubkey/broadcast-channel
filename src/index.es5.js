@@ -11,12 +11,14 @@ import {
     BroadcastChannel,
     createLeaderElection,
     clearNodeFolder,
-    enforceOptions
+    enforceOptions,
+    beLeader
 } from './index.js';
 
 module.exports = {
     BroadcastChannel,
     createLeaderElection,
     clearNodeFolder,
-    enforceOptions
+    enforceOptions,
+    beLeader
 };

@@ -1,4 +1,8 @@
-import { BroadcastChannel } from './broadcast-channel';
+import {
+    BroadcastChannel,
+    EventContext,
+    OnMessageHandler
+} from './broadcast-channel';
 
 export type LeaderElectionOptions = {
     /**
@@ -12,7 +16,6 @@ export type LeaderElectionOptions = {
      */
     responseTime?: number;
 };
-
 
 export declare class LeaderElector {
 
@@ -30,7 +33,11 @@ export declare class LeaderElector {
     awaitLeadership(): Promise<void>;
     die(): Promise<void>;
 
-
+    /**
+     * Add an event handler that is run
+     * when it is detected that there are duplicate leaders
+     */
+    onduplicate: OnMessageHandler<T>;
 }
 
 type CreateFunction = (channel: BroadcastChannel, options?: LeaderElectionOptions) => LeaderElector;

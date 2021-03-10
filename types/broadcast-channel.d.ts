@@ -34,7 +34,7 @@ export type BroadcastChannelOptions = {
     };
 };
 
-declare type EventType = 'message' | 'internal';
+declare type EventContext = 'message' | 'internal' | 'leader';
 
 declare type OnMessageHandler<T> = ((this: BroadcastChannel, ev: T) => any) | null;
 
@@ -55,8 +55,8 @@ export class BroadcastChannel<T = any> {
     onmessage: OnMessageHandler<T>;
 
     // not defined in the offical standard
-    addEventListener(type: EventType, handler: OnMessageHandler<T>): void;
-    removeEventListener(type: EventType, handler: OnMessageHandler<T>): void;
+    addEventListener(type: EventContext, handler: OnMessageHandler<T>): void;
+    removeEventListener(type: EventContext, handler: OnMessageHandler<T>): void;
 
 }
 // statics

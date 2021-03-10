@@ -4,5 +4,6 @@ export {
     enforceOptions
 } from './broadcast-channel';
 export {
-    createLeaderElection
+    createLeaderElection,
+    beLeader
 } from './leader-election';
