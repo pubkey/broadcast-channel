@@ -20,7 +20,7 @@
 
 ## Info
   - Environment: (Node.js/browser/electron/etc..)
-  - Method: (IndexedDB/Localstorage/LevelDB/etc..)
+  - Method: (IndexedDB/Localstorage/Node/etc..)
   - Stack: (Typescript, Babel, Angular, React, etc..)
 
 ## Code
