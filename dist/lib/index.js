@@ -27,6 +27,12 @@ Object.defineProperty(exports, "createLeaderElection", {
     return _leaderElection.createLeaderElection;
   }
 });
+Object.defineProperty(exports, "beLeader", {
+  enumerable: true,
+  get: function get() {
+    return _leaderElection.beLeader;
+  }
+});
 
 var _broadcastChannel = require("./broadcast-channel");
 

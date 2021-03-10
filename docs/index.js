@@ -265,7 +265,8 @@ module.exports = {
   BroadcastChannel: _index.BroadcastChannel,
   createLeaderElection: _index.createLeaderElection,
   clearNodeFolder: _index.clearNodeFolder,
-  enforceOptions: _index.enforceOptions
+  enforceOptions: _index.enforceOptions,
+  beLeader: _index.beLeader
 };
 },{"./index.js":3}],3:[function(require,module,exports){
 "use strict";
@@ -297,6 +298,12 @@ Object.defineProperty(exports, "createLeaderElection", {
     return _leaderElection.createLeaderElection;
   }
 });
+Object.defineProperty(exports, "beLeader", {
+  enumerable: true,
+  get: function get() {
+    return _leaderElection.beLeader;
+  }
+});
 
 var _broadcastChannel = require("./broadcast-channel");
 
@@ -309,6 +316,7 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.beLeader = beLeader;
 exports.createLeaderElection = createLeaderElection;
 
 var _util = require("./util.js");
@@ -330,6 +338,11 @@ var LeaderElection = function LeaderElection(channel, options) {
   this._lstns = []; // _listeners
 
   this._invs = []; // _intervals
+
+  this._dpL = function () {}; // onduplicate listener
+
+
+  this._dpLC = false; // true when onduplicate called
 };
 
 LeaderElection.prototype = {
@@ -381,7 +394,7 @@ LeaderElection.prototype = {
     .then(function () {
       if (stopCriteria) return Promise.reject(new Error());else return _sendMessage(_this);
     }).then(function () {
-      return _beLeader(_this);
+      return beLeader(_this);
     }) // no one disagreed -> this one is now leader
     .then(function () {
       return true;
@@ -410,6 +423,11 @@ LeaderElection.prototype = {
 
     return this._aLP;
   },
+
+  set onduplicate(fn) {
+    this._dpL = fn;
+  },
+
   die: function die() {
     var _this2 = this;
 
@@ -437,24 +455,31 @@ function _awaitLeadershipOnce(leaderElector) {
   return new Promise(function (res) {
     var resolved = false;
 
-    var finish = function finish() {
-      if (resolved) return;
+    function finish() {
+      if (resolved) {
+        return;
+      }
+
       resolved = true;
       clearInterval(interval);
 
       leaderElector._channel.removeEventListener('internal', whenDeathListener);
 
       res(true);
-    }; // try once now
+    } // try once now
 
 
     leaderElector.applyOnce().then(function () {
-      if (leaderElector.isLeader) finish();
+      if (leaderElector.isLeader) {
+        finish();
+      }
     }); // try on fallbackInterval
 
     var interval = setInterval(function () {
       leaderElector.applyOnce().then(function () {
-        if (leaderElector.isLeader) finish();
+        if (leaderElector.isLeader) {
+          finish();
+        }
       });
     }, leaderElector._options.fallbackInterval);
 
@@ -488,7 +513,7 @@ function _sendMessage(leaderElector, action) {
   return leaderElector._channel.postInternal(msgJson);
 }
 
-function _beLeader(leaderElector) {
+function beLeader(leaderElector) {
   leaderElector.isLeader = true;
 
   var unloadFn = _unload["default"].add(function () {
@@ -500,6 +525,24 @@ function _beLeader(leaderElector) {
   var isLeaderListener = function isLeaderListener(msg) {
     if (msg.context === 'leader' && msg.action === 'apply') {
       _sendMessage(leaderElector, 'tell');
+    }
+
+    if (msg.context === 'leader' && msg.action === 'tell' && !leaderElector._dpLC) {
+      /**
+       * another instance is also leader!
+       * This can happen on rare events
+       * like when the CPU is at 100% for long time
+       * or the tabs are open very long and the browser throttles them.
+       * @link https://github.com/pubkey/broadcast-channel/issues/414
+       * @link https://github.com/pubkey/broadcast-channel/issues/385
+       */
+      leaderElector._dpLC = true;
+
+      leaderElector._dpL(); // message the lib user so the app can handle the problem
+
+
+      _sendMessage(leaderElector, 'tell'); // ensure other leader also knows the problem
+
     }
   };
 

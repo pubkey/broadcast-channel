@@ -2,6 +2,11 @@
 
 ## X.X.X (comming soon)
 
+## 3.5.0 (11 March 2021)
+
+Features:
+  - Added `LeaderElector.onduplicate`
+
 ## 3.4.0 (24 January 2021)
 
 Bugfixes:
