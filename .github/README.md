@@ -1,7 +1,7 @@
 
 <p align="center">
   <a href="https://github.com/pubkey/broadcast-channel">
-    <img src="./docs/files/icon.png" width="150px" />
+    <img src="../docs/files/icon.png" width="150px" />
   </a>
 </p>
 
