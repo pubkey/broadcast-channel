@@ -18,7 +18,7 @@
             alt="follow on Twitter"></a>
 </p>
 
-![demo.gif](docs/files/demo.gif)
+![demo.gif](../docs/files/demo.gif)
 
 * * *
 
