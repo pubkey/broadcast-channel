@@ -67,9 +67,10 @@ channel.removeEventListener('message', handler);
 ```
 
 #### Close the channel if you do not need it anymore.
+Returns a `Promise` that resolved when everything is processed.
 
 ```js
-channel.close();
+await channel.close();
 ```
 
 #### Set options when creating a channel (optional):

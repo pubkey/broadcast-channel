@@ -29,7 +29,12 @@ export function close(channelState) {
 }
 
 export function postMessage(channelState, messageJson) {
-    channelState.bc.postMessage(messageJson, false);
+    try {
+        channelState.bc.postMessage(messageJson, false);
+        return Promise.resolve();
+    } catch (err) {
+        return Promise.reject(err);
+    }
 }
 
 export function onMessage(channelState, fn) {

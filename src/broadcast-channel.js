@@ -181,7 +181,9 @@ function _post(broadcastChannel, type, msg) {
 
         // add/remove to unsend messages list
         broadcastChannel._uMP.add(sendPromise);
-        sendPromise.then(() => broadcastChannel._uMP.delete(sendPromise));
+        sendPromise
+        .catch()
+        .then(() => broadcastChannel._uMP.delete(sendPromise));
 
         return sendPromise;
     });
