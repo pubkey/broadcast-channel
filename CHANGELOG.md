@@ -2,6 +2,9 @@
 
 ## X.X.X (comming soon)
 
+Bugfixes:
+  - `BroadcastChannel.close()` waits for all ongoing message sending to be finished before resolving.
+
 ## 3.5.0 (11 March 2021)
 
 Features:

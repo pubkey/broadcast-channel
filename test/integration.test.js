@@ -45,6 +45,19 @@ function runTest(channelOptions) {
                     );
                 });
             });
+            describe('.close()', () => {
+                it('should have resolved all processed message promises when close() resolves', async () => {
+                    const channelName = AsyncTestUtil.randomString(12);
+                    const channel = new BroadcastChannel(channelName, channelOptions);
+
+                    channel.postMessage({});
+                    channel.postMessage({});
+                    channel.postMessage({});
+
+                    await channel.close();
+                    assert.strictEqual(channel._uMP.size, 0);
+                });
+            });
             describe('.onmessage', () => {
                 /**
                  * the window.BroadcastChannel

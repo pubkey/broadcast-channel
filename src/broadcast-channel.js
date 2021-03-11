@@ -40,6 +40,13 @@ export const BroadcastChannel = function (name, options) {
     };
 
     /**
+     * Unsend message promises
+     * where the sending is still in progress
+     * @type {Set<Promise>}
+     */
+    this._uMP = new Set();
+
+    /**
      * _beforeClose
      * array of promises that will be awaited
      * before the channel is closed
@@ -129,7 +136,9 @@ BroadcastChannel.prototype = {
     },
 
     close() {
-        if (this.closed) return;
+        if (this.closed) {
+            return;
+        }
         this.closed = true;
         const awaitPrepare = this._prepP ? this._prepP : Promise.resolve();
 
@@ -137,12 +146,12 @@ BroadcastChannel.prototype = {
         this._addEL.message = [];
 
         return awaitPrepare
+            // wait until all current sending are processed
+            .then(() => Promise.all(Array.from(this._uMP)))
+            // run before-close hooks
             .then(() => Promise.all(this._befC.map(fn => fn())))
-            .then(() => {
-                return this.method.close(
-                    this._state
-                );
-            });
+            // close the channel
+            .then(() => this.method.close(this._state));
     },
     get type() {
         return this.method.type;
@@ -150,6 +159,10 @@ BroadcastChannel.prototype = {
 };
 
 
+/**
+ * Post a message over the channel
+ * @returns {Promise} that resolved when the message sending is done
+ */
 function _post(broadcastChannel, type, msg) {
     const time = broadcastChannel.method.microSeconds();
     const msgObj = {
@@ -160,10 +173,17 @@ function _post(broadcastChannel, type, msg) {
 
     const awaitPrepare = broadcastChannel._prepP ? broadcastChannel._prepP : Promise.resolve();
     return awaitPrepare.then(() => {
-        return broadcastChannel.method.postMessage(
+
+        const sendPromise = broadcastChannel.method.postMessage(
             broadcastChannel._state,
             msgObj
         );
+
+        // add/remove to unsend messages list
+        broadcastChannel._uMP.add(sendPromise);
+        sendPromise.then(() => broadcastChannel._uMP.delete(sendPromise));
+
+        return sendPromise;
     });
 }
 
