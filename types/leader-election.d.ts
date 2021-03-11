@@ -1,6 +1,5 @@
 import {
     BroadcastChannel,
-    EventContext,
     OnMessageHandler
 } from './broadcast-channel';
 
@@ -37,7 +36,7 @@ export declare class LeaderElector {
      * Add an event handler that is run
      * when it is detected that there are duplicate leaders
      */
-    onduplicate: OnMessageHandler<T>;
+    onduplicate: OnMessageHandler<any>;
 }
 
 type CreateFunction = (channel: BroadcastChannel, options?: LeaderElectionOptions) => LeaderElector;

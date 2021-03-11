@@ -2,6 +2,11 @@
 
 ## X.X.X (comming soon)
 
+## 3.5.3 (11 March 2021)
+
+Bugfixes:
+  - Fixed broken typings
+
 ## 3.5.2 (11 March 2021)
 
 Bugfixes:
