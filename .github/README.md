@@ -185,7 +185,7 @@ This module also comes with a leader-election which can be used so elect a leade
 For example if you have a stable connection from the frontend to your server, you can use the LeaderElection to save server-side performance by only connecting once, even if the user has opened your website in multiple tabs.
 
 In this example the leader is marked with the crown ♛:
-![leader-election.gif](docs/files/leader-election.gif)
+![leader-election.gif](../docs/files/leader-election.gif)
 
 
 Create a channel and an elector.
