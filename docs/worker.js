@@ -41,6 +41,13 @@ var BroadcastChannel = function BroadcastChannel(name, options) {
     internal: []
   };
   /**
+   * Unsend message promises
+   * where the sending is still in progress
+   * @type {Set<Promise>}
+   */
+
+  this._uMP = new Set();
+  /**
    * _beforeClose
    * array of promises that will be awaited
    * before the channel is closed
@@ -144,16 +151,24 @@ BroadcastChannel.prototype = {
   close: function close() {
     var _this = this;
 
-    if (this.closed) return;
+    if (this.closed) {
+      return;
+    }
+
     this.closed = true;
     var awaitPrepare = this._prepP ? this._prepP : Promise.resolve();
     this._onML = null;
     this._addEL.message = [];
-    return awaitPrepare.then(function () {
+    return awaitPrepare // wait until all current sending are processed
+    .then(function () {
+      return Promise.all(Array.from(_this._uMP));
+    }) // run before-close hooks
+    .then(function () {
       return Promise.all(_this._befC.map(function (fn) {
         return fn();
       }));
-    }).then(function () {
+    }) // close the channel
+    .then(function () {
       return _this.method.close(_this._state);
     });
   },
@@ -163,6 +178,10 @@ BroadcastChannel.prototype = {
   }
 
 };
+/**
+ * Post a message over the channel
+ * @returns {Promise} that resolved when the message sending is done
+ */
 
 function _post(broadcastChannel, type, msg) {
   var time = broadcastChannel.method.microSeconds();
@@ -173,7 +192,14 @@ function _post(broadcastChannel, type, msg) {
   };
   var awaitPrepare = broadcastChannel._prepP ? broadcastChannel._prepP : Promise.resolve();
   return awaitPrepare.then(function () {
-    return broadcastChannel.method.postMessage(broadcastChannel._state, msgObj);
+    var sendPromise = broadcastChannel.method.postMessage(broadcastChannel._state, msgObj); // add/remove to unsend messages list
+
+    broadcastChannel._uMP.add(sendPromise);
+
+    sendPromise["catch"]().then(function () {
+      return broadcastChannel._uMP["delete"](sendPromise);
+    });
+    return sendPromise;
   });
 }
 
@@ -1261,7 +1287,12 @@ function close(channelState) {
 }
 
 function postMessage(channelState, messageJson) {
-  channelState.bc.postMessage(messageJson, false);
+  try {
+    channelState.bc.postMessage(messageJson, false);
+    return Promise.resolve();
+  } catch (err) {
+    return Promise.reject(err);
+  }
 }
 
 function onMessage(channelState, fn) {

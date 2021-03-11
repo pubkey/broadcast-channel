@@ -41,7 +41,12 @@ function close(channelState) {
 }
 
 function postMessage(channelState, messageJson) {
-  channelState.bc.postMessage(messageJson, false);
+  try {
+    channelState.bc.postMessage(messageJson, false);
+    return Promise.resolve();
+  } catch (err) {
+    return Promise.reject(err);
+  }
 }
 
 function onMessage(channelState, fn) {
