@@ -7,5 +7,3 @@ package-lock.json
 shelljs_*
 test_tmp/
 tmp/
-dist
-docs

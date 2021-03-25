@@ -55,6 +55,7 @@ function runTest(channelOptions) {
                     channel.postMessage({});
 
                     await channel.close();
+                    assert.strictEqual(channel.isClosed, true);
                     assert.strictEqual(channel._uMP.size, 0);
                 });
             });
@@ -730,4 +731,7 @@ if (isNode) {
     });
 }
 
-useOptions.forEach(o => runTest(o));
+// useOptions.forEach(o => runTest(o));
+runTest({
+    type: 'native'
+});
