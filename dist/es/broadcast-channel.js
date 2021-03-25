@@ -1,7 +1,7 @@
 import { isPromise } from './util.js';
 import { chooseMethod } from './method-chooser.js';
 import { fillOptionsWithDefaults } from './options.js';
-export var BroadcastChannel = function BroadcastChannel(name, options) {
+export function BroadcastChannel(name, options) {
   this.name = name;
 
   if (ENFORCED_OPTIONS) {
@@ -48,7 +48,7 @@ export var BroadcastChannel = function BroadcastChannel(name, options) {
   this._prepP = null;
 
   _prepareChannel(this);
-}; // STATICS
+} // STATICS
 
 /**
  * used to identify if someone overwrites
@@ -157,6 +157,10 @@ BroadcastChannel.prototype = {
 
   get type() {
     return this.method.type;
+  },
+
+  get isClosed() {
+    return this.closed;
   }
 
 };

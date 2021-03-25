@@ -3,9 +3,9 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.BroadcastChannel = BroadcastChannel;
 exports.clearNodeFolder = clearNodeFolder;
 exports.enforceOptions = enforceOptions;
-exports.BroadcastChannel = void 0;
 
 var _util = require("./util.js");
 
@@ -13,7 +13,7 @@ var _methodChooser = require("./method-chooser.js");
 
 var _options = require("./options.js");
 
-var BroadcastChannel = function BroadcastChannel(name, options) {
+function BroadcastChannel(name, options) {
   this.name = name;
 
   if (ENFORCED_OPTIONS) {
@@ -60,7 +60,7 @@ var BroadcastChannel = function BroadcastChannel(name, options) {
   this._prepP = null;
 
   _prepareChannel(this);
-}; // STATICS
+} // STATICS
 
 /**
  * used to identify if someone overwrites
@@ -69,7 +69,6 @@ var BroadcastChannel = function BroadcastChannel(name, options) {
  */
 
 
-exports.BroadcastChannel = BroadcastChannel;
 BroadcastChannel._pubkey = true;
 /**
  * clears the tmp-folder if is node
@@ -174,6 +173,10 @@ BroadcastChannel.prototype = {
 
   get type() {
     return this.method.type;
+  },
+
+  get isClosed() {
+    return this.closed;
   }
 
 };
