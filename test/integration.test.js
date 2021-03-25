@@ -731,7 +731,4 @@ if (isNode) {
     });
 }
 
-// useOptions.forEach(o => runTest(o));
-runTest({
-    type: 'native'
-});
+useOptions.forEach(o => runTest(o));
