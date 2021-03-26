@@ -74,7 +74,7 @@
   },
   "devDependencies": {
     "@babel/cli": "7.13.10",
-    "@babel/core": "7.13.10",
+    "@babel/core": "7.13.13",
     "@babel/plugin-check-constants": "7.0.0-beta.38",
     "@babel/plugin-proposal-object-rest-spread": "7.13.8",
     "@babel/plugin-transform-member-expression-literals": "7.12.13",
@@ -82,7 +82,7 @@
     "@babel/plugin-transform-runtime": "7.13.10",
     "@babel/polyfill": "7.12.1",
     "@babel/preset-env": "7.13.12",
-    "@babel/types": "7.13.12",
+    "@babel/types": "7.13.13",
     "@types/core-js": "2.5.4",
     "assert": "2.0.0",
     "async-test-util": "1.7.3",
