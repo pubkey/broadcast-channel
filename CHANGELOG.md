@@ -2,6 +2,9 @@
 
 ## X.X.X (comming soon)
 
+Features:
+  - Added `BroadcastChannel.isClosed` [#544](https://github.com/pubkey/broadcast-channel/issues/544)
+
 ## 3.5.3 (11 March 2021)
 
 Bugfixes:
