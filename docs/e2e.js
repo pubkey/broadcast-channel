@@ -175,6 +175,10 @@ BroadcastChannel.prototype = {
 
   get type() {
     return this.method.type;
+  },
+
+  get isClosed() {
+    return this.closed;
   }
 
 };
@@ -1654,6 +1658,7 @@ function _asyncToGenerator(fn) {
 }
 
 module.exports = _asyncToGenerator;
+module.exports["default"] = module.exports, module.exports.__esModule = true;
 },{}],16:[function(require,module,exports){
 function _interopRequireDefault(obj) {
   return obj && obj.__esModule ? obj : {
@@ -1662,6 +1667,7 @@ function _interopRequireDefault(obj) {
 }
 
 module.exports = _interopRequireDefault;
+module.exports["default"] = module.exports, module.exports.__esModule = true;
 },{}],17:[function(require,module,exports){
 module.exports = require("regenerator-runtime");
 

@@ -175,6 +175,10 @@ BroadcastChannel.prototype = {
 
   get type() {
     return this.method.type;
+  },
+
+  get isClosed() {
+    return this.closed;
   }
 
 };
@@ -1589,6 +1593,7 @@ function _interopRequireDefault(obj) {
 }
 
 module.exports = _interopRequireDefault;
+module.exports["default"] = module.exports, module.exports.__esModule = true;
 },{}],15:[function(require,module,exports){
 
 },{}],16:[function(require,module,exports){

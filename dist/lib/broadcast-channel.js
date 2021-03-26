@@ -174,6 +174,10 @@ BroadcastChannel.prototype = {
 
   get type() {
     return this.method.type;
+  },
+
+  get isClosed() {
+    return this.closed;
   }
 
 };

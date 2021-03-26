@@ -55,6 +55,7 @@ function runTest(channelOptions) {
                     channel.postMessage({});
 
                     await channel.close();
+                    assert.strictEqual(channel.isClosed, true);
                     assert.strictEqual(channel._uMP.size, 0);
                 });
             });

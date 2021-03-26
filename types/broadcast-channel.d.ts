@@ -48,6 +48,7 @@ export class BroadcastChannel<T = any> {
     readonly name: string;
     readonly options: BroadcastChannelOptions;
     readonly type: MethodType;
+    readonly isClosed: boolean;
 
     postMessage(msg: T): Promise<void>;
     close(): Promise<void>;
