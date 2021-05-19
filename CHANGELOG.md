@@ -2,8 +2,13 @@
 
 ## X.X.X (comming soon)
 
+## 3.6.0 (19 May 2021)
+
 Features:
   - Added `BroadcastChannel.isClosed` [#544](https://github.com/pubkey/broadcast-channel/issues/544)
+
+Other:
+  - Updated dependencies to work with newer node versions
 
 ## 3.5.3 (11 March 2021)
 
