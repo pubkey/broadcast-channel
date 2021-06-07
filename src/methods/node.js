@@ -19,7 +19,7 @@ const fillOptionsWithDefaults = require('../../dist/lib/options.js').fillOptions
 const ownUtil = require('../../dist/lib/util.js');
 const randomInt = ownUtil.randomInt;
 const randomToken = ownUtil.randomToken;
-const ObliviousSet = require('../../dist/lib/oblivious-set').default;
+const { ObliviousSet } = require('oblivious-set');
 
 /**
  * windows sucks, so we have handle windows-type of socket-paths

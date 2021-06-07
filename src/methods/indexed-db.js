@@ -13,7 +13,7 @@ import {
 } from '../util.js';
 
 export const microSeconds = micro;
-import ObliviousSet from '../oblivious-set';
+import { ObliviousSet } from 'oblivious-set';
 
 import {
     fillOptionsWithDefaults

@@ -6,7 +6,7 @@
  * @link https://caniuse.com/#feat=indexeddb
  */
 
-import ObliviousSet from '../oblivious-set';
+import { ObliviousSet } from 'oblivious-set';
 
 import {
     fillOptionsWithDefaults
