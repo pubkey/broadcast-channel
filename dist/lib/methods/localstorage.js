@@ -1,7 +1,5 @@
 "use strict";
 
-var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
-
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -17,7 +15,7 @@ exports.canBeUsed = canBeUsed;
 exports.averageResponseTime = averageResponseTime;
 exports["default"] = exports.type = exports.microSeconds = void 0;
 
-var _obliviousSet = _interopRequireDefault(require("../oblivious-set"));
+var _obliviousSet = require("oblivious-set");
 
 var _options = require("../options");
 
@@ -124,7 +122,7 @@ function create(channelName, options) {
    * @type {ObliviousSet}
    */
 
-  var eMIs = new _obliviousSet["default"](options.localstorage.removeTimeout);
+  var eMIs = new _obliviousSet.ObliviousSet(options.localstorage.removeTimeout);
   var state = {
     channelName: channelName,
     uuid: uuid,

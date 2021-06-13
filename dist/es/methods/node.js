@@ -34,7 +34,8 @@ var ownUtil = require('../../dist/lib/util.js');
 var randomInt = ownUtil.randomInt;
 var randomToken = ownUtil.randomToken;
 
-var ObliviousSet = require('../../dist/lib/oblivious-set')["default"];
+var _require = require('oblivious-set'),
+    ObliviousSet = _require.ObliviousSet;
 /**
  * windows sucks, so we have handle windows-type of socket-paths
  * @link https://gist.github.com/domenic/2790533#gistcomment-331356

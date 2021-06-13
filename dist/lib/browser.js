@@ -278,7 +278,7 @@ function _stopListening(channel) {
     channel.method.onMessage(channel._state, null, time);
   }
 }
-},{"./method-chooser.js":6,"./options.js":12,"./util.js":13}],2:[function(require,module,exports){
+},{"./method-chooser.js":6,"./options.js":11,"./util.js":12}],2:[function(require,module,exports){
 "use strict";
 
 var _module = require('./index.es5.js');
@@ -622,7 +622,7 @@ function createLeaderElection(channel, options) {
   channel._leaderElector = elector;
   return elector;
 }
-},{"./util.js":13,"@babel/runtime/helpers/interopRequireDefault":14,"unload":19}],6:[function(require,module,exports){
+},{"./util.js":12,"@babel/runtime/helpers/interopRequireDefault":13,"unload":19}],6:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -703,10 +703,8 @@ function chooseMethod(options) {
     return m.type;
   })));else return useMethod;
 }
-},{"./methods/indexed-db.js":7,"./methods/localstorage.js":8,"./methods/native.js":9,"./methods/simulate.js":10,"./util":13,"@babel/runtime/helpers/interopRequireDefault":14}],7:[function(require,module,exports){
+},{"./methods/indexed-db.js":7,"./methods/localstorage.js":8,"./methods/native.js":9,"./methods/simulate.js":10,"./util":12,"@babel/runtime/helpers/interopRequireDefault":13}],7:[function(require,module,exports){
 "use strict";
-
-var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -729,7 +727,7 @@ exports["default"] = exports.type = exports.microSeconds = void 0;
 
 var _util = require("../util.js");
 
-var _obliviousSet = _interopRequireDefault(require("../oblivious-set"));
+var _obliviousSet = require("oblivious-set");
 
 var _options = require("../options");
 
@@ -921,7 +919,7 @@ function create(channelName, options) {
        * contains all messages that have been emitted before
        * @type {ObliviousSet}
        */
-      eMIs: new _obliviousSet["default"](options.idb.ttl * 2),
+      eMIs: new _obliviousSet.ObliviousSet(options.idb.ttl * 2),
       // ensures we do not read messages in parrallel
       writeBlockPromise: Promise.resolve(),
       messagesCallback: null,
@@ -1056,10 +1054,8 @@ var _default = {
   microSeconds: microSeconds
 };
 exports["default"] = _default;
-},{"../oblivious-set":11,"../options":12,"../util.js":13,"@babel/runtime/helpers/interopRequireDefault":14}],8:[function(require,module,exports){
+},{"../options":11,"../util.js":12,"oblivious-set":16}],8:[function(require,module,exports){
 "use strict";
-
-var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -1076,7 +1072,7 @@ exports.canBeUsed = canBeUsed;
 exports.averageResponseTime = averageResponseTime;
 exports["default"] = exports.type = exports.microSeconds = void 0;
 
-var _obliviousSet = _interopRequireDefault(require("../oblivious-set"));
+var _obliviousSet = require("oblivious-set");
 
 var _options = require("../options");
 
@@ -1183,7 +1179,7 @@ function create(channelName, options) {
    * @type {ObliviousSet}
    */
 
-  var eMIs = new _obliviousSet["default"](options.localstorage.removeTimeout);
+  var eMIs = new _obliviousSet.ObliviousSet(options.localstorage.removeTimeout);
   var state = {
     channelName: channelName,
     uuid: uuid,
@@ -1256,7 +1252,7 @@ var _default = {
   microSeconds: microSeconds
 };
 exports["default"] = _default;
-},{"../oblivious-set":11,"../options":12,"../util":13,"@babel/runtime/helpers/interopRequireDefault":14}],9:[function(require,module,exports){
+},{"../options":11,"../util":12,"oblivious-set":16}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1343,7 +1339,7 @@ var _default = {
   microSeconds: microSeconds
 };
 exports["default"] = _default;
-},{"../util":13}],10:[function(require,module,exports){
+},{"../util":12}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1419,65 +1415,7 @@ var _default = {
   microSeconds: microSeconds
 };
 exports["default"] = _default;
-},{"../util":13}],11:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = void 0;
-
-/**
- * this is a set which automatically forgets
- * a given entry when a new entry is set and the ttl
- * of the old one is over
- * @constructor
- */
-var ObliviousSet = function ObliviousSet(ttl) {
-  var set = new Set();
-  var timeMap = new Map();
-  this.has = set.has.bind(set);
-
-  this.add = function (value) {
-    timeMap.set(value, now());
-    set.add(value);
-
-    _removeTooOldValues();
-  };
-
-  this.clear = function () {
-    set.clear();
-    timeMap.clear();
-  };
-
-  function _removeTooOldValues() {
-    var olderThen = now() - ttl;
-    var iterator = set[Symbol.iterator]();
-
-    while (true) {
-      var value = iterator.next().value;
-      if (!value) return; // no more elements
-
-      var time = timeMap.get(value);
-
-      if (time < olderThen) {
-        timeMap["delete"](value);
-        set["delete"](value);
-      } else {
-        // we reached a value that is not old enough
-        return;
-      }
-    }
-  }
-};
-
-function now() {
-  return new Date().getTime();
-}
-
-var _default = ObliviousSet;
-exports["default"] = _default;
-},{}],12:[function(require,module,exports){
+},{"../util":12}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1509,7 +1447,7 @@ function fillOptionsWithDefaults() {
   if (typeof options.node.useFastPath === 'undefined') options.node.useFastPath = true;
   return options;
 }
-},{}],13:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 (function (process){(function (){
 "use strict";
 
@@ -1585,7 +1523,7 @@ function microSeconds() {
 var isNode = Object.prototype.toString.call(typeof process !== 'undefined' ? process : 0) === '[object process]';
 exports.isNode = isNode;
 }).call(this)}).call(this,require('_process'))
-},{"_process":17}],14:[function(require,module,exports){
+},{"_process":17}],13:[function(require,module,exports){
 function _interopRequireDefault(obj) {
   return obj && obj.__esModule ? obj : {
     "default": obj
@@ -1594,11 +1532,83 @@ function _interopRequireDefault(obj) {
 
 module.exports = _interopRequireDefault;
 module.exports["default"] = module.exports, module.exports.__esModule = true;
-},{}],15:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 
-},{}],16:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 module.exports = false;
 
+
+},{}],16:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.now = exports.removeTooOldValues = exports.ObliviousSet = void 0;
+/**
+ * this is a set which automatically forgets
+ * a given entry when a new entry is set and the ttl
+ * of the old one is over
+ */
+var ObliviousSet = /** @class */ (function () {
+    function ObliviousSet(ttl) {
+        this.ttl = ttl;
+        this.set = new Set();
+        this.timeMap = new Map();
+    }
+    ObliviousSet.prototype.has = function (value) {
+        return this.set.has(value);
+    };
+    ObliviousSet.prototype.add = function (value) {
+        var _this = this;
+        this.timeMap.set(value, now());
+        this.set.add(value);
+        /**
+         * When a new value is added,
+         * start the cleanup at the next tick
+         * to not block the cpu for more important stuff
+         * that might happen.
+         */
+        setTimeout(function () {
+            removeTooOldValues(_this);
+        }, 0);
+    };
+    ObliviousSet.prototype.clear = function () {
+        this.set.clear();
+        this.timeMap.clear();
+    };
+    return ObliviousSet;
+}());
+exports.ObliviousSet = ObliviousSet;
+/**
+ * Removes all entries from the set
+ * where the TTL has expired
+ */
+function removeTooOldValues(obliviousSet) {
+    var olderThen = now() - obliviousSet.ttl;
+    var iterator = obliviousSet.set[Symbol.iterator]();
+    /**
+     * Because we can assume the new values are added at the bottom,
+     * we start from the top and stop as soon as we reach a non-too-old value.
+     */
+    while (true) {
+        var value = iterator.next().value;
+        if (!value) {
+            return; // no more elements
+        }
+        var time = obliviousSet.timeMap.get(value);
+        if (time < olderThen) {
+            obliviousSet.timeMap.delete(value);
+            obliviousSet.set.delete(value);
+        }
+        else {
+            // We reached a value that is not old enough
+            return;
+        }
+    }
+}
+exports.removeTooOldValues = removeTooOldValues;
+function now() {
+    return new Date().getTime();
+}
+exports.now = now;
 
 },{}],17:[function(require,module,exports){
 // shim for using process in browser
@@ -1900,4 +1910,4 @@ var _default = {
   getSize: getSize
 };
 exports["default"] = _default;
-},{"./browser.js":18,"./node.js":15,"@babel/runtime/helpers/interopRequireDefault":14,"detect-node":16}]},{},[2]);
+},{"./browser.js":18,"./node.js":14,"@babel/runtime/helpers/interopRequireDefault":13,"detect-node":15}]},{},[2]);

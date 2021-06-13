@@ -1,7 +1,5 @@
 "use strict";
 
-var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
-
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -23,7 +21,7 @@ exports["default"] = exports.type = exports.microSeconds = void 0;
 
 var _util = require("../util.js");
 
-var _obliviousSet = _interopRequireDefault(require("../oblivious-set"));
+var _obliviousSet = require("oblivious-set");
 
 var _options = require("../options");
 
@@ -215,7 +213,7 @@ function create(channelName, options) {
        * contains all messages that have been emitted before
        * @type {ObliviousSet}
        */
-      eMIs: new _obliviousSet["default"](options.idb.ttl * 2),
+      eMIs: new _obliviousSet.ObliviousSet(options.idb.ttl * 2),
       // ensures we do not read messages in parrallel
       writeBlockPromise: Promise.resolve(),
       messagesCallback: null,

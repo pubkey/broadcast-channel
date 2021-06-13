@@ -5,7 +5,7 @@
  * @link https://caniuse.com/#feat=namevalue-storage
  * @link https://caniuse.com/#feat=indexeddb
  */
-import ObliviousSet from '../oblivious-set';
+import { ObliviousSet } from 'oblivious-set';
 import { fillOptionsWithDefaults } from '../options';
 import { sleep, randomToken, microSeconds as micro, isNode } from '../util';
 export var microSeconds = micro;

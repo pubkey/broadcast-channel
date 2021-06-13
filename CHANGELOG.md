@@ -2,6 +2,11 @@
 
 ## X.X.X (comming soon)
 
+## 3.7.0 (13 June 2021)
+
+Other:
+  - Moved `ObliviousSet` into [its own npm module](https://www.npmjs.com/package/oblivious-set)
+
 ## 3.6.0 (19 May 2021)
 
 Features:
