@@ -118,7 +118,7 @@
     "rollup-plugin-uglify": "6.0.4",
     "testcafe": "1.14.2",
     "ts-node": "10.0.0",
-    "typescript": "4.3.4",
+    "typescript": "4.3.5",
     "watchify": "4.0.0",
     "webpack": "5.41.1",
     "webpack-cli": "4.7.2"
