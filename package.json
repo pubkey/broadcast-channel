@@ -93,7 +93,7 @@
     "convert-hrtime": "5.0.0",
     "copyfiles": "2.4.1",
     "cross-env": "7.0.3",
-    "eslint": "7.30.0",
+    "eslint": "7.31.0",
     "gzip-size-cli": "5.0.0",
     "http-server": "0.12.3",
     "jest": "27.0.6",
