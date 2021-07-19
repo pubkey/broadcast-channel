@@ -1,4 +1,4 @@
-import { uglify } from 'rollup-plugin-uglify';
+import { terser } from 'rollup-plugin-terser';
 
 export default {
     input: './dist/es/index.js',
@@ -9,6 +9,6 @@ export default {
         file: './test_tmp/rollup.bundle.js'
     },
     plugins: [
-        uglify()
+        terser()
     ]
 };
