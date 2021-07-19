@@ -24,8 +24,8 @@
   "bugs": {
     "url": "https://github.com/pubkey/broadcast-channel/issues"
   },
-  "main": "./dist/lib/index.es5.js",
-  "jsnext:main": "./dist/es/index.js",
+  "browser": "./dist/lib/index.es5.js",
+  "main": "./dist/es/index.js",
   "module": "./dist/es/index.js",
   "sideEffects": false,
   "types": "./types/index.d.ts",
