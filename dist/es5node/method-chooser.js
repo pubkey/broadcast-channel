@@ -17,7 +17,7 @@ var _localstorage = _interopRequireDefault(require("./methods/localstorage.js"))
 
 var _simulate = _interopRequireDefault(require("./methods/simulate.js"));
 
-
+var NodeMethod = _interopRequireWildcard(require("../../src/methods/node.js"));
 
 var _util = require("./util");
 
@@ -39,7 +39,7 @@ function chooseMethod(options) {
 
   if (!process.browser) {
     // the line below will be removed from es5/browser builds
-
+    chooseMethods.push(NodeMethod);
   } // directly chosen
 
 

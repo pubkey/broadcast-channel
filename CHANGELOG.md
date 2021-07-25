@@ -2,6 +2,11 @@
 
 ## X.X.X (comming soon)
 
+## 4.0.0 (15 July 2021)
+
+Other:
+  - Changed entrypoints and method-choosing [#679](https://github.com/pubkey/broadcast-channel/pull/679). Thanks [benmccann](https://github.com/benmccann)
+
 ## 3.7.0 (13 June 2021)
 
 Other:

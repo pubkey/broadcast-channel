@@ -622,10 +622,13 @@ function createLeaderElection(channel, options) {
   channel._leaderElector = elector;
   return elector;
 }
-},{"./util.js":12,"@babel/runtime/helpers/interopRequireDefault":13,"unload":19}],6:[function(require,module,exports){
+},{"./util.js":12,"@babel/runtime/helpers/interopRequireDefault":13,"unload":20}],6:[function(require,module,exports){
+(function (process){(function (){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+var _typeof = require("@babel/runtime/helpers/typeof");
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -640,38 +643,31 @@ var _localstorage = _interopRequireDefault(require("./methods/localstorage.js"))
 
 var _simulate = _interopRequireDefault(require("./methods/simulate.js"));
 
+
+
 var _util = require("./util");
 
+function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
+
+function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== "object" && typeof obj !== "function") { return { "default": obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj["default"] = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
+// the line below will be removed from es5/browser builds
+// the non-transpiled code runs faster
 // order is important
 var METHODS = [_native["default"], // fastest
 _indexedDb["default"], _localstorage["default"]];
-/**
- * The NodeMethod is loaded lazy
- * so it will not get bundled in browser-builds
- */
-
-if (_util.isNode) {
-  /**
-   * we use the non-transpiled code for nodejs
-   * because it runs faster
-   */
-  var NodeMethod = require('../../src/methods/' + // use this hack so that browserify and others
-  // do not import the node-method by default
-  // when bundling.
-  'node.js');
-  /**
-   * this will be false for webpackbuilds
-   * which will shim the node-method with an empty object {}
-   */
-
-
-  if (typeof NodeMethod.canBeUsed === 'function') {
-    METHODS.push(NodeMethod);
-  }
-}
 
 function chooseMethod(options) {
-  var chooseMethods = [].concat(options.methods, METHODS).filter(Boolean); // directly chosen
+  var chooseMethods = [].concat(options.methods, METHODS).filter(Boolean); // process.browser check allows ES6 builds to be used on server or client. Bundlers like
+  // Browserify, Webpack, etc. define process.browser and can then dead code eliminate the unused
+  // import. However, we still use sed during build of es5/browser build to remove the import so
+  // that it's also removed from non-minified version
+
+  if (!process.browser) {
+    // the line below will be removed from es5/browser builds
+
+  } // directly chosen
+
 
   if (options.type) {
     if (options.type === 'simulate') {
@@ -699,11 +695,12 @@ function chooseMethod(options) {
   var useMethod = chooseMethods.find(function (method) {
     return method.canBeUsed();
   });
-  if (!useMethod) throw new Error('No useable methode found:' + JSON.stringify(METHODS.map(function (m) {
+  if (!useMethod) throw new Error("No useable method found in " + JSON.stringify(METHODS.map(function (m) {
     return m.type;
   })));else return useMethod;
 }
-},{"./methods/indexed-db.js":7,"./methods/localstorage.js":8,"./methods/native.js":9,"./methods/simulate.js":10,"./util":12,"@babel/runtime/helpers/interopRequireDefault":13}],7:[function(require,module,exports){
+}).call(this)}).call(this,require('_process'))
+},{"./methods/indexed-db.js":7,"./methods/localstorage.js":8,"./methods/native.js":9,"./methods/simulate.js":10,"./util":12,"@babel/runtime/helpers/interopRequireDefault":13,"@babel/runtime/helpers/typeof":14,"_process":18}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1054,7 +1051,7 @@ var _default = {
   microSeconds: microSeconds
 };
 exports["default"] = _default;
-},{"../options":11,"../util.js":12,"oblivious-set":16}],8:[function(require,module,exports){
+},{"../options":11,"../util.js":12,"oblivious-set":17}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1252,7 +1249,7 @@ var _default = {
   microSeconds: microSeconds
 };
 exports["default"] = _default;
-},{"../options":11,"../util":12,"oblivious-set":16}],9:[function(require,module,exports){
+},{"../options":11,"../util":12,"oblivious-set":17}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1523,7 +1520,7 @@ function microSeconds() {
 var isNode = Object.prototype.toString.call(typeof process !== 'undefined' ? process : 0) === '[object process]';
 exports.isNode = isNode;
 }).call(this)}).call(this,require('_process'))
-},{"_process":17}],13:[function(require,module,exports){
+},{"_process":18}],13:[function(require,module,exports){
 function _interopRequireDefault(obj) {
   return obj && obj.__esModule ? obj : {
     "default": obj
@@ -1533,12 +1530,35 @@ function _interopRequireDefault(obj) {
 module.exports = _interopRequireDefault;
 module.exports["default"] = module.exports, module.exports.__esModule = true;
 },{}],14:[function(require,module,exports){
+function _typeof(obj) {
+  "@babel/helpers - typeof";
 
+  if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
+    module.exports = _typeof = function _typeof(obj) {
+      return typeof obj;
+    };
+
+    module.exports["default"] = module.exports, module.exports.__esModule = true;
+  } else {
+    module.exports = _typeof = function _typeof(obj) {
+      return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+    };
+
+    module.exports["default"] = module.exports, module.exports.__esModule = true;
+  }
+
+  return _typeof(obj);
+}
+
+module.exports = _typeof;
+module.exports["default"] = module.exports, module.exports.__esModule = true;
 },{}],15:[function(require,module,exports){
+
+},{}],16:[function(require,module,exports){
 module.exports = false;
 
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.now = exports.removeTooOldValues = exports.ObliviousSet = void 0;
@@ -1610,7 +1630,7 @@ function now() {
 }
 exports.now = now;
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -1796,7 +1816,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1840,7 +1860,7 @@ var _default = {
   add: add
 };
 exports["default"] = _default;
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -1910,4 +1930,4 @@ var _default = {
   getSize: getSize
 };
 exports["default"] = _default;
-},{"./browser.js":18,"./node.js":14,"@babel/runtime/helpers/interopRequireDefault":13,"detect-node":15}]},{},[2]);
+},{"./browser.js":19,"./node.js":15,"@babel/runtime/helpers/interopRequireDefault":13,"detect-node":16}]},{},[2]);

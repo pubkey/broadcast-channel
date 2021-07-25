@@ -511,8 +511,7 @@ function _getReadersUuids() {
             }).filter(function (split) {
               return split[1] === 'json';
             }) // do not scan .socket-files
-            . // do not scan .socket-files
-            map(function (split) {
+            .map(function (split) {
               return split[0];
             }));
 

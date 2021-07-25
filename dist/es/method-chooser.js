@@ -1,38 +1,25 @@
 import NativeMethod from './methods/native.js';
 import IndexeDbMethod from './methods/indexed-db.js';
 import LocalstorageMethod from './methods/localstorage.js';
-import SimulateMethod from './methods/simulate.js';
+import SimulateMethod from './methods/simulate.js'; // the line below will be removed from es5/browser builds
+
+import * as NodeMethod from '../../src/methods/node.js'; // the non-transpiled code runs faster
+
 import { isNode } from './util'; // order is important
 
 var METHODS = [NativeMethod, // fastest
 IndexeDbMethod, LocalstorageMethod];
-/**
- * The NodeMethod is loaded lazy
- * so it will not get bundled in browser-builds
- */
-
-if (isNode) {
-  /**
-   * we use the non-transpiled code for nodejs
-   * because it runs faster
-   */
-  var NodeMethod = require('../../src/methods/' + // use this hack so that browserify and others
-  // do not import the node-method by default
-  // when bundling.
-  'node.js');
-  /**
-   * this will be false for webpackbuilds
-   * which will shim the node-method with an empty object {}
-   */
-
-
-  if (typeof NodeMethod.canBeUsed === 'function') {
-    METHODS.push(NodeMethod);
-  }
-}
-
 export function chooseMethod(options) {
-  var chooseMethods = [].concat(options.methods, METHODS).filter(Boolean); // directly chosen
+  var chooseMethods = [].concat(options.methods, METHODS).filter(Boolean); // process.browser check allows ES6 builds to be used on server or client. Bundlers like
+  // Browserify, Webpack, etc. define process.browser and can then dead code eliminate the unused
+  // import. However, we still use sed during build of es5/browser build to remove the import so
+  // that it's also removed from non-minified version
+
+  if (!process.browser) {
+    // the line below will be removed from es5/browser builds
+    chooseMethods.push(NodeMethod);
+  } // directly chosen
+
 
   if (options.type) {
     if (options.type === 'simulate') {
@@ -60,7 +47,7 @@ export function chooseMethod(options) {
   var useMethod = chooseMethods.find(function (method) {
     return method.canBeUsed();
   });
-  if (!useMethod) throw new Error('No useable methode found:' + JSON.stringify(METHODS.map(function (m) {
+  if (!useMethod) throw new Error("No useable method found in " + JSON.stringify(METHODS.map(function (m) {
     return m.type;
   })));else return useMethod;
 }
