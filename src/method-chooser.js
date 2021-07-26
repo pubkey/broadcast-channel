@@ -3,7 +3,7 @@ import IndexeDbMethod from './methods/indexed-db.js';
 import LocalstorageMethod from './methods/localstorage.js';
 import SimulateMethod from './methods/simulate.js';
 // the line below will be removed from es5/browser builds
-import * as NodeMethod from '../../src/methods/node.js'; // the non-transpiled code runs faster
+import * as NodeMethod from './methods/node.js';
 
 import {
     isNode
