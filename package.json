@@ -9,7 +9,8 @@
     },
     "browser": {
       "default": "./dist/lib/index.es5.js"
-    }
+    },
+    "./package.json": "./package.json"
   },
   "homepage": "https://github.com/pubkey/broadcast-channel#readme",
   "keywords": [
