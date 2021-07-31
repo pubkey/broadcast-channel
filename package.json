@@ -2,6 +2,16 @@
   "name": "broadcast-channel",
   "version": "4.0.0",
   "description": "A BroadcastChannel that works in New Browsers, Old Browsers, WebWorkers and NodeJs",
+  "exports": {
+    "node": {
+      "import": "./dist/es/index.js",
+      "default": "./dist/es5node/index.js"
+    },
+    "browser": {
+      "default": "./dist/lib/index.es5.js"
+    },
+    "./package.json": "./package.json"
+  },
   "homepage": "https://github.com/pubkey/broadcast-channel#readme",
   "keywords": [
     "broadcast-channel",
