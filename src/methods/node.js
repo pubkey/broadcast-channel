@@ -3,29 +3,27 @@
  * The ipc is handled via sockets and file-writes to the tmp-folder
  */
 
-const util = require('util');
-const fs = require('fs');
-const os = require('os');
-const events = require('events');
-const net = require('net');
-const path = require('path');
-const micro = require('nano-time');
-const rimraf = require('rimraf');
-const sha3_224 = require('js-sha3').sha3_224;
-const isNode = require('detect-node');
-const unload = require('unload');
+import util from 'util';
+import fs from 'fs';
+import os from 'os';
+import events from 'events';
+import net from 'net';
+import path from 'path';
+import micro from 'nano-time';
+import rimraf from 'rimraf';
+import { sha3_224 } from 'js-sha3';
+import isNode from 'detect-node';
+import unload from 'unload';
 
-const fillOptionsWithDefaults = require('../../dist/lib/options.js').fillOptionsWithDefaults;
-const ownUtil = require('../../dist/lib/util.js');
-const randomInt = ownUtil.randomInt;
-const randomToken = ownUtil.randomToken;
-const { ObliviousSet } = require('oblivious-set');
+import { fillOptionsWithDefaults } from '../options.js';
+import { randomInt, randomToken } from '../util.js';
+import { ObliviousSet } from 'oblivious-set';
 
 /**
  * windows sucks, so we have handle windows-type of socket-paths
  * @link https://gist.github.com/domenic/2790533#gistcomment-331356
  */
-function cleanPipeName(str) {
+export function cleanPipeName(str) {
     if (
         process.platform === 'win32' &&
         !str.startsWith('\\\\.\\pipe\\')
@@ -48,13 +46,13 @@ const removeDir = util.promisify(rimraf);
 
 const OTHER_INSTANCES = {};
 const TMP_FOLDER_NAME = 'pubkey.bc';
-const TMP_FOLDER_BASE = path.join(
+export const TMP_FOLDER_BASE = path.join(
     os.tmpdir(),
     TMP_FOLDER_NAME
 );
 const getPathsCache = new Map();
 
-function getPaths(channelName) {
+export function getPaths(channelName) {
     if (!getPathsCache.has(channelName)) {
         const channelHash = sha3_224(channelName); // use hash incase of strange characters
         /**
@@ -96,7 +94,7 @@ async function ensureBaseFolderExists() {
     return ENSURE_BASE_FOLDER_EXISTS_PROMISE;
 }
 
-async function ensureFoldersExist(channelName, paths) {
+export async function ensureFoldersExist(channelName, paths) {
     paths = paths || getPaths(channelName);
 
     await ensureBaseFolderExists();
@@ -120,7 +118,7 @@ async function ensureFoldersExist(channelName, paths) {
  * removes the tmp-folder
  * @return {Promise<true>}
  */
-async function clearNodeFolder() {
+export async function clearNodeFolder() {
     if (!TMP_FOLDER_BASE || TMP_FOLDER_BASE === '' || TMP_FOLDER_BASE === '/') {
         throw new Error('BroadcastChannel.clearNodeFolder(): path is wrong');
     }
@@ -131,7 +129,7 @@ async function clearNodeFolder() {
 }
 
 
-function socketPath(channelName, readerUuid, paths) {
+export function socketPath(channelName, readerUuid, paths) {
     paths = paths || getPaths(channelName);
     const socketPath = path.join(
         paths.readers,
@@ -140,7 +138,7 @@ function socketPath(channelName, readerUuid, paths) {
     return cleanPipeName(socketPath);
 }
 
-function socketInfoPath(channelName, readerUuid, paths) {
+export function socketInfoPath(channelName, readerUuid, paths) {
     paths = paths || getPaths(channelName);
     const socketPath = path.join(
         paths.readers,
@@ -155,7 +153,7 @@ function socketInfoPath(channelName, readerUuid, paths) {
  * when used under fucking windows,
  * we have to set a normal file so other readers know our socket exists
  */
-function createSocketInfoFile(channelName, readerUuid, paths) {
+export function createSocketInfoFile(channelName, readerUuid, paths) {
     const pathToFile = socketInfoPath(channelName, readerUuid, paths);
     return writeFile(
         pathToFile,
@@ -169,7 +167,7 @@ function createSocketInfoFile(channelName, readerUuid, paths) {
  * returns the amount of channel-folders in the tmp-directory
  * @return {Promise<number>}
  */
-async function countChannelFolders() {
+export async function countChannelFolders() {
     await ensureBaseFolderExists();
     const folders = await readdir(TMP_FOLDER_BASE);
     return folders.length;
@@ -198,7 +196,7 @@ async function connectionError(originalError) {
  * creates the socket-file and subscribes to it
  * @return {{emitter: EventEmitter, server: any}}
  */
-async function createSocketEventEmitter(channelName, readerUuid, paths) {
+export async function createSocketEventEmitter(channelName, readerUuid, paths) {
     const pathToSocket = socketPath(channelName, readerUuid, paths);
 
     const emitter = new events.EventEmitter();
@@ -231,7 +229,7 @@ async function createSocketEventEmitter(channelName, readerUuid, paths) {
     };
 }
 
-async function openClientConnection(channelName, readerUuid) {
+export async function openClientConnection(channelName, readerUuid) {
     const pathToSocket = socketPath(channelName, readerUuid);
     const client = new net.Socket();
     return new Promise((res, rej) => {
@@ -249,7 +247,7 @@ async function openClientConnection(channelName, readerUuid) {
  * so other readers can find it
  * @return {Promise}
  */
-function writeMessage(channelName, readerUuid, messageJson, paths) {
+export function writeMessage(channelName, readerUuid, messageJson, paths) {
     paths = paths || getPaths(channelName);
     const time = microSeconds();
     const writeObject = {
@@ -283,7 +281,7 @@ function writeMessage(channelName, readerUuid, messageJson, paths) {
  * returns the uuids of all readers
  * @return {string[]}
  */
-async function getReadersUuids(channelName, paths) {
+export async function getReadersUuids(channelName, paths) {
     paths = paths || getPaths(channelName);
     const readersPath = paths.readers;
     const files = await readdir(readersPath);
@@ -294,7 +292,7 @@ async function getReadersUuids(channelName, paths) {
         .map(split => split[0]);
 }
 
-async function messagePath(channelName, time, token, writerUuid) {
+export async function messagePath(channelName, time, token, writerUuid) {
     const fileName = time + '_' + writerUuid + '_' + token + '.json';
 
     const msgPath = path.join(
@@ -304,7 +302,7 @@ async function messagePath(channelName, time, token, writerUuid) {
     return msgPath;
 }
 
-async function getAllMessages(channelName, paths) {
+export async function getAllMessages(channelName, paths) {
     paths = paths || getPaths(channelName);
     const messagesPath = paths.messages;
     const files = await readdir(messagesPath);
@@ -324,7 +322,7 @@ async function getAllMessages(channelName, paths) {
     });
 }
 
-function getSingleMessage(channelName, msgObj, paths) {
+export function getSingleMessage(channelName, msgObj, paths) {
     paths = paths || getPaths(channelName);
 
     return {
@@ -339,12 +337,12 @@ function getSingleMessage(channelName, msgObj, paths) {
 }
 
 
-function readMessage(messageObj) {
+export function readMessage(messageObj) {
     return readFile(messageObj.path, 'utf8')
         .then(content => JSON.parse(content));
 }
 
-async function cleanOldMessages(messageObjects, ttl) {
+export async function cleanOldMessages(messageObjects, ttl) {
     const olderThen = Date.now() - ttl;
     await Promise.all(
         messageObjects
@@ -355,13 +353,13 @@ async function cleanOldMessages(messageObjects, ttl) {
 
 
 
-const type = 'node';
+export const type = 'node';
 
 /**
  * creates a new channelState
  * @return {Promise<any>}
  */
-async function create(channelName, options = {}) {
+export async function create(channelName, options = {}) {
     options = fillOptionsWithDefaults(options);
     const time = microSeconds();
     const paths = getPaths(channelName);
@@ -422,7 +420,7 @@ async function create(channelName, options = {}) {
     return state;
 }
 
-function _filterMessage(msgObj, state) {
+export function _filterMessage(msgObj, state) {
     if (msgObj.senderUuid === state.uuid) return false; // not send by own
     if (state.emittedMessagesIds.has(msgObj.token)) return false; // not already emitted
     if (!state.messagesCallback) return false; // no listener
@@ -437,7 +435,7 @@ function _filterMessage(msgObj, state) {
  * when the socket pings, so that we now new messages came,
  * run this
  */
-async function handleMessagePing(state, msgObj) {
+export async function handleMessagePing(state, msgObj) {
 
     /**
      * when there are no listener, we do nothing
@@ -485,7 +483,7 @@ async function handleMessagePing(state, msgObj) {
  * ensures that the channelState is connected with all other readers
  * @return {Promise<void>}
  */
-function refreshReaderClients(channelState) {
+export function refreshReaderClients(channelState) {
     return getReadersUuids(channelState.channelName, channelState.paths)
         .then(otherReaders => {
             // remove subscriptions to closed readers
@@ -526,7 +524,7 @@ function refreshReaderClients(channelState) {
  * post a message to the other readers
  * @return {Promise<void>}
  */
-function postMessage(channelState, messageJson) {
+export function postMessage(channelState, messageJson) {
     const writePromise = writeMessage(
         channelState.channelName,
         channelState.uuid,
@@ -578,7 +576,7 @@ function postMessage(channelState, messageJson) {
  * This might not happen often in production
  * but will speed up things when this module is used in unit-tests.
  */
-function emitOverFastPath(state, msgObj, messageJson) {
+export function emitOverFastPath(state, msgObj, messageJson) {
     if (!state.options.node.useFastPath) return; // disabled
     const others = OTHER_INSTANCES[state.channelName].filter(s => s !== state);
 
@@ -596,7 +594,7 @@ function emitOverFastPath(state, msgObj, messageJson) {
 }
 
 
-function onMessage(channelState, fn, time = microSeconds()) {
+export function onMessage(channelState, fn, time = microSeconds()) {
     channelState.messagesCallbackTime = time;
     channelState.messagesCallback = fn;
     handleMessagePing(channelState);
@@ -606,7 +604,7 @@ function onMessage(channelState, fn, time = microSeconds()) {
  * closes the channel
  * @return {Promise}
  */
-function close(channelState) {
+export function close(channelState) {
     if (channelState.closed) return;
     channelState.closed = true;
     channelState.emittedMessagesIds.clear();
@@ -642,7 +640,7 @@ function close(channelState) {
 }
 
 
-function canBeUsed() {
+export function canBeUsed() {
     return isNode;
 }
 
@@ -652,43 +650,10 @@ function canBeUsed() {
  * Also it is more important that the leader-election is reliable,
  * then to have a fast election.
  */
-function averageResponseTime() {
+export function averageResponseTime() {
     return 200;
 }
 
-function microSeconds() {
+export function microSeconds() {
     return parseInt(micro.microseconds());
 }
-
-module.exports = {
-    TMP_FOLDER_BASE,
-    cleanPipeName,
-    getPaths,
-    ensureFoldersExist,
-    clearNodeFolder,
-    socketPath,
-    socketInfoPath,
-    createSocketInfoFile,
-    countChannelFolders,
-    createSocketEventEmitter,
-    openClientConnection,
-    writeMessage,
-    getReadersUuids,
-    messagePath,
-    getAllMessages,
-    getSingleMessage,
-    readMessage,
-    cleanOldMessages,
-    type,
-    create,
-    _filterMessage,
-    handleMessagePing,
-    refreshReaderClients,
-    postMessage,
-    emitOverFastPath,
-    onMessage,
-    close,
-    canBeUsed,
-    averageResponseTime,
-    microSeconds
-};
