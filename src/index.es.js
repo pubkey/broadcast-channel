@@ -4,7 +4,7 @@ import {
 
 import {
     chooseMethod
-} from './method-chooser-node.js';
+} from './method-chooser.js';
 
 setChooseMethod(chooseMethod);
 

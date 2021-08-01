@@ -1,7 +1,12 @@
 "use strict";
 
+var _broadcastChannel = require("./broadcast-channel");
+
+var _methodChooserNode = require("./method-chooser-node.js");
+
 var _index = require("./index.js");
 
+(0, _broadcastChannel.setChooseMethod)(_methodChooserNode.chooseMethod);
 /**
  * because babel can only export on default-attribute,
  * we use this for the non-module-build
@@ -10,6 +15,7 @@ var _index = require("./index.js");
  * but
  * var BroadcastChannel = require('broadcast-channel');
  */
+
 module.exports = {
   BroadcastChannel: _index.BroadcastChannel,
   createLeaderElection: _index.createLeaderElection,

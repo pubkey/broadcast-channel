@@ -13,12 +13,13 @@ import net from 'net';
 import path from 'path';
 import micro from 'nano-time';
 import rimraf from 'rimraf';
-import { sha3_224 } from 'js-sha3';
+import sha3 from 'js-sha3';
 import isNode from 'detect-node';
 import unload from 'unload';
-import { fillOptionsWithDefaults } from '../options.js';
-import { randomInt, randomToken } from '../util.js';
+import { fillOptionsWithDefaults } from '../options.mjs';
+import { randomInt, randomToken } from '../util.mjs';
 import { ObliviousSet } from 'oblivious-set';
+var sha3_224 = sha3.sha3_224;
 /**
  * windows sucks, so we have handle windows-type of socket-paths
  * @link https://gist.github.com/domenic/2790533#gistcomment-331356
@@ -193,7 +194,7 @@ export function socketPath(channelName, readerUuid, paths) {
 }
 export function socketInfoPath(channelName, readerUuid, paths) {
   paths = paths || getPaths(channelName);
-  var socketPath = path.join(paths.readers, readerUuid + '.json');
+  var socketPath = path.join(paths.readers, readerUuid + '.mjson');
   return socketPath;
 }
 /**
@@ -445,7 +446,7 @@ export function writeMessage(channelName, readerUuid, messageJson, paths) {
     data: messageJson
   };
   var token = randomToken();
-  var fileName = time + '_' + readerUuid + '_' + token + '.json';
+  var fileName = time + '_' + readerUuid + '_' + token + '.mjson';
   var msgPath = path.join(paths.messages, fileName);
   return writeFile(msgPath, JSON.stringify(writeObject)).then(function () {
     return {
@@ -509,7 +510,7 @@ function _messagePath() {
       while (1) {
         switch (_context14.prev = _context14.next) {
           case 0:
-            fileName = time + '_' + writerUuid + '_' + token + '.json';
+            fileName = time + '_' + writerUuid + '_' + token + '.mjson';
             msgPath = path.join(getPaths(channelName).messages, fileName);
             return _context14.abrupt("return", msgPath);
 
@@ -565,7 +566,7 @@ function _getAllMessages() {
 export function getSingleMessage(channelName, msgObj, paths) {
   paths = paths || getPaths(channelName);
   return {
-    path: path.join(paths.messages, msgObj.t + '_' + msgObj.u + '_' + msgObj.to + '.json'),
+    path: path.join(paths.messages, msgObj.t + '_' + msgObj.u + '_' + msgObj.to + '.mjson'),
     time: msgObj.t,
     senderUuid: msgObj.u,
     token: msgObj.to

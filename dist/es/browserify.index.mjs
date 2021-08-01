@@ -1,4 +1,4 @@
-var module = require('./index.es5.js');
+var module = require('./index.es5.mjs');
 
 var BroadcastChannel = module.BroadcastChannel;
 var createLeaderElection = module.createLeaderElection;

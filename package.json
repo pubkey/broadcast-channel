@@ -5,15 +5,12 @@
   "exports": {
     ".": {
       "node": {
-        "import": "./dist/es/index.js",
+        "import": "./dist/es/index.mjs",
         "default": "./dist/es5node/index.js"
       },
       "browser": {
-        "import": "./dist/es/index.js",
+        "import": "./dist/esbrowser/index.es.mjs",
         "default": "./dist/lib/index.es5.js"
-      },
-      "module": {
-        "default": "./dist/es/index.js"
       }
     },
     "./package.json": "./package.json"
@@ -41,7 +38,7 @@
     "url": "https://github.com/pubkey/broadcast-channel/issues"
   },
   "main": "./dist/es5node/index.js",
-  "module": "./dist/es/index.js",
+  "module": "./dist/esbrowser/index.es.mjs",
   "browser": "./dist/lib/index.es5.js",
   "sideEffects": false,
   "types": "./types/index.d.ts",
@@ -61,7 +58,8 @@
     "size:rollup": "npm run build && rollup --config ./config/rollup.config.js && echo \"Build-Size Rollup (minified+gzip):\" && gzip-size --raw ./test_tmp/rollup.bundle.js",
     "lint": "eslint src test config",
     "clear": "rimraf -rf ./dist && rimraf -rf ./gen",
-    "build:es6": "rimraf -rf dist/es && cross-env NODE_ENV=es6 babel src --out-dir dist/es",
+    "build:es6": "rimraf -rf dist/es && cross-env NODE_ENV=es6 babel src --out-dir dist/es --out-file-extension .mjs && find ./dist/es -name \"*\\.mjs\" -print0 | xargs -0 sed -i 's/\\.js/\\.mjs/g'",
+    "build:es6browser": "rimraf -rf dist/esbrowser && cross-env NODE_ENV=es6 babel src --out-dir dist/esbrowser --out-file-extension .mjs && find ./dist/esbrowser -name \"*\\.mjs\" -print0 | xargs -0 sed -i 's/\\.js/\\.mjs/g'",
     "build:es5node": "cross-env NODE_ENV=es5 babel src --out-dir dist/es5node",
     "build:es5browser": "cross-env NODE_ENV=es5 babel src --out-dir dist/lib && grep -rl NodeMethod dist/lib/ | xargs sed -i 's/.*NodeMethod.*//'",
     "build:test": "cross-env NODE_ENV=es5 babel test --out-dir test_tmp",
@@ -72,7 +70,7 @@
     "build:leader-iframe": "browserify test_tmp/scripts/leader-iframe.js > docs/leader-iframe.js",
     "build:lib-browser": "browserify dist/lib/browserify.index.js > dist/lib/browser.js",
     "build:lib-browser:min": "uglifyjs --compress --mangle --output dist/lib/browser.min.js -- dist/lib/browser.js",
-    "build": "npm run clear && concurrently \"npm run build:es6\" \"npm run build:es5node\" \"npm run build:es5browser\" \"npm run build:test\" && concurrently \"npm run build:index\" \"npm run build:browser\" \"npm run build:worker\" \"npm run build:iframe\" \"npm run build:leader-iframe\" && npm run build:lib-browser && npm run build:lib-browser:min",
+    "build": "npm run clear && concurrently \"npm run build:es6\" \"npm run build:es6browser\" \"npm run build:es5node\" \"npm run build:es5browser\" \"npm run build:test\" && concurrently \"npm run build:index\" \"npm run build:browser\" \"npm run build:worker\" \"npm run build:iframe\" \"npm run build:leader-iframe\" && npm run build:lib-browser && npm run build:lib-browser:min",
     "build:min": "uglifyjs --compress --mangle --output dist/lib/browserify.min.js -- dist/lib/browserify.index.js",
     "docs:only": "http-server ./docs --silent",
     "docs:serve": "npm run build && echo \"Open http://localhost:8080/\" && npm run docs:only"

@@ -6,14 +6,14 @@
  * @link https://caniuse.com/#feat=indexeddb
  */
 import { ObliviousSet } from 'oblivious-set';
-import { fillOptionsWithDefaults } from '../options';
-import { sleep, randomToken, microSeconds as micro, isNode } from '../util';
+import { fillOptionsWithDefaults } from '../options.mjs';
+import { sleep, randomToken, microSeconds as micro, isNode } from '../util.mjs';
 export var microSeconds = micro;
 var KEY_PREFIX = 'pubkey.broadcastChannel-';
 export var type = 'localstorage';
 /**
  * copied from crosstab
- * @link https://github.com/tejacques/crosstab/blob/master/src/crosstab.js#L32
+ * @link https://github.com/tejacques/crosstab/blob/master/src/crosstab.mjs#L32
  */
 
 export function getLocalStorage() {

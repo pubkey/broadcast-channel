@@ -17,9 +17,9 @@ exports["default"] = exports.type = exports.microSeconds = void 0;
 
 var _obliviousSet = require("oblivious-set");
 
-var _options = require("../options");
+var _options = require("../options.js");
 
-var _util = require("../util");
+var _util = require("../util.js");
 
 /**
  * A localStorage-only method which uses localstorage and its 'storage'-event

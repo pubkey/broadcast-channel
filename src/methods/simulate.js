@@ -1,6 +1,6 @@
 import {
     microSeconds as micro,
-} from '../util';
+} from '../util.js';
 
 export const microSeconds = micro;
 

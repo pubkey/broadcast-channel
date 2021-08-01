@@ -34,6 +34,10 @@ Object.defineProperty(exports, "beLeader", {
   }
 });
 
-var _broadcastChannel = require("./broadcast-channel");
+var _broadcastChannel = require("./broadcast-channel.js");
 
-var _leaderElection = require("./leader-election");
+var _methodChooserNode = require("./method-chooser-node.js");
+
+var _leaderElection = require("./leader-election.js");
+
+(0, _broadcastChannel.setChooseMethod)(_methodChooserNode.chooseMethod);

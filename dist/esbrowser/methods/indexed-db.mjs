@@ -1,43 +1,16 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.getIdb = getIdb;
-exports.createDatabase = createDatabase;
-exports.writeMessage = writeMessage;
-exports.getAllMessages = getAllMessages;
-exports.getMessagesHigherThan = getMessagesHigherThan;
-exports.removeMessageById = removeMessageById;
-exports.getOldMessages = getOldMessages;
-exports.cleanOldMessages = cleanOldMessages;
-exports.create = create;
-exports.close = close;
-exports.postMessage = postMessage;
-exports.onMessage = onMessage;
-exports.canBeUsed = canBeUsed;
-exports.averageResponseTime = averageResponseTime;
-exports["default"] = exports.type = exports.microSeconds = void 0;
-
-var _util = require("../util.js");
-
-var _obliviousSet = require("oblivious-set");
-
-var _options = require("../options.js");
-
 /**
  * this method uses indexeddb to store the messages
  * There is currently no observerAPI for idb
  * @link https://github.com/w3c/IndexedDB/issues/51
  */
-var microSeconds = _util.microSeconds;
-exports.microSeconds = microSeconds;
+import { sleep, randomInt, randomToken, microSeconds as micro, isNode } from '../util.mjs';
+export var microSeconds = micro;
+import { ObliviousSet } from 'oblivious-set';
+import { fillOptionsWithDefaults } from '../options.mjs';
 var DB_PREFIX = 'pubkey.broadcast-channel-0-';
 var OBJECT_STORE_ID = 'messages';
-var type = 'idb';
-exports.type = type;
-
-function getIdb() {
+export var type = 'idb';
+export function getIdb() {
   if (typeof indexedDB !== 'undefined') return indexedDB;
 
   if (typeof window !== 'undefined') {
@@ -48,8 +21,7 @@ function getIdb() {
 
   return false;
 }
-
-function createDatabase(channelName) {
+export function createDatabase(channelName) {
   var IndexedDB = getIdb(); // create table
 
   var dbName = DB_PREFIX + channelName;
@@ -79,8 +51,7 @@ function createDatabase(channelName) {
  * so other readers can find it
  */
 
-
-function writeMessage(db, readerUuid, messageJson) {
+export function writeMessage(db, readerUuid, messageJson) {
   var time = new Date().getTime();
   var writeObject = {
     uuid: readerUuid,
@@ -101,8 +72,7 @@ function writeMessage(db, readerUuid, messageJson) {
     objectStore.add(writeObject);
   });
 }
-
-function getAllMessages(db) {
+export function getAllMessages(db) {
   var objectStore = db.transaction(OBJECT_STORE_ID).objectStore(OBJECT_STORE_ID);
   var ret = [];
   return new Promise(function (res) {
@@ -119,8 +89,7 @@ function getAllMessages(db) {
     };
   });
 }
-
-function getMessagesHigherThan(db, lastCursorId) {
+export function getMessagesHigherThan(db, lastCursorId) {
   var objectStore = db.transaction(OBJECT_STORE_ID).objectStore(OBJECT_STORE_ID);
   var ret = [];
 
@@ -153,8 +122,7 @@ function getMessagesHigherThan(db, lastCursorId) {
     };
   });
 }
-
-function removeMessageById(db, id) {
+export function removeMessageById(db, id) {
   var request = db.transaction([OBJECT_STORE_ID], 'readwrite').objectStore(OBJECT_STORE_ID)["delete"](id);
   return new Promise(function (res) {
     request.onsuccess = function () {
@@ -162,8 +130,7 @@ function removeMessageById(db, id) {
     };
   });
 }
-
-function getOldMessages(db, ttl) {
+export function getOldMessages(db, ttl) {
   var olderThen = new Date().getTime() - ttl;
   var objectStore = db.transaction(OBJECT_STORE_ID).objectStore(OBJECT_STORE_ID);
   var ret = [];
@@ -189,31 +156,29 @@ function getOldMessages(db, ttl) {
     };
   });
 }
-
-function cleanOldMessages(db, ttl) {
+export function cleanOldMessages(db, ttl) {
   return getOldMessages(db, ttl).then(function (tooOld) {
     return Promise.all(tooOld.map(function (msgObj) {
       return removeMessageById(db, msgObj.id);
     }));
   });
 }
-
-function create(channelName, options) {
-  options = (0, _options.fillOptionsWithDefaults)(options);
+export function create(channelName, options) {
+  options = fillOptionsWithDefaults(options);
   return createDatabase(channelName).then(function (db) {
     var state = {
       closed: false,
       lastCursorId: 0,
       channelName: channelName,
       options: options,
-      uuid: (0, _util.randomToken)(),
+      uuid: randomToken(),
 
       /**
        * emittedMessagesIds
        * contains all messages that have been emitted before
        * @type {ObliviousSet}
        */
-      eMIs: new _obliviousSet.ObliviousSet(options.idb.ttl * 2),
+      eMIs: new ObliviousSet(options.idb.ttl * 2),
       // ensures we do not read messages in parrallel
       writeBlockPromise: Promise.resolve(),
       messagesCallback: null,
@@ -247,7 +212,7 @@ function create(channelName, options) {
 function _readLoop(state) {
   if (state.closed) return;
   readNewMessages(state).then(function () {
-    return (0, _util.sleep)(state.options.idb.fallbackInterval);
+    return sleep(state.options.idb.fallbackInterval);
   }).then(function () {
     return _readLoop(state);
   });
@@ -303,41 +268,36 @@ function readNewMessages(state) {
   });
 }
 
-function close(channelState) {
+export function close(channelState) {
   channelState.closed = true;
   channelState.db.close();
 }
-
-function postMessage(channelState, messageJson) {
+export function postMessage(channelState, messageJson) {
   channelState.writeBlockPromise = channelState.writeBlockPromise.then(function () {
     return writeMessage(channelState.db, channelState.uuid, messageJson);
   }).then(function () {
-    if ((0, _util.randomInt)(0, 10) === 0) {
+    if (randomInt(0, 10) === 0) {
       /* await (do not await) */
       cleanOldMessages(channelState.db, channelState.options.idb.ttl);
     }
   });
   return channelState.writeBlockPromise;
 }
-
-function onMessage(channelState, fn, time) {
+export function onMessage(channelState, fn, time) {
   channelState.messagesCallbackTime = time;
   channelState.messagesCallback = fn;
   readNewMessages(channelState);
 }
-
-function canBeUsed() {
-  if (_util.isNode) return false;
+export function canBeUsed() {
+  if (isNode) return false;
   var idb = getIdb();
   if (!idb) return false;
   return true;
 }
-
-function averageResponseTime(options) {
+export function averageResponseTime(options) {
   return options.idb.fallbackInterval * 2;
 }
-
-var _default = {
+export default {
   create: create,
   close: close,
   onMessage: onMessage,
@@ -347,4 +307,3 @@ var _default = {
   averageResponseTime: averageResponseTime,
   microSeconds: microSeconds
 };
-exports["default"] = _default;

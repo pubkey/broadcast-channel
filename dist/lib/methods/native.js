@@ -11,7 +11,7 @@ exports.canBeUsed = canBeUsed;
 exports.averageResponseTime = averageResponseTime;
 exports["default"] = exports.type = exports.microSeconds = void 0;
 
-var _util = require("../util");
+var _util = require("../util.js");
 
 var microSeconds = _util.microSeconds;
 exports.microSeconds = microSeconds;

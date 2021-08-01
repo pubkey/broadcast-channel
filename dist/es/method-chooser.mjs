@@ -1,33 +1,18 @@
-"use strict";
+import NativeMethod from './methods/native.mjs';
+import IndexeDbMethod from './methods/indexed-db.mjs';
+import LocalstorageMethod from './methods/localstorage.mjs';
+import SimulateMethod from './methods/simulate.mjs';
+import { isNode } from './util.mjs'; // order is important
 
-var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.chooseMethod = chooseMethod;
-
-var _native = _interopRequireDefault(require("./methods/native.js"));
-
-var _indexedDb = _interopRequireDefault(require("./methods/indexed-db.js"));
-
-var _localstorage = _interopRequireDefault(require("./methods/localstorage.js"));
-
-var _simulate = _interopRequireDefault(require("./methods/simulate.js"));
-
-var _util = require("./util.js");
-
-// order is important
-var METHODS = [_native["default"], // fastest
-_indexedDb["default"], _localstorage["default"]];
-
-function chooseMethod(options) {
+var METHODS = [NativeMethod, // fastest
+IndexeDbMethod, LocalstorageMethod];
+export function chooseMethod(options) {
   var chooseMethods = [].concat(options.methods, METHODS).filter(Boolean); // directly chosen
 
   if (options.type) {
     if (options.type === 'simulate') {
       // only use simulate-method if directly chosen
-      return _simulate["default"];
+      return SimulateMethod;
     }
 
     var ret = chooseMethods.find(function (m) {
@@ -41,7 +26,7 @@ function chooseMethod(options) {
    */
 
 
-  if (!options.webWorkerSupport && !_util.isNode) {
+  if (!options.webWorkerSupport && !isNode) {
     chooseMethods = chooseMethods.filter(function (m) {
       return m.type !== 'idb';
     });

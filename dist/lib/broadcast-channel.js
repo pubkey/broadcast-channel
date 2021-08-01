@@ -3,6 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.setChooseMethod = setChooseMethod;
 exports.clearNodeFolder = clearNodeFolder;
 exports.enforceOptions = enforceOptions;
 exports.BroadcastChannel = void 0;
@@ -13,6 +14,12 @@ var _methodChooser = require("./method-chooser.js");
 
 var _options = require("./options.js");
 
+var chooseMethod = _methodChooser.chooseMethod;
+
+function setChooseMethod(m) {
+  chooseMethod = m;
+}
+
 var BroadcastChannel = function BroadcastChannel(name, options) {
   this.name = name;
 
@@ -21,7 +28,7 @@ var BroadcastChannel = function BroadcastChannel(name, options) {
   }
 
   this.options = (0, _options.fillOptionsWithDefaults)(options);
-  this.method = (0, _methodChooser.chooseMethod)(this.options); // isListening
+  this.method = chooseMethod(this.options); // isListening
 
   this._iL = false;
   /**
@@ -78,7 +85,7 @@ BroadcastChannel._pubkey = true;
 
 function clearNodeFolder(options) {
   options = (0, _options.fillOptionsWithDefaults)(options);
-  var method = (0, _methodChooser.chooseMethod)(options);
+  var method = chooseMethod(options);
 
   if (method.type === 'node') {
     return method.clearNodeFolder().then(function () {

@@ -1,3 +1,13 @@
+import {
+    setChooseMethod
+} from './broadcast-channel';
+
+import {
+    chooseMethod
+} from './method-chooser-node.js';
+
+setChooseMethod(chooseMethod);
+
 /**
  * because babel can only export on default-attribute,
  * we use this for the non-module-build

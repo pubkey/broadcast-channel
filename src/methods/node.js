@@ -11,13 +11,15 @@ import net from 'net';
 import path from 'path';
 import micro from 'nano-time';
 import rimraf from 'rimraf';
-import { sha3_224 } from 'js-sha3';
+import sha3 from 'js-sha3';
 import isNode from 'detect-node';
 import unload from 'unload';
 
 import { fillOptionsWithDefaults } from '../options.js';
 import { randomInt, randomToken } from '../util.js';
 import { ObliviousSet } from 'oblivious-set';
+
+const { sha3_224 } = sha3;
 
 /**
  * windows sucks, so we have handle windows-type of socket-paths

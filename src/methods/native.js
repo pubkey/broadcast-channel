@@ -1,7 +1,7 @@
 import {
     microSeconds as micro,
     isNode
-} from '../util';
+} from '../util.js';
 
 export const microSeconds = micro;
 

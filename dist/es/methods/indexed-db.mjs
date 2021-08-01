@@ -3,10 +3,10 @@
  * There is currently no observerAPI for idb
  * @link https://github.com/w3c/IndexedDB/issues/51
  */
-import { sleep, randomInt, randomToken, microSeconds as micro, isNode } from '../util.js';
+import { sleep, randomInt, randomToken, microSeconds as micro, isNode } from '../util.mjs';
 export var microSeconds = micro;
 import { ObliviousSet } from 'oblivious-set';
-import { fillOptionsWithDefaults } from '../options';
+import { fillOptionsWithDefaults } from '../options.mjs';
 var DB_PREFIX = 'pubkey.broadcast-channel-0-';
 var OBJECT_STORE_ID = 'messages';
 export var type = 'idb';

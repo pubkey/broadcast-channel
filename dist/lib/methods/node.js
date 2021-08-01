@@ -55,7 +55,7 @@ var _nanoTime = _interopRequireDefault(require("nano-time"));
 
 var _rimraf = _interopRequireDefault(require("rimraf"));
 
-var _jsSha = require("js-sha3");
+var _jsSha = _interopRequireDefault(require("js-sha3"));
 
 var _detectNode = _interopRequireDefault(require("detect-node"));
 
@@ -71,11 +71,12 @@ var _obliviousSet = require("oblivious-set");
  * this method is used in nodejs-environments.
  * The ipc is handled via sockets and file-writes to the tmp-folder
  */
-
+var sha3_224 = _jsSha["default"].sha3_224;
 /**
  * windows sucks, so we have handle windows-type of socket-paths
  * @link https://gist.github.com/domenic/2790533#gistcomment-331356
  */
+
 function cleanPipeName(str) {
   if (process.platform === 'win32' && !str.startsWith('\\\\.\\pipe\\')) {
     str = str.replace(/^\//, '');
@@ -110,7 +111,7 @@ var getPathsCache = new Map();
 
 function getPaths(channelName) {
   if (!getPathsCache.has(channelName)) {
-    var channelHash = (0, _jsSha.sha3_224)(channelName); // use hash incase of strange characters
+    var channelHash = sha3_224(channelName); // use hash incase of strange characters
 
     /**
      * because the lenght of socket-paths is limited, we use only the first 20 chars

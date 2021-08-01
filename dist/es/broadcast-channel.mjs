@@ -1,6 +1,10 @@
-import { isPromise } from './util.js';
-import { chooseMethod } from './method-chooser.js';
-import { fillOptionsWithDefaults } from './options.js';
+import { isPromise } from './util.mjs';
+import { chooseMethod as cm } from './method-chooser.mjs';
+import { fillOptionsWithDefaults } from './options.mjs';
+var chooseMethod = cm;
+export function setChooseMethod(m) {
+  chooseMethod = m;
+}
 export var BroadcastChannel = function BroadcastChannel(name, options) {
   this.name = name;
 
@@ -53,7 +57,7 @@ export var BroadcastChannel = function BroadcastChannel(name, options) {
 /**
  * used to identify if someone overwrites
  * window.BroadcastChannel with this
- * See methods/native.js
+ * See methods/native.mjs
  */
 
 BroadcastChannel._pubkey = true;

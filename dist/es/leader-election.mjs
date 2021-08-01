@@ -1,4 +1,4 @@
-import { sleep, randomToken } from './util.js';
+import { sleep, randomToken } from './util.mjs';
 import unload from 'unload';
 
 var LeaderElection = function LeaderElection(channel, options) {

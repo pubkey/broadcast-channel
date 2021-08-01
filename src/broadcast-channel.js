@@ -3,13 +3,18 @@ import {
 } from './util.js';
 
 import {
-    chooseMethod
+    chooseMethod as cm
 } from './method-chooser.js';
 
 import {
     fillOptionsWithDefaults
 } from './options.js';
 
+let chooseMethod = cm;
+
+export function setChooseMethod(m) {
+    chooseMethod = m;
+}
 
 export const BroadcastChannel = function (name, options) {
     this.name = name;

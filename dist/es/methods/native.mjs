@@ -1,4 +1,4 @@
-import { microSeconds as micro, isNode } from '../util';
+import { microSeconds as micro, isNode } from '../util.mjs';
 export var microSeconds = micro;
 export var type = 'native';
 export function create(channelName) {
