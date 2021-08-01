@@ -1,11 +1,18 @@
 import NativeMethod from './methods/native.js';
 import IndexeDbMethod from './methods/indexed-db.js';
 import LocalstorageMethod from './methods/localstorage.js';
-import SimulateMethod from './methods/simulate.js'; // the line below will be removed from es5/browser builds
+import SimulateMethod from './methods/simulate.js';
+import { isNode } from './util';
+var NodeMethod;
 
-import * as NodeMethod from '../../src/methods/node.js'; // the non-transpiled code runs faster
+if (isNode) {
+  import('./methods/node.js').then(function (m) {
+    return NodeMethod = m;
+  })["catch"](function (err) {
+    throw new Error("could not load NodeMethod, error: " + err);
+  });
+} // order is important
 
-import { isNode } from './util'; // order is important
 
 var METHODS = [NativeMethod, // fastest
 IndexeDbMethod, LocalstorageMethod];
@@ -15,7 +22,7 @@ export function chooseMethod(options) {
   // import. However, we still use sed during build of es5/browser build to remove the import so
   // that it's also removed from non-minified version
 
-  if (!process.browser) {
+  if (typeof process !== 'undefined' && !process.browser) {
     // the line below will be removed from es5/browser builds
     chooseMethods.push(NodeMethod);
   } // directly chosen

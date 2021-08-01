@@ -2,51 +2,80 @@
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.cleanPipeName = cleanPipeName;
+exports.getPaths = getPaths;
+exports.ensureFoldersExist = ensureFoldersExist;
+exports.clearNodeFolder = clearNodeFolder;
+exports.socketPath = socketPath;
+exports.socketInfoPath = socketInfoPath;
+exports.createSocketInfoFile = createSocketInfoFile;
+exports.countChannelFolders = countChannelFolders;
+exports.createSocketEventEmitter = createSocketEventEmitter;
+exports.openClientConnection = openClientConnection;
+exports.writeMessage = writeMessage;
+exports.getReadersUuids = getReadersUuids;
+exports.messagePath = messagePath;
+exports.getAllMessages = getAllMessages;
+exports.getSingleMessage = getSingleMessage;
+exports.readMessage = readMessage;
+exports.cleanOldMessages = cleanOldMessages;
+exports.create = create;
+exports._filterMessage = _filterMessage;
+exports.handleMessagePing = handleMessagePing;
+exports.refreshReaderClients = refreshReaderClients;
+exports.postMessage = postMessage;
+exports.emitOverFastPath = emitOverFastPath;
+exports.onMessage = onMessage;
+exports.close = close;
+exports.canBeUsed = canBeUsed;
+exports.averageResponseTime = averageResponseTime;
+exports.microSeconds = microSeconds;
+exports.type = exports.TMP_FOLDER_BASE = void 0;
+
 var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"));
 
 var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/asyncToGenerator"));
+
+var _util = _interopRequireDefault(require("util"));
+
+var _fs = _interopRequireDefault(require("fs"));
+
+var _os = _interopRequireDefault(require("os"));
+
+var _events = _interopRequireDefault(require("events"));
+
+var _net = _interopRequireDefault(require("net"));
+
+var _path = _interopRequireDefault(require("path"));
+
+var _nanoTime = _interopRequireDefault(require("nano-time"));
+
+var _rimraf = _interopRequireDefault(require("rimraf"));
+
+var _jsSha = require("js-sha3");
+
+var _detectNode = _interopRequireDefault(require("detect-node"));
+
+var _unload = _interopRequireDefault(require("unload"));
+
+var _options = require("../options.js");
+
+var _util2 = require("../util.js");
+
+var _obliviousSet = require("oblivious-set");
 
 /**
  * this method is used in nodejs-environments.
  * The ipc is handled via sockets and file-writes to the tmp-folder
  */
-var util = require('util');
 
-var fs = require('fs');
-
-var os = require('os');
-
-var events = require('events');
-
-var net = require('net');
-
-var path = require('path');
-
-var micro = require('nano-time');
-
-var rimraf = require('rimraf');
-
-var sha3_224 = require('js-sha3').sha3_224;
-
-var isNode = require('detect-node');
-
-var unload = require('unload');
-
-var fillOptionsWithDefaults = require('../../dist/lib/options.js').fillOptionsWithDefaults;
-
-var ownUtil = require('../../dist/lib/util.js');
-
-var randomInt = ownUtil.randomInt;
-var randomToken = ownUtil.randomToken;
-
-var _require = require('oblivious-set'),
-    ObliviousSet = _require.ObliviousSet;
 /**
  * windows sucks, so we have handle windows-type of socket-paths
  * @link https://gist.github.com/domenic/2790533#gistcomment-331356
  */
-
-
 function cleanPipeName(str) {
   if (process.platform === 'win32' && !str.startsWith('\\\\.\\pipe\\')) {
     str = str.replace(/^\//, '');
@@ -57,21 +86,31 @@ function cleanPipeName(str) {
   }
 }
 
-var mkdir = util.promisify(fs.mkdir);
-var writeFile = util.promisify(fs.writeFile);
-var readFile = util.promisify(fs.readFile);
-var unlink = util.promisify(fs.unlink);
-var readdir = util.promisify(fs.readdir);
-var chmod = util.promisify(fs.chmod);
-var removeDir = util.promisify(rimraf);
+var mkdir = _util["default"].promisify(_fs["default"].mkdir);
+
+var writeFile = _util["default"].promisify(_fs["default"].writeFile);
+
+var readFile = _util["default"].promisify(_fs["default"].readFile);
+
+var unlink = _util["default"].promisify(_fs["default"].unlink);
+
+var readdir = _util["default"].promisify(_fs["default"].readdir);
+
+var chmod = _util["default"].promisify(_fs["default"].chmod);
+
+var removeDir = _util["default"].promisify(_rimraf["default"]);
+
 var OTHER_INSTANCES = {};
 var TMP_FOLDER_NAME = 'pubkey.bc';
-var TMP_FOLDER_BASE = path.join(os.tmpdir(), TMP_FOLDER_NAME);
+
+var TMP_FOLDER_BASE = _path["default"].join(_os["default"].tmpdir(), TMP_FOLDER_NAME);
+
+exports.TMP_FOLDER_BASE = TMP_FOLDER_BASE;
 var getPathsCache = new Map();
 
 function getPaths(channelName) {
   if (!getPathsCache.has(channelName)) {
-    var channelHash = sha3_224(channelName); // use hash incase of strange characters
+    var channelHash = (0, _jsSha.sha3_224)(channelName); // use hash incase of strange characters
 
     /**
      * because the lenght of socket-paths is limited, we use only the first 20 chars
@@ -80,9 +119,13 @@ function getPaths(channelName) {
      */
 
     var channelFolder = 'A' + channelHash.substring(0, 20);
-    var channelPathBase = path.join(TMP_FOLDER_BASE, channelFolder);
-    var folderPathReaders = path.join(channelPathBase, 'rdrs');
-    var folderPathMessages = path.join(channelPathBase, 'messages');
+
+    var channelPathBase = _path["default"].join(TMP_FOLDER_BASE, channelFolder);
+
+    var folderPathReaders = _path["default"].join(channelPathBase, 'rdrs');
+
+    var folderPathMessages = _path["default"].join(channelPathBase, 'messages');
+
     var ret = {
       channelBase: channelPathBase,
       readers: folderPathReaders,
@@ -215,13 +258,17 @@ function _clearNodeFolder() {
 
 function socketPath(channelName, readerUuid, paths) {
   paths = paths || getPaths(channelName);
-  var socketPath = path.join(paths.readers, readerUuid + '.s');
+
+  var socketPath = _path["default"].join(paths.readers, readerUuid + '.s');
+
   return cleanPipeName(socketPath);
 }
 
 function socketInfoPath(channelName, readerUuid, paths) {
   paths = paths || getPaths(channelName);
-  var socketPath = path.join(paths.readers, readerUuid + '.json');
+
+  var socketPath = _path["default"].join(paths.readers, readerUuid + '.json');
+
   return socketPath;
 }
 /**
@@ -339,8 +386,8 @@ function _createSocketEventEmitter() {
         switch (_context11.prev = _context11.next) {
           case 0:
             pathToSocket = socketPath(channelName, readerUuid, paths);
-            emitter = new events.EventEmitter();
-            server = net.createServer(function (stream) {
+            emitter = new _events["default"].EventEmitter();
+            server = _net["default"].createServer(function (stream) {
               stream.on('end', function () {});
               stream.on('data', function (msg) {
                 emitter.emit('data', msg.toString());
@@ -447,7 +494,7 @@ function _openClientConnection() {
         switch (_context12.prev = _context12.next) {
           case 0:
             pathToSocket = socketPath(channelName, readerUuid);
-            client = new net.Socket();
+            client = new _net["default"].Socket();
             return _context12.abrupt("return", new Promise(function (res, rej) {
               client.connect(pathToSocket, function () {
                 return res(client);
@@ -475,9 +522,11 @@ function writeMessage(channelName, readerUuid, messageJson, paths) {
     time: time,
     data: messageJson
   };
-  var token = randomToken();
+  var token = (0, _util2.randomToken)();
   var fileName = time + '_' + readerUuid + '_' + token + '.json';
-  var msgPath = path.join(paths.messages, fileName);
+
+  var msgPath = _path["default"].join(paths.messages, fileName);
+
   return writeFile(msgPath, JSON.stringify(writeObject)).then(function () {
     return {
       time: time,
@@ -542,7 +591,7 @@ function _messagePath() {
         switch (_context14.prev = _context14.next) {
           case 0:
             fileName = time + '_' + writerUuid + '_' + token + '.json';
-            msgPath = path.join(getPaths(channelName).messages, fileName);
+            msgPath = _path["default"].join(getPaths(channelName).messages, fileName);
             return _context14.abrupt("return", msgPath);
 
           case 3:
@@ -577,7 +626,7 @@ function _getAllMessages() {
               var fileName = file.split('.')[0];
               var split = fileName.split('_');
               return {
-                path: path.join(messagesPath, file),
+                path: _path["default"].join(messagesPath, file),
                 time: parseInt(split[0]),
                 senderUuid: split[1],
                 token: split[2]
@@ -597,7 +646,7 @@ function _getAllMessages() {
 function getSingleMessage(channelName, msgObj, paths) {
   paths = paths || getPaths(channelName);
   return {
-    path: path.join(paths.messages, msgObj.t + '_' + msgObj.u + '_' + msgObj.to + '.json'),
+    path: _path["default"].join(paths.messages, msgObj.t + '_' + msgObj.u + '_' + msgObj.to + '.json'),
     time: msgObj.t,
     senderUuid: msgObj.u,
     token: msgObj.to
@@ -647,6 +696,8 @@ var type = 'node';
  * @return {Promise<any>}
  */
 
+exports.type = type;
+
 function create(_x19) {
   return _create.apply(this, arguments);
 }
@@ -669,11 +720,11 @@ function _create() {
         switch (_context17.prev = _context17.next) {
           case 0:
             options = _args17.length > 1 && _args17[1] !== undefined ? _args17[1] : {};
-            options = fillOptionsWithDefaults(options);
+            options = (0, _options.fillOptionsWithDefaults)(options);
             time = microSeconds();
             paths = getPaths(channelName);
             ensureFolderExistsPromise = ensureFoldersExist(channelName, paths);
-            uuid = randomToken();
+            uuid = (0, _util2.randomToken)();
             state = {
               time: time,
               channelName: channelName,
@@ -681,14 +732,14 @@ function _create() {
               uuid: uuid,
               paths: paths,
               // contains all messages that have been emitted before
-              emittedMessagesIds: new ObliviousSet(options.node.ttl * 2),
+              emittedMessagesIds: new _obliviousSet.ObliviousSet(options.node.ttl * 2),
               messagesCallbackTime: null,
               messagesCallback: null,
               // ensures we do not read messages in parrallel
               writeBlockPromise: Promise.resolve(),
               otherReaderClients: {},
               // ensure if process crashes, everything is cleaned up
-              removeUnload: unload.add(function () {
+              removeUnload: _unload["default"].add(function () {
                 return close(state);
               }),
               closed: false
@@ -981,7 +1032,7 @@ function postMessage(channelState, messageJson) {
              * only if random-int matches, we clean up old messages
              */
 
-            if (randomInt(0, 20) === 0) {
+            if ((0, _util2.randomInt)(0, 20) === 0) {
               /* await */
               getAllMessages(channelState.channelName, channelState.paths).then(function (allMessages) {
                 return cleanOldMessages(allMessages, channelState.options.node.ttl);
@@ -1057,7 +1108,7 @@ function close(channelState) {
 
     if (channelState.infoFilePath) {
       try {
-        fs.unlinkSync(channelState.infoFilePath);
+        _fs["default"].unlinkSync(channelState.infoFilePath);
       } catch (err) {}
     }
     /**
@@ -1074,7 +1125,7 @@ function close(channelState) {
 }
 
 function canBeUsed() {
-  return isNode;
+  return _detectNode["default"];
 }
 /**
  * on node we use a relatively height averageResponseTime,
@@ -1089,38 +1140,5 @@ function averageResponseTime() {
 }
 
 function microSeconds() {
-  return parseInt(micro.microseconds());
+  return parseInt(_nanoTime["default"].microseconds());
 }
-
-module.exports = {
-  TMP_FOLDER_BASE: TMP_FOLDER_BASE,
-  cleanPipeName: cleanPipeName,
-  getPaths: getPaths,
-  ensureFoldersExist: ensureFoldersExist,
-  clearNodeFolder: clearNodeFolder,
-  socketPath: socketPath,
-  socketInfoPath: socketInfoPath,
-  createSocketInfoFile: createSocketInfoFile,
-  countChannelFolders: countChannelFolders,
-  createSocketEventEmitter: createSocketEventEmitter,
-  openClientConnection: openClientConnection,
-  writeMessage: writeMessage,
-  getReadersUuids: getReadersUuids,
-  messagePath: messagePath,
-  getAllMessages: getAllMessages,
-  getSingleMessage: getSingleMessage,
-  readMessage: readMessage,
-  cleanOldMessages: cleanOldMessages,
-  type: type,
-  create: create,
-  _filterMessage: _filterMessage,
-  handleMessagePing: handleMessagePing,
-  refreshReaderClients: refreshReaderClients,
-  postMessage: postMessage,
-  emitOverFastPath: emitOverFastPath,
-  onMessage: onMessage,
-  close: close,
-  canBeUsed: canBeUsed,
-  averageResponseTime: averageResponseTime,
-  microSeconds: microSeconds
-};

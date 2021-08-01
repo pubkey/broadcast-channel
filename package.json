@@ -3,12 +3,18 @@
   "version": "4.0.0",
   "description": "A BroadcastChannel that works in New Browsers, Old Browsers, WebWorkers and NodeJs",
   "exports": {
-    "node": {
-      "import": "./dist/es/index.js",
-      "default": "./dist/es5node/index.js"
-    },
-    "browser": {
-      "default": "./dist/lib/index.es5.js"
+    ".": {
+      "node": {
+        "import": "./dist/es/index.js",
+        "default": "./dist/es5node/index.js"
+      },
+      "browser": {
+        "import": "./dist/es/index.js",
+        "default": "./dist/lib/index.es5.js"
+      },
+      "module": {
+        "default": "./dist/es/index.js"
+      }
     },
     "./package.json": "./package.json"
   },
