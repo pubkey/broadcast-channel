@@ -2,6 +2,12 @@
 
 ## X.X.X (comming soon)
 
+## 4.1.0 (2 August 2021)
+
+Bugfixes:
+  - Fixed various problems with the module loading. Thanks [benmccann](https://github.com/benmccann) and [chbdetta](https://github.com/chbdetta)
+
+
 ## 4.0.0 (15 July 2021)
 
 Other:

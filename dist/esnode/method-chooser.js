@@ -3,23 +3,15 @@ import IndexeDbMethod from './methods/indexed-db.js';
 import LocalstorageMethod from './methods/localstorage.js';
 import SimulateMethod from './methods/simulate.js'; // the line below will be removed from es5/browser builds
 
-import * as NodeMethod from '../../src/methods/node.js'; // the non-transpiled code runs faster
-
+import * as NodeMethod from './methods/node.js';
 import { isNode } from './util'; // order is important
 
 var METHODS = [NativeMethod, // fastest
 IndexeDbMethod, LocalstorageMethod];
 export function chooseMethod(options) {
-  var chooseMethods = [].concat(options.methods, METHODS).filter(Boolean); // process.browser check allows ES6 builds to be used on server or client. Bundlers like
-  // Browserify, Webpack, etc. define process.browser and can then dead code eliminate the unused
-  // import. However, we still use sed during build of es5/browser build to remove the import so
-  // that it's also removed from non-minified version
+  var chooseMethods = [].concat(options.methods, METHODS).filter(Boolean); // the line below will be removed from es5/browser builds
 
-  if (!process.browser) {
-    // the line below will be removed from es5/browser builds
-    chooseMethods.push(NodeMethod);
-  } // directly chosen
-
+  chooseMethods.push(NodeMethod); // directly chosen
 
   if (options.type) {
     if (options.type === 'simulate') {

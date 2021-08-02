@@ -5,44 +5,26 @@ import _regeneratorRuntime from "@babel/runtime/regenerator";
  * this method is used in nodejs-environments.
  * The ipc is handled via sockets and file-writes to the tmp-folder
  */
-var util = require('util');
-
-var fs = require('fs');
-
-var os = require('os');
-
-var events = require('events');
-
-var net = require('net');
-
-var path = require('path');
-
-var micro = require('nano-time');
-
-var rimraf = require('rimraf');
-
-var sha3_224 = require('js-sha3').sha3_224;
-
-var isNode = require('detect-node');
-
-var unload = require('unload');
-
-var fillOptionsWithDefaults = require('../../dist/lib/options.js').fillOptionsWithDefaults;
-
-var ownUtil = require('../../dist/lib/util.js');
-
-var randomInt = ownUtil.randomInt;
-var randomToken = ownUtil.randomToken;
-
-var _require = require('oblivious-set'),
-    ObliviousSet = _require.ObliviousSet;
+import util from 'util';
+import fs from 'fs';
+import os from 'os';
+import events from 'events';
+import net from 'net';
+import path from 'path';
+import micro from 'nano-time';
+import rimraf from 'rimraf';
+import { sha3_224 } from 'js-sha3';
+import isNode from 'detect-node';
+import unload from 'unload';
+import { fillOptionsWithDefaults } from '../options.js';
+import { randomInt, randomToken } from '../util.js';
+import { ObliviousSet } from 'oblivious-set';
 /**
  * windows sucks, so we have handle windows-type of socket-paths
  * @link https://gist.github.com/domenic/2790533#gistcomment-331356
  */
 
-
-function cleanPipeName(str) {
+export function cleanPipeName(str) {
   if (process.platform === 'win32' && !str.startsWith('\\\\.\\pipe\\')) {
     str = str.replace(/^\//, '');
     str = str.replace(/\//g, '-');
@@ -51,7 +33,6 @@ function cleanPipeName(str) {
     return str;
   }
 }
-
 var mkdir = util.promisify(fs.mkdir);
 var writeFile = util.promisify(fs.writeFile);
 var readFile = util.promisify(fs.readFile);
@@ -61,10 +42,9 @@ var chmod = util.promisify(fs.chmod);
 var removeDir = util.promisify(rimraf);
 var OTHER_INSTANCES = {};
 var TMP_FOLDER_NAME = 'pubkey.bc';
-var TMP_FOLDER_BASE = path.join(os.tmpdir(), TMP_FOLDER_NAME);
+export var TMP_FOLDER_BASE = path.join(os.tmpdir(), TMP_FOLDER_NAME);
 var getPathsCache = new Map();
-
-function getPaths(channelName) {
+export function getPaths(channelName) {
   if (!getPathsCache.has(channelName)) {
     var channelHash = sha3_224(channelName); // use hash incase of strange characters
 
@@ -89,7 +69,6 @@ function getPaths(channelName) {
 
   return getPathsCache.get(channelName);
 }
-
 var ENSURE_BASE_FOLDER_EXISTS_PROMISE = null;
 
 function ensureBaseFolderExists() {
@@ -120,14 +99,13 @@ function _ensureBaseFolderExists() {
   return _ensureBaseFolderExists.apply(this, arguments);
 }
 
-function ensureFoldersExist(_x, _x2) {
+export function ensureFoldersExist(_x, _x2) {
   return _ensureFoldersExist.apply(this, arguments);
 }
 /**
  * removes the tmp-folder
  * @return {Promise<true>}
  */
-
 
 function _ensureFoldersExist() {
   _ensureFoldersExist = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee5(channelName, paths) {
@@ -172,7 +150,7 @@ function _ensureFoldersExist() {
   return _ensureFoldersExist.apply(this, arguments);
 }
 
-function clearNodeFolder() {
+export function clearNodeFolder() {
   return _clearNodeFolder.apply(this, arguments);
 }
 
@@ -208,13 +186,12 @@ function _clearNodeFolder() {
   return _clearNodeFolder.apply(this, arguments);
 }
 
-function socketPath(channelName, readerUuid, paths) {
+export function socketPath(channelName, readerUuid, paths) {
   paths = paths || getPaths(channelName);
   var socketPath = path.join(paths.readers, readerUuid + '.s');
   return cleanPipeName(socketPath);
 }
-
-function socketInfoPath(channelName, readerUuid, paths) {
+export function socketInfoPath(channelName, readerUuid, paths) {
   paths = paths || getPaths(channelName);
   var socketPath = path.join(paths.readers, readerUuid + '.json');
   return socketPath;
@@ -225,8 +202,7 @@ function socketInfoPath(channelName, readerUuid, paths) {
  * we have to set a normal file so other readers know our socket exists
  */
 
-
-function createSocketInfoFile(channelName, readerUuid, paths) {
+export function createSocketInfoFile(channelName, readerUuid, paths) {
   var pathToFile = socketInfoPath(channelName, readerUuid, paths);
   return writeFile(pathToFile, JSON.stringify({
     time: microSeconds()
@@ -239,8 +215,7 @@ function createSocketInfoFile(channelName, readerUuid, paths) {
  * @return {Promise<number>}
  */
 
-
-function countChannelFolders() {
+export function countChannelFolders() {
   return _countChannelFolders.apply(this, arguments);
 }
 
@@ -322,7 +297,7 @@ function _connectionError() {
   return _connectionError.apply(this, arguments);
 }
 
-function createSocketEventEmitter(_x4, _x5, _x6) {
+export function createSocketEventEmitter(_x4, _x5, _x6) {
   return _createSocketEventEmitter.apply(this, arguments);
 }
 
@@ -424,7 +399,7 @@ function _createSocketEventEmitter() {
   return _createSocketEventEmitter.apply(this, arguments);
 }
 
-function openClientConnection(_x7, _x8) {
+export function openClientConnection(_x7, _x8) {
   return _openClientConnection.apply(this, arguments);
 }
 /**
@@ -432,7 +407,6 @@ function openClientConnection(_x7, _x8) {
  * so other readers can find it
  * @return {Promise}
  */
-
 
 function _openClientConnection() {
   _openClientConnection = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee12(channelName, readerUuid) {
@@ -462,7 +436,7 @@ function _openClientConnection() {
   return _openClientConnection.apply(this, arguments);
 }
 
-function writeMessage(channelName, readerUuid, messageJson, paths) {
+export function writeMessage(channelName, readerUuid, messageJson, paths) {
   paths = paths || getPaths(channelName);
   var time = microSeconds();
   var writeObject = {
@@ -487,8 +461,7 @@ function writeMessage(channelName, readerUuid, messageJson, paths) {
  * @return {string[]}
  */
 
-
-function getReadersUuids(_x9, _x10) {
+export function getReadersUuids(_x9, _x10) {
   return _getReadersUuids.apply(this, arguments);
 }
 
@@ -525,7 +498,7 @@ function _getReadersUuids() {
   return _getReadersUuids.apply(this, arguments);
 }
 
-function messagePath(_x11, _x12, _x13, _x14) {
+export function messagePath(_x11, _x12, _x13, _x14) {
   return _messagePath.apply(this, arguments);
 }
 
@@ -550,7 +523,7 @@ function _messagePath() {
   return _messagePath.apply(this, arguments);
 }
 
-function getAllMessages(_x15, _x16) {
+export function getAllMessages(_x15, _x16) {
   return _getAllMessages.apply(this, arguments);
 }
 
@@ -589,7 +562,7 @@ function _getAllMessages() {
   return _getAllMessages.apply(this, arguments);
 }
 
-function getSingleMessage(channelName, msgObj, paths) {
+export function getSingleMessage(channelName, msgObj, paths) {
   paths = paths || getPaths(channelName);
   return {
     path: path.join(paths.messages, msgObj.t + '_' + msgObj.u + '_' + msgObj.to + '.json'),
@@ -598,14 +571,12 @@ function getSingleMessage(channelName, msgObj, paths) {
     token: msgObj.to
   };
 }
-
-function readMessage(messageObj) {
+export function readMessage(messageObj) {
   return readFile(messageObj.path, 'utf8').then(function (content) {
     return JSON.parse(content);
   });
 }
-
-function cleanOldMessages(_x17, _x18) {
+export function cleanOldMessages(_x17, _x18) {
   return _cleanOldMessages.apply(this, arguments);
 }
 
@@ -636,13 +607,13 @@ function _cleanOldMessages() {
   return _cleanOldMessages.apply(this, arguments);
 }
 
-var type = 'node';
+export var type = 'node';
 /**
  * creates a new channelState
  * @return {Promise<any>}
  */
 
-function create(_x19) {
+export function create(_x19) {
   return _create.apply(this, arguments);
 }
 
@@ -731,7 +702,7 @@ function _create() {
   return _create.apply(this, arguments);
 }
 
-function _filterMessage(msgObj, state) {
+export function _filterMessage(msgObj, state) {
   if (msgObj.senderUuid === state.uuid) return false; // not send by own
 
   if (state.emittedMessagesIds.has(msgObj.token)) return false; // not already emitted
@@ -750,15 +721,13 @@ function _filterMessage(msgObj, state) {
  * run this
  */
 
-
-function handleMessagePing(_x20, _x21) {
+export function handleMessagePing(_x20, _x21) {
   return _handleMessagePing.apply(this, arguments);
 }
 /**
  * ensures that the channelState is connected with all other readers
  * @return {Promise<void>}
  */
-
 
 function _handleMessagePing() {
   _handleMessagePing = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee18(state, msgObj) {
@@ -835,7 +804,7 @@ function _handleMessagePing() {
   return _handleMessagePing.apply(this, arguments);
 }
 
-function refreshReaderClients(channelState) {
+export function refreshReaderClients(channelState) {
   return getReadersUuids(channelState.channelName, channelState.paths).then(function (otherReaders) {
     // remove subscriptions to closed readers
     Object.keys(channelState.otherReaderClients).filter(function (readerUuid) {
@@ -938,8 +907,7 @@ function refreshReaderClients(channelState) {
  * @return {Promise<void>}
  */
 
-
-function postMessage(channelState, messageJson) {
+export function postMessage(channelState, messageJson) {
   var writePromise = writeMessage(channelState.channelName, channelState.uuid, messageJson, channelState.paths);
   channelState.writeBlockPromise = channelState.writeBlockPromise.then( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee3() {
     var _yield$Promise$all, msgObj, pingStr, writeToReadersPromise;
@@ -1001,8 +969,7 @@ function postMessage(channelState, messageJson) {
  * but will speed up things when this module is used in unit-tests.
  */
 
-
-function emitOverFastPath(state, msgObj, messageJson) {
+export function emitOverFastPath(state, msgObj, messageJson) {
   if (!state.options.node.useFastPath) return; // disabled
 
   var others = OTHER_INSTANCES[state.channelName].filter(function (s) {
@@ -1019,8 +986,7 @@ function emitOverFastPath(state, msgObj, messageJson) {
     otherState.messagesCallback(messageJson);
   });
 }
-
-function onMessage(channelState, fn) {
+export function onMessage(channelState, fn) {
   var time = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : microSeconds();
   channelState.messagesCallbackTime = time;
   channelState.messagesCallback = fn;
@@ -1031,8 +997,7 @@ function onMessage(channelState, fn) {
  * @return {Promise}
  */
 
-
-function close(channelState) {
+export function close(channelState) {
   if (channelState.closed) return;
   channelState.closed = true;
   channelState.emittedMessagesIds.clear();
@@ -1067,8 +1032,7 @@ function close(channelState) {
     }, 200);
   });
 }
-
-function canBeUsed() {
+export function canBeUsed() {
   return isNode;
 }
 /**
@@ -1078,44 +1042,9 @@ function canBeUsed() {
  * then to have a fast election.
  */
 
-
-function averageResponseTime() {
+export function averageResponseTime() {
   return 200;
 }
-
-function microSeconds() {
+export function microSeconds() {
   return parseInt(micro.microseconds());
 }
-
-module.exports = {
-  TMP_FOLDER_BASE: TMP_FOLDER_BASE,
-  cleanPipeName: cleanPipeName,
-  getPaths: getPaths,
-  ensureFoldersExist: ensureFoldersExist,
-  clearNodeFolder: clearNodeFolder,
-  socketPath: socketPath,
-  socketInfoPath: socketInfoPath,
-  createSocketInfoFile: createSocketInfoFile,
-  countChannelFolders: countChannelFolders,
-  createSocketEventEmitter: createSocketEventEmitter,
-  openClientConnection: openClientConnection,
-  writeMessage: writeMessage,
-  getReadersUuids: getReadersUuids,
-  messagePath: messagePath,
-  getAllMessages: getAllMessages,
-  getSingleMessage: getSingleMessage,
-  readMessage: readMessage,
-  cleanOldMessages: cleanOldMessages,
-  type: type,
-  create: create,
-  _filterMessage: _filterMessage,
-  handleMessagePing: handleMessagePing,
-  refreshReaderClients: refreshReaderClients,
-  postMessage: postMessage,
-  emitOverFastPath: emitOverFastPath,
-  onMessage: onMessage,
-  close: close,
-  canBeUsed: canBeUsed,
-  averageResponseTime: averageResponseTime,
-  microSeconds: microSeconds
-};

@@ -623,7 +623,6 @@ function createLeaderElection(channel, options) {
   return elector;
 }
 },{"./util.js":12,"@babel/runtime/helpers/interopRequireDefault":13,"unload":20}],6:[function(require,module,exports){
-(function (process){(function (){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -652,21 +651,13 @@ function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "functio
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== "object" && typeof obj !== "function") { return { "default": obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj["default"] = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 // the line below will be removed from es5/browser builds
-// the non-transpiled code runs faster
 // order is important
 var METHODS = [_native["default"], // fastest
 _indexedDb["default"], _localstorage["default"]];
 
 function chooseMethod(options) {
-  var chooseMethods = [].concat(options.methods, METHODS).filter(Boolean); // process.browser check allows ES6 builds to be used on server or client. Bundlers like
-  // Browserify, Webpack, etc. define process.browser and can then dead code eliminate the unused
-  // import. However, we still use sed during build of es5/browser build to remove the import so
-  // that it's also removed from non-minified version
+  var chooseMethods = [].concat(options.methods, METHODS).filter(Boolean); // the line below will be removed from es5/browser builds
 
-  if (!process.browser) {
-    // the line below will be removed from es5/browser builds
-
-  } // directly chosen
 
 
   if (options.type) {
@@ -699,8 +690,7 @@ function chooseMethod(options) {
     return m.type;
   })));else return useMethod;
 }
-}).call(this)}).call(this,require('_process'))
-},{"./methods/indexed-db.js":7,"./methods/localstorage.js":8,"./methods/native.js":9,"./methods/simulate.js":10,"./util":12,"@babel/runtime/helpers/interopRequireDefault":13,"@babel/runtime/helpers/typeof":14,"_process":18}],7:[function(require,module,exports){
+},{"./methods/indexed-db.js":7,"./methods/localstorage.js":8,"./methods/native.js":9,"./methods/simulate.js":10,"./util":12,"@babel/runtime/helpers/interopRequireDefault":13,"@babel/runtime/helpers/typeof":14}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
