@@ -2,6 +2,10 @@
 
 ## X.X.X (comming soon)
 
+## 4.2.0 (3 August 2021)
+
+Bugfixes:
+  - Fixed Webpack 5 Relative Import Support. Thanks [catrielmuller](https://github.com/catrielmuller)
 ## 4.1.0 (2 August 2021)
 
 Bugfixes:
