@@ -12,5 +12,6 @@
   "prHourlyLimit": 2,
   "ignorePaths": [
     "test-electron/package.json"
-  ]
+  ],
+  "dependencyDashboard": false
 }
