@@ -19,6 +19,12 @@ export type LeaderElectionOptions = {
 export declare class LeaderElector {
 
     /**
+     * The broadcastChannel with which the
+     * leader elector was created.
+     */
+    readonly broadcastChannel: BroadcastChannel;
+
+    /**
      * IMPORTANT: The leader election is lazy,
      * it will not start before you call awaitLeadership()
      * so isLeader will never become true then
@@ -46,6 +52,6 @@ export declare class LeaderElector {
     onduplicate: OnMessageHandler<any>;
 }
 
-type CreateFunction = (channel: BroadcastChannel, options?: LeaderElectionOptions) => LeaderElector;
+type CreateFunction = (broadcastChannel: BroadcastChannel, options?: LeaderElectionOptions) => LeaderElector;
 
 export const createLeaderElection: CreateFunction;

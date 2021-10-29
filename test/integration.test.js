@@ -458,7 +458,8 @@ function runTest(channelOptions) {
                 it('should create an elector', () => {
                     const channelName = AsyncTestUtil.randomString(12);
                     const channel = new BroadcastChannel(channelName, channelOptions);
-                    createLeaderElection(channel);
+                    const elector = createLeaderElection(channel);
+                    assert.ok(elector.broadcastChannel);
                     channel.close();
                 });
             });

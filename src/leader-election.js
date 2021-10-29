@@ -2,13 +2,14 @@ import {
     sleep,
     randomToken,
     PROMISE_RESOLVED_FALSE,
+    PROMISE_RESOLVED_VOID,
     PROMISE_REJECTED
 } from './util.js';
 
 import unload from 'unload';
 
-const LeaderElection = function (channel, options) {
-    this._channel = channel;
+const LeaderElection = function (broadcastChannel, options) {
+    this.broadcastChannel = broadcastChannel;
     this._options = options;
 
     this.isLeader = false;
@@ -65,7 +66,7 @@ LeaderElection.prototype = {
                 }
             }
         };
-        this._channel.addEventListener('internal', handleMessage);
+        this.broadcastChannel.addEventListener('internal', handleMessage);
         const ret = _sendMessage(this, 'apply') // send out that this one is applying
             .then(() => sleep(this._options.responseTime)) // let others time to respond
             .then(() => {
@@ -87,7 +88,7 @@ LeaderElection.prototype = {
             .then(() => true)
             .catch(() => false) // apply not successfull
             .then(success => {
-                this._channel.removeEventListener('internal', handleMessage);
+                this.broadcastChannel.removeEventListener('internal', handleMessage);
                 this._isApl = false;
                 if (!success && this._reApply) {
                     this._reApply = false;
@@ -118,7 +119,7 @@ LeaderElection.prototype = {
         this.hasLeader = false;
         this.isDead = true;
 
-        this._lstns.forEach(listener => this._channel.removeEventListener('internal', listener));
+        this._lstns.forEach(listener => this.broadcastChannel.removeEventListener('internal', listener));
         this._invs.forEach(interval => clearInterval(interval));
         this._unl.forEach(uFn => {
             uFn.remove();
@@ -144,7 +145,7 @@ function _awaitLeadershipOnce(leaderElector) {
             }
             resolved = true;
             clearInterval(interval);
-            leaderElector._channel.removeEventListener('internal', whenDeathListener);
+            leaderElector.broadcastChannel.removeEventListener('internal', whenDeathListener);
             res(true);
         }
 
@@ -177,7 +178,7 @@ function _awaitLeadershipOnce(leaderElector) {
                     });
             }
         };
-        leaderElector._channel.addEventListener('internal', whenDeathListener);
+        leaderElector.broadcastChannel.addEventListener('internal', whenDeathListener);
         leaderElector._lstns.push(whenDeathListener);
     });
 }
@@ -191,7 +192,7 @@ function _sendMessage(leaderElector, action) {
         action,
         token: leaderElector.token
     };
-    return leaderElector._channel.postInternal(msgJson);
+    return leaderElector.broadcastChannel.postInternal(msgJson);
 }
 
 export function beLeader(leaderElector) {
@@ -219,7 +220,7 @@ export function beLeader(leaderElector) {
             _sendMessage(leaderElector, 'tell'); // ensure other leader also knows the problem
         }
     };
-    leaderElector._channel.addEventListener('internal', isLeaderListener);
+    leaderElector.broadcastChannel.addEventListener('internal', isLeaderListener);
     leaderElector._lstns.push(isLeaderListener);
     return _sendMessage(leaderElector, 'tell');
 }
