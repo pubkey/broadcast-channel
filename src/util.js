@@ -10,6 +10,10 @@ export function isPromise(obj) {
     }
 }
 
+export const PROMISE_RESOLVED_FALSE = Promise.resolve(false);
+export const PROMISE_RESOLVED_VOID = Promise.resolve();
+export const PROMISE_REJECTED = Promise.reject(new Error());
+
 export function sleep(time) {
     if (!time) time = 0;
     return new Promise(res => setTimeout(res, time));

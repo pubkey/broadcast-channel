@@ -16,7 +16,11 @@ import isNode from 'detect-node';
 import unload from 'unload';
 
 import { fillOptionsWithDefaults } from '../options.js';
-import { randomInt, randomToken } from '../util.js';
+import {
+    randomInt,
+    randomToken,
+    PROMISE_RESOLVED_VOID
+} from '../util.js';
 import { ObliviousSet } from 'oblivious-set';
 
 /**
@@ -377,7 +381,7 @@ export async function create(channelName, options = {}) {
         messagesCallbackTime: null,
         messagesCallback: null,
         // ensures we do not read messages in parrallel
-        writeBlockPromise: Promise.resolve(),
+        writeBlockPromise: PROMISE_RESOLVED_VOID,
         otherReaderClients: {},
         // ensure if process crashes, everything is cleaned up
         removeUnload: unload.add(() => close(state)),

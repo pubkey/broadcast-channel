@@ -9,7 +9,8 @@ import {
     randomInt,
     randomToken,
     microSeconds as micro,
-    isNode
+    isNode,
+    PROMISE_RESOLVED_VOID
 } from '../util.js';
 
 export const microSeconds = micro;
@@ -192,7 +193,7 @@ export function create(channelName, options) {
              */
             eMIs: new ObliviousSet(options.idb.ttl * 2),
             // ensures we do not read messages in parrallel
-            writeBlockPromise: Promise.resolve(),
+            writeBlockPromise: PROMISE_RESOLVED_VOID,
             messagesCallback: null,
             readQueuePromises: [],
             db
@@ -243,10 +244,10 @@ function _filterMessage(msgObj, state) {
 function readNewMessages(state) {
 
     // channel already closed
-    if (state.closed) return Promise.resolve();
+    if (state.closed) return PROMISE_RESOLVED_VOID;
 
     // if no one is listening, we do not need to scan for new messages
-    if (!state.messagesCallback) return Promise.resolve();
+    if (!state.messagesCallback) return PROMISE_RESOLVED_VOID;
 
     return getMessagesHigherThan(state.db, state.lastCursorId)
         .then(newerMessages => {
@@ -272,7 +273,7 @@ function readNewMessages(state) {
                 }
             });
 
-            return Promise.resolve();
+            return PROMISE_RESOLVED_VOID;
         });
 }
 

@@ -1,6 +1,8 @@
 import {
     sleep,
-    randomToken
+    randomToken,
+    PROMISE_RESOLVED_FALSE,
+    PROMISE_REJECTED
 } from './util.js';
 
 import unload from 'unload';
@@ -10,6 +12,7 @@ const LeaderElection = function (channel, options) {
     this._options = options;
 
     this.isLeader = false;
+    this.hasLeader = false;
     this.isDead = false;
     this.token = randomToken();
 
@@ -26,13 +29,17 @@ const LeaderElection = function (channel, options) {
 
 LeaderElection.prototype = {
     applyOnce() {
-        if (this.isLeader) return Promise.resolve(false);
-        if (this.isDead) return Promise.resolve(false);
+        if (this.isLeader) {
+            return PROMISE_RESOLVED_FALSE;
+        }
+        if (this.isDead) {
+            return PROMISE_RESOLVED_FALSE;
+        }
 
         // do nothing if already running
         if (this._isApl) {
             this._reApply = true;
-            return Promise.resolve(false);
+            return PROMISE_RESOLVED_FALSE;
         }
         this._isApl = true;
 
@@ -54,23 +61,27 @@ LeaderElection.prototype = {
                 if (msg.action === 'tell') {
                     // other is already leader
                     stopCriteria = true;
+                    this.hasLeader = true;
                 }
             }
         };
         this._channel.addEventListener('internal', handleMessage);
-
-
-
         const ret = _sendMessage(this, 'apply') // send out that this one is applying
             .then(() => sleep(this._options.responseTime)) // let others time to respond
             .then(() => {
-                if (stopCriteria) return Promise.reject(new Error());
-                else return _sendMessage(this, 'apply');
+                if (stopCriteria) {
+                    return PROMISE_REJECTED;
+                } else {
+                    return _sendMessage(this, 'apply');
+                }
             })
             .then(() => sleep(this._options.responseTime)) // let others time to respond
             .then(() => {
-                if (stopCriteria) return Promise.reject(new Error());
-                else return _sendMessage(this);
+                if (stopCriteria) {
+                    return PROMISE_REJECTED;
+                } else {
+                    return _sendMessage(this);
+                }
             })
             .then(() => beLeader(this)) // no one disagreed -> this one is now leader
             .then(() => true)
@@ -101,7 +112,10 @@ LeaderElection.prototype = {
     },
 
     die() {
-        if (this.isDead) return;
+        if (this.isDead || !this.isLeader) {
+            return;
+        }
+        this.hasLeader = false;
         this.isDead = true;
 
         this._lstns.forEach(listener => this._channel.removeEventListener('internal', listener));
@@ -113,8 +127,13 @@ LeaderElection.prototype = {
     }
 };
 
+/**
+ * @param leaderElector {LeaderElector}
+ */
 function _awaitLeadershipOnce(leaderElector) {
-    if (leaderElector.isLeader) return Promise.resolve();
+    if (leaderElector.isLeader) {
+        return PROMISE_RESOLVED_VOID;
+    }
 
     return new Promise((res) => {
         let resolved = false;
@@ -149,9 +168,13 @@ function _awaitLeadershipOnce(leaderElector) {
         // try when other leader dies
         const whenDeathListener = msg => {
             if (msg.context === 'leader' && msg.action === 'death') {
-                leaderElector.applyOnce().then(() => {
-                    if (leaderElector.isLeader) finish();
-                });
+                leaderElector.hasLeader = false;
+                leaderElector.applyOnce()
+                    .then(() => {
+                        if (leaderElector.isLeader) {
+                            finish();
+                        }
+                    });
             }
         };
         leaderElector._channel.addEventListener('internal', whenDeathListener);
@@ -173,6 +196,7 @@ function _sendMessage(leaderElector, action) {
 
 export function beLeader(leaderElector) {
     leaderElector.isLeader = true;
+    leaderElector.hasLeader = true;
     const unloadFn = unload.add(() => leaderElector.die());
     leaderElector._unl.push(unloadFn);
 

@@ -1,6 +1,7 @@
 import {
     microSeconds as micro,
-    isNode
+    isNode,
+    PROMISE_RESOLVED_VOID
 } from '../util';
 
 export const microSeconds = micro;
@@ -31,7 +32,7 @@ export function close(channelState) {
 export function postMessage(channelState, messageJson) {
     try {
         channelState.bc.postMessage(messageJson, false);
-        return Promise.resolve();
+        return PROMISE_RESOLVED_VOID;
     } catch (err) {
         return Promise.reject(err);
     }

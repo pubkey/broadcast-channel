@@ -642,6 +642,53 @@ function runTest(channelOptions) {
                     console.log('Finished: ' + JSON.stringify(channelOptions));
                 });
             });
+            describe('.hasLeader', () => {
+                it('should have hasLeader=true after election has run', async () => {
+                    const channelName = AsyncTestUtil.randomString(12);
+                    const channel = new BroadcastChannel(channelName, channelOptions);
+                    const channel2 = new BroadcastChannel(channelName, channelOptions);
+                    const elector = createLeaderElection(channel);
+                    const elector2 = createLeaderElection(channel2);
+
+                    await Promise.race([
+                        elector.awaitLeadership(),
+                        elector2.awaitLeadership()
+                    ]);
+
+                    await AsyncTestUtil.waitUntil(() => elector.hasLeader === true);
+                    await AsyncTestUtil.waitUntil(() => elector2.hasLeader === true);
+
+                    channel.close();
+                    channel2.close();
+                });
+                it('should have hasLeader=false after leader dies', async () => {
+                    const channelName = AsyncTestUtil.randomString(12);
+                    const channel = new BroadcastChannel(channelName, channelOptions);
+                    const channel2 = new BroadcastChannel(channelName, channelOptions);
+                    const elector = createLeaderElection(channel);
+                    const elector2 = createLeaderElection(channel2);
+
+                    await Promise.race([
+                        elector.awaitLeadership(),
+                        elector2.awaitLeadership()
+                    ]);
+
+                    const both = [elector, elector2];
+                    const leadingElector = both.find(e => e.isLeader);
+                    const nonLeadingElector = both.find(e => !e.isLeader);
+
+                    // First hasLeader should become false
+                    const waitForFalse = AsyncTestUtil.waitUntil(() => nonLeadingElector.hasLeader === false, 1000, 10);
+                    leadingElector.die();
+                    await waitForFalse;
+
+                    // Then it should become true again when the new leader was elected.
+                    await AsyncTestUtil.waitUntil(() => nonLeadingElector.hasLeader === true, 1000, 10);
+
+                    channel.close();
+                    channel2.close();
+                });
+            });
             describe('.onduplicate', () => {
                 it('should fire when duplicate leaders', async () => {
                     const channelName = AsyncTestUtil.randomString(12);

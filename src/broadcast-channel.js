@@ -1,5 +1,7 @@
 import {
-    isPromise
+    isPromise,
+    PROMISE_RESOLVED_FALSE,
+    PROMISE_RESOLVED_VOID
 } from './util.js';
 
 import {
@@ -79,7 +81,7 @@ export function clearNodeFolder(options) {
     if (method.type === 'node') {
         return method.clearNodeFolder().then(() => true);
     } else {
-        return Promise.resolve(false);
+        return PROMISE_RESOLVED_FALSE;
     }
 }
 
@@ -140,7 +142,7 @@ BroadcastChannel.prototype = {
             return;
         }
         this.closed = true;
-        const awaitPrepare = this._prepP ? this._prepP : Promise.resolve();
+        const awaitPrepare = this._prepP ? this._prepP : PROMISE_RESOLVED_VOID;
 
         this._onML = null;
         this._addEL.message = [];
@@ -174,7 +176,7 @@ function _post(broadcastChannel, type, msg) {
         data: msg
     };
 
-    const awaitPrepare = broadcastChannel._prepP ? broadcastChannel._prepP : Promise.resolve();
+    const awaitPrepare = broadcastChannel._prepP ? broadcastChannel._prepP : PROMISE_RESOLVED_VOID;
     return awaitPrepare.then(() => {
 
         const sendPromise = broadcastChannel.method.postMessage(

@@ -25,6 +25,13 @@ export declare class LeaderElector {
      */
     readonly isLeader: boolean;
 
+    /**
+     * True if this or another instance is leader.
+     * False if there is not leader at the moment
+     * and we must wait for the election cycle.
+     */
+    readonly hasLeader: boolean;
+
     readonly isDead: boolean;
     readonly token: string;
 
