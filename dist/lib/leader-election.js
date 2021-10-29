@@ -12,10 +12,11 @@ var _util = require("./util.js");
 
 var _unload = _interopRequireDefault(require("unload"));
 
-var LeaderElection = function LeaderElection(channel, options) {
-  this._channel = channel;
+var LeaderElection = function LeaderElection(broadcastChannel, options) {
+  this.broadcastChannel = broadcastChannel;
   this._options = options;
   this.isLeader = false;
+  this.hasLeader = false;
   this.isDead = false;
   this.token = (0, _util.randomToken)();
   this._isApl = false; // _isApplying
@@ -38,12 +39,18 @@ LeaderElection.prototype = {
   applyOnce: function applyOnce() {
     var _this = this;
 
-    if (this.isLeader) return Promise.resolve(false);
-    if (this.isDead) return Promise.resolve(false); // do nothing if already running
+    if (this.isLeader) {
+      return _util.PROMISE_RESOLVED_FALSE;
+    }
+
+    if (this.isDead) {
+      return _util.PROMISE_RESOLVED_FALSE;
+    } // do nothing if already running
+
 
     if (this._isApl) {
       this._reApply = true;
-      return Promise.resolve(false);
+      return _util.PROMISE_RESOLVED_FALSE;
     }
 
     this._isApl = true;
@@ -65,23 +72,32 @@ LeaderElection.prototype = {
         if (msg.action === 'tell') {
           // other is already leader
           stopCriteria = true;
+          _this.hasLeader = true;
         }
       }
     };
 
-    this._channel.addEventListener('internal', handleMessage);
+    this.broadcastChannel.addEventListener('internal', handleMessage);
 
     var ret = _sendMessage(this, 'apply') // send out that this one is applying
     .then(function () {
       return (0, _util.sleep)(_this._options.responseTime);
     }) // let others time to respond
     .then(function () {
-      if (stopCriteria) return Promise.reject(new Error());else return _sendMessage(_this, 'apply');
+      if (stopCriteria) {
+        return _util.PROMISE_REJECTED;
+      } else {
+        return _sendMessage(_this, 'apply');
+      }
     }).then(function () {
       return (0, _util.sleep)(_this._options.responseTime);
     }) // let others time to respond
     .then(function () {
-      if (stopCriteria) return Promise.reject(new Error());else return _sendMessage(_this);
+      if (stopCriteria) {
+        return _util.PROMISE_REJECTED;
+      } else {
+        return _sendMessage(_this);
+      }
     }).then(function () {
       return beLeader(_this);
     }) // no one disagreed -> this one is now leader
@@ -91,7 +107,7 @@ LeaderElection.prototype = {
       return false;
     }) // apply not successfull
     .then(function (success) {
-      _this._channel.removeEventListener('internal', handleMessage);
+      _this.broadcastChannel.removeEventListener('internal', handleMessage);
 
       _this._isApl = false;
 
@@ -120,11 +136,15 @@ LeaderElection.prototype = {
   die: function die() {
     var _this2 = this;
 
-    if (this.isDead) return;
+    if (this.isDead || !this.isLeader) {
+      return;
+    }
+
+    this.hasLeader = false;
     this.isDead = true;
 
     this._lstns.forEach(function (listener) {
-      return _this2._channel.removeEventListener('internal', listener);
+      return _this2.broadcastChannel.removeEventListener('internal', listener);
     });
 
     this._invs.forEach(function (interval) {
@@ -138,9 +158,15 @@ LeaderElection.prototype = {
     return _sendMessage(this, 'death');
   }
 };
+/**
+ * @param leaderElector {LeaderElector}
+ */
 
 function _awaitLeadershipOnce(leaderElector) {
-  if (leaderElector.isLeader) return Promise.resolve();
+  if (leaderElector.isLeader) {
+    return _util.PROMISE_RESOLVED_VOID;
+  }
+
   return new Promise(function (res) {
     var resolved = false;
 
@@ -151,9 +177,7 @@ function _awaitLeadershipOnce(leaderElector) {
 
       resolved = true;
       clearInterval(interval);
-
-      leaderElector._channel.removeEventListener('internal', whenDeathListener);
-
+      leaderElector.broadcastChannel.removeEventListener('internal', whenDeathListener);
       res(true);
     } // try once now
 
@@ -177,13 +201,16 @@ function _awaitLeadershipOnce(leaderElector) {
 
     var whenDeathListener = function whenDeathListener(msg) {
       if (msg.context === 'leader' && msg.action === 'death') {
+        leaderElector.hasLeader = false;
         leaderElector.applyOnce().then(function () {
-          if (leaderElector.isLeader) finish();
+          if (leaderElector.isLeader) {
+            finish();
+          }
         });
       }
     };
 
-    leaderElector._channel.addEventListener('internal', whenDeathListener);
+    leaderElector.broadcastChannel.addEventListener('internal', whenDeathListener);
 
     leaderElector._lstns.push(whenDeathListener);
   });
@@ -199,11 +226,12 @@ function _sendMessage(leaderElector, action) {
     action: action,
     token: leaderElector.token
   };
-  return leaderElector._channel.postInternal(msgJson);
+  return leaderElector.broadcastChannel.postInternal(msgJson);
 }
 
 function beLeader(leaderElector) {
   leaderElector.isLeader = true;
+  leaderElector.hasLeader = true;
 
   var unloadFn = _unload["default"].add(function () {
     return leaderElector.die();
@@ -235,7 +263,7 @@ function beLeader(leaderElector) {
     }
   };
 
-  leaderElector._channel.addEventListener('internal', isLeaderListener);
+  leaderElector.broadcastChannel.addEventListener('internal', isLeaderListener);
 
   leaderElector._lstns.push(isLeaderListener);
 

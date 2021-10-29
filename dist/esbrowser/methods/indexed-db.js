@@ -3,7 +3,7 @@
  * There is currently no observerAPI for idb
  * @link https://github.com/w3c/IndexedDB/issues/51
  */
-import { sleep, randomInt, randomToken, microSeconds as micro, isNode } from '../util.js';
+import { sleep, randomInt, randomToken, microSeconds as micro, isNode, PROMISE_RESOLVED_VOID } from '../util.js';
 export var microSeconds = micro;
 import { ObliviousSet } from 'oblivious-set';
 import { fillOptionsWithDefaults } from '../options';
@@ -180,7 +180,7 @@ export function create(channelName, options) {
        */
       eMIs: new ObliviousSet(options.idb.ttl * 2),
       // ensures we do not read messages in parrallel
-      writeBlockPromise: Promise.resolve(),
+      writeBlockPromise: PROMISE_RESOLVED_VOID,
       messagesCallback: null,
       readQueuePromises: [],
       db: db
@@ -234,9 +234,9 @@ function _filterMessage(msgObj, state) {
 
 function readNewMessages(state) {
   // channel already closed
-  if (state.closed) return Promise.resolve(); // if no one is listening, we do not need to scan for new messages
+  if (state.closed) return PROMISE_RESOLVED_VOID; // if no one is listening, we do not need to scan for new messages
 
-  if (!state.messagesCallback) return Promise.resolve();
+  if (!state.messagesCallback) return PROMISE_RESOLVED_VOID;
   return getMessagesHigherThan(state.db, state.lastCursorId).then(function (newerMessages) {
     var useMessages = newerMessages
     /**
@@ -264,7 +264,7 @@ function readNewMessages(state) {
         state.messagesCallback(msgObj.data);
       }
     });
-    return Promise.resolve();
+    return PROMISE_RESOLVED_VOID;
   });
 }
 

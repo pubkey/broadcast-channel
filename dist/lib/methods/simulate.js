@@ -3,13 +3,14 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.create = create;
-exports.close = close;
-exports.postMessage = postMessage;
-exports.onMessage = onMessage;
-exports.canBeUsed = canBeUsed;
 exports.averageResponseTime = averageResponseTime;
-exports["default"] = exports.type = exports.microSeconds = void 0;
+exports.canBeUsed = canBeUsed;
+exports.close = close;
+exports.create = create;
+exports.microSeconds = exports["default"] = void 0;
+exports.onMessage = onMessage;
+exports.postMessage = postMessage;
+exports.type = void 0;
 
 var _util = require("../util");
 

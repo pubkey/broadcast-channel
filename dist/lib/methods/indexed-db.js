@@ -3,21 +3,23 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getIdb = getIdb;
-exports.createDatabase = createDatabase;
-exports.writeMessage = writeMessage;
-exports.getAllMessages = getAllMessages;
-exports.getMessagesHigherThan = getMessagesHigherThan;
-exports.removeMessageById = removeMessageById;
-exports.getOldMessages = getOldMessages;
-exports.cleanOldMessages = cleanOldMessages;
-exports.create = create;
-exports.close = close;
-exports.postMessage = postMessage;
-exports.onMessage = onMessage;
-exports.canBeUsed = canBeUsed;
 exports.averageResponseTime = averageResponseTime;
-exports["default"] = exports.type = exports.microSeconds = void 0;
+exports.canBeUsed = canBeUsed;
+exports.cleanOldMessages = cleanOldMessages;
+exports.close = close;
+exports.create = create;
+exports.createDatabase = createDatabase;
+exports["default"] = void 0;
+exports.getAllMessages = getAllMessages;
+exports.getIdb = getIdb;
+exports.getMessagesHigherThan = getMessagesHigherThan;
+exports.getOldMessages = getOldMessages;
+exports.microSeconds = void 0;
+exports.onMessage = onMessage;
+exports.postMessage = postMessage;
+exports.removeMessageById = removeMessageById;
+exports.type = void 0;
+exports.writeMessage = writeMessage;
 
 var _util = require("../util.js");
 
@@ -215,7 +217,7 @@ function create(channelName, options) {
        */
       eMIs: new _obliviousSet.ObliviousSet(options.idb.ttl * 2),
       // ensures we do not read messages in parrallel
-      writeBlockPromise: Promise.resolve(),
+      writeBlockPromise: _util.PROMISE_RESOLVED_VOID,
       messagesCallback: null,
       readQueuePromises: [],
       db: db
@@ -269,9 +271,9 @@ function _filterMessage(msgObj, state) {
 
 function readNewMessages(state) {
   // channel already closed
-  if (state.closed) return Promise.resolve(); // if no one is listening, we do not need to scan for new messages
+  if (state.closed) return _util.PROMISE_RESOLVED_VOID; // if no one is listening, we do not need to scan for new messages
 
-  if (!state.messagesCallback) return Promise.resolve();
+  if (!state.messagesCallback) return _util.PROMISE_RESOLVED_VOID;
   return getMessagesHigherThan(state.db, state.lastCursorId).then(function (newerMessages) {
     var useMessages = newerMessages
     /**
@@ -299,7 +301,7 @@ function readNewMessages(state) {
         state.messagesCallback(msgObj.data);
       }
     });
-    return Promise.resolve();
+    return _util.PROMISE_RESOLVED_VOID;
   });
 }
 

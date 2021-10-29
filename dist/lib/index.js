@@ -9,16 +9,16 @@ Object.defineProperty(exports, "BroadcastChannel", {
     return _broadcastChannel.BroadcastChannel;
   }
 });
+Object.defineProperty(exports, "beLeader", {
+  enumerable: true,
+  get: function get() {
+    return _leaderElection.beLeader;
+  }
+});
 Object.defineProperty(exports, "clearNodeFolder", {
   enumerable: true,
   get: function get() {
     return _broadcastChannel.clearNodeFolder;
-  }
-});
-Object.defineProperty(exports, "enforceOptions", {
-  enumerable: true,
-  get: function get() {
-    return _broadcastChannel.enforceOptions;
   }
 });
 Object.defineProperty(exports, "createLeaderElection", {
@@ -27,10 +27,10 @@ Object.defineProperty(exports, "createLeaderElection", {
     return _leaderElection.createLeaderElection;
   }
 });
-Object.defineProperty(exports, "beLeader", {
+Object.defineProperty(exports, "enforceOptions", {
   enumerable: true,
   get: function get() {
-    return _leaderElection.beLeader;
+    return _broadcastChannel.enforceOptions;
   }
 });
 

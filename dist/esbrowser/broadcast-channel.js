@@ -1,4 +1,4 @@
-import { isPromise } from './util.js';
+import { isPromise, PROMISE_RESOLVED_FALSE, PROMISE_RESOLVED_VOID } from './util.js';
 import { chooseMethod } from './method-chooser.js';
 import { fillOptionsWithDefaults } from './options.js';
 export var BroadcastChannel = function BroadcastChannel(name, options) {
@@ -71,7 +71,7 @@ export function clearNodeFolder(options) {
       return true;
     });
   } else {
-    return Promise.resolve(false);
+    return PROMISE_RESOLVED_FALSE;
   }
 }
 /**
@@ -138,7 +138,7 @@ BroadcastChannel.prototype = {
     }
 
     this.closed = true;
-    var awaitPrepare = this._prepP ? this._prepP : Promise.resolve();
+    var awaitPrepare = this._prepP ? this._prepP : PROMISE_RESOLVED_VOID;
     this._onML = null;
     this._addEL.message = [];
     return awaitPrepare // wait until all current sending are processed
@@ -176,7 +176,7 @@ function _post(broadcastChannel, type, msg) {
     type: type,
     data: msg
   };
-  var awaitPrepare = broadcastChannel._prepP ? broadcastChannel._prepP : Promise.resolve();
+  var awaitPrepare = broadcastChannel._prepP ? broadcastChannel._prepP : PROMISE_RESOLVED_VOID;
   return awaitPrepare.then(function () {
     var sendPromise = broadcastChannel.method.postMessage(broadcastChannel._state, msgObj); // add/remove to unsend messages list
 

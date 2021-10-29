@@ -17,7 +17,7 @@ import { sha3_224 } from 'js-sha3';
 import isNode from 'detect-node';
 import unload from 'unload';
 import { fillOptionsWithDefaults } from '../options.js';
-import { randomInt, randomToken } from '../util.js';
+import { randomInt, randomToken, PROMISE_RESOLVED_VOID } from '../util.js';
 import { ObliviousSet } from 'oblivious-set';
 /**
  * windows sucks, so we have handle windows-type of socket-paths
@@ -651,7 +651,7 @@ function _create() {
               messagesCallbackTime: null,
               messagesCallback: null,
               // ensures we do not read messages in parrallel
-              writeBlockPromise: Promise.resolve(),
+              writeBlockPromise: PROMISE_RESOLVED_VOID,
               otherReaderClients: {},
               // ensure if process crashes, everything is cleaned up
               removeUnload: unload.add(function () {

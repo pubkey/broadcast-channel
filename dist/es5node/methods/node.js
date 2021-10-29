@@ -5,35 +5,36 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.cleanPipeName = cleanPipeName;
-exports.getPaths = getPaths;
-exports.ensureFoldersExist = ensureFoldersExist;
-exports.clearNodeFolder = clearNodeFolder;
-exports.socketPath = socketPath;
-exports.socketInfoPath = socketInfoPath;
-exports.createSocketInfoFile = createSocketInfoFile;
-exports.countChannelFolders = countChannelFolders;
-exports.createSocketEventEmitter = createSocketEventEmitter;
-exports.openClientConnection = openClientConnection;
-exports.writeMessage = writeMessage;
-exports.getReadersUuids = getReadersUuids;
-exports.messagePath = messagePath;
-exports.getAllMessages = getAllMessages;
-exports.getSingleMessage = getSingleMessage;
-exports.readMessage = readMessage;
-exports.cleanOldMessages = cleanOldMessages;
-exports.create = create;
+exports.TMP_FOLDER_BASE = void 0;
 exports._filterMessage = _filterMessage;
-exports.handleMessagePing = handleMessagePing;
-exports.refreshReaderClients = refreshReaderClients;
-exports.postMessage = postMessage;
-exports.emitOverFastPath = emitOverFastPath;
-exports.onMessage = onMessage;
-exports.close = close;
-exports.canBeUsed = canBeUsed;
 exports.averageResponseTime = averageResponseTime;
+exports.canBeUsed = canBeUsed;
+exports.cleanOldMessages = cleanOldMessages;
+exports.cleanPipeName = cleanPipeName;
+exports.clearNodeFolder = clearNodeFolder;
+exports.close = close;
+exports.countChannelFolders = countChannelFolders;
+exports.create = create;
+exports.createSocketEventEmitter = createSocketEventEmitter;
+exports.createSocketInfoFile = createSocketInfoFile;
+exports.emitOverFastPath = emitOverFastPath;
+exports.ensureFoldersExist = ensureFoldersExist;
+exports.getAllMessages = getAllMessages;
+exports.getPaths = getPaths;
+exports.getReadersUuids = getReadersUuids;
+exports.getSingleMessage = getSingleMessage;
+exports.handleMessagePing = handleMessagePing;
+exports.messagePath = messagePath;
 exports.microSeconds = microSeconds;
-exports.type = exports.TMP_FOLDER_BASE = void 0;
+exports.onMessage = onMessage;
+exports.openClientConnection = openClientConnection;
+exports.postMessage = postMessage;
+exports.readMessage = readMessage;
+exports.refreshReaderClients = refreshReaderClients;
+exports.socketInfoPath = socketInfoPath;
+exports.socketPath = socketPath;
+exports.type = void 0;
+exports.writeMessage = writeMessage;
 
 var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"));
 
@@ -736,7 +737,7 @@ function _create() {
               messagesCallbackTime: null,
               messagesCallback: null,
               // ensures we do not read messages in parrallel
-              writeBlockPromise: Promise.resolve(),
+              writeBlockPromise: _util2.PROMISE_RESOLVED_VOID,
               otherReaderClients: {},
               // ensure if process crashes, everything is cleaned up
               removeUnload: _unload["default"].add(function () {

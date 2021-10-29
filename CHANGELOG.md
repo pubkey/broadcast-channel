@@ -2,6 +2,8 @@
 
 ## X.X.X (comming soon)
 
+## 4.3.0 (30 October 2021)
+
 Features:
   - Added `LeaderElector.hasLeader`
   - Added `LeaderElector.broadcastChannel`

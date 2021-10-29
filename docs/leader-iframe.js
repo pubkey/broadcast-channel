@@ -4,9 +4,9 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.BroadcastChannel = void 0;
 exports.clearNodeFolder = clearNodeFolder;
 exports.enforceOptions = enforceOptions;
-exports.BroadcastChannel = void 0;
 
 var _util = require("./util.js");
 
@@ -86,7 +86,7 @@ function clearNodeFolder(options) {
       return true;
     });
   } else {
-    return Promise.resolve(false);
+    return _util.PROMISE_RESOLVED_FALSE;
   }
 }
 /**
@@ -156,7 +156,7 @@ BroadcastChannel.prototype = {
     }
 
     this.closed = true;
-    var awaitPrepare = this._prepP ? this._prepP : Promise.resolve();
+    var awaitPrepare = this._prepP ? this._prepP : _util.PROMISE_RESOLVED_VOID;
     this._onML = null;
     this._addEL.message = [];
     return awaitPrepare // wait until all current sending are processed
@@ -194,7 +194,7 @@ function _post(broadcastChannel, type, msg) {
     type: type,
     data: msg
   };
-  var awaitPrepare = broadcastChannel._prepP ? broadcastChannel._prepP : Promise.resolve();
+  var awaitPrepare = broadcastChannel._prepP ? broadcastChannel._prepP : _util.PROMISE_RESOLVED_VOID;
   return awaitPrepare.then(function () {
     var sendPromise = broadcastChannel.method.postMessage(broadcastChannel._state, msgObj); // add/remove to unsend messages list
 
@@ -310,16 +310,16 @@ Object.defineProperty(exports, "BroadcastChannel", {
     return _broadcastChannel.BroadcastChannel;
   }
 });
+Object.defineProperty(exports, "beLeader", {
+  enumerable: true,
+  get: function get() {
+    return _leaderElection.beLeader;
+  }
+});
 Object.defineProperty(exports, "clearNodeFolder", {
   enumerable: true,
   get: function get() {
     return _broadcastChannel.clearNodeFolder;
-  }
-});
-Object.defineProperty(exports, "enforceOptions", {
-  enumerable: true,
-  get: function get() {
-    return _broadcastChannel.enforceOptions;
   }
 });
 Object.defineProperty(exports, "createLeaderElection", {
@@ -328,10 +328,10 @@ Object.defineProperty(exports, "createLeaderElection", {
     return _leaderElection.createLeaderElection;
   }
 });
-Object.defineProperty(exports, "beLeader", {
+Object.defineProperty(exports, "enforceOptions", {
   enumerable: true,
   get: function get() {
-    return _leaderElection.beLeader;
+    return _broadcastChannel.enforceOptions;
   }
 });
 
@@ -353,10 +353,11 @@ var _util = require("./util.js");
 
 var _unload = _interopRequireDefault(require("unload"));
 
-var LeaderElection = function LeaderElection(channel, options) {
-  this._channel = channel;
+var LeaderElection = function LeaderElection(broadcastChannel, options) {
+  this.broadcastChannel = broadcastChannel;
   this._options = options;
   this.isLeader = false;
+  this.hasLeader = false;
   this.isDead = false;
   this.token = (0, _util.randomToken)();
   this._isApl = false; // _isApplying
@@ -379,12 +380,18 @@ LeaderElection.prototype = {
   applyOnce: function applyOnce() {
     var _this = this;
 
-    if (this.isLeader) return Promise.resolve(false);
-    if (this.isDead) return Promise.resolve(false); // do nothing if already running
+    if (this.isLeader) {
+      return _util.PROMISE_RESOLVED_FALSE;
+    }
+
+    if (this.isDead) {
+      return _util.PROMISE_RESOLVED_FALSE;
+    } // do nothing if already running
+
 
     if (this._isApl) {
       this._reApply = true;
-      return Promise.resolve(false);
+      return _util.PROMISE_RESOLVED_FALSE;
     }
 
     this._isApl = true;
@@ -406,23 +413,32 @@ LeaderElection.prototype = {
         if (msg.action === 'tell') {
           // other is already leader
           stopCriteria = true;
+          _this.hasLeader = true;
         }
       }
     };
 
-    this._channel.addEventListener('internal', handleMessage);
+    this.broadcastChannel.addEventListener('internal', handleMessage);
 
     var ret = _sendMessage(this, 'apply') // send out that this one is applying
     .then(function () {
       return (0, _util.sleep)(_this._options.responseTime);
     }) // let others time to respond
     .then(function () {
-      if (stopCriteria) return Promise.reject(new Error());else return _sendMessage(_this, 'apply');
+      if (stopCriteria) {
+        return _util.PROMISE_REJECTED;
+      } else {
+        return _sendMessage(_this, 'apply');
+      }
     }).then(function () {
       return (0, _util.sleep)(_this._options.responseTime);
     }) // let others time to respond
     .then(function () {
-      if (stopCriteria) return Promise.reject(new Error());else return _sendMessage(_this);
+      if (stopCriteria) {
+        return _util.PROMISE_REJECTED;
+      } else {
+        return _sendMessage(_this);
+      }
     }).then(function () {
       return beLeader(_this);
     }) // no one disagreed -> this one is now leader
@@ -432,7 +448,7 @@ LeaderElection.prototype = {
       return false;
     }) // apply not successfull
     .then(function (success) {
-      _this._channel.removeEventListener('internal', handleMessage);
+      _this.broadcastChannel.removeEventListener('internal', handleMessage);
 
       _this._isApl = false;
 
@@ -461,11 +477,15 @@ LeaderElection.prototype = {
   die: function die() {
     var _this2 = this;
 
-    if (this.isDead) return;
+    if (this.isDead || !this.isLeader) {
+      return;
+    }
+
+    this.hasLeader = false;
     this.isDead = true;
 
     this._lstns.forEach(function (listener) {
-      return _this2._channel.removeEventListener('internal', listener);
+      return _this2.broadcastChannel.removeEventListener('internal', listener);
     });
 
     this._invs.forEach(function (interval) {
@@ -479,9 +499,15 @@ LeaderElection.prototype = {
     return _sendMessage(this, 'death');
   }
 };
+/**
+ * @param leaderElector {LeaderElector}
+ */
 
 function _awaitLeadershipOnce(leaderElector) {
-  if (leaderElector.isLeader) return Promise.resolve();
+  if (leaderElector.isLeader) {
+    return _util.PROMISE_RESOLVED_VOID;
+  }
+
   return new Promise(function (res) {
     var resolved = false;
 
@@ -492,9 +518,7 @@ function _awaitLeadershipOnce(leaderElector) {
 
       resolved = true;
       clearInterval(interval);
-
-      leaderElector._channel.removeEventListener('internal', whenDeathListener);
-
+      leaderElector.broadcastChannel.removeEventListener('internal', whenDeathListener);
       res(true);
     } // try once now
 
@@ -518,13 +542,16 @@ function _awaitLeadershipOnce(leaderElector) {
 
     var whenDeathListener = function whenDeathListener(msg) {
       if (msg.context === 'leader' && msg.action === 'death') {
+        leaderElector.hasLeader = false;
         leaderElector.applyOnce().then(function () {
-          if (leaderElector.isLeader) finish();
+          if (leaderElector.isLeader) {
+            finish();
+          }
         });
       }
     };
 
-    leaderElector._channel.addEventListener('internal', whenDeathListener);
+    leaderElector.broadcastChannel.addEventListener('internal', whenDeathListener);
 
     leaderElector._lstns.push(whenDeathListener);
   });
@@ -540,11 +567,12 @@ function _sendMessage(leaderElector, action) {
     action: action,
     token: leaderElector.token
   };
-  return leaderElector._channel.postInternal(msgJson);
+  return leaderElector.broadcastChannel.postInternal(msgJson);
 }
 
 function beLeader(leaderElector) {
   leaderElector.isLeader = true;
+  leaderElector.hasLeader = true;
 
   var unloadFn = _unload["default"].add(function () {
     return leaderElector.die();
@@ -576,7 +604,7 @@ function beLeader(leaderElector) {
     }
   };
 
-  leaderElector._channel.addEventListener('internal', isLeaderListener);
+  leaderElector.broadcastChannel.addEventListener('internal', isLeaderListener);
 
   leaderElector._lstns.push(isLeaderListener);
 
@@ -687,21 +715,23 @@ function chooseMethod(options) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getIdb = getIdb;
-exports.createDatabase = createDatabase;
-exports.writeMessage = writeMessage;
-exports.getAllMessages = getAllMessages;
-exports.getMessagesHigherThan = getMessagesHigherThan;
-exports.removeMessageById = removeMessageById;
-exports.getOldMessages = getOldMessages;
-exports.cleanOldMessages = cleanOldMessages;
-exports.create = create;
-exports.close = close;
-exports.postMessage = postMessage;
-exports.onMessage = onMessage;
-exports.canBeUsed = canBeUsed;
 exports.averageResponseTime = averageResponseTime;
-exports["default"] = exports.type = exports.microSeconds = void 0;
+exports.canBeUsed = canBeUsed;
+exports.cleanOldMessages = cleanOldMessages;
+exports.close = close;
+exports.create = create;
+exports.createDatabase = createDatabase;
+exports["default"] = void 0;
+exports.getAllMessages = getAllMessages;
+exports.getIdb = getIdb;
+exports.getMessagesHigherThan = getMessagesHigherThan;
+exports.getOldMessages = getOldMessages;
+exports.microSeconds = void 0;
+exports.onMessage = onMessage;
+exports.postMessage = postMessage;
+exports.removeMessageById = removeMessageById;
+exports.type = void 0;
+exports.writeMessage = writeMessage;
 
 var _util = require("../util.js");
 
@@ -899,7 +929,7 @@ function create(channelName, options) {
        */
       eMIs: new _obliviousSet.ObliviousSet(options.idb.ttl * 2),
       // ensures we do not read messages in parrallel
-      writeBlockPromise: Promise.resolve(),
+      writeBlockPromise: _util.PROMISE_RESOLVED_VOID,
       messagesCallback: null,
       readQueuePromises: [],
       db: db
@@ -953,9 +983,9 @@ function _filterMessage(msgObj, state) {
 
 function readNewMessages(state) {
   // channel already closed
-  if (state.closed) return Promise.resolve(); // if no one is listening, we do not need to scan for new messages
+  if (state.closed) return _util.PROMISE_RESOLVED_VOID; // if no one is listening, we do not need to scan for new messages
 
-  if (!state.messagesCallback) return Promise.resolve();
+  if (!state.messagesCallback) return _util.PROMISE_RESOLVED_VOID;
   return getMessagesHigherThan(state.db, state.lastCursorId).then(function (newerMessages) {
     var useMessages = newerMessages
     /**
@@ -983,7 +1013,7 @@ function readNewMessages(state) {
         state.messagesCallback(msgObj.data);
       }
     });
-    return Promise.resolve();
+    return _util.PROMISE_RESOLVED_VOID;
   });
 }
 
@@ -1038,17 +1068,19 @@ exports["default"] = _default;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.getLocalStorage = getLocalStorage;
-exports.storageKey = storageKey;
-exports.postMessage = postMessage;
 exports.addStorageEventListener = addStorageEventListener;
-exports.removeStorageEventListener = removeStorageEventListener;
-exports.create = create;
-exports.close = close;
-exports.onMessage = onMessage;
-exports.canBeUsed = canBeUsed;
 exports.averageResponseTime = averageResponseTime;
-exports["default"] = exports.type = exports.microSeconds = void 0;
+exports.canBeUsed = canBeUsed;
+exports.close = close;
+exports.create = create;
+exports["default"] = void 0;
+exports.getLocalStorage = getLocalStorage;
+exports.microSeconds = void 0;
+exports.onMessage = onMessage;
+exports.postMessage = postMessage;
+exports.removeStorageEventListener = removeStorageEventListener;
+exports.storageKey = storageKey;
+exports.type = void 0;
 
 var _obliviousSet = require("oblivious-set");
 
@@ -1236,13 +1268,14 @@ exports["default"] = _default;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.create = create;
-exports.close = close;
-exports.postMessage = postMessage;
-exports.onMessage = onMessage;
-exports.canBeUsed = canBeUsed;
 exports.averageResponseTime = averageResponseTime;
-exports["default"] = exports.type = exports.microSeconds = void 0;
+exports.canBeUsed = canBeUsed;
+exports.close = close;
+exports.create = create;
+exports.microSeconds = exports["default"] = void 0;
+exports.onMessage = onMessage;
+exports.postMessage = postMessage;
+exports.type = void 0;
 
 var _util = require("../util");
 
@@ -1276,7 +1309,7 @@ function close(channelState) {
 function postMessage(channelState, messageJson) {
   try {
     channelState.bc.postMessage(messageJson, false);
-    return Promise.resolve();
+    return _util.PROMISE_RESOLVED_VOID;
   } catch (err) {
     return Promise.reject(err);
   }
@@ -1323,13 +1356,14 @@ exports["default"] = _default;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.create = create;
-exports.close = close;
-exports.postMessage = postMessage;
-exports.onMessage = onMessage;
-exports.canBeUsed = canBeUsed;
 exports.averageResponseTime = averageResponseTime;
-exports["default"] = exports.type = exports.microSeconds = void 0;
+exports.canBeUsed = canBeUsed;
+exports.close = close;
+exports.create = create;
+exports.microSeconds = exports["default"] = void 0;
+exports.onMessage = onMessage;
+exports.postMessage = postMessage;
+exports.type = void 0;
 
 var _util = require("../util");
 
@@ -1432,12 +1466,12 @@ function fillOptionsWithDefaults() {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.isNode = exports.PROMISE_RESOLVED_VOID = exports.PROMISE_RESOLVED_FALSE = exports.PROMISE_REJECTED = void 0;
 exports.isPromise = isPromise;
-exports.sleep = sleep;
+exports.microSeconds = microSeconds;
 exports.randomInt = randomInt;
 exports.randomToken = randomToken;
-exports.microSeconds = microSeconds;
-exports.isNode = void 0;
+exports.sleep = sleep;
 
 /**
  * returns true if the given object is a promise
@@ -1449,6 +1483,13 @@ function isPromise(obj) {
     return false;
   }
 }
+
+var PROMISE_RESOLVED_FALSE = Promise.resolve(false);
+exports.PROMISE_RESOLVED_FALSE = PROMISE_RESOLVED_FALSE;
+var PROMISE_RESOLVED_VOID = Promise.resolve();
+exports.PROMISE_RESOLVED_VOID = PROMISE_RESOLVED_VOID;
+var PROMISE_REJECTED = Promise.reject(new Error());
+exports.PROMISE_REJECTED = PROMISE_REJECTED;
 
 function sleep(time) {
   if (!time) time = 0;

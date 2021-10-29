@@ -3,12 +3,12 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.isNode = exports.PROMISE_RESOLVED_VOID = exports.PROMISE_RESOLVED_FALSE = exports.PROMISE_REJECTED = void 0;
 exports.isPromise = isPromise;
-exports.sleep = sleep;
+exports.microSeconds = microSeconds;
 exports.randomInt = randomInt;
 exports.randomToken = randomToken;
-exports.microSeconds = microSeconds;
-exports.isNode = void 0;
+exports.sleep = sleep;
 
 /**
  * returns true if the given object is a promise
@@ -20,6 +20,13 @@ function isPromise(obj) {
     return false;
   }
 }
+
+var PROMISE_RESOLVED_FALSE = Promise.resolve(false);
+exports.PROMISE_RESOLVED_FALSE = PROMISE_RESOLVED_FALSE;
+var PROMISE_RESOLVED_VOID = Promise.resolve();
+exports.PROMISE_RESOLVED_VOID = PROMISE_RESOLVED_VOID;
+var PROMISE_REJECTED = Promise.reject(new Error());
+exports.PROMISE_REJECTED = PROMISE_REJECTED;
 
 function sleep(time) {
   if (!time) time = 0;

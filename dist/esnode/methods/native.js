@@ -1,4 +1,4 @@
-import { microSeconds as micro, isNode } from '../util';
+import { microSeconds as micro, isNode, PROMISE_RESOLVED_VOID } from '../util';
 export var microSeconds = micro;
 export var type = 'native';
 export function create(channelName) {
@@ -24,7 +24,7 @@ export function close(channelState) {
 export function postMessage(channelState, messageJson) {
   try {
     channelState.bc.postMessage(messageJson, false);
-    return Promise.resolve();
+    return PROMISE_RESOLVED_VOID;
   } catch (err) {
     return Promise.reject(err);
   }
