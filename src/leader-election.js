@@ -2,8 +2,7 @@ import {
     sleep,
     randomToken,
     PROMISE_RESOLVED_FALSE,
-    PROMISE_RESOLVED_VOID,
-    PROMISE_REJECTED
+    PROMISE_RESOLVED_VOID
 } from './util.js';
 
 import unload from 'unload';
@@ -71,7 +70,7 @@ LeaderElection.prototype = {
             .then(() => sleep(this._options.responseTime)) // let others time to respond
             .then(() => {
                 if (stopCriteria) {
-                    return PROMISE_REJECTED;
+                    return Promise.reject(new Error());
                 } else {
                     return _sendMessage(this, 'apply');
                 }
@@ -79,7 +78,7 @@ LeaderElection.prototype = {
             .then(() => sleep(this._options.responseTime)) // let others time to respond
             .then(() => {
                 if (stopCriteria) {
-                    return PROMISE_REJECTED;
+                    return Promise.reject(new Error());
                 } else {
                     return _sendMessage(this);
                 }
