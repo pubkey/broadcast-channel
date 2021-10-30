@@ -101,7 +101,7 @@
     "@rollup/plugin-node-resolve": "13.0.6",
     "@types/core-js": "2.5.5",
     "assert": "2.0.0",
-    "async-test-util": "1.7.3",
+    "async-test-util": "2.0.0",
     "browserify": "17.0.0",
     "child-process-promise": "2.2.1",
     "clone": "2.1.2",
