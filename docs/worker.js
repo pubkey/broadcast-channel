@@ -426,7 +426,7 @@ LeaderElection.prototype = {
     }) // let others time to respond
     .then(function () {
       if (stopCriteria) {
-        return _util.PROMISE_REJECTED;
+        return Promise.reject(new Error());
       } else {
         return _sendMessage(_this, 'apply');
       }
@@ -435,7 +435,7 @@ LeaderElection.prototype = {
     }) // let others time to respond
     .then(function () {
       if (stopCriteria) {
-        return _util.PROMISE_REJECTED;
+        return Promise.reject(new Error());
       } else {
         return _sendMessage(_this);
       }
@@ -1466,7 +1466,7 @@ function fillOptionsWithDefaults() {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.isNode = exports.PROMISE_RESOLVED_VOID = exports.PROMISE_RESOLVED_FALSE = exports.PROMISE_REJECTED = void 0;
+exports.isNode = exports.PROMISE_RESOLVED_VOID = exports.PROMISE_RESOLVED_FALSE = void 0;
 exports.isPromise = isPromise;
 exports.microSeconds = microSeconds;
 exports.randomInt = randomInt;
@@ -1488,8 +1488,6 @@ var PROMISE_RESOLVED_FALSE = Promise.resolve(false);
 exports.PROMISE_RESOLVED_FALSE = PROMISE_RESOLVED_FALSE;
 var PROMISE_RESOLVED_VOID = Promise.resolve();
 exports.PROMISE_RESOLVED_VOID = PROMISE_RESOLVED_VOID;
-var PROMISE_REJECTED = Promise.reject(new Error());
-exports.PROMISE_REJECTED = PROMISE_REJECTED;
 
 function sleep(time) {
   if (!time) time = 0;

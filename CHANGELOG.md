@@ -2,6 +2,11 @@
 
 ## X.X.X (comming soon)
 
+## 4.3.1 (30 October 2021)
+
+Bugfixes:
+  - Fixed broken promise rejection.
+
 ## 4.3.0 (30 October 2021)
 
 Features:

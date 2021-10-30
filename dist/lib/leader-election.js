@@ -85,7 +85,7 @@ LeaderElection.prototype = {
     }) // let others time to respond
     .then(function () {
       if (stopCriteria) {
-        return _util.PROMISE_REJECTED;
+        return Promise.reject(new Error());
       } else {
         return _sendMessage(_this, 'apply');
       }
@@ -94,7 +94,7 @@ LeaderElection.prototype = {
     }) // let others time to respond
     .then(function () {
       if (stopCriteria) {
-        return _util.PROMISE_REJECTED;
+        return Promise.reject(new Error());
       } else {
         return _sendMessage(_this);
       }

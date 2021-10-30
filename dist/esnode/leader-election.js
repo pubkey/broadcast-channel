@@ -1,4 +1,4 @@
-import { sleep, randomToken, PROMISE_RESOLVED_FALSE, PROMISE_RESOLVED_VOID, PROMISE_REJECTED } from './util.js';
+import { sleep, randomToken, PROMISE_RESOLVED_FALSE, PROMISE_RESOLVED_VOID } from './util.js';
 import unload from 'unload';
 
 var LeaderElection = function LeaderElection(broadcastChannel, options) {
@@ -74,7 +74,7 @@ LeaderElection.prototype = {
     }) // let others time to respond
     .then(function () {
       if (stopCriteria) {
-        return PROMISE_REJECTED;
+        return Promise.reject(new Error());
       } else {
         return _sendMessage(_this, 'apply');
       }
@@ -83,7 +83,7 @@ LeaderElection.prototype = {
     }) // let others time to respond
     .then(function () {
       if (stopCriteria) {
-        return PROMISE_REJECTED;
+        return Promise.reject(new Error());
       } else {
         return _sendMessage(_this);
       }
