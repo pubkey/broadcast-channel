@@ -5,13 +5,13 @@
 
 import util from 'util';
 import fs from 'fs';
+import crypto from 'crypto';
 import os from 'os';
 import events from 'events';
 import net from 'net';
 import path from 'path';
 import micro from 'nano-time';
 import rimraf from 'rimraf';
-import { sha3_224 } from 'js-sha3';
 import isNode from 'detect-node';
 import unload from 'unload';
 
@@ -58,7 +58,14 @@ const getPathsCache = new Map();
 
 export function getPaths(channelName) {
     if (!getPathsCache.has(channelName)) {
-        const channelHash = sha3_224(channelName); // use hash incase of strange characters
+        /**
+         * Use the hash instead of the channelName
+         * to ensure we have no characters that cannot be used as filenames.
+         * And also to ensure that trimming the string will not end up
+         * in using the same folders for different channels.
+         */
+        const channelHash = crypto.createHash('sha256').update(channelName).digest('hex');
+
         /**
          * because the lenght of socket-paths is limited, we use only the first 20 chars
          * and also start with A to ensure we do not start with a number

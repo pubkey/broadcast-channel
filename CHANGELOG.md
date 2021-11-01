@@ -2,6 +2,11 @@
 
 ## X.X.X (comming soon)
 
+## 4.4.0 (2 November 2021)
+
+Other:
+  - Replaced `js-sha` with node's `crypto` module.
+
 ## 4.3.1 (30 October 2021)
 
 Bugfixes:

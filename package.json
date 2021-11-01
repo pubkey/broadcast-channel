@@ -79,9 +79,8 @@
     "lint"
   ],
   "dependencies": {
-    "@babel/runtime": "^7.7.2",
+    "@babel/runtime": "^7.16.0",
     "detect-node": "^2.1.0",
-    "js-sha3": "0.8.0",
     "microseconds": "0.2.0",
     "nano-time": "1.0.0",
     "oblivious-set": "1.0.0",
