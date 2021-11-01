@@ -44,6 +44,8 @@ var _util = _interopRequireDefault(require("util"));
 
 var _fs = _interopRequireDefault(require("fs"));
 
+var _crypto = _interopRequireDefault(require("crypto"));
+
 var _os = _interopRequireDefault(require("os"));
 
 var _events = _interopRequireDefault(require("events"));
@@ -55,8 +57,6 @@ var _path = _interopRequireDefault(require("path"));
 var _nanoTime = _interopRequireDefault(require("nano-time"));
 
 var _rimraf = _interopRequireDefault(require("rimraf"));
-
-var _jsSha = require("js-sha3");
 
 var _detectNode = _interopRequireDefault(require("detect-node"));
 
@@ -111,13 +111,19 @@ var getPathsCache = new Map();
 
 function getPaths(channelName) {
   if (!getPathsCache.has(channelName)) {
-    var channelHash = (0, _jsSha.sha3_224)(channelName); // use hash incase of strange characters
-
+    /**
+     * Use the hash instead of the channelName
+     * to ensure we have no characters that cannot be used as filenames.
+     * And also to ensure that trimming the string will not end up
+     * in using the same folders for different channels.
+     */
+    var channelHash = _crypto["default"].createHash('sha256').update(channelName).digest('hex');
     /**
      * because the lenght of socket-paths is limited, we use only the first 20 chars
      * and also start with A to ensure we do not start with a number
      * @link https://serverfault.com/questions/641347/check-if-a-path-exceeds-maximum-for-unix-domain-socket
      */
+
 
     var channelFolder = 'A' + channelHash.substring(0, 20);
 
