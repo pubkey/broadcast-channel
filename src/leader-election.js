@@ -16,6 +16,12 @@ const LeaderElection = function (broadcastChannel, options) {
     this.isDead = false;
     this.token = randomToken();
 
+    /**
+     * _isApplying
+     * Only set when a leader application is
+     * running at the moment.
+     * @type {Promise<any> | null}
+     */
     this._isApl = false; // _isApplying
     this._reApply = false;
 
@@ -25,12 +31,31 @@ const LeaderElection = function (broadcastChannel, options) {
     this._invs = []; // _intervals
     this._dpL = () => { }; // onduplicate listener
     this._dpLC = false; // true when onduplicate called
+
+
+    /**
+     * Even when the own instance is not applying,
+     * we still listen to messages to ensure the hasLeader flag
+     * is set correctly.
+     */
+    const hasLeaderListener = (msg => {
+        if (msg.context === 'leader') {
+            if (msg.action === 'death') {
+                this.hasLeader = false;
+            }
+            if (msg.action === 'tell') {
+                this.hasLeader = true;
+            }
+        }
+    });
+    this.broadcastChannel.addEventListener('internal', hasLeaderListener);
+    this._lstns.push(hasLeaderListener);
 };
 
 LeaderElection.prototype = {
     applyOnce() {
         if (this.isLeader) {
-            return PROMISE_RESOLVED_FALSE;
+            return sleep(0, true);
         }
         if (this.isDead) {
             return PROMISE_RESOLVED_FALSE;
@@ -39,9 +64,8 @@ LeaderElection.prototype = {
         // do nothing if already running
         if (this._isApl) {
             this._reApply = true;
-            return PROMISE_RESOLVED_FALSE;
+            return sleep(0, false);
         }
-        this._isApl = true;
 
         let stopCriteria = false;
         const recieved = [];
@@ -49,7 +73,6 @@ LeaderElection.prototype = {
         const handleMessage = (msg) => {
             if (msg.context === 'leader' && msg.token != this.token) {
                 recieved.push(msg);
-
                 if (msg.action === 'apply') {
                     // other is applying
                     if (msg.token > this.token) {
@@ -66,7 +89,7 @@ LeaderElection.prototype = {
             }
         };
         this.broadcastChannel.addEventListener('internal', handleMessage);
-        const ret = _sendMessage(this, 'apply') // send out that this one is applying
+        const applyPromise = _sendMessage(this, 'apply') // send out that this one is applying
             .then(() => sleep(this._options.responseTime)) // let others time to respond
             .then(() => {
                 if (stopCriteria) {
@@ -92,9 +115,12 @@ LeaderElection.prototype = {
                 if (!success && this._reApply) {
                     this._reApply = false;
                     return this.applyOnce();
-                } else return success;
+                } else {
+                    return success;
+                }
             });
-        return ret;
+        this._isApl = applyPromise;
+        return applyPromise;
     },
 
     awaitLeadership() {
@@ -112,17 +138,18 @@ LeaderElection.prototype = {
     },
 
     die() {
-        if (this.isDead || !this.isLeader) {
-            return;
-        }
-        this.hasLeader = false;
-        this.isDead = true;
-
         this._lstns.forEach(listener => this.broadcastChannel.removeEventListener('internal', listener));
+        this._lstns = [];
         this._invs.forEach(interval => clearInterval(interval));
-        this._unl.forEach(uFn => {
-            uFn.remove();
-        });
+        this._invs = [];
+        this._unl.forEach(uFn => uFn.remove());
+        this._unl = [];
+
+        if (this.isLeader) {
+            this.hasLeader = false;
+            this.isLeader = false;
+        }
+        this.isDead = true;
         return _sendMessage(this, 'death');
     }
 };

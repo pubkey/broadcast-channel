@@ -11,6 +11,15 @@ const {
     beLeader
 } = require('../');
 
+if (isNode) {
+    process.on('uncaughtException', (err, origin) => {
+        console.error('uncaughtException!');
+        console.dir(err);
+        console.dir(origin);
+        process.exit(1);
+    });
+}
+
 /**
  * we run this test once per method
  */
@@ -450,6 +459,7 @@ function runTest(channelOptions) {
                         unload.runAll();
                         channels.push(channel);
                     }
+                    channels.forEach(channel => channel.close());
                 });
             });
         });
@@ -475,24 +485,30 @@ function runTest(channelOptions) {
                     channel.close();
                 });
                 it('from two electors, only one should become leader', async () => {
-                    const channelName = AsyncTestUtil.randomString(12);
-                    const channel = new BroadcastChannel(channelName, channelOptions);
-                    const channel2 = new BroadcastChannel(channelName, channelOptions);
-                    const elector = createLeaderElection(channel);
-                    const elector2 = createLeaderElection(channel2);
 
-                    await Promise.all([
-                        elector.applyOnce(),
-                        elector2.applyOnce()
-                    ]);
+                    // run this many times because it failed randomly
+                    let t = 2;
+                    while (t > 0) {
+                        t--;
+                        const channelName = AsyncTestUtil.randomString(12);
+                        const channel = new BroadcastChannel(channelName, channelOptions);
+                        const channel2 = new BroadcastChannel(channelName, channelOptions);
+                        const elector = createLeaderElection(channel);
+                        const elector2 = createLeaderElection(channel2);
 
-                    await AsyncTestUtil.waitUntil(() => elector.isLeader || elector2.isLeader);
-                    await AsyncTestUtil.wait(200);
+                        await Promise.all([
+                            elector.applyOnce(),
+                            elector2.applyOnce()
+                        ]);
 
-                    assert.notEqual(elector.isLeader, elector2.isLeader);
+                        await AsyncTestUtil.waitUntil(() => elector.isLeader || elector2.isLeader);
+                        await AsyncTestUtil.wait(200);
 
-                    channel.close();
-                    channel2.close();
+                        assert.notEqual(elector.isLeader, elector2.isLeader);
+
+                        channel.close();
+                        channel2.close();
+                    }
                 });
                 it('from many electors, only one should become leader', async () => {
                     const channelName = AsyncTestUtil.randomString(12);
@@ -513,6 +529,27 @@ function runTest(channelOptions) {
                     assert.equal(leaderCount, 1);
 
                     clients.forEach(c => c.channel.close());
+                });
+                it('running applyOnce() in a loop should not block the process', async () => {
+                    const channelName = AsyncTestUtil.randomString(12);
+                    const channel = new BroadcastChannel(channelName, channelOptions);
+                    const channel2 = new BroadcastChannel(channelName, channelOptions);
+                    const elector = createLeaderElection(channel);
+                    const elector2 = createLeaderElection(channel2);
+
+                    let t = 0;
+                    while (!elector.hasLeader) {
+                        t++;
+                        await elector2.applyOnce();
+                        // ensure we do not full block the test runner so it cannot exit
+                        if (t > 200) {
+                            throw new Error('this should never happen');
+                        }
+                    }
+
+                    assert.ok(elector);
+                    channel.close();
+                    channel2.close();
                 });
             });
             describe('.die()', () => {
@@ -552,20 +589,23 @@ function runTest(channelOptions) {
                     channel2.close();
                 });
                 it('should clean up all unloaded when dead', async () => {
-                    await AsyncTestUtil.wait(50);
+                    // wait until all unloads are cleaned up from before
+                    await AsyncTestUtil.waitUntil(async () => {
+                        const mustBe0 = unload.getSize();
+                        return mustBe0 === 0;
+                    });
 
                     const unloadSizeBefore = unload.getSize();
-
                     const channelName = AsyncTestUtil.randomString(12);
                     const channel = new BroadcastChannel(channelName, channelOptions);
                     const elector = createLeaderElection(channel);
                     await elector.awaitLeadership();
-
                     await channel.close();
-                    await AsyncTestUtil.wait(50);
-                    const unloadSizeAfter = unload.getSize();
 
-                    assert.equal(unloadSizeBefore, unloadSizeAfter);
+                    await AsyncTestUtil.waitUntil(async () => {
+                        const unloadSizeAfter = unload.getSize();
+                        return unloadSizeAfter === unloadSizeBefore;
+                    });
                 });
             });
             describe('.awaitLeadership()', () => {

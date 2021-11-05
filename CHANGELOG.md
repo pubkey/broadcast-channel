@@ -2,6 +2,9 @@
 
 ## X.X.X (comming soon)
 
+Bugfixes:
+  - Running `applyOnce()` in a loop must not fully block the JavaScript process.
+
 ## 4.4.0 (2 November 2021)
 
 Other:
