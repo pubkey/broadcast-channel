@@ -60,7 +60,7 @@ var _rimraf = _interopRequireDefault(require("rimraf"));
 
 var _detectNode = _interopRequireDefault(require("detect-node"));
 
-var _unload = _interopRequireDefault(require("unload"));
+var _unload = require("unload");
 
 var _options = require("../options.js");
 
@@ -746,7 +746,7 @@ function _create() {
               writeBlockPromise: _util2.PROMISE_RESOLVED_VOID,
               otherReaderClients: {},
               // ensure if process crashes, everything is cleaned up
-              removeUnload: _unload["default"].add(function () {
+              removeUnload: (0, _unload.add)(function () {
                 return close(state);
               }),
               closed: false

@@ -350,8 +350,6 @@ var _leaderElection = require("./leader-election");
 },{"./broadcast-channel":1,"./leader-election":5}],5:[function(require,module,exports){
 "use strict";
 
-var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
-
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
@@ -360,15 +358,24 @@ exports.createLeaderElection = createLeaderElection;
 
 var _util = require("./util.js");
 
-var _unload = _interopRequireDefault(require("unload"));
+var _unload = require("unload");
 
 var LeaderElection = function LeaderElection(broadcastChannel, options) {
+  var _this = this;
+
   this.broadcastChannel = broadcastChannel;
   this._options = options;
   this.isLeader = false;
   this.hasLeader = false;
   this.isDead = false;
   this.token = (0, _util.randomToken)();
+  /**
+   * _isApplying
+   * Only set when a leader application is
+   * running at the moment.
+   * @type {Promise<any> | null}
+   */
+
   this._isApl = false; // _isApplying
 
   this._reApply = false; // things to clean up
@@ -383,14 +390,36 @@ var LeaderElection = function LeaderElection(broadcastChannel, options) {
 
 
   this._dpLC = false; // true when onduplicate called
+
+  /**
+   * Even when the own instance is not applying,
+   * we still listen to messages to ensure the hasLeader flag
+   * is set correctly.
+   */
+
+  var hasLeaderListener = function hasLeaderListener(msg) {
+    if (msg.context === 'leader') {
+      if (msg.action === 'death') {
+        _this.hasLeader = false;
+      }
+
+      if (msg.action === 'tell') {
+        _this.hasLeader = true;
+      }
+    }
+  };
+
+  this.broadcastChannel.addEventListener('internal', hasLeaderListener);
+
+  this._lstns.push(hasLeaderListener);
 };
 
 LeaderElection.prototype = {
   applyOnce: function applyOnce() {
-    var _this = this;
+    var _this2 = this;
 
     if (this.isLeader) {
-      return _util.PROMISE_RESOLVED_FALSE;
+      return (0, _util.sleep)(0, true);
     }
 
     if (this.isDead) {
@@ -400,20 +429,19 @@ LeaderElection.prototype = {
 
     if (this._isApl) {
       this._reApply = true;
-      return _util.PROMISE_RESOLVED_FALSE;
+      return (0, _util.sleep)(0, false);
     }
 
-    this._isApl = true;
     var stopCriteria = false;
     var recieved = [];
 
     var handleMessage = function handleMessage(msg) {
-      if (msg.context === 'leader' && msg.token != _this.token) {
+      if (msg.context === 'leader' && msg.token != _this2.token) {
         recieved.push(msg);
 
         if (msg.action === 'apply') {
           // other is applying
-          if (msg.token > _this.token) {
+          if (msg.token > _this2.token) {
             // other has higher token, stop applying
             stopCriteria = true;
           }
@@ -422,34 +450,34 @@ LeaderElection.prototype = {
         if (msg.action === 'tell') {
           // other is already leader
           stopCriteria = true;
-          _this.hasLeader = true;
+          _this2.hasLeader = true;
         }
       }
     };
 
     this.broadcastChannel.addEventListener('internal', handleMessage);
 
-    var ret = _sendMessage(this, 'apply') // send out that this one is applying
+    var applyPromise = _sendMessage(this, 'apply') // send out that this one is applying
     .then(function () {
-      return (0, _util.sleep)(_this._options.responseTime);
+      return (0, _util.sleep)(_this2._options.responseTime);
     }) // let others time to respond
     .then(function () {
       if (stopCriteria) {
         return Promise.reject(new Error());
       } else {
-        return _sendMessage(_this, 'apply');
+        return _sendMessage(_this2, 'apply');
       }
     }).then(function () {
-      return (0, _util.sleep)(_this._options.responseTime);
+      return (0, _util.sleep)(_this2._options.responseTime);
     }) // let others time to respond
     .then(function () {
       if (stopCriteria) {
         return Promise.reject(new Error());
       } else {
-        return _sendMessage(_this);
+        return _sendMessage(_this2);
       }
     }).then(function () {
-      return beLeader(_this);
+      return beLeader(_this2);
     }) // no one disagreed -> this one is now leader
     .then(function () {
       return true;
@@ -457,17 +485,20 @@ LeaderElection.prototype = {
       return false;
     }) // apply not successfull
     .then(function (success) {
-      _this.broadcastChannel.removeEventListener('internal', handleMessage);
+      _this2.broadcastChannel.removeEventListener('internal', handleMessage);
 
-      _this._isApl = false;
+      _this2._isApl = false;
 
-      if (!success && _this._reApply) {
-        _this._reApply = false;
-        return _this.applyOnce();
-      } else return success;
+      if (!success && _this2._reApply) {
+        _this2._reApply = false;
+        return _this2.applyOnce();
+      } else {
+        return success;
+      }
     });
 
-    return ret;
+    this._isApl = applyPromise;
+    return applyPromise;
   },
   awaitLeadership: function awaitLeadership() {
     if (
@@ -484,27 +515,32 @@ LeaderElection.prototype = {
   },
 
   die: function die() {
-    var _this2 = this;
-
-    if (this.isDead || !this.isLeader) {
-      return;
-    }
-
-    this.hasLeader = false;
-    this.isDead = true;
+    var _this3 = this;
 
     this._lstns.forEach(function (listener) {
-      return _this2.broadcastChannel.removeEventListener('internal', listener);
+      return _this3.broadcastChannel.removeEventListener('internal', listener);
     });
+
+    this._lstns = [];
 
     this._invs.forEach(function (interval) {
       return clearInterval(interval);
     });
 
+    this._invs = [];
+
     this._unl.forEach(function (uFn) {
-      uFn.remove();
+      return uFn.remove();
     });
 
+    this._unl = [];
+
+    if (this.isLeader) {
+      this.hasLeader = false;
+      this.isLeader = false;
+    }
+
+    this.isDead = true;
     return _sendMessage(this, 'death');
   }
 };
@@ -582,8 +618,7 @@ function _sendMessage(leaderElector, action) {
 function beLeader(leaderElector) {
   leaderElector.isLeader = true;
   leaderElector.hasLeader = true;
-
-  var unloadFn = _unload["default"].add(function () {
+  var unloadFn = (0, _unload.add)(function () {
     return leaderElector.die();
   });
 
@@ -650,7 +685,7 @@ function createLeaderElection(channel, options) {
   channel._leaderElector = elector;
   return elector;
 }
-},{"./util.js":12,"@babel/runtime/helpers/interopRequireDefault":13,"unload":20}],6:[function(require,module,exports){
+},{"./util.js":12,"unload":20}],6:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -1498,10 +1533,12 @@ exports.PROMISE_RESOLVED_FALSE = PROMISE_RESOLVED_FALSE;
 var PROMISE_RESOLVED_VOID = Promise.resolve();
 exports.PROMISE_RESOLVED_VOID = PROMISE_RESOLVED_VOID;
 
-function sleep(time) {
+function sleep(time, resolveWith) {
   if (!time) time = 0;
   return new Promise(function (res) {
-    return setTimeout(res, time);
+    return setTimeout(function () {
+      return res(resolveWith);
+    }, time);
   });
 }
 
@@ -1898,10 +1935,9 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.add = add;
-exports.runAll = runAll;
-exports.removeAll = removeAll;
 exports.getSize = getSize;
-exports["default"] = void 0;
+exports.removeAll = removeAll;
+exports.runAll = runAll;
 
 var _detectNode = _interopRequireDefault(require("detect-node"));
 
@@ -1951,12 +1987,4 @@ function removeAll() {
 function getSize() {
   return LISTENERS.size;
 }
-
-var _default = {
-  add: add,
-  runAll: runAll,
-  removeAll: removeAll,
-  getSize: getSize
-};
-exports["default"] = _default;
 },{"./browser.js":19,"./node.js":15,"@babel/runtime/helpers/interopRequireDefault":13,"detect-node":16}]},{},[2]);

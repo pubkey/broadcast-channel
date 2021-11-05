@@ -15,7 +15,7 @@ import path from 'path';
 import micro from 'nano-time';
 import rimraf from 'rimraf';
 import isNode from 'detect-node';
-import unload from 'unload';
+import { add as unloadAdd } from 'unload';
 import { fillOptionsWithDefaults } from '../options.js';
 import { randomInt, randomToken, PROMISE_RESOLVED_VOID } from '../util.js';
 import { ObliviousSet } from 'oblivious-set';
@@ -659,7 +659,7 @@ function _create() {
               writeBlockPromise: PROMISE_RESOLVED_VOID,
               otherReaderClients: {},
               // ensure if process crashes, everything is cleaned up
-              removeUnload: unload.add(function () {
+              removeUnload: unloadAdd(function () {
                 return close(state);
               }),
               closed: false

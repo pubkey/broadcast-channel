@@ -10,10 +10,12 @@ export function isPromise(obj) {
 }
 export var PROMISE_RESOLVED_FALSE = Promise.resolve(false);
 export var PROMISE_RESOLVED_VOID = Promise.resolve();
-export function sleep(time) {
+export function sleep(time, resolveWith) {
   if (!time) time = 0;
   return new Promise(function (res) {
-    return setTimeout(res, time);
+    return setTimeout(function () {
+      return res(resolveWith);
+    }, time);
   });
 }
 export function randomInt(min, max) {

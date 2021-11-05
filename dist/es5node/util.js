@@ -26,10 +26,12 @@ exports.PROMISE_RESOLVED_FALSE = PROMISE_RESOLVED_FALSE;
 var PROMISE_RESOLVED_VOID = Promise.resolve();
 exports.PROMISE_RESOLVED_VOID = PROMISE_RESOLVED_VOID;
 
-function sleep(time) {
+function sleep(time, resolveWith) {
   if (!time) time = 0;
   return new Promise(function (res) {
-    return setTimeout(res, time);
+    return setTimeout(function () {
+      return res(resolveWith);
+    }, time);
   });
 }
 
