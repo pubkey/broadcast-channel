@@ -5,7 +5,9 @@ import {
     PROMISE_RESOLVED_VOID
 } from './util.js';
 
-import unload from 'unload';
+import {
+    add as unloadAdd
+} from 'unload';
 
 const LeaderElection = function (broadcastChannel, options) {
     this.broadcastChannel = broadcastChannel;
@@ -224,7 +226,7 @@ function _sendMessage(leaderElector, action) {
 export function beLeader(leaderElector) {
     leaderElector.isLeader = true;
     leaderElector.hasLeader = true;
-    const unloadFn = unload.add(() => leaderElector.die());
+    const unloadFn = unloadAdd(() => leaderElector.die());
     leaderElector._unl.push(unloadFn);
 
     const isLeaderListener = msg => {

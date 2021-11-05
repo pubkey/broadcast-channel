@@ -13,7 +13,9 @@ import path from 'path';
 import micro from 'nano-time';
 import rimraf from 'rimraf';
 import isNode from 'detect-node';
-import unload from 'unload';
+import {
+    add as unloadAdd
+} from 'unload';
 
 import { fillOptionsWithDefaults } from '../options.js';
 import {
@@ -391,7 +393,7 @@ export async function create(channelName, options = {}) {
         writeBlockPromise: PROMISE_RESOLVED_VOID,
         otherReaderClients: {},
         // ensure if process crashes, everything is cleaned up
-        removeUnload: unload.add(() => close(state)),
+        removeUnload: unloadAdd(() => close(state)),
         closed: false
     };
 
