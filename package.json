@@ -130,7 +130,7 @@
     "random-token": "0.0.8",
     "rollup": "2.59.0",
     "rollup-plugin-terser": "7.0.2",
-    "testcafe": "1.17.0",
+    "testcafe": "1.17.1",
     "ts-node": "10.4.0",
     "typescript": "4.4.4",
     "uglify-js": "3.14.3",
