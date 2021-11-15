@@ -109,7 +109,7 @@
     "copyfiles": "2.4.1",
     "cross-env": "7.0.3",
     "eslint": "8.2.0",
-    "gzip-size-cli": "5.0.0",
+    "gzip-size-cli": "5.0.1",
     "http-server": "14.0.0",
     "jest": "27.3.1",
     "karma": "6.3.8",
