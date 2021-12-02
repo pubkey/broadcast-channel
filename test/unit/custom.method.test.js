@@ -15,6 +15,7 @@ describe('unit/custom.method.test.js', () => {
             };
             const channel = new BroadcastChannel(channelName, { methods: method });
             assert.equal(channel.method, method);
+            channel.close();
         });
         it('should select one of the provided methods', () => {
             const channelName = AsyncTestUtil.randomString(12);
@@ -25,6 +26,7 @@ describe('unit/custom.method.test.js', () => {
             };
             const channel = new BroadcastChannel(channelName, { methods: [method] });
             assert.equal(channel.method, method);
+            channel.close();
         });
     });
 });

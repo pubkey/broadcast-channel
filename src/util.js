@@ -11,6 +11,7 @@ export function isPromise(obj) {
 }
 
 export const PROMISE_RESOLVED_FALSE = Promise.resolve(false);
+export const PROMISE_RESOLVED_TRUE = Promise.resolve(true);
 export const PROMISE_RESOLVED_VOID = Promise.resolve();
 
 export function sleep(time, resolveWith) {

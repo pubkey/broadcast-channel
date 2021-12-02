@@ -1,7 +1,8 @@
 export {
     BroadcastChannel,
     clearNodeFolder,
-    enforceOptions
+    enforceOptions,
+    OPEN_BROADCAST_CHANNELS
 } from './broadcast-channel';
 export {
     createLeaderElection,

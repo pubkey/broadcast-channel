@@ -5,6 +5,7 @@ const clone = require('clone');
 const unload = require('unload');
 const {
     BroadcastChannel,
+    OPEN_BROADCAST_CHANNELS,
     createLeaderElection,
     clearNodeFolder,
     enforceOptions,
@@ -27,7 +28,7 @@ function runTest(channelOptions) {
     describe('integration.test.js (' + JSON.stringify(channelOptions) + ')', () => {
         describe('BroadcastChannel', () => {
             describe('.constructor()', () => {
-                it('asdf', () => {
+                it('log options', () => {
                     console.log('Started: ' + JSON.stringify(channelOptions));
                 });
                 it('should create a channel', async () => {
@@ -484,12 +485,9 @@ function runTest(channelOptions) {
 
                     channel.close();
                 });
-                it('from two electors, only one should become leader', async () => {
-
-                    // run this many times because it failed randomly
-                    let t = 2;
-                    while (t > 0) {
-                        t--;
+                // run this multiple times because it failed randomly
+                new Array(2).fill(0).forEach((_i, idx) => {
+                    it('from two electors, only one should become leader (' + idx + ')', async () => {
                         const channelName = AsyncTestUtil.randomString(12);
                         const channel = new BroadcastChannel(channelName, channelOptions);
                         const channel2 = new BroadcastChannel(channelName, channelOptions);
@@ -508,7 +506,7 @@ function runTest(channelOptions) {
 
                         channel.close();
                         channel2.close();
-                    }
+                    });
                 });
                 it('from many electors, only one should become leader', async () => {
                     const channelName = AsyncTestUtil.randomString(12);
@@ -542,7 +540,7 @@ function runTest(channelOptions) {
                         t++;
                         await elector2.applyOnce();
                         // ensure we do not full block the test runner so it cannot exit
-                        if (t > 200) {
+                        if (t > 50) {
                             throw new Error('this should never happen');
                         }
                     }
@@ -780,6 +778,15 @@ function runTest(channelOptions) {
                     channel2.close();
                 });
             });
+        });
+    });
+    describe('final', () => {
+        it('should have closed all channels', () => {
+            assert.strictEqual(
+                OPEN_BROADCAST_CHANNELS.size,
+                0
+            );
+
         });
     });
 }

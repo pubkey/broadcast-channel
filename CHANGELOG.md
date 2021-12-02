@@ -2,6 +2,12 @@
 
 ## X.X.X (comming soon)
 
+Other:
+  - Added `broadcastChannel.id()` for debugging
+
+Bugfixes:
+  - Refactor `applyOnce()` queue to ensure we do not run more often then needed.
+
 ## 4.5.0 (5 November 2021)
 
 Bugfixes:

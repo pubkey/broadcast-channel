@@ -590,7 +590,10 @@ export function postMessage(channelState, messageJson) {
  * but will speed up things when this module is used in unit-tests.
  */
 export function emitOverFastPath(state, msgObj, messageJson) {
-    if (!state.options.node.useFastPath) return; // disabled
+    if (!state.options.node.useFastPath) {
+        // disabled
+        return;
+    }
     const others = OTHER_INSTANCES[state.channelName].filter(s => s !== state);
 
     const checkObj = {

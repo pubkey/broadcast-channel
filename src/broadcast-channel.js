@@ -12,8 +12,19 @@ import {
     fillOptionsWithDefaults
 } from './options.js';
 
+/**
+ * Contains all open channels,
+ * used in tests to ensure everything is closed.
+ */
+export const OPEN_BROADCAST_CHANNELS = new Set();
+
+let lastId = 0;
 
 export const BroadcastChannel = function (name, options) {
+    // identifier of the channel to debug stuff
+    this.id = lastId++;
+
+    OPEN_BROADCAST_CHANNELS.add(this);
     this.name = name;
 
     if (ENFORCED_OPTIONS) {
@@ -141,6 +152,7 @@ BroadcastChannel.prototype = {
         if (this.closed) {
             return;
         }
+        OPEN_BROADCAST_CHANNELS.delete(this);
         this.closed = true;
         const awaitPrepare = this._prepP ? this._prepP : PROMISE_RESOLVED_VOID;
 
@@ -187,8 +199,8 @@ function _post(broadcastChannel, type, msg) {
         // add/remove to unsend messages list
         broadcastChannel._uMP.add(sendPromise);
         sendPromise
-        .catch()
-        .then(() => broadcastChannel._uMP.delete(sendPromise));
+            .catch()
+            .then(() => broadcastChannel._uMP.delete(sendPromise));
 
         return sendPromise;
     });

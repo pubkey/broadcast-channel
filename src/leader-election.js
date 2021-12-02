@@ -1,8 +1,8 @@
 import {
     sleep,
     randomToken,
-    PROMISE_RESOLVED_FALSE,
-    PROMISE_RESOLVED_VOID
+    PROMISE_RESOLVED_VOID,
+    PROMISE_RESOLVED_TRUE
 } from './util.js';
 
 import {
@@ -18,14 +18,15 @@ const LeaderElection = function (broadcastChannel, options) {
     this.isDead = false;
     this.token = randomToken();
 
+
     /**
-     * _isApplying
-     * Only set when a leader application is
-     * running at the moment.
-     * @type {Promise<any> | null}
+     * Apply Queue,
+     * used to ensure we do not run applyOnce()
+     * in parallel.
      */
-    this._isApl = false; // _isApplying
-    this._reApply = false;
+    this._aplQ = PROMISE_RESOLVED_VOID;
+    // amount of unfinished applyOnce() calls
+    this._aplQC = 0;
 
     // things to clean up
     this._unl = []; // _unloads
@@ -55,74 +56,88 @@ const LeaderElection = function (broadcastChannel, options) {
 };
 
 LeaderElection.prototype = {
+    /**
+     * Returns true if the instance is leader,
+     * false if not.
+     * @async
+     */
     applyOnce() {
         if (this.isLeader) {
             return sleep(0, true);
         }
         if (this.isDead) {
-            return PROMISE_RESOLVED_FALSE;
-        }
-
-        // do nothing if already running
-        if (this._isApl) {
-            this._reApply = true;
             return sleep(0, false);
         }
 
-        let stopCriteria = false;
-        const recieved = [];
+        /**
+         * Already applying more then once,
+         * -> wait for the apply queue to be finished.
+         */
+        if (this._aplQC > 1) {
+            return this._aplQ;
+        }
 
-        const handleMessage = (msg) => {
-            if (msg.context === 'leader' && msg.token != this.token) {
-                recieved.push(msg);
-                if (msg.action === 'apply') {
-                    // other is applying
-                    if (msg.token > this.token) {
-                        // other has higher token, stop applying
+        /**
+         * Add a new apply-run
+         */
+        const applyRun = () => {
+            /**
+             * Optimization shortcuts.
+             * Directly return if a previous run
+             * has already elected a leader.
+             */
+            if (this.isLeader) {
+                return PROMISE_RESOLVED_TRUE;
+            }
+            let stopCriteria = false;
+            const recieved = [];
+            const handleMessage = (msg) => {
+                if (msg.context === 'leader' && msg.token != this.token) {
+                    recieved.push(msg);
+                    if (msg.action === 'apply') {
+                        // other is applying
+                        if (msg.token > this.token) {
+                            /**
+                             * other has higher token
+                             * -> stop applying and let other become leader.
+                             */
+                            stopCriteria = true;
+                        }
+                    }
+
+                    if (msg.action === 'tell') {
+                        // other is already leader
                         stopCriteria = true;
+                        this.hasLeader = true;
                     }
                 }
-
-                if (msg.action === 'tell') {
-                    // other is already leader
-                    stopCriteria = true;
-                    this.hasLeader = true;
-                }
-            }
+            };
+            this.broadcastChannel.addEventListener('internal', handleMessage);
+            const applyPromise = _sendMessage(this, 'apply') // send out that this one is applying
+                .then(() => sleep(this._options.responseTime / 2))
+                // send again in case another instance was just created
+                .then(() => _sendMessage(this, 'apply'))
+                // let others time to respond
+                .then(() => sleep(this._options.responseTime / 2))
+                .then(() => {
+                    this.broadcastChannel.removeEventListener('internal', handleMessage);
+                    if (!stopCriteria) {
+                        // no stop criteria -> own is leader
+                        return beLeader(this).then(() => true);
+                    } else {
+                        // other is leader
+                        return false;
+                    }
+                });
+            return applyPromise;
         };
-        this.broadcastChannel.addEventListener('internal', handleMessage);
-        const applyPromise = _sendMessage(this, 'apply') // send out that this one is applying
-            .then(() => sleep(this._options.responseTime)) // let others time to respond
+        this._aplQC = this._aplQC + 1;
+        this._aplQ = this._aplQ
+            .then(() => applyRun())
             .then(() => {
-                if (stopCriteria) {
-                    return Promise.reject(new Error());
-                } else {
-                    return _sendMessage(this, 'apply');
-                }
-            })
-            .then(() => sleep(this._options.responseTime)) // let others time to respond
-            .then(() => {
-                if (stopCriteria) {
-                    return Promise.reject(new Error());
-                } else {
-                    return _sendMessage(this);
-                }
-            })
-            .then(() => beLeader(this)) // no one disagreed -> this one is now leader
-            .then(() => true)
-            .catch(() => false) // apply not successfull
-            .then(success => {
-                this.broadcastChannel.removeEventListener('internal', handleMessage);
-                this._isApl = false;
-                if (!success && this._reApply) {
-                    this._reApply = false;
-                    return this.applyOnce();
-                } else {
-                    return success;
-                }
+                this._aplQC = this._aplQC - 1;
             });
-        this._isApl = applyPromise;
-        return applyPromise;
+        return this._aplQ.then(() => this.isLeader);
     },
 
     awaitLeadership() {
@@ -186,6 +201,7 @@ function _awaitLeadershipOnce(leaderElector) {
 
         // try on fallbackInterval
         const interval = setInterval(() => {
+            console.log('applyOnce via fallbackInterval');
             leaderElector.applyOnce().then(() => {
                 if (leaderElector.isLeader) {
                     finish();

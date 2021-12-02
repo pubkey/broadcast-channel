@@ -1,7 +1,8 @@
 const AsyncTestUtil = require('async-test-util');
 const {
     BroadcastChannel,
-    clearNodeFolder
+    clearNodeFolder,
+    createLeaderElection
 } = require('../');
 
 const benchmark = {
@@ -98,6 +99,46 @@ describe('performance.test.js', () => {
 
         const elapsed = elapsedTime(startTime);
         benchmark.sendRecieve.series = elapsed;
+    });
+    it('leaderElection', async () => {
+        const startTime = AsyncTestUtil.performanceNow();
+
+        let t = 10;
+        const channelsToClose = [];
+        while (t > 0) {
+            t--;
+            const channelName = AsyncTestUtil.randomString(10);
+            const channelA = new BroadcastChannel(channelName);
+            channelsToClose.push(channelA);
+            const channelB = new BroadcastChannel(channelName);
+            channelsToClose.push(channelB);
+            const leaderElectorA = createLeaderElection(channelA);
+            const leaderElectorB = createLeaderElection(channelB);
+
+            leaderElectorA.applyOnce();
+            leaderElectorB.applyOnce();
+
+            while (
+                !leaderElectorA.isLeader &&
+                !leaderElectorB.isLeader
+            ) {
+                await Promise.all([
+                    leaderElectorA.applyOnce(),
+                    leaderElectorB.applyOnce(),
+                    /**
+                     * We apply twice to better simulate
+                     * real world usage.
+                     */
+                    leaderElectorA.applyOnce(),
+                    leaderElectorB.applyOnce()
+                ]);
+            }
+        }
+
+        const elapsed = elapsedTime(startTime);
+        benchmark.leaderElection = elapsed;
+
+        await channelsToClose.forEach(channel => channel.close());
     });
     it('show result', () => {
         console.log('benchmark result:');

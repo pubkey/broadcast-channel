@@ -45,6 +45,7 @@ declare type OnMessageHandler<T> = ((this: BroadcastChannel, ev: T) => any) | nu
  */
 export class BroadcastChannel<T = any> {
     constructor(name: string, opts?: BroadcastChannelOptions);
+    readonly id: number;
     readonly name: string;
     readonly options: BroadcastChannelOptions;
     readonly type: MethodType;
@@ -63,3 +64,5 @@ export class BroadcastChannel<T = any> {
 // statics
 export function clearNodeFolder(opts?: BroadcastChannelOptions): Promise<boolean>;
 export function enforceOptions(opts?: BroadcastChannelOptions | false | null): void;
+
+export const OPEN_BROADCAST_CHANNELS: Set<BroadcastChannel>;
