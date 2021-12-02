@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.isNode = exports.PROMISE_RESOLVED_VOID = exports.PROMISE_RESOLVED_FALSE = void 0;
+exports.isNode = exports.PROMISE_RESOLVED_VOID = exports.PROMISE_RESOLVED_TRUE = exports.PROMISE_RESOLVED_FALSE = void 0;
 exports.isPromise = isPromise;
 exports.microSeconds = microSeconds;
 exports.randomInt = randomInt;
@@ -23,6 +23,8 @@ function isPromise(obj) {
 
 var PROMISE_RESOLVED_FALSE = Promise.resolve(false);
 exports.PROMISE_RESOLVED_FALSE = PROMISE_RESOLVED_FALSE;
+var PROMISE_RESOLVED_TRUE = Promise.resolve(true);
+exports.PROMISE_RESOLVED_TRUE = PROMISE_RESOLVED_TRUE;
 var PROMISE_RESOLVED_VOID = Promise.resolve();
 exports.PROMISE_RESOLVED_VOID = PROMISE_RESOLVED_VOID;
 

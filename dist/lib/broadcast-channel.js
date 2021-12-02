@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.BroadcastChannel = void 0;
+exports.OPEN_BROADCAST_CHANNELS = exports.BroadcastChannel = void 0;
 exports.clearNodeFolder = clearNodeFolder;
 exports.enforceOptions = enforceOptions;
 
@@ -13,7 +13,18 @@ var _methodChooser = require("./method-chooser.js");
 
 var _options = require("./options.js");
 
+/**
+ * Contains all open channels,
+ * used in tests to ensure everything is closed.
+ */
+var OPEN_BROADCAST_CHANNELS = new Set();
+exports.OPEN_BROADCAST_CHANNELS = OPEN_BROADCAST_CHANNELS;
+var lastId = 0;
+
 var BroadcastChannel = function BroadcastChannel(name, options) {
+  // identifier of the channel to debug stuff
+  this.id = lastId++;
+  OPEN_BROADCAST_CHANNELS.add(this);
   this.name = name;
 
   if (ENFORCED_OPTIONS) {
@@ -154,6 +165,7 @@ BroadcastChannel.prototype = {
       return;
     }
 
+    OPEN_BROADCAST_CHANNELS["delete"](this);
     this.closed = true;
     var awaitPrepare = this._prepP ? this._prepP : _util.PROMISE_RESOLVED_VOID;
     this._onML = null;

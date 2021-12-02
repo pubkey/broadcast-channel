@@ -20,15 +20,14 @@ var LeaderElection = function LeaderElection(broadcastChannel, options) {
   this.isDead = false;
   this.token = (0, _util.randomToken)();
   /**
-   * _isApplying
-   * Only set when a leader application is
-   * running at the moment.
-   * @type {Promise<any> | null}
+   * Apply Queue,
+   * used to ensure we do not run applyOnce()
+   * in parallel.
    */
 
-  this._isApl = false; // _isApplying
+  this._aplQ = _util.PROMISE_RESOLVED_VOID; // amount of unfinished applyOnce() calls
 
-  this._reApply = false; // things to clean up
+  this._aplQC = 0; // things to clean up
 
   this._unl = []; // _unloads
 
@@ -65,6 +64,11 @@ var LeaderElection = function LeaderElection(broadcastChannel, options) {
 };
 
 LeaderElection.prototype = {
+  /**
+   * Returns true if the instance is leader,
+   * false if not.
+   * @async
+   */
   applyOnce: function applyOnce() {
     var _this2 = this;
 
@@ -73,82 +77,113 @@ LeaderElection.prototype = {
     }
 
     if (this.isDead) {
-      return _util.PROMISE_RESOLVED_FALSE;
-    } // do nothing if already running
-
-
-    if (this._isApl) {
-      this._reApply = true;
       return (0, _util.sleep)(0, false);
     }
+    /**
+     * Already applying more then once,
+     * -> wait for the apply queue to be finished.
+     */
 
-    var stopCriteria = false;
-    var recieved = [];
 
-    var handleMessage = function handleMessage(msg) {
-      if (msg.context === 'leader' && msg.token != _this2.token) {
-        recieved.push(msg);
+    if (this._aplQC > 1) {
+      return this._aplQ;
+    }
+    /**
+     * Add a new apply-run
+     */
 
-        if (msg.action === 'apply') {
-          // other is applying
-          if (msg.token > _this2.token) {
-            // other has higher token, stop applying
-            stopCriteria = true;
+
+    var applyRun = function applyRun() {
+      /**
+       * Optimization shortcuts.
+       * Directly return if a previous run
+       * has already elected a leader.
+       */
+      if (_this2.isLeader) {
+        return _util.PROMISE_RESOLVED_TRUE;
+      }
+
+      var stopCriteria = false;
+      var stopCriteriaPromiseResolve;
+      /**
+       * Resolves when a stop criteria is reached.
+       * Uses as a performance shortcut so we do not
+       * have to await the responseTime when it is already clear
+       * that the election failed.
+       */
+
+      var stopCriteriaPromise = new Promise(function (res) {
+        stopCriteriaPromiseResolve = function stopCriteriaPromiseResolve() {
+          stopCriteria = true;
+          res();
+        };
+      });
+      var recieved = [];
+
+      var handleMessage = function handleMessage(msg) {
+        if (msg.context === 'leader' && msg.token != _this2.token) {
+          recieved.push(msg);
+
+          if (msg.action === 'apply') {
+            // other is applying
+            if (msg.token > _this2.token) {
+              /**
+               * other has higher token
+               * -> stop applying and let other become leader.
+               */
+              stopCriteriaPromiseResolve();
+            }
+          }
+
+          if (msg.action === 'tell') {
+            // other is already leader
+            stopCriteriaPromiseResolve();
+            _this2.hasLeader = true;
           }
         }
+      };
 
-        if (msg.action === 'tell') {
-          // other is already leader
-          stopCriteria = true;
-          _this2.hasLeader = true;
+      _this2.broadcastChannel.addEventListener('internal', handleMessage);
+
+      var applyPromise = _sendMessage(_this2, 'apply') // send out that this one is applying
+      .then(function () {
+        return Promise.race([(0, _util.sleep)(_this2._options.responseTime / 2), stopCriteriaPromise.then(function () {
+          return Promise.reject(new Error());
+        })]);
+      }) // send again in case another instance was just created
+      .then(function () {
+        return _sendMessage(_this2, 'apply');
+      }) // let others time to respond
+      .then(function () {
+        return Promise.race([(0, _util.sleep)(_this2._options.responseTime / 2), stopCriteriaPromise.then(function () {
+          return Promise.reject(new Error());
+        })]);
+      })["catch"](function () {}).then(function () {
+        _this2.broadcastChannel.removeEventListener('internal', handleMessage);
+
+        if (!stopCriteria) {
+          // no stop criteria -> own is leader
+          return beLeader(_this2).then(function () {
+            return true;
+          });
+        } else {
+          // other is leader
+          return false;
         }
-      }
+      });
+
+      return applyPromise;
     };
 
-    this.broadcastChannel.addEventListener('internal', handleMessage);
-
-    var applyPromise = _sendMessage(this, 'apply') // send out that this one is applying
-    .then(function () {
-      return (0, _util.sleep)(_this2._options.responseTime);
-    }) // let others time to respond
-    .then(function () {
-      if (stopCriteria) {
-        return Promise.reject(new Error());
-      } else {
-        return _sendMessage(_this2, 'apply');
-      }
+    this._aplQC = this._aplQC + 1;
+    this._aplQ = this._aplQ.then(function () {
+      return applyRun();
     }).then(function () {
-      return (0, _util.sleep)(_this2._options.responseTime);
-    }) // let others time to respond
-    .then(function () {
-      if (stopCriteria) {
-        return Promise.reject(new Error());
-      } else {
-        return _sendMessage(_this2);
-      }
-    }).then(function () {
-      return beLeader(_this2);
-    }) // no one disagreed -> this one is now leader
-    .then(function () {
-      return true;
-    })["catch"](function () {
-      return false;
-    }) // apply not successfull
-    .then(function (success) {
-      _this2.broadcastChannel.removeEventListener('internal', handleMessage);
-
-      _this2._isApl = false;
-
-      if (!success && _this2._reApply) {
-        _this2._reApply = false;
-        return _this2.applyOnce();
-      } else {
-        return success;
-      }
+      _this2._aplQC = _this2._aplQC - 1;
     });
-
-    this._isApl = applyPromise;
-    return applyPromise;
+    return this._aplQ.then(function () {
+      return _this2.isLeader;
+    });
   },
   awaitLeadership: function awaitLeadership() {
     if (
@@ -225,6 +260,7 @@ function _awaitLeadershipOnce(leaderElector) {
     }); // try on fallbackInterval
 
     var interval = setInterval(function () {
+      console.log('applyOnce via fallbackInterval');
       leaderElector.applyOnce().then(function () {
         if (leaderElector.isLeader) {
           finish();

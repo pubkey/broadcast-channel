@@ -9,6 +9,7 @@ export function isPromise(obj) {
   }
 }
 export var PROMISE_RESOLVED_FALSE = Promise.resolve(false);
+export var PROMISE_RESOLVED_TRUE = Promise.resolve(true);
 export var PROMISE_RESOLVED_VOID = Promise.resolve();
 export function sleep(time, resolveWith) {
   if (!time) time = 0;

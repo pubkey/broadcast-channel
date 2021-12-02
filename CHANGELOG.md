@@ -2,6 +2,8 @@
 
 ## X.X.X (comming soon)
 
+## 4.6.0 (2 December 2021)
+
 Other:
   - Added `broadcastChannel.id()` for debugging
 

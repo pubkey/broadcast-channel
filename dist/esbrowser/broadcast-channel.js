@@ -1,7 +1,17 @@
 import { isPromise, PROMISE_RESOLVED_FALSE, PROMISE_RESOLVED_VOID } from './util.js';
 import { chooseMethod } from './method-chooser.js';
 import { fillOptionsWithDefaults } from './options.js';
+/**
+ * Contains all open channels,
+ * used in tests to ensure everything is closed.
+ */
+
+export var OPEN_BROADCAST_CHANNELS = new Set();
+var lastId = 0;
 export var BroadcastChannel = function BroadcastChannel(name, options) {
+  // identifier of the channel to debug stuff
+  this.id = lastId++;
+  OPEN_BROADCAST_CHANNELS.add(this);
   this.name = name;
 
   if (ENFORCED_OPTIONS) {
@@ -137,6 +147,7 @@ BroadcastChannel.prototype = {
       return;
     }
 
+    OPEN_BROADCAST_CHANNELS["delete"](this);
     this.closed = true;
     var awaitPrepare = this._prepP ? this._prepP : PROMISE_RESOLVED_VOID;
     this._onML = null;

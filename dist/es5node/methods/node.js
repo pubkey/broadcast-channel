@@ -1066,7 +1066,10 @@ function postMessage(channelState, messageJson) {
 
 
 function emitOverFastPath(state, msgObj, messageJson) {
-  if (!state.options.node.useFastPath) return; // disabled
+  if (!state.options.node.useFastPath) {
+    // disabled
+    return;
+  }
 
   var others = OTHER_INSTANCES[state.channelName].filter(function (s) {
     return s !== state;

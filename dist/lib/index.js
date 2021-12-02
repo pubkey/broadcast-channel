@@ -9,6 +9,12 @@ Object.defineProperty(exports, "BroadcastChannel", {
     return _broadcastChannel.BroadcastChannel;
   }
 });
+Object.defineProperty(exports, "OPEN_BROADCAST_CHANNELS", {
+  enumerable: true,
+  get: function get() {
+    return _broadcastChannel.OPEN_BROADCAST_CHANNELS;
+  }
+});
 Object.defineProperty(exports, "beLeader", {
   enumerable: true,
   get: function get() {
