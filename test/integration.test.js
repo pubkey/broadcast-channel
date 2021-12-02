@@ -782,10 +782,12 @@ function runTest(channelOptions) {
     });
     describe('final', () => {
         it('should have closed all channels', () => {
-            assert.strictEqual(
-                OPEN_BROADCAST_CHANNELS.size,
-                0
-            );
+            if (isNode) {
+                assert.strictEqual(
+                    OPEN_BROADCAST_CHANNELS.size,
+                    0
+                );
+            }
 
         });
     });
