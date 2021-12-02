@@ -90,6 +90,19 @@ LeaderElection.prototype = {
                 return PROMISE_RESOLVED_TRUE;
             }
             let stopCriteria = false;
+            let stopCriteriaPromiseResolve;
+            /**
+             * Resolves when a stop criteria is reached.
+             * Uses as a performance shortcut so we do not
+             * have to await the responseTime when it is already clear
+             * that the election failed.
+             */
+            const stopCriteriaPromise = new Promise(res => {
+                stopCriteriaPromiseResolve = () => {
+                    stopCriteria = true;
+                    res();
+                };
+            });
             const recieved = [];
             const handleMessage = (msg) => {
                 if (msg.context === 'leader' && msg.token != this.token) {
@@ -101,24 +114,31 @@ LeaderElection.prototype = {
                              * other has higher token
                              * -> stop applying and let other become leader.
                              */
-                            stopCriteria = true;
+                            stopCriteriaPromiseResolve();
                         }
                     }
 
                     if (msg.action === 'tell') {
                         // other is already leader
-                        stopCriteria = true;
+                        stopCriteriaPromiseResolve();
                         this.hasLeader = true;
                     }
                 }
             };
             this.broadcastChannel.addEventListener('internal', handleMessage);
             const applyPromise = _sendMessage(this, 'apply') // send out that this one is applying
-                .then(() => sleep(this._options.responseTime / 2))
+                .then(() => Promise.race([
+                    sleep(this._options.responseTime / 2),
+                    stopCriteriaPromise.then(() => Promise.reject(new Error()))
+                ]))
                 // send again in case another instance was just created
                 .then(() => _sendMessage(this, 'apply'))
                 // let others time to respond
-                .then(() => sleep(this._options.responseTime / 2))
+                .then(() => Promise.race([
+                    sleep(this._options.responseTime / 2),
+                    stopCriteriaPromise.then(() => Promise.reject(new Error()))
+                ]))
+                .catch(() => { })
                 .then(() => {
                     this.broadcastChannel.removeEventListener('internal', handleMessage);
                     if (!stopCriteria) {
