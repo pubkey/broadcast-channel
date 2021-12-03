@@ -43,4 +43,20 @@ describe('issues.test.js', () => {
         await channel1.close();
         await channel2.close();
     });
+    it('write many messages and then close', async function() {
+        this.timeout(40 * 1000);
+        const channelName = AsyncTestUtil.randomString(12);
+        const channel = new BroadcastChannel(channelName);
+        new Array(5000)
+            .fill(0)
+            .map((_i, idx) => ({
+                foo: 'bar',
+                idx,
+                longString: AsyncTestUtil.randomString(40)
+            }))
+            .map(msg => channel.postMessage(msg));
+
+
+        await channel.close();
+    });
 });

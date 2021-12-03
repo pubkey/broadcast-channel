@@ -13,6 +13,7 @@ import path from 'path';
 import micro from 'nano-time';
 import rimraf from 'rimraf';
 import isNode from 'detect-node';
+import PQueue from 'p-queue';
 import {
     add as unloadAdd
 } from 'unload';
@@ -387,6 +388,12 @@ export async function create(channelName, options = {}) {
         paths,
         // contains all messages that have been emitted before
         emittedMessagesIds: new ObliviousSet(options.node.ttl * 2),
+        /**
+         * Used to ensure we do not write too many files at once
+         * which could throw an error.
+         * Must always be smaller then options.node.maxParallelWrites
+         */
+        writeFileQueue: new PQueue({ concurrency: options.node.maxParallelWrites }),
         messagesCallbackTime: null,
         messagesCallback: null,
         // ensures we do not read messages in parrallel
@@ -533,16 +540,19 @@ export function refreshReaderClients(channelState) {
         });
 }
 
+
 /**
  * post a message to the other readers
  * @return {Promise<void>}
  */
-export function postMessage(channelState, messageJson) {
-    const writePromise = writeMessage(
-        channelState.channelName,
-        channelState.uuid,
-        messageJson,
-        channelState.paths
+export async function postMessage(channelState, messageJson) {
+    const writePromise = channelState.writeFileQueue.add(
+        () => writeMessage(
+            channelState.channelName,
+            channelState.uuid,
+            messageJson,
+            channelState.paths
+        )
     );
     channelState.writeBlockPromise = channelState.writeBlockPromise.then(async () => {
 

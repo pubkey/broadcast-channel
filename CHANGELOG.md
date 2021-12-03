@@ -1,6 +1,9 @@
 # CHANGELOG
 
-## X.X.X (comming soon)
+## 4.7.0 (3 December 2021)
+
+Bugfixes:
+  - Prevent `EMFILE, too many open files` error when writing many messages at once.
 
 ## 4.6.0 (2 December 2021)
 

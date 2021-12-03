@@ -10,6 +10,11 @@ const benchmark = {
     sendRecieve: {}
 };
 
+const options = {
+    node: {
+        useFastPath: false
+    }
+};
 
 const elapsedTime = before => {
     return AsyncTestUtil.performanceNow() - before;
@@ -30,7 +35,7 @@ describe('performance.test.js', () => {
 
         const startTime = AsyncTestUtil.performanceNow();
         for (let i = 0; i < amount; i++) {
-            const channel = new BroadcastChannel(channelName);
+            const channel = new BroadcastChannel(channelName, options);
             channels.push(channel);
         }
         await Promise.all(
@@ -42,8 +47,8 @@ describe('performance.test.js', () => {
     });
     it('sendRecieve.parallel', async () => {
         const channelName = AsyncTestUtil.randomString(10);
-        const channelSender = new BroadcastChannel(channelName);
-        const channelReciever = new BroadcastChannel(channelName);
+        const channelSender = new BroadcastChannel(channelName, options);
+        const channelReciever = new BroadcastChannel(channelName, options);
         const msgAmount = 2000;
         let emittedCount = 0;
         const waitPromise = new Promise(res => {
@@ -69,8 +74,8 @@ describe('performance.test.js', () => {
     });
     it('sendRecieve.series', async () => {
         const channelName = AsyncTestUtil.randomString(10);
-        const channelSender = new BroadcastChannel(channelName);
-        const channelReciever = new BroadcastChannel(channelName);
+        const channelSender = new BroadcastChannel(channelName, options);
+        const channelReciever = new BroadcastChannel(channelName, options);
         const msgAmount = 600;
         let emittedCount = 0;
 
@@ -108,9 +113,9 @@ describe('performance.test.js', () => {
         while (t > 0) {
             t--;
             const channelName = AsyncTestUtil.randomString(10);
-            const channelA = new BroadcastChannel(channelName);
+            const channelA = new BroadcastChannel(channelName, options);
             channelsToClose.push(channelA);
-            const channelB = new BroadcastChannel(channelName);
+            const channelB = new BroadcastChannel(channelName, options);
             channelsToClose.push(channelB);
             const leaderElectorA = createLeaderElection(channelA);
             const leaderElectorB = createLeaderElection(channelB);

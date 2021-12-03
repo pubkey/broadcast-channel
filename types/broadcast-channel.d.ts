@@ -26,6 +26,12 @@ export type BroadcastChannelOptions = {
     node?: {
         ttl?: number;
         useFastPath?: boolean;
+        /**
+         * Opening too many write files will throw an error.
+         * So we ensure we throttle to have a max limit on writes.
+         * @link https://stackoverflow.com/questions/8965606/node-and-error-emfile-too-many-open-files
+         */
+        maxParallelWrites?: number;
     };
     idb?: {
         ttl?: number;
