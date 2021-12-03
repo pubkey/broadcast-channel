@@ -1545,6 +1545,12 @@ function fillOptionsWithDefaults() {
   if (!options.node) options.node = {};
   if (!options.node.ttl) options.node.ttl = 1000 * 60 * 2; // 2 minutes;
 
+  /**
+   * On linux use 'ulimit -Hn' to get the limit of open files.
+   * On ubuntu this was 4096 for me, so we use half of that as maxParallelWrites default.
+   */
+
+  if (!options.node.maxParallelWrites) options.node.maxParallelWrites = 2048;
   if (typeof options.node.useFastPath === 'undefined') options.node.useFastPath = true;
   return options;
 }
