@@ -1,5 +1,9 @@
 # CHANGELOG
 
+
+Bugfixes:
+  - Remove useless log at leader election fallback interval.
+
 ## 4.7.0 (3 December 2021)
 
 Bugfixes:
