@@ -619,7 +619,6 @@ function _awaitLeadershipOnce(leaderElector) {
     }); // try on fallbackInterval
 
     var interval = setInterval(function () {
-      console.log('applyOnce via fallbackInterval');
       leaderElector.applyOnce().then(function () {
         if (leaderElector.isLeader) {
           finish();
