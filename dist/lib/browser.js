@@ -401,8 +401,6 @@ var LeaderElection = function LeaderElection(broadcastChannel, options) {
 
   this._lstns = []; // _listeners
 
-  this._invs = []; // _intervals
-
   this._dpL = function () {}; // onduplicate listener
 
 
@@ -437,7 +435,8 @@ LeaderElection.prototype = {
    * false if not.
    * @async
    */
-  applyOnce: function applyOnce() {
+  applyOnce: function applyOnce( // true if the applyOnce() call came from the fallbackInterval cycle
+  isFromFallbackInterval) {
     var _this2 = this;
 
     if (this.isLeader) {
@@ -512,10 +511,23 @@ LeaderElection.prototype = {
       };
 
       _this2.broadcastChannel.addEventListener('internal', handleMessage);
+      /**
+       * If the applyOnce() call came from the fallbackInterval,
+       * we can assume that the election runs in the background and
+       * not critical process is waiting for it.
+       * When this is true, we give the other intances
+       * more time to answer to messages in the election cycle.
+       * This makes it less likely to elect duplicate leaders.
+       * But also it takes longer which is not a problem because we anyway
+       * run in the background.
+       */
+
+
+      var waitForAnswerTime = isFromFallbackInterval ? _this2._options.responseTime * 4 : _this2._options.responseTime;
 
       var applyPromise = _sendMessage(_this2, 'apply') // send out that this one is applying
       .then(function () {
-        return Promise.race([(0, _util.sleep)(_this2._options.responseTime / 2), stopCriteriaPromise.then(function () {
+        return Promise.race([(0, _util.sleep)(waitForAnswerTime), stopCriteriaPromise.then(function () {
           return Promise.reject(new Error());
         })]);
       }) // send again in case another instance was just created
@@ -523,7 +535,7 @@ LeaderElection.prototype = {
         return _sendMessage(_this2, 'apply');
       }) // let others time to respond
       .then(function () {
-        return Promise.race([(0, _util.sleep)(_this2._options.responseTime / 2), stopCriteriaPromise.then(function () {
+        return Promise.race([(0, _util.sleep)(waitForAnswerTime), stopCriteriaPromise.then(function () {
           return Promise.reject(new Error());
         })]);
       })["catch"](function () {}).then(function () {
@@ -576,12 +588,6 @@ LeaderElection.prototype = {
 
     this._lstns = [];
 
-    this._invs.forEach(function (interval) {
-      return clearInterval(interval);
-    });
-
-    this._invs = [];
-
     this._unl.forEach(function (uFn) {
       return uFn.remove();
     });
@@ -615,7 +621,6 @@ function _awaitLeadershipOnce(leaderElector) {
       }
 
       resolved = true;
-      clearInterval(interval);
       leaderElector.broadcastChannel.removeEventListener('internal', whenDeathListener);
       res(true);
     } // try once now
@@ -625,18 +630,33 @@ function _awaitLeadershipOnce(leaderElector) {
       if (leaderElector.isLeader) {
         finish();
       }
-    }); // try on fallbackInterval
+    });
+    /**
+     * Try on fallbackInterval
+     * @recursive
+     */
 
-    var interval = setInterval(function () {
-      leaderElector.applyOnce().then(function () {
+    var tryOnFallBack = function tryOnFallBack() {
+      return (0, _util.sleep)(leaderElector._options.fallbackInterval).then(function () {
+        if (leaderElector.isDead || resolved) {
+          return;
+        }
+
         if (leaderElector.isLeader) {
           finish();
+        } else {
+          return leaderElector.applyOnce(true).then(function () {
+            if (leaderElector.isLeader) {
+              finish();
+            } else {
+              tryOnFallBack();
+            }
+          });
         }
       });
-    }, leaderElector._options.fallbackInterval);
+    };
 
-    leaderElector._invs.push(interval); // try when other leader dies
-
+    tryOnFallBack(); // try when other leader dies
 
     var whenDeathListener = function whenDeathListener(msg) {
       if (msg.context === 'leader' && msg.action === 'death') {
