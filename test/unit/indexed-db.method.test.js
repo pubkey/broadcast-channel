@@ -207,7 +207,7 @@ describe('unit/indexed-db.method.test.js', () => {
             });
             /**
              * localstorage-pings do not work in a web-workers,
-             * which means this should be detected and work over intervall
+             * which means this should be detected and work over interval
              * @link https://stackoverflow.com/a/6179599/3443137
              */
             it('should also work if localstorage does not work', async () => {

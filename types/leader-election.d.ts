@@ -5,8 +5,12 @@ import {
 
 export type LeaderElectionOptions = {
     /**
-     * This value decides how often instances will renegotiate who is leader.
-     * Probably should be at least 2x bigger than responseTime.
+     * Normally, when the leading JavaScript process dies, it will send an I-am-dead
+     * message to the other LeaderElectors, so that they can elect a new leader.
+     * On rare cases, when the JavaScript process exits ungracefully, it can happen
+     * that the other electors do not get a dead-message.
+     * So we have to also run the election cycle in an interval to ensure
+     * we never stuck on a state where noone is leader and noone is trying to get elected.
      */
     fallbackInterval?: number;
     /**
@@ -41,7 +45,7 @@ export declare class LeaderElector {
     readonly isDead: boolean;
     readonly token: string;
 
-    applyOnce(): Promise<boolean>;
+    applyOnce(isFromFallbackInterval?: boolean): Promise<boolean>;
     awaitLeadership(): Promise<void>;
     die(): Promise<void>;
 

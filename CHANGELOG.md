@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 4.8.0 (15 December 2021)
+
+Changes:
+  - Better determine the correct `responseTime` to use to make it less likely to elect duplicate leaders.
 
 ## 4.7.1 (13 December 2021)
 

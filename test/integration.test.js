@@ -643,9 +643,16 @@ function runTest(channelOptions) {
                     const elector2 = createLeaderElection(channel2);
 
                     await elector.awaitLeadership();
+                    await AsyncTestUtil.wait(200);
 
                     let resolved = false;
-                    elector2.awaitLeadership().then(() => resolved = true);
+                    elector2.awaitLeadership().then(() => {
+                        resolved = true;
+                    });
+
+                    // wait for the applyQueue to be done
+                    // to not accientially skip testing the fallbackInterval election cycle.
+                    await elector2._aplQ;
 
                     // overwrite postInternal to simulate non-responding leader
                     channel.postInternal = () => Promise.resolve();

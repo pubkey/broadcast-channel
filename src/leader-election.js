@@ -31,7 +31,6 @@ const LeaderElection = function (broadcastChannel, options) {
     // things to clean up
     this._unl = []; // _unloads
     this._lstns = []; // _listeners
-    this._invs = []; // _intervals
     this._dpL = () => { }; // onduplicate listener
     this._dpLC = false; // true when onduplicate called
 
@@ -61,7 +60,10 @@ LeaderElection.prototype = {
      * false if not.
      * @async
      */
-    applyOnce() {
+    applyOnce(
+        // true if the applyOnce() call came from the fallbackInterval cycle
+        isFromFallbackInterval
+    ) {
         if (this.isLeader) {
             return sleep(0, true);
         }
@@ -126,16 +128,29 @@ LeaderElection.prototype = {
                 }
             };
             this.broadcastChannel.addEventListener('internal', handleMessage);
+
+            /**
+             * If the applyOnce() call came from the fallbackInterval,
+             * we can assume that the election runs in the background and
+             * not critical process is waiting for it.
+             * When this is true, we give the other intances
+             * more time to answer to messages in the election cycle.
+             * This makes it less likely to elect duplicate leaders.
+             * But also it takes longer which is not a problem because we anyway
+             * run in the background.
+             */
+            const waitForAnswerTime = isFromFallbackInterval ? this._options.responseTime * 4 : this._options.responseTime;
+
             const applyPromise = _sendMessage(this, 'apply') // send out that this one is applying
                 .then(() => Promise.race([
-                    sleep(this._options.responseTime / 2),
+                    sleep(waitForAnswerTime),
                     stopCriteriaPromise.then(() => Promise.reject(new Error()))
                 ]))
                 // send again in case another instance was just created
                 .then(() => _sendMessage(this, 'apply'))
                 // let others time to respond
                 .then(() => Promise.race([
-                    sleep(this._options.responseTime / 2),
+                    sleep(waitForAnswerTime),
                     stopCriteriaPromise.then(() => Promise.reject(new Error()))
                 ]))
                 .catch(() => { })
@@ -177,8 +192,6 @@ LeaderElection.prototype = {
     die() {
         this._lstns.forEach(listener => this.broadcastChannel.removeEventListener('internal', listener));
         this._lstns = [];
-        this._invs.forEach(interval => clearInterval(interval));
-        this._invs = [];
         this._unl.forEach(uFn => uFn.remove());
         this._unl = [];
 
@@ -207,7 +220,6 @@ function _awaitLeadershipOnce(leaderElector) {
                 return;
             }
             resolved = true;
-            clearInterval(interval);
             leaderElector.broadcastChannel.removeEventListener('internal', whenDeathListener);
             res(true);
         }
@@ -219,15 +231,32 @@ function _awaitLeadershipOnce(leaderElector) {
             }
         });
 
-        // try on fallbackInterval
-        const interval = setInterval(() => {
-            leaderElector.applyOnce().then(() => {
-                if (leaderElector.isLeader) {
-                    finish();
-                }
-            });
-        }, leaderElector._options.fallbackInterval);
-        leaderElector._invs.push(interval);
+        /**
+         * Try on fallbackInterval
+         * @recursive
+         */
+        const tryOnFallBack = () => {
+            return sleep(leaderElector._options.fallbackInterval)
+                .then(() => {
+                    if (leaderElector.isDead || resolved) {
+                        return;
+                    }
+                    if (leaderElector.isLeader) {
+                        finish();
+                    } else {
+                        return leaderElector
+                            .applyOnce(true)
+                            .then(() => {
+                                if (leaderElector.isLeader) {
+                                    finish();
+                                } else {
+                                    tryOnFallBack();
+                                }
+                            });
+                    }
+                });
+        };
+        tryOnFallBack();
 
         // try when other leader dies
         const whenDeathListener = msg => {
