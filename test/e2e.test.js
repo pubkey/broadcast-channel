@@ -114,7 +114,7 @@ async function nativeBroadcastChannelExists(t) {
 [
     'native',
     'idb',
-    'localstorage',
+    // 'localstorage', // WebWorker does not work with localstorage method
     'default'
 ].forEach(methodType => {
     test.page(BASE_PAGE + '?methodType=' + methodType + '&autoStart=startWorkerTest')('test(startWorkerTest) with method: ' + methodType, async (t) => {
