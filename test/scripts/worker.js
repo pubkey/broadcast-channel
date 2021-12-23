@@ -7,6 +7,13 @@ var {
     BroadcastChannel
 } = require('../../');
 
+var {
+    randomNumber,
+    randomBoolean,
+    wait
+} = require('async-test-util');
+var resolved = Promise.resolve();
+
 // overwrite console.log
 try {
     var logBefore = console.log;
@@ -17,7 +24,7 @@ try {
 
 
 /**
- * because shitware microsof-edge stucks the worker
+ * because shitware microsoft-edge sucks, the worker
  * when initialisation is done,
  * we have to set a interval here.
  */
@@ -37,13 +44,23 @@ self.addEventListener('message', function (e) {
             // console.log('Worker channel-uuid: ' + channel._state.uuid);
             channel.onmessage = function (msg) {
                 console.log('recieved message(' + msg.step + ') from ' + msg.from + ': ' + JSON.stringify(msg));
+
                 if (!msg.answer) {
-                    console.log('(' + msg.step + ') answer back');
-                    channel.postMessage({
-                        answer: true,
-                        from: 'worker',
-                        original: msg
-                    });
+                    /**
+                     * Wait a random amount of time to simulate 'normal' usage
+                     * where the worker would do some work before returning anything.
+                     * Sometimes do not wait at all to simulate a direct response.
+                     */
+                    const waitBefore = randomBoolean() ? resolved : wait(randomNumber(10, 150));
+                    waitBefore
+                        .then(function () {
+                            console.log('(' + msg.step + ') answer back');
+                            channel.postMessage({
+                                answer: true,
+                                from: 'worker',
+                                original: msg
+                            });
+                        });
                 }
             };
 

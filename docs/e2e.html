@@ -79,7 +79,10 @@
         <br />
         <b>Method:</b>
         <select id="method-type-select">
-            <option value="" selected>default</option>
+            <option
+                value=""
+                selected
+            >default</option>
             <option value="native">native</option>
             <option value="idb">IndexedDb</option>
             <option value="localstorage">localstorage</option>
@@ -87,8 +90,18 @@
         <span id="method">X</span>
         <br />
         <br />
-        <button id="bc-button" onclick="startBroadcastChannel()">Test BroadcastChannel</button>
-        <button id="le-button" onclick="startLeaderElection()">Test LeaderElection</button>
+        <button
+            id="bc-button"
+            onclick="startBroadcastChannel()"
+        >Test BroadcastChannel</button>
+        <button
+            id="le-button"
+            onclick="startLeaderElection()"
+        >Test LeaderElection</button>
+        <button
+            id="w-button"
+            onclick="startWorkerTest()"
+        >Test WebWorker</button>
 
         <br />
         <b>State:</b>
@@ -100,35 +113,81 @@
         <b>Amount Time:</b>
         <span id="time-amount">X</span>
     </div>
-    <a href="https://github.com/pubkey/broadcast-channel" target="_blank">
-        <img style="position: fixed; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"
-            alt="Fork me on GitHub">
+    <a
+        href="https://github.com/pubkey/broadcast-channel"
+        target="_blank"
+    >
+        <img
+            style="position: fixed; top: 0; right: 0; border: 0;"
+            src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png"
+            alt="Fork me on GitHub"
+        >
     </a>
 
-    <div id="bc-state" class="state-box">
+    <div
+        id="bc-state"
+        class="state-box"
+    >
         <div style="float: left; width: 250px;">
             <h2>BroadcastChannel Test</h2>
-            <p>This will send a message from the main-context, await until the iframe and the web-worker answered, then repeat
+            <p>This will send a message from the main-context, await until the iframe and the web-worker answered, then
+                repeat
                 until all messages have been send.</p>
             <br />
             <b>MessageCount:</b>
             <span id="msg-count">0</span>
         </div>
-        <iframe id="test-iframe" class="msg-box"></iframe>
-        <div id="messages" class="msg-box"></div>
+        <iframe
+            id="test-iframe"
+            class="msg-box"
+        ></iframe>
+        <div
+            id="messages"
+            class="msg-box"
+        ></div>
     </div>
 
 
-    <div id="le-state" class="state-box" style="margin-top: 10px;">
+    <div
+        id="le-state"
+        class="state-box"
+        style="margin-top: 10px;"
+    >
         <div style="float: left; width: 250px;">
             <h2>LeaderElection Test</h2>
-            <p>This will spawn several iframes which all want to be leader. No matter what happens, exactly one iframe should be
+            <p>This will spawn several iframes which all want to be leader. No matter what happens, exactly one iframe
+                should be
                 leader.
             </p>
             <br />
         </div>
 
         <div id="leader-iframes"></div>
+    </div>
+
+    <div
+        id="wk-state"
+        class="state-box"
+    >
+        <div style="float: left; width: 250px;">
+            <h2>WebWorker Test</h2>
+            <p>
+                This will send a message from the main-context to the worker and wait for a response message.
+                This runs many times with random timings to ensure there are no edge cases where messages are missing or
+                in the wrong order.
+            </p>
+            <br />
+            <b>MessageCount:</b>
+            <span id="msg-count-worker">0</span>
+        </div>
+        <iframe
+            id="test-iframe"
+            class="msg-box"
+        ></iframe>
+        <div
+            id="messages"
+            class="msg-box"
+        ></div>
     </div>
 
 
