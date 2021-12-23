@@ -193,6 +193,13 @@ function runTest(channelOptions) {
                     channel1.postMessage('foo1');
                     channel1.postMessage('foo2');
 
+                    /**
+                     * We have to wait 200ms here because only 'too old' messages should be filtered out.
+                     * Becuase the JavaScript time precision is not good enough, we also emit messages that are only a bit off.
+                     * This ensures we do not miss out messages which would be way more critical then getting additionals.
+                     */
+                    await wait(200);
+
                     const emitted = [];
                     channel2.onmessage = msg => emitted.push(msg);
 
