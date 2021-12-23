@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## X.X.X (comming soon)
+
+Bugfixes:
+  - When listening to messages directly, responses that where send directly after `addEventListener()` where missing because of inaccurate JavaScript timing.
+
 ## 4.8.0 (15 December 2021)
 
 Changes:

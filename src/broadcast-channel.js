@@ -244,11 +244,23 @@ function _startListening(channel) {
         // someone is listening, start subscribing
 
         const listenerFn = msgObj => {
-            channel._addEL[msgObj.type].forEach(obj => {
-                if (msgObj.time >= obj.time) {
-                    obj.fn(msgObj.data);
-                }
-            });
+            channel._addEL[msgObj.type]
+                .forEach(listenerObject => {
+                    /**
+                     * Getting the current time in JavaScript has no good precision.
+                     * So instead of only listening to events that happend 'after' the listener
+                     * was added, we also listen to events that happended 100ms before it.
+                     * This ensures that when another process, like a WebWorker, sends events
+                     * we do not miss them out because their timestamp is a bit off compared to the main process.
+                     * Not doing this would make messages missing when we send data directly after subscribing and awaiting a response.
+                     * @link https://johnresig.com/blog/accuracy-of-javascript-time/
+                     */
+                    const minMessageTime = listenerObject.time - 100;
+
+                    if (msgObj.time >= minMessageTime) {
+                        listenerObject.fn(msgObj.data);
+                    }
+                });
         };
 
         const time = channel.method.microSeconds();
