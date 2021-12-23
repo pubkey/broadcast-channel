@@ -79,8 +79,6 @@ function run() {
         const rand = new Date().getTime();
 
         channel.onmessage = function (msg) {
-            console.log('main: recieved msg' + JSON.stringify(msg));
-
             answerPool[msg.from] = msg;
             var textnode = document.createTextNode(JSON.stringify(msg) + '</br>');
             msgContainer.appendChild(textnode);

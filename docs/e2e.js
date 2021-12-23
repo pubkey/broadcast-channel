@@ -261,9 +261,21 @@ function _startListening(channel) {
   if (!channel._iL && _hasMessageListeners(channel)) {
     // someone is listening, start subscribing
     var listenerFn = function listenerFn(msgObj) {
-      channel._addEL[msgObj.type].forEach(function (obj) {
-        if (msgObj.time >= obj.time) {
-          obj.fn(msgObj.data);
+      channel._addEL[msgObj.type].forEach(function (listenerObject) {
+        /**
+         * Getting the current time in JavaScript has no good precision.
+         * So instead of only listening to events that happend 'after' the listener
+         * was added, we also listen to events that happended 100ms before it.
+         * This ensures that when another process, like a WebWorker, sends events
+         * we do not miss them out because their timestamp is a bit off compared to the main process.
+         * Not doing this would make messages missing when we send data directly after subscribing and awaiting a response.
+         * @link https://johnresig.com/blog/accuracy-of-javascript-time/
+         */
+        var hundredMsInMicro = 100 * 1000;
+        var minMessageTime = listenerObject.time - hundredMsInMicro;
+
+        if (msgObj.time >= minMessageTime) {
+          listenerObject.fn(msgObj.data);
         }
       });
     };
@@ -12374,7 +12386,6 @@ function run() {
             rand = new Date().getTime();
 
             channel.onmessage = function (msg) {
-              console.log('main: recieved msg' + JSON.stringify(msg));
               answerPool[msg.from] = msg;
               var textnode = document.createTextNode(JSON.stringify(msg) + '</br>');
               msgContainer.appendChild(textnode);
@@ -12670,7 +12681,9 @@ function run() {
                         return true;
                       })]).then(function (errored) {
                         if (errored) {
-                          throw new Error('timed out for msgId ' + msgId);
+                          var errorMessage = 'ERROR startWorkerTest() timed out for msgId ' + msgId;
+                          console.error(errorMessage);
+                          throw new Error(errorMessage);
                         }
                       });
 
