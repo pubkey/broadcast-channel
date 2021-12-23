@@ -198,7 +198,7 @@ function runTest(channelOptions) {
                      * Becuase the JavaScript time precision is not good enough, we also emit messages that are only a bit off.
                      * This ensures we do not miss out messages which would be way more critical then getting additionals.
                      */
-                    await wait(200);
+                    await AsyncTestUtil.wait(200);
 
                     const emitted = [];
                     channel2.onmessage = msg => emitted.push(msg);

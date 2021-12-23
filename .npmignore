@@ -9,6 +9,7 @@ babel.config.js
 .editorconfig
 .eslintignore
 .eslintrc.json
+.eslintcache
 .gitignore
 .travis.yml
 renovate.json
