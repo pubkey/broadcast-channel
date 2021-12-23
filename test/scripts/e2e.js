@@ -293,7 +293,9 @@ function run() {
                         wait(2000).then(() => true)
                     ]).then(errored => {
                         if (errored) {
-                            throw new Error('timed out for msgId ' + msgId);
+                            const errorMessage = 'ERROR startWorkerTest() timed out for msgId ' + msgId;
+                            console.error(errorMessage);
+                            throw new Error(errorMessage);
                         }
                     });
                 })
