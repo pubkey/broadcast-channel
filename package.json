@@ -113,7 +113,7 @@
     "gzip-size-cli": "5.1.0",
     "http-server": "14.0.0",
     "jest": "27.4.7",
-    "karma": "6.3.9",
+    "karma": "6.3.10",
     "karma-babel-preprocessor": "8.0.1",
     "karma-browserify": "8.1.0",
     "karma-chrome-launcher": "3.1.0",
