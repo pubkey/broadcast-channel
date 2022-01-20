@@ -133,7 +133,7 @@
     "rollup-plugin-terser": "7.0.2",
     "testcafe": "1.18.2",
     "ts-node": "10.4.0",
-    "typescript": "4.5.4",
+    "typescript": "4.5.5",
     "uglify-js": "3.14.5",
     "watchify": "4.0.0",
     "webpack": "5.66.0",
