@@ -84,7 +84,7 @@
     "microseconds": "0.2.0",
     "nano-time": "1.0.0",
     "oblivious-set": "1.0.0",
-    "p-queue": "6.6.2",
+    "p-queue": "7.1.0",
     "rimraf": "3.0.2",
     "unload": "2.3.1"
   },
