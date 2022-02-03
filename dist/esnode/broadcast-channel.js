@@ -97,7 +97,13 @@ export function enforceOptions(options) {
 BroadcastChannel.prototype = {
   postMessage: function postMessage(msg) {
     if (this.closed) {
-      throw new Error('BroadcastChannel.postMessage(): ' + 'Cannot post message after channel has closed');
+      throw new Error('BroadcastChannel.postMessage(): ' + 'Cannot post message after channel has closed ' +
+      /**
+       * In the past when this error appeared, it was realy hard to debug.
+       * So now we log the msg together with the error so it at least
+       * gives some clue about where in your application this happens.
+       */
+      JSON.stringify(msg));
     }
 
     return _post(this, 'message', msg);
