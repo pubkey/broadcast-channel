@@ -1,5 +1,10 @@
 # CHANGELOG
 
+
+## X.X.X (comming soon)
+
+- Improve error message when calling `postMessage` to a closed channel.
+
 ## 4.9.0 (23 December 2021)
 
 Bugfixes:
