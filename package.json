@@ -89,9 +89,9 @@
     "unload": "2.3.1"
   },
   "devDependencies": {
-    "@babel/cli": "7.17.0",
-    "@babel/core": "7.17.2",
-    "@babel/plugin-proposal-object-rest-spread": "7.16.7",
+    "@babel/cli": "7.17.3",
+    "@babel/core": "7.17.3",
+    "@babel/plugin-proposal-object-rest-spread": "7.17.3",
     "@babel/plugin-transform-member-expression-literals": "7.16.7",
     "@babel/plugin-transform-property-literals": "7.16.7",
     "@babel/plugin-transform-runtime": "7.17.0",
