@@ -129,7 +129,7 @@
     "pre-commit": "1.2.2",
     "random-int": "3.0.0",
     "random-token": "0.0.8",
-    "rollup": "2.69.0",
+    "rollup": "2.69.1",
     "rollup-plugin-terser": "7.0.2",
     "testcafe": "1.18.4",
     "ts-node": "10.6.0",
