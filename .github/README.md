@@ -238,7 +238,7 @@ await elector.die();
 
 ### Handle duplicate leaders
 
-Duplicate leadership can happen on rare occurences like when the [CPU is on 100%](https://github.com/pubkey/broadcast-channel/issues/385) for longer time, or the browser [has throttled the javascript timers](https://github.com/pubkey/broadcast-channel/issues/414).
+Duplicate leadership can happen on rare occurences like when the [CPU is on 100%](https://web.archive.org/web/20201221051328/https://github.com/pubkey/broadcast-channel/issues/385) for longer time, or the browser [has throttled the javascript timers](https://web.archive.org/web/20201221051312/https://github.com/pubkey/broadcast-channel/issues/414).
 
 ```js
 const elector = createLeaderElection(channel);
