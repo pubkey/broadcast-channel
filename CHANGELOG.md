@@ -3,6 +3,9 @@
 
 ## X.X.X (comming soon)
 
+- Replaced `nano-time` with `microtime`.
+- Improve IndexedDB method performance.
+
 ## 4.10.0 (3 February 2022)
 
 - Improve error message when calling `postMessage` to a closed channel.
