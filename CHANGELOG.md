@@ -3,6 +3,8 @@
 
 ## X.X.X (comming soon)
 
+## 4.11.0 (12 April 2022)
+
 - Replaced `nano-time` with `microtime`.
 - Improve IndexedDB method performance.
 

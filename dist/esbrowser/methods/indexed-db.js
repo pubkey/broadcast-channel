@@ -2,6 +2,9 @@
  * this method uses indexeddb to store the messages
  * There is currently no observerAPI for idb
  * @link https://github.com/w3c/IndexedDB/issues/51
+ * 
+ * When working on this, ensure to use these performance optimizations:
+ * @link https://rxdb.info/slow-indexeddb.html
  */
 import { sleep, randomInt, randomToken, microSeconds as micro, isNode, PROMISE_RESOLVED_VOID } from '../util.js';
 export var microSeconds = micro;
@@ -9,6 +12,14 @@ import { ObliviousSet } from 'oblivious-set';
 import { fillOptionsWithDefaults } from '../options';
 var DB_PREFIX = 'pubkey.broadcast-channel-0-';
 var OBJECT_STORE_ID = 'messages';
+/**
+ * Use relaxed durability for faster performance on all transactions.
+ * @link https://nolanlawson.com/2021/08/22/speeding-up-indexeddb-reads-and-writes/
+ */
+
+export var TRANSACTION_SETTINGS = {
+  durability: 'relaxed'
+};
 export var type = 'idb';
 export function getIdb() {
   if (typeof indexedDB !== 'undefined') return indexedDB;
@@ -21,11 +32,28 @@ export function getIdb() {
 
   return false;
 }
+/**
+ * If possible, we should explicitly commit IndexedDB transactions
+ * for better performance.
+ * @link https://nolanlawson.com/2021/08/22/speeding-up-indexeddb-reads-and-writes/
+ */
+
+export function commitIndexedDBTransaction(tx) {
+  if (tx.commit) {
+    tx.commit();
+  }
+}
 export function createDatabase(channelName) {
   var IndexedDB = getIdb(); // create table
 
   var dbName = DB_PREFIX + channelName;
-  var openRequest = IndexedDB.open(dbName, 1);
+  /**
+   * All IndexedDB databases are opened without version
+   * because it is a bit faster, especially on firefox
+   * @link http://nparashuram.com/IndexedDB/perf/#Open%20Database%20with%20version
+   */
+
+  var openRequest = IndexedDB.open(dbName);
 
   openRequest.onupgradeneeded = function (ev) {
     var db = ev.target.result;
@@ -58,22 +86,24 @@ export function writeMessage(db, readerUuid, messageJson) {
     time: time,
     data: messageJson
   };
-  var transaction = db.transaction([OBJECT_STORE_ID], 'readwrite');
+  var tx = db.transaction([OBJECT_STORE_ID], 'readwrite', TRANSACTION_SETTINGS);
   return new Promise(function (res, rej) {
-    transaction.oncomplete = function () {
+    tx.oncomplete = function () {
       return res();
     };
 
-    transaction.onerror = function (ev) {
+    tx.onerror = function (ev) {
       return rej(ev);
     };
 
-    var objectStore = transaction.objectStore(OBJECT_STORE_ID);
+    var objectStore = tx.objectStore(OBJECT_STORE_ID);
     objectStore.add(writeObject);
+    commitIndexedDBTransaction(tx);
   });
 }
 export function getAllMessages(db) {
-  var objectStore = db.transaction(OBJECT_STORE_ID).objectStore(OBJECT_STORE_ID);
+  var tx = db.transaction(OBJECT_STORE_ID, 'readonly', TRANSACTION_SETTINGS);
+  var objectStore = tx.objectStore(OBJECT_STORE_ID);
   var ret = [];
   return new Promise(function (res) {
     objectStore.openCursor().onsuccess = function (ev) {
@@ -84,29 +114,56 @@ export function getAllMessages(db) {
 
         cursor["continue"]();
       } else {
+        commitIndexedDBTransaction(tx);
         res(ret);
       }
     };
   });
 }
 export function getMessagesHigherThan(db, lastCursorId) {
-  var objectStore = db.transaction(OBJECT_STORE_ID).objectStore(OBJECT_STORE_ID);
+  var tx = db.transaction(OBJECT_STORE_ID, 'readonly', TRANSACTION_SETTINGS);
+  var objectStore = tx.objectStore(OBJECT_STORE_ID);
   var ret = [];
+  var keyRangeValue = IDBKeyRange.bound(lastCursorId + 1, Infinity);
+  /**
+   * Optimization shortcut,
+   * if getAll() can be used, do not use a cursor.
+   * @link https://rxdb.info/slow-indexeddb.html
+   */
+
+  if (objectStore.getAll) {
+    var getAllRequest = objectStore.getAll(keyRangeValue);
+    return new Promise(function (res, rej) {
+      getAllRequest.onerror = function (err) {
+        return rej(err);
+      };
+
+      getAllRequest.onsuccess = function (e) {
+        res(e.target.result);
+      };
+    });
+  }
 
   function openCursor() {
     // Occasionally Safari will fail on IDBKeyRange.bound, this
     // catches that error, having it open the cursor to the first
     // item. When it gets data it will advance to the desired key.
     try {
-      var keyRangeValue = IDBKeyRange.bound(lastCursorId + 1, Infinity);
+      keyRangeValue = IDBKeyRange.bound(lastCursorId + 1, Infinity);
       return objectStore.openCursor(keyRangeValue);
     } catch (e) {
       return objectStore.openCursor();
     }
   }
 
-  return new Promise(function (res) {
-    openCursor().onsuccess = function (ev) {
+  return new Promise(function (res, rej) {
+    var openCursorRequest = openCursor();
+
+    openCursorRequest.onerror = function (err) {
+      return rej(err);
+    };
+
+    openCursorRequest.onsuccess = function (ev) {
       var cursor = ev.target.result;
 
       if (cursor) {
@@ -117,22 +174,28 @@ export function getMessagesHigherThan(db, lastCursorId) {
           cursor["continue"]();
         }
       } else {
+        commitIndexedDBTransaction(tx);
         res(ret);
       }
     };
   });
 }
-export function removeMessageById(db, id) {
-  var request = db.transaction([OBJECT_STORE_ID], 'readwrite').objectStore(OBJECT_STORE_ID)["delete"](id);
-  return new Promise(function (res) {
-    request.onsuccess = function () {
-      return res();
-    };
-  });
+export function removeMessagesById(db, ids) {
+  var tx = db.transaction([OBJECT_STORE_ID], 'readwrite', TRANSACTION_SETTINGS);
+  var objectStore = tx.objectStore(OBJECT_STORE_ID);
+  return Promise.all(ids.map(function (id) {
+    var deleteRequest = objectStore["delete"](id);
+    return new Promise(function (res) {
+      deleteRequest.onsuccess = function () {
+        return res();
+      };
+    });
+  }));
 }
 export function getOldMessages(db, ttl) {
   var olderThen = new Date().getTime() - ttl;
-  var objectStore = db.transaction(OBJECT_STORE_ID).objectStore(OBJECT_STORE_ID);
+  var tx = db.transaction(OBJECT_STORE_ID, 'readonly', TRANSACTION_SETTINGS);
+  var objectStore = tx.objectStore(OBJECT_STORE_ID);
   var ret = [];
   return new Promise(function (res) {
     objectStore.openCursor().onsuccess = function (ev) {
@@ -147,6 +210,7 @@ export function getOldMessages(db, ttl) {
           cursor["continue"]();
         } else {
           // no more old messages,
+          commitIndexedDBTransaction(tx);
           res(ret);
           return;
         }
@@ -158,8 +222,8 @@ export function getOldMessages(db, ttl) {
 }
 export function cleanOldMessages(db, ttl) {
   return getOldMessages(db, ttl).then(function (tooOld) {
-    return Promise.all(tooOld.map(function (msgObj) {
-      return removeMessageById(db, msgObj.id);
+    return removeMessagesById(db, tooOld.map(function (msg) {
+      return msg.id;
     }));
   });
 }

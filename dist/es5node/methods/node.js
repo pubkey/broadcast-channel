@@ -121,7 +121,7 @@ function getPaths(channelName) {
      */
     var channelHash = _crypto["default"].createHash('sha256').update(channelName).digest('hex');
     /**
-     * because the lenght of socket-paths is limited, we use only the first 20 chars
+     * because the length of socket-paths is limited, we use only the first 20 chars
      * and also start with A to ensure we do not start with a number
      * @link https://serverfault.com/questions/641347/check-if-a-path-exceeds-maximum-for-unix-domain-socket
      */
@@ -133,7 +133,7 @@ function getPaths(channelName) {
 
     var folderPathReaders = _path["default"].join(channelPathBase, 'rdrs');
 
-    var folderPathMessages = _path["default"].join(channelPathBase, 'messages');
+    var folderPathMessages = _path["default"].join(channelPathBase, 'msgs');
 
     var ret = {
       channelBase: channelPathBase,
