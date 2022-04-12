@@ -70,7 +70,7 @@ export function getPaths(channelName) {
         const channelHash = crypto.createHash('sha256').update(channelName).digest('hex');
 
         /**
-         * because the lenght of socket-paths is limited, we use only the first 20 chars
+         * because the length of socket-paths is limited, we use only the first 20 chars
          * and also start with A to ensure we do not start with a number
          * @link https://serverfault.com/questions/641347/check-if-a-path-exceeds-maximum-for-unix-domain-socket
          */
@@ -86,7 +86,7 @@ export function getPaths(channelName) {
         );
         const folderPathMessages = path.join(
             channelPathBase,
-            'messages'
+            'msgs'
         );
 
         const ret = {

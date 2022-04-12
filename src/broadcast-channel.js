@@ -3,11 +3,9 @@ import {
     PROMISE_RESOLVED_FALSE,
     PROMISE_RESOLVED_VOID
 } from './util.js';
-
 import {
     chooseMethod
 } from './method-chooser.js';
-
 import {
     fillOptionsWithDefaults
 } from './options.js';
@@ -17,7 +15,6 @@ import {
  * used in tests to ensure everything is closed.
  */
 export const OPEN_BROADCAST_CHANNELS = new Set();
-
 let lastId = 0;
 
 export const BroadcastChannel = function (name, options) {
