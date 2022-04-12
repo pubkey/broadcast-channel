@@ -146,7 +146,7 @@ export function getMessagesHigherThan(db, lastCursorId) {
      * @link https://rxdb.info/slow-indexeddb.html
      */
     if (objectStore.getAll) {
-        const getAllRequest = storeIndex.getAll(keyRangeValue);
+        const getAllRequest = objectStore.getAll(keyRangeValue);
         return new Promise((res, rej) => {
             getAllRequest.onerror = err => rej(err);
             getAllRequest.onsuccess = function (e) {
@@ -231,7 +231,7 @@ export function getOldMessages(db, ttl) {
 export function cleanOldMessages(db, ttl) {
     return getOldMessages(db, ttl)
         .then(tooOld => {
-            return removeMessageById(
+            return removeMessagesById(
                 db,
                 tooOld.map(msg => msg.id)
             );
