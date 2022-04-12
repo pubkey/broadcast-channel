@@ -54,7 +54,7 @@ var _net = _interopRequireDefault(require("net"));
 
 var _path = _interopRequireDefault(require("path"));
 
-var _nanoTime = _interopRequireDefault(require("nano-time"));
+var _microtime = _interopRequireDefault(require("microtime"));
 
 var _rimraf = _interopRequireDefault(require("rimraf"));
 
@@ -1182,5 +1182,5 @@ function averageResponseTime() {
 }
 
 function microSeconds() {
-  return parseInt(_nanoTime["default"].microseconds());
+  return parseInt(_microtime["default"].now());
 }

@@ -7,7 +7,7 @@
 
 <h1 align="center">BroadcastChannel</h1>
 <p align="center">
-  <strong>A BroadcastChannel to send data between different browser-tabs or nodejs-processes</strong>
+  <strong>A BroadcastChannel to send data across multiple browser-tabs or nodejs-processes</strong>
   <br/>
   <span>+ LeaderElection over the channels</span><br />
 </p>
@@ -24,8 +24,8 @@
 
 A BroadcastChannel that allows you to send data between different browser-tabs or nodejs-processes.
 
-- It works completely **client-side** and **offline**.
-- Tested on **old browsers**, **new browsers**, **WebWorkers**, **Iframes** and **NodeJs**
+- It works completely **client-side** and **offline**,
+- Tested on **old browsers**, **new browsers**, **WebWorkers**, **Iframes** and **NodeJs**.
 
 This behaves similar to the [BroadcastChannel-API](https://developer.mozilla.org/en-US/docs/Web/API/Broadcast_Channel_API) which is currently only featured in [some browsers](https://caniuse.com/#feat=broadcastchannel).
 
@@ -35,7 +35,7 @@ This behaves similar to the [BroadcastChannel-API](https://developer.mozilla.org
 npm install --save broadcast-channel
 ```
 
-#### Create a channel in one tab/process and send a message.
+#### Create a channel in one tab/process and send a message
 
 ```ts
 import { BroadcastChannel } from 'broadcast-channel';
@@ -43,7 +43,7 @@ const channel = new BroadcastChannel('foobar');
 channel.postMessage('I am not alone');
 ```
 
-#### Create a channel with the same name in another tab/process and recieve messages.
+#### Create a channel with the same name in another tab/process and recieve messages
 
 ```ts
 import { BroadcastChannel } from 'broadcast-channel';
@@ -66,14 +66,14 @@ channel.addEventListener('message', handler);
 channel.removeEventListener('message', handler);
 ```
 
-#### Close the channel if you do not need it anymore.
-Returns a `Promise` that resolved when everything is processed.
+#### Close the channel if you do not need it anymore
+Returns a `Promise` which is resolved when everything is processed.
 
 ```js
 await channel.close();
 ```
 
-#### Set options when creating a channel (optional):
+#### Set options when creating a channel (optional)
 
 ```js
 const options = {
@@ -83,7 +83,7 @@ const options = {
 const channel = new BroadcastChannel('foobar', options);
 ```
 
-#### Create a typed channel in typescript:
+#### Create a typed channel in typescript
 
 ```typescript
 import { BroadcastChannel } from 'broadcast-channel';
@@ -96,7 +96,7 @@ channel.postMessage({
 });
 ```
 
-#### Enforce a options globally
+#### Enforce options globally
 
 When you use this module in a test-suite, it is recommended to enforce the fast `simulate` method on all channels so your tests run faster. You can do this with `enforceOptions()`. If you set this, all channels have the enforced options, no mather what options are given in the constructor.
 
@@ -113,9 +113,10 @@ enforceOptions(null);
 ```
 
 
-#### Clear tmp-folder:
-When used in NodeJs, the BroadcastChannel will communicate with other processes over filesystem based sockets.
-When you create a huge amount of channels, like you would do when running unit tests, you might get problems because there are too many folders in the tmp-directory. Calling `BroadcastChannel.clearNodeFolder()` will clear the tmp-folder and it is recommended to run this at the beginning of your test-suite.
+#### Clear tmp-folder
+
+When used in NodeJs, the BroadcastChannel will communicate with other processes over filesystem sockets.
+When you create a huge amount of channels, like you would do when running unit tests, you might get problems because there are too many folders in the tmp-directory. Calling `BroadcastChannel.clearNodeFolder()` will clear the tmp-folder. It is recommended to run this at the beginning of your test-suite.
 
 ```typescript
 import { clearNodeFolder } from 'broadcast-channel';
@@ -137,7 +138,7 @@ before(async () => {
 
 #### Handling IndexedDB onclose events
 
-IndexedDB databases can close unexpectedly for various reasons. This could happen, for example, if the underlying storage is removed or if the user clears the database in the browser's history preferences. Most often we have seen this happen in Mobile Safari. By default, we let the connection close and stop polling for changes. If you would like to continue listening you should close BroadcastChannel and create a new one.
+IndexedDB databases can close unexpectedly for various reasons. This could happen, for example, if the underlying storage is removed or if a user clears the database in the browser's history preferences. Most often we have seen this happen in Mobile Safari. By default, we let the connection close and stop polling for changes. If you would like to continue listening you should close BroadcastChannel and create a new one.
 
 Example of how you might do this:
 
@@ -165,7 +166,7 @@ const createChannel = () => {
 };
 ```
 
-## Methods:
+## Methods
 
 Depending in which environment this is used, a proper method is automatically selected to ensure it always works.
 
@@ -181,14 +182,14 @@ Depending in which environment this is used, a proper method is automatically se
 
 ## Using the LeaderElection
 
-This module also comes with a leader-election which can be used so elect a leader between different BroadcastChannels.
+This module also comes with a leader-election which can be used to elect a leader between different BroadcastChannels.
 For example if you have a stable connection from the frontend to your server, you can use the LeaderElection to save server-side performance by only connecting once, even if the user has opened your website in multiple tabs.
 
 In this example the leader is marked with the crown ♛:
 ![leader-election.gif](../docs/files/leader-election.gif)
 
 
-Create a channel and an elector.
+Create a channel and an elector:
 
 ```ts
 import {
@@ -199,7 +200,7 @@ const channel = new BroadcastChannel('foobar');
 const elector = createLeaderElection(channel);
 ```
 
-Wait until the elector becomes leader.
+Wait until the elector becomes leader:
 
 ```js
 import { createLeaderElection } from 'broadcast-channel';
@@ -229,7 +230,7 @@ elector.awaitLeadership().then(()=> {
 })
 ```
 
-Let the leader die. (automatically happens if the tab is closed or the process exits).
+Let the leader die. (automatically happens if a tab is closed or the process exits).
 
 ```js
 const elector = createLeaderElection(channel);
@@ -238,7 +239,7 @@ await elector.die();
 
 ### Handle duplicate leaders
 
-Duplicate leadership can happen on rare occurences like when the [CPU is on 100%](https://github.com/pubkey/broadcast-channel/issues/385) for longer time, or the browser [has throttled the javascript timers](https://github.com/pubkey/broadcast-channel/issues/414).
+Duplicate leadership can happen on rare occurences like when the [CPU is on 100%](https://web.archive.org/web/20201221051328/https://github.com/pubkey/broadcast-channel/issues/385) for longer time, or the browser [has throttled the javascript timers](https://web.archive.org/web/20201221051312/https://github.com/pubkey/broadcast-channel/issues/414).
 
 ```js
 const elector = createLeaderElection(channel);
@@ -252,16 +253,16 @@ elector.onduplicate = () => {
 
 This module is optimised for:
 
-- **low latency**: When you postMessage on one channel, it should take as low as possible time until other channels recieve the message.
-- **lossless**: When you send a message, it should be impossible that the message is lost before other channels recieved it
+- **low latency**: When you `postMessage` to a channel, it will be delivered to other channels as soon as possible,
+- **lossless**: When you send a message, it should be impossible that the message is lost before other channels recieved it,
 - **low idle workload**: During the time when no messages are send, there should be a low processor footprint.
 
 ## What this is not
 
 -   This is not a polyfill. Do not set this module to `window.BroadcastChannel`. This implementation behaves similiar to the [BroadcastChannel-Standard](https://developer.mozilla.org/en-US/docs/Web/API/Broadcast_Channel_API) with these limitations:
-    - You can only send data that can be `JSON.stringify`-ed.
-    - While the offical API emits [onmessage-events](https://developer.mozilla.org/en-US/docs/Web/API/BroadcastChannel/onmessage), this module directly emitts the data which was posted
--   This is not a replacement for a message queue. If you use this in NodeJs and want send more than 50 messages per second, you should use proper [IPC-Tooling](https://en.wikipedia.org/wiki/Message_queue)
+    - You can only send data that can be `JSON.stringify`-ed,
+    - While the offical API emits [onmessage-events](https://developer.mozilla.org/en-US/docs/Web/API/BroadcastChannel/onmessage), this module directly emitts the data which was posted.
+-   This is not a replacement for a message queue. If you use this in NodeJs and want send more than 50 messages per second, you should use proper [IPC-Tooling](https://en.wikipedia.org/wiki/Message_queue).
 
 
 ## Browser Support

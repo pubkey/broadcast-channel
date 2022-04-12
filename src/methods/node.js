@@ -10,7 +10,7 @@ import os from 'os';
 import events from 'events';
 import net from 'net';
 import path from 'path';
-import micro from 'nano-time';
+import micro from 'microtime';
 import rimraf from 'rimraf';
 import isNode from 'detect-node';
 import PQueue from 'p-queue';
@@ -681,5 +681,5 @@ export function averageResponseTime() {
 }
 
 export function microSeconds() {
-    return parseInt(micro.microseconds());
+    return parseInt(micro.now());
 }
