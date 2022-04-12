@@ -203,7 +203,7 @@ export function removeMessagesById(db, ids) {
 
 export function getOldMessages(db, ttl) {
     const olderThen = new Date().getTime() - ttl;
-    const tx = db.transaction(OBJECT_STORE_ID, TRANSACTION_SETTINGS);
+    const tx = db.transaction(OBJECT_STORE_ID, 'readonly', TRANSACTION_SETTINGS);
     const objectStore = tx.objectStore(OBJECT_STORE_ID);
     const ret = [];
     return new Promise(res => {
