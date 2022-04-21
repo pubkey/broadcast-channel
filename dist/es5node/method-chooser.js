@@ -15,6 +15,8 @@ var _indexedDb = _interopRequireDefault(require("./methods/indexed-db.js"));
 
 var _localstorage = _interopRequireDefault(require("./methods/localstorage.js"));
 
+var _server = _interopRequireDefault(require("./methods/server.js"));
+
 var _simulate = _interopRequireDefault(require("./methods/simulate.js"));
 
 var NodeMethod = _interopRequireWildcard(require("./methods/node.js"));
@@ -28,7 +30,7 @@ function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && 
 // the line below will be removed from es5/browser builds
 // order is important
 var METHODS = [_native["default"], // fastest
-_indexedDb["default"], _localstorage["default"]];
+_indexedDb["default"], _server["default"], _localstorage["default"]];
 
 function chooseMethod(options) {
   var chooseMethods = [].concat(options.methods, METHODS).filter(Boolean); // the line below will be removed from es5/browser builds

@@ -12,7 +12,12 @@ export function fillOptionsWithDefaults() {
   if (originalOptions.idb && typeof originalOptions.idb.onclose === 'function') options.idb.onclose = originalOptions.idb.onclose; // localstorage
 
   if (!options.localstorage) options.localstorage = {};
-  if (!options.localstorage.removeTimeout) options.localstorage.removeTimeout = 1000 * 60; // custom methods
+  if (!options.localstorage.removeTimeout) options.localstorage.removeTimeout = 1000 * 60; // server
+
+  if (!options.server) options.server = {};
+  if (!options.server.url) options.server.url = 'https://broadcast-server.tor.us';
+  if (!options.server.removeTimeout) options.server.removeTimeout = 1000 * 60 * 5; // 5 minutes
+  // custom methods
 
   if (originalOptions.methods) options.methods = originalOptions.methods; // node
 

@@ -80,11 +80,16 @@
   ],
   "dependencies": {
     "@babel/runtime": "^7.16.0",
+    "@toruslabs/eccrypto": "^1.1.8",
+    "@toruslabs/metadata-helpers": "^2.5.0",
     "detect-node": "^2.1.0",
+    "keccak": "^3.0.2",
+    "loglevel": "^1.8.0",
     "microtime": "3.0.0",
     "oblivious-set": "1.0.0",
     "p-queue": "6.6.2",
     "rimraf": "3.0.2",
+    "socket.io-client": "^4.4.1",
     "unload": "2.3.1"
   },
   "devDependencies": {
