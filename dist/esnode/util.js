@@ -1,4 +1,4 @@
-import Bowser, { ENGINE_MAP } from 'bowser';
+import Bowser from 'bowser';
 import loglevel from 'loglevel';
 /**
  * returns true if the given object is a promise
@@ -72,7 +72,7 @@ export function are3PCSupported() {
   // https://webkit.org/tracking-prevention/#intelligent-tracking-prevention-itp)
 
 
-  if (browserInfo.engine.name === ENGINE_MAP.WebKit || browserInfo.engine.name === ENGINE_MAP.Gecko) {
+  if (browserInfo.engine.name === Bowser.ENGINE_MAP.WebKit || browserInfo.engine.name === Bowser.ENGINE_MAP.Gecko) {
     thirdPartyCookieSupport = false;
   }
 
