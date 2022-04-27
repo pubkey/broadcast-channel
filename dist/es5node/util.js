@@ -1,14 +1,28 @@
 "use strict";
 
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+var _typeof = require("@babel/runtime/helpers/typeof");
+
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.isNode = exports.PROMISE_RESOLVED_VOID = exports.PROMISE_RESOLVED_TRUE = exports.PROMISE_RESOLVED_FALSE = void 0;
+exports.PROMISE_RESOLVED_VOID = exports.PROMISE_RESOLVED_TRUE = exports.PROMISE_RESOLVED_FALSE = void 0;
+exports.are3PCSupported = are3PCSupported;
+exports.isNode = void 0;
 exports.isPromise = isPromise;
 exports.microSeconds = microSeconds;
 exports.randomInt = randomInt;
 exports.randomToken = randomToken;
 exports.sleep = sleep;
+
+var _bowser = _interopRequireWildcard(require("bowser"));
+
+var _loglevel = _interopRequireDefault(require("loglevel"));
+
+function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
+
+function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== "object" && typeof obj !== "function") { return { "default": obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj["default"] = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 /**
  * returns true if the given object is a promise
@@ -80,3 +94,23 @@ function microSeconds() {
 
 var isNode = Object.prototype.toString.call(typeof process !== 'undefined' ? process : 0) === '[object process]';
 exports.isNode = isNode;
+
+function are3PCSupported() {
+  var browserInfo = _bowser["default"].parse(navigator.userAgent);
+
+  _loglevel["default"].info(JSON.stringify(browserInfo), 'current browser info');
+
+  var thirdPartyCookieSupport = true; // brave
+
+  if (navigator.brave) {
+    thirdPartyCookieSupport = false;
+  } // All webkit & gecko engine instances use itp (intelligent tracking prevention -
+  // https://webkit.org/tracking-prevention/#intelligent-tracking-prevention-itp)
+
+
+  if (browserInfo.engine.name === _bowser.ENGINE_MAP.WebKit || browserInfo.engine.name === _bowser.ENGINE_MAP.Gecko) {
+    thirdPartyCookieSupport = false;
+  }
+
+  return thirdPartyCookieSupport;
+}

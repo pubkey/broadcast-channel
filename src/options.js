@@ -1,5 +1,9 @@
+import { are3PCSupported } from './util';
+
 export function fillOptionsWithDefaults(originalOptions = {}) {
     const options = JSON.parse(JSON.stringify(originalOptions));
+
+    if (typeof options.support3PC === 'undefined') options.support3PC = are3PCSupported();
 
     // main
     if (typeof options.webWorkerSupport === 'undefined') options.webWorkerSupport = true;

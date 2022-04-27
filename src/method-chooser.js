@@ -41,7 +41,7 @@ export function chooseMethod(options) {
         chooseMethods = chooseMethods.filter((m) => m.type !== 'idb');
     }
 
-    const useMethod = chooseMethods.find((method) => method.canBeUsed());
+    const useMethod = chooseMethods.find((method) => method.canBeUsed(options));
     if (!useMethod) throw new Error(`No useable method found in ${JSON.stringify(METHODS.map((m) => m.type))}`);
     else return useMethod;
 }

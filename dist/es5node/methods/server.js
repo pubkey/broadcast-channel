@@ -202,7 +202,7 @@ function removeStorageEventListener() {
 function create(channelName, options) {
   options = (0, _options.fillOptionsWithDefaults)(options);
 
-  if (!canBeUsed()) {
+  if (!canBeUsed(options)) {
     throw new Error('BroadcastChannel: server cannot be used');
   }
 
@@ -240,7 +240,6 @@ function onMessage(channelState, fn, time) {
 }
 
 function canBeUsed() {
-  if (_util.isNode) return false;
   return true;
 }
 

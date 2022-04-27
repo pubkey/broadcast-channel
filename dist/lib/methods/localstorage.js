@@ -60,9 +60,9 @@ function storageKey(channelName) {
   return KEY_PREFIX + channelName;
 }
 /**
-* writes the new message to the storage
-* and fires the storage-event so other readers can find it
-*/
+ * writes the new message to the storage
+ * and fires the storage-event so other readers can find it
+ */
 
 
 function postMessage(channelState, messageJson) {
@@ -113,7 +113,7 @@ function removeStorageEventListener(listener) {
 function create(channelName, options) {
   options = (0, _options.fillOptionsWithDefaults)(options);
 
-  if (!canBeUsed()) {
+  if (!canBeUsed(options)) {
     throw new Error('BroadcastChannel: localstorage cannot be used');
   }
 
@@ -155,8 +155,9 @@ function onMessage(channelState, fn, time) {
   channelState.messagesCallback = fn;
 }
 
-function canBeUsed() {
+function canBeUsed(options) {
   if (_util.isNode) return false;
+  if (!options.support3PC) return false;
   var ls = getLocalStorage();
   if (!ls) return false;
 

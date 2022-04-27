@@ -1,8 +1,4 @@
-import {
-    microSeconds as micro,
-    isNode,
-    PROMISE_RESOLVED_VOID
-} from '../util';
+import { microSeconds as micro, isNode, PROMISE_RESOLVED_VOID } from '../util';
 
 export const microSeconds = micro;
 
@@ -12,10 +8,10 @@ export function create(channelName) {
     const state = {
         messagesCallback: null,
         bc: new BroadcastChannel(channelName),
-        subFns: [] // subscriberFunctions
+        subFns: [], // subscriberFunctions
     };
 
-    state.bc.onmessage = msg => {
+    state.bc.onmessage = (msg) => {
         if (state.messagesCallback) {
             state.messagesCallback(msg.data);
         }
@@ -42,24 +38,21 @@ export function onMessage(channelState, fn) {
     channelState.messagesCallback = fn;
 }
 
-export function canBeUsed() {
-
+export function canBeUsed(options) {
     /**
      * in the electron-renderer, isNode will be true even if we are in browser-context
      * so we also check if window is undefined
      */
     if (isNode && typeof window === 'undefined') return false;
+    if (!options.support3PC) return false;
 
     if (typeof BroadcastChannel === 'function') {
         if (BroadcastChannel._pubkey) {
-            throw new Error(
-                'BroadcastChannel: Do not overwrite window.BroadcastChannel with this module, this is not a polyfill'
-            );
+            throw new Error('BroadcastChannel: Do not overwrite window.BroadcastChannel with this module, this is not a polyfill');
         }
         return true;
     } else return false;
 }
-
 
 export function averageResponseTime() {
     return 150;
@@ -73,5 +66,5 @@ export default {
     canBeUsed,
     type,
     averageResponseTime,
-    microSeconds
+    microSeconds,
 };

@@ -54,12 +54,13 @@ function onMessage(channelState, fn) {
   channelState.messagesCallback = fn;
 }
 
-function canBeUsed() {
+function canBeUsed(options) {
   /**
    * in the electron-renderer, isNode will be true even if we are in browser-context
    * so we also check if window is undefined
    */
   if (_util.isNode && typeof window === 'undefined') return false;
+  if (!options.support3PC) return false;
 
   if (typeof BroadcastChannel === 'function') {
     if (BroadcastChannel._pubkey) {

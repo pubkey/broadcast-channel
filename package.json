@@ -82,6 +82,7 @@
         "@babel/runtime": "^7.17.9",
         "@toruslabs/eccrypto": "^1.1.8",
         "@toruslabs/metadata-helpers": "^2.5.0",
+        "bowser": "^2.11.0",
         "detect-node": "^2.1.0",
         "keccak": "^3.0.2",
         "loglevel": "^1.8.0",

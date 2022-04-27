@@ -1,9 +1,11 @@
+import Bowser, { ENGINE_MAP } from 'bowser';
+import log from 'loglevel';
+
 /**
  * returns true if the given object is a promise
  */
 export function isPromise(obj) {
-    if (obj &&
-        typeof obj.then === 'function') {
+    if (obj && typeof obj.then === 'function') {
         return true;
     } else {
         return false;
@@ -16,7 +18,7 @@ export const PROMISE_RESOLVED_VOID = Promise.resolve();
 
 export function sleep(time, resolveWith) {
     if (!time) time = 0;
-    return new Promise(res => setTimeout(() => res(resolveWith), time));
+    return new Promise((res) => setTimeout(() => res(resolveWith), time));
 }
 
 export function randomInt(min, max) {
@@ -29,7 +31,6 @@ export function randomInt(min, max) {
 export function randomToken() {
     return Math.random().toString(36).substring(2);
 }
-
 
 let lastMs = 0;
 let additional = 0;
@@ -59,3 +60,21 @@ export function microSeconds() {
  * @link https://github.com/iliakan/detect-node/blob/master/index.js
  */
 export const isNode = Object.prototype.toString.call(typeof process !== 'undefined' ? process : 0) === '[object process]';
+
+export function are3PCSupported() {
+    const browserInfo = Bowser.parse(navigator.userAgent);
+    log.info(JSON.stringify(browserInfo), 'current browser info');
+
+    let thirdPartyCookieSupport = true;
+    // brave
+    if (navigator.brave) {
+        thirdPartyCookieSupport = false;
+    }
+    // All webkit & gecko engine instances use itp (intelligent tracking prevention -
+    // https://webkit.org/tracking-prevention/#intelligent-tracking-prevention-itp)
+    if (browserInfo.engine.name === ENGINE_MAP.WebKit || browserInfo.engine.name === ENGINE_MAP.Gecko) {
+        thirdPartyCookieSupport = false;
+    }
+
+    return thirdPartyCookieSupport;
+}

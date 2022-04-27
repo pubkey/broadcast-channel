@@ -14,7 +14,7 @@ import createKeccakHash from 'keccak';
 import log from 'loglevel';
 import { fillOptionsWithDefaults } from '../options';
 
-import { sleep, randomToken, microSeconds as micro, isNode } from '../util';
+import { sleep, randomToken, microSeconds as micro } from '../util';
 
 export const microSeconds = micro;
 
@@ -99,7 +99,7 @@ export function removeStorageEventListener() {
 
 export function create(channelName, options) {
     options = fillOptionsWithDefaults(options);
-    if (!canBeUsed()) {
+    if (!canBeUsed(options)) {
         throw new Error('BroadcastChannel: server cannot be used');
     }
 
@@ -139,7 +139,6 @@ export function onMessage(channelState, fn, time) {
 }
 
 export function canBeUsed() {
-    if (isNode) return false;
     return true;
 }
 

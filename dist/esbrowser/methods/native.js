@@ -32,12 +32,13 @@ export function postMessage(channelState, messageJson) {
 export function onMessage(channelState, fn) {
   channelState.messagesCallback = fn;
 }
-export function canBeUsed() {
+export function canBeUsed(options) {
   /**
    * in the electron-renderer, isNode will be true even if we are in browser-context
    * so we also check if window is undefined
    */
   if (isNode && typeof window === 'undefined') return false;
+  if (!options.support3PC) return false;
 
   if (typeof BroadcastChannel === 'function') {
     if (BroadcastChannel._pubkey) {

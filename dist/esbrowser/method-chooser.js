@@ -5,7 +5,7 @@ import ServerMethod from './methods/server.js';
 import SimulateMethod from './methods/simulate.js'; // the line below will be removed from es5/browser builds
 
 
-import { isNode } from './util'; // order is important
+import { are3PCSupported, isNode } from './util'; // order is important
 
 var METHODS = [NativeMethod, // fastest
 IndexeDbMethod, ServerMethod, LocalstorageMethod];
@@ -38,7 +38,7 @@ export function chooseMethod(options) {
   }
 
   var useMethod = chooseMethods.find(function (method) {
-    return method.canBeUsed();
+    return method.canBeUsed(options);
   });
   if (!useMethod) throw new Error("No useable method found in " + JSON.stringify(METHODS.map(function (m) {
     return m.type;

@@ -1,6 +1,9 @@
+import Bowser, { ENGINE_MAP } from 'bowser';
+import log from 'loglevel';
 /**
  * returns true if the given object is a promise
  */
+
 export function isPromise(obj) {
   if (obj && typeof obj.then === 'function') {
     return true;
@@ -58,3 +61,20 @@ export function microSeconds() {
  */
 
 export var isNode = Object.prototype.toString.call(typeof process !== 'undefined' ? process : 0) === '[object process]';
+export function are3PCSupported() {
+  var browserInfo = Bowser.parse(navigator.userAgent);
+  log.info(JSON.stringify(browserInfo), 'current browser info');
+  var thirdPartyCookieSupport = true; // brave
+
+  if (navigator.brave) {
+    thirdPartyCookieSupport = false;
+  } // All webkit & gecko engine instances use itp (intelligent tracking prevention -
+  // https://webkit.org/tracking-prevention/#intelligent-tracking-prevention-itp)
+
+
+  if (browserInfo.engine.name === ENGINE_MAP.WebKit || browserInfo.engine.name === ENGINE_MAP.Gecko) {
+    thirdPartyCookieSupport = false;
+  }
+
+  return thirdPartyCookieSupport;
+}

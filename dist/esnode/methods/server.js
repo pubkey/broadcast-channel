@@ -15,7 +15,7 @@ import { encryptData, decryptData } from '@toruslabs/metadata-helpers';
 import createKeccakHash from 'keccak';
 import log from 'loglevel';
 import { fillOptionsWithDefaults } from '../options';
-import { sleep, randomToken, microSeconds as micro, isNode } from '../util';
+import { sleep, randomToken, microSeconds as micro } from '../util';
 export var microSeconds = micro; // PASS IN STRING/BUFFER TO GET BUFFER
 
 export function keccak256(a) {
@@ -159,7 +159,7 @@ export function removeStorageEventListener() {
 export function create(channelName, options) {
   options = fillOptionsWithDefaults(options);
 
-  if (!canBeUsed()) {
+  if (!canBeUsed(options)) {
     throw new Error('BroadcastChannel: server cannot be used');
   }
 
@@ -194,7 +194,6 @@ export function onMessage(channelState, fn, time) {
   channelState.messagesCallback = fn;
 }
 export function canBeUsed() {
-  if (isNode) return false;
   return true;
 }
 export function averageResponseTime() {

@@ -5,9 +5,12 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.fillOptionsWithDefaults = fillOptionsWithDefaults;
 
+var _util = require("./util");
+
 function fillOptionsWithDefaults() {
   var originalOptions = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-  var options = JSON.parse(JSON.stringify(originalOptions)); // main
+  var options = JSON.parse(JSON.stringify(originalOptions));
+  if (typeof options.support3PC === 'undefined') options.support3PC = (0, _util.are3PCSupported)(); // main
 
   if (typeof options.webWorkerSupport === 'undefined') options.webWorkerSupport = true; // indexed-db
 

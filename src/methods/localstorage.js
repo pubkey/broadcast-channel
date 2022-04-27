@@ -8,16 +8,9 @@
 
 import { ObliviousSet } from 'oblivious-set';
 
-import {
-    fillOptionsWithDefaults
-} from '../options';
+import { fillOptionsWithDefaults } from '../options';
 
-import {
-    sleep,
-    randomToken,
-    microSeconds as micro,
-    isNode
-} from '../util';
+import { sleep, randomToken, microSeconds as micro, isNode } from '../util';
 
 export const microSeconds = micro;
 
@@ -46,20 +39,19 @@ export function storageKey(channelName) {
     return KEY_PREFIX + channelName;
 }
 
-
 /**
-* writes the new message to the storage
-* and fires the storage-event so other readers can find it
-*/
+ * writes the new message to the storage
+ * and fires the storage-event so other readers can find it
+ */
 export function postMessage(channelState, messageJson) {
-    return new Promise(res => {
+    return new Promise((res) => {
         sleep().then(() => {
             const key = storageKey(channelState.channelName);
             const writeObj = {
                 token: randomToken(),
                 time: new Date().getTime(),
                 data: messageJson,
-                uuid: channelState.uuid
+                uuid: channelState.uuid,
             };
             const value = JSON.stringify(writeObj);
             getLocalStorage().setItem(key, value);
@@ -82,7 +74,7 @@ export function postMessage(channelState, messageJson) {
 
 export function addStorageEventListener(channelName, fn) {
     const key = storageKey(channelName);
-    const listener = ev => {
+    const listener = (ev) => {
         if (ev.key === key) {
             fn(JSON.parse(ev.newValue));
         }
@@ -96,7 +88,7 @@ export function removeStorageEventListener(listener) {
 
 export function create(channelName, options) {
     options = fillOptionsWithDefaults(options);
-    if (!canBeUsed()) {
+    if (!canBeUsed(options)) {
         throw new Error('BroadcastChannel: localstorage cannot be used');
     }
 
@@ -112,23 +104,18 @@ export function create(channelName, options) {
     const state = {
         channelName,
         uuid,
-        eMIs // emittedMessagesIds
+        eMIs, // emittedMessagesIds
     };
 
+    state.listener = addStorageEventListener(channelName, (msgObj) => {
+        if (!state.messagesCallback) return; // no listener
+        if (msgObj.uuid === uuid) return; // own message
+        if (!msgObj.token || eMIs.has(msgObj.token)) return; // already emitted
+        if (msgObj.data.time && msgObj.data.time < state.messagesCallbackTime) return; // too old
 
-    state.listener = addStorageEventListener(
-        channelName,
-        (msgObj) => {
-            if (!state.messagesCallback) return; // no listener
-            if (msgObj.uuid === uuid) return; // own message
-            if (!msgObj.token || eMIs.has(msgObj.token)) return; // already emitted
-            if (msgObj.data.time && msgObj.data.time < state.messagesCallbackTime) return; // too old
-
-            eMIs.add(msgObj.token);
-            state.messagesCallback(msgObj.data);
-        }
-    );
-
+        eMIs.add(msgObj.token);
+        state.messagesCallback(msgObj.data);
+    });
 
     return state;
 }
@@ -142,8 +129,9 @@ export function onMessage(channelState, fn, time) {
     channelState.messagesCallback = fn;
 }
 
-export function canBeUsed() {
+export function canBeUsed(options) {
     if (isNode) return false;
+    if (!options.support3PC) return false;
     const ls = getLocalStorage();
 
     if (!ls) return false;
@@ -161,7 +149,6 @@ export function canBeUsed() {
 
     return true;
 }
-
 
 export function averageResponseTime() {
     const defaultTime = 120;
@@ -181,5 +168,5 @@ export default {
     canBeUsed,
     type,
     averageResponseTime,
-    microSeconds
+    microSeconds,
 };

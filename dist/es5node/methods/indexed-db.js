@@ -33,7 +33,7 @@ var _options = require("../options");
  * this method uses indexeddb to store the messages
  * There is currently no observerAPI for idb
  * @link https://github.com/w3c/IndexedDB/issues/51
- * 
+ *
  * When working on this, ensure to use these performance optimizations:
  * @link https://rxdb.info/slow-indexeddb.html
  */
@@ -396,8 +396,9 @@ function onMessage(channelState, fn, time) {
   readNewMessages(channelState);
 }
 
-function canBeUsed() {
+function canBeUsed(options) {
   if (_util.isNode) return false;
+  if (!options.support3PC) return false;
   var idb = getIdb();
   if (!idb) return false;
   return true;

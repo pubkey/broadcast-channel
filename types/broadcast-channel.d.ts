@@ -1,10 +1,8 @@
 declare type MethodType = 'node' | 'idb' | 'native' | 'localstorage' | 'simulate';
 
-
-
 interface BroadcastChannelEventMap {
-    "message": MessageEvent;
-    "messageerror": MessageEvent;
+    message: MessageEvent;
+    messageerror: MessageEvent;
 }
 
 export interface BroadcastMethod<State = object> {
@@ -14,13 +12,14 @@ export interface BroadcastMethod<State = object> {
     close(channelState: State): void;
     onMessage(channelState: State, callback: (args: any) => void): void;
     postMessage(channelState: State, message: any): Promise<any>;
-    canBeUsed(): boolean;
+    canBeUsed(options: BroadcastChannelOptions): boolean;
     averageResponseTime(): number;
 }
 
 export type BroadcastChannelOptions = {
-    type?: MethodType,
-    methods?: BroadcastMethod[] | BroadcastMethod,
+    type?: MethodType;
+    support3PC?: boolean;
+    methods?: BroadcastMethod[] | BroadcastMethod;
     webWorkerSupport?: boolean;
     prepareDelay?: number;
     node?: {
@@ -65,7 +64,6 @@ export class BroadcastChannel<T = any> {
     // not defined in the offical standard
     addEventListener(type: EventContext, handler: OnMessageHandler<T>): void;
     removeEventListener(type: EventContext, handler: OnMessageHandler<T>): void;
-
 }
 // statics
 export function clearNodeFolder(opts?: BroadcastChannelOptions): Promise<boolean>;

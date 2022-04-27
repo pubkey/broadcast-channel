@@ -2,26 +2,17 @@
  * this method uses indexeddb to store the messages
  * There is currently no observerAPI for idb
  * @link https://github.com/w3c/IndexedDB/issues/51
- * 
+ *
  * When working on this, ensure to use these performance optimizations:
  * @link https://rxdb.info/slow-indexeddb.html
  */
 
-import {
-    sleep,
-    randomInt,
-    randomToken,
-    microSeconds as micro,
-    isNode,
-    PROMISE_RESOLVED_VOID
-} from '../util.js';
+import { sleep, randomInt, randomToken, microSeconds as micro, isNode, PROMISE_RESOLVED_VOID } from '../util.js';
 
 export const microSeconds = micro;
 import { ObliviousSet } from 'oblivious-set';
 
-import {
-    fillOptionsWithDefaults
-} from '../options';
+import { fillOptionsWithDefaults } from '../options';
 
 const DB_PREFIX = 'pubkey.broadcast-channel-0-';
 const OBJECT_STORE_ID = 'messages';
@@ -45,7 +36,6 @@ export function getIdb() {
     return false;
 }
 
-
 /**
  * If possible, we should explicitly commit IndexedDB transactions
  * for better performance.
@@ -56,7 +46,6 @@ export function commitIndexedDBTransaction(tx) {
         tx.commit();
     }
 }
-
 
 export function createDatabase(channelName) {
     const IndexedDB = getIdb();
@@ -71,15 +60,15 @@ export function createDatabase(channelName) {
      */
     const openRequest = IndexedDB.open(dbName);
 
-    openRequest.onupgradeneeded = ev => {
+    openRequest.onupgradeneeded = (ev) => {
         const db = ev.target.result;
         db.createObjectStore(OBJECT_STORE_ID, {
             keyPath: 'id',
-            autoIncrement: true
+            autoIncrement: true,
         });
     };
     const dbPromise = new Promise((res, rej) => {
-        openRequest.onerror = ev => rej(ev);
+        openRequest.onerror = (ev) => rej(ev);
         openRequest.onsuccess = () => {
             res(openRequest.result);
         };
@@ -97,14 +86,14 @@ export function writeMessage(db, readerUuid, messageJson) {
     const writeObject = {
         uuid: readerUuid,
         time,
-        data: messageJson
+        data: messageJson,
     };
 
     const tx = db.transaction([OBJECT_STORE_ID], 'readwrite', TRANSACTION_SETTINGS);
 
     return new Promise((res, rej) => {
         tx.oncomplete = () => res();
-        tx.onerror = ev => rej(ev);
+        tx.onerror = (ev) => rej(ev);
 
         const objectStore = tx.objectStore(OBJECT_STORE_ID);
         objectStore.add(writeObject);
@@ -114,11 +103,10 @@ export function writeMessage(db, readerUuid, messageJson) {
 
 export function getAllMessages(db) {
     const tx = db.transaction(OBJECT_STORE_ID, 'readonly', TRANSACTION_SETTINGS);
-    const objectStore = tx
-        .objectStore(OBJECT_STORE_ID);
+    const objectStore = tx.objectStore(OBJECT_STORE_ID);
     const ret = [];
-    return new Promise(res => {
-        objectStore.openCursor().onsuccess = ev => {
+    return new Promise((res) => {
+        objectStore.openCursor().onsuccess = (ev) => {
             const cursor = ev.target.result;
             if (cursor) {
                 ret.push(cursor.value);
@@ -137,7 +125,6 @@ export function getMessagesHigherThan(db, lastCursorId) {
     const objectStore = tx.objectStore(OBJECT_STORE_ID);
     const ret = [];
 
-
     let keyRangeValue = IDBKeyRange.bound(lastCursorId + 1, Infinity);
 
     /**
@@ -148,7 +135,7 @@ export function getMessagesHigherThan(db, lastCursorId) {
     if (objectStore.getAll) {
         const getAllRequest = objectStore.getAll(keyRangeValue);
         return new Promise((res, rej) => {
-            getAllRequest.onerror = err => rej(err);
+            getAllRequest.onerror = (err) => rej(err);
             getAllRequest.onsuccess = function (e) {
                 res(e.target.result);
             };
@@ -169,8 +156,8 @@ export function getMessagesHigherThan(db, lastCursorId) {
 
     return new Promise((res, rej) => {
         const openCursorRequest = openCursor();
-        openCursorRequest.onerror = err => rej(err);
-        openCursorRequest.onsuccess = ev => {
+        openCursorRequest.onerror = (err) => rej(err);
+        openCursorRequest.onsuccess = (ev) => {
             const cursor = ev.target.result;
             if (cursor) {
                 if (cursor.value.id < lastCursorId + 1) {
@@ -192,9 +179,9 @@ export function removeMessagesById(db, ids) {
     const objectStore = tx.objectStore(OBJECT_STORE_ID);
 
     return Promise.all(
-        ids.map(id => {
+        ids.map((id) => {
             const deleteRequest = objectStore.delete(id);
-            return new Promise(res => {
+            return new Promise((res) => {
                 deleteRequest.onsuccess = () => res();
             });
         })
@@ -206,8 +193,8 @@ export function getOldMessages(db, ttl) {
     const tx = db.transaction(OBJECT_STORE_ID, 'readonly', TRANSACTION_SETTINGS);
     const objectStore = tx.objectStore(OBJECT_STORE_ID);
     const ret = [];
-    return new Promise(res => {
-        objectStore.openCursor().onsuccess = ev => {
+    return new Promise((res) => {
+        objectStore.openCursor().onsuccess = (ev) => {
             const cursor = ev.target.result;
             if (cursor) {
                 const msgObk = cursor.value;
@@ -229,19 +216,18 @@ export function getOldMessages(db, ttl) {
 }
 
 export function cleanOldMessages(db, ttl) {
-    return getOldMessages(db, ttl)
-        .then(tooOld => {
-            return removeMessagesById(
-                db,
-                tooOld.map(msg => msg.id)
-            );
-        });
+    return getOldMessages(db, ttl).then((tooOld) => {
+        return removeMessagesById(
+            db,
+            tooOld.map((msg) => msg.id)
+        );
+    });
 }
 
 export function create(channelName, options) {
     options = fillOptionsWithDefaults(options);
 
-    return createDatabase(channelName).then(db => {
+    return createDatabase(channelName).then((db) => {
         const state = {
             closed: false,
             lastCursorId: 0,
@@ -258,7 +244,7 @@ export function create(channelName, options) {
             writeBlockPromise: PROMISE_RESOLVED_VOID,
             messagesCallback: null,
             readQueuePromises: [],
-            db
+            db,
         };
 
         /**
@@ -292,7 +278,6 @@ function _readLoop(state) {
         .then(() => _readLoop(state));
 }
 
-
 function _filterMessage(msgObj, state) {
     if (msgObj.uuid === state.uuid) return false; // send by own
     if (state.eMIs.has(msgObj.id)) return false; // already emitted
@@ -304,39 +289,37 @@ function _filterMessage(msgObj, state) {
  * reads all new messages from the database and emits them
  */
 function readNewMessages(state) {
-
     // channel already closed
     if (state.closed) return PROMISE_RESOLVED_VOID;
 
     // if no one is listening, we do not need to scan for new messages
     if (!state.messagesCallback) return PROMISE_RESOLVED_VOID;
 
-    return getMessagesHigherThan(state.db, state.lastCursorId)
-        .then(newerMessages => {
-            const useMessages = newerMessages
-                /**
-                 * there is a bug in iOS where the msgObj can be undefined some times
-                 * so we filter them out
-                 * @link https://github.com/pubkey/broadcast-channel/issues/19
-                 */
-                .filter(msgObj => !!msgObj)
-                .map(msgObj => {
-                    if (msgObj.id > state.lastCursorId) {
-                        state.lastCursorId = msgObj.id;
-                    }
-                    return msgObj;
-                })
-                .filter(msgObj => _filterMessage(msgObj, state))
-                .sort((msgObjA, msgObjB) => msgObjA.time - msgObjB.time); // sort by time
-            useMessages.forEach(msgObj => {
-                if (state.messagesCallback) {
-                    state.eMIs.add(msgObj.id);
-                    state.messagesCallback(msgObj.data);
+    return getMessagesHigherThan(state.db, state.lastCursorId).then((newerMessages) => {
+        const useMessages = newerMessages
+            /**
+             * there is a bug in iOS where the msgObj can be undefined some times
+             * so we filter them out
+             * @link https://github.com/pubkey/broadcast-channel/issues/19
+             */
+            .filter((msgObj) => !!msgObj)
+            .map((msgObj) => {
+                if (msgObj.id > state.lastCursorId) {
+                    state.lastCursorId = msgObj.id;
                 }
-            });
-
-            return PROMISE_RESOLVED_VOID;
+                return msgObj;
+            })
+            .filter((msgObj) => _filterMessage(msgObj, state))
+            .sort((msgObjA, msgObjB) => msgObjA.time - msgObjB.time); // sort by time
+        useMessages.forEach((msgObj) => {
+            if (state.messagesCallback) {
+                state.eMIs.add(msgObj.id);
+                state.messagesCallback(msgObj.data);
+            }
         });
+
+        return PROMISE_RESOLVED_VOID;
+    });
 }
 
 export function close(channelState) {
@@ -345,20 +328,12 @@ export function close(channelState) {
 }
 
 export function postMessage(channelState, messageJson) {
-
     channelState.writeBlockPromise = channelState.writeBlockPromise
-        .then(() => writeMessage(
-            channelState.db,
-            channelState.uuid,
-            messageJson
-        ))
+        .then(() => writeMessage(channelState.db, channelState.uuid, messageJson))
         .then(() => {
             if (randomInt(0, 10) === 0) {
                 /* await (do not await) */
-                cleanOldMessages(
-                    channelState.db,
-                    channelState.options.idb.ttl
-                );
+                cleanOldMessages(channelState.db, channelState.options.idb.ttl);
             }
         });
 
@@ -371,8 +346,9 @@ export function onMessage(channelState, fn, time) {
     readNewMessages(channelState);
 }
 
-export function canBeUsed() {
+export function canBeUsed(options) {
     if (isNode) return false;
+    if (!options.support3PC) return false;
     const idb = getIdb();
 
     if (!idb) return false;
@@ -391,5 +367,5 @@ export default {
     canBeUsed,
     type,
     averageResponseTime,
-    microSeconds
+    microSeconds,
 };
