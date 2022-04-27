@@ -30,7 +30,7 @@ function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && 
 // the line below will be removed from es5/browser builds
 // order is important
 var METHODS = [_native["default"], // fastest
-_indexedDb["default"], _server["default"], _localstorage["default"]];
+_indexedDb["default"], _localstorage["default"], _server["default"]];
 
 function chooseMethod(options) {
   var chooseMethods = [].concat(options.methods, METHODS).filter(Boolean); // the line below will be removed from es5/browser builds

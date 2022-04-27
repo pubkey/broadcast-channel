@@ -809,7 +809,7 @@ function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && 
 // the line below will be removed from es5/browser builds
 // order is important
 var METHODS = [_native["default"], // fastest
-_indexedDb["default"], _server["default"], _localstorage["default"]];
+_indexedDb["default"], _localstorage["default"], _server["default"]];
 
 function chooseMethod(options) {
   var chooseMethods = [].concat(options.methods, METHODS).filter(Boolean); // the line below will be removed from es5/browser builds
@@ -1661,12 +1661,16 @@ function postMessage(channelState, messageJson) {
               };
               _context.t7 = _context.t2.stringify.call(_context.t2, _context.t6);
               _context.t8 = {
-                method: 'POST',
-                body: _context.t7
+                'Content-Type': 'application/json; charset=utf-8'
               };
-              (0, _context.t0)(_context.t1, _context.t8).then(res)["catch"](rej);
+              _context.t9 = {
+                method: 'POST',
+                body: _context.t7,
+                headers: _context.t8
+              };
+              (0, _context.t0)(_context.t1, _context.t9).then(res)["catch"](rej);
 
-            case 17:
+            case 18:
             case "end":
               return _context.stop();
           }
@@ -1677,8 +1681,6 @@ function postMessage(channelState, messageJson) {
 }
 
 function addStorageEventListener(channelName, serverUrl, fn) {
-  var _this = this;
-
   var key = storageKey(channelName);
   var channelEncPrivKey = keccak256(key);
 
@@ -1728,7 +1730,7 @@ function addStorageEventListener(channelName, serverUrl, fn) {
           case 0:
             _loglevel["default"].debug('connected with socket');
 
-            engine = _this.SOCKET_CONN.io.engine;
+            engine = SOCKET_CONN.io.engine;
 
             _loglevel["default"].debug('initially connected to', engine.transport.name); // in most cases, prints "polling"
 

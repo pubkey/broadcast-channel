@@ -50,6 +50,9 @@ export function postMessage(channelState, messageJson) {
                     data: encData,
                     signature: (await sign(channelEncPrivKey, keccak256(encData))).toString('hex'),
                 }),
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8',
+                },
             })
                 .then(res)
                 .catch(rej);
