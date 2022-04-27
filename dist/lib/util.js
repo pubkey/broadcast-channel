@@ -15,6 +15,7 @@ exports.log = void 0;
 exports.microSeconds = microSeconds;
 exports.randomInt = randomInt;
 exports.randomToken = randomToken;
+exports.setLogLevel = void 0;
 exports.sleep = sleep;
 
 var _bowser = _interopRequireWildcard(require("bowser"));
@@ -118,3 +119,10 @@ function are3PCSupported() {
 var log = _loglevel["default"].getLogger('broadcast-channel');
 
 exports.log = log;
+log.setLevel('error');
+
+var setLogLevel = function setLogLevel(level) {
+  log.setLevel(level);
+};
+
+exports.setLogLevel = setLogLevel;

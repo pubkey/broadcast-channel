@@ -1973,6 +1973,7 @@ exports.log = void 0;
 exports.microSeconds = microSeconds;
 exports.randomInt = randomInt;
 exports.randomToken = randomToken;
+exports.setLogLevel = void 0;
 exports.sleep = sleep;
 
 var _bowser = _interopRequireWildcard(require("bowser"));
@@ -2076,6 +2077,13 @@ function are3PCSupported() {
 var log = _loglevel["default"].getLogger('broadcast-channel');
 
 exports.log = log;
+log.setLevel('error');
+
+var setLogLevel = function setLogLevel(level) {
+  log.setLevel(level);
+};
+
+exports.setLogLevel = setLogLevel;
 }).call(this)}).call(this,require('_process'))
 },{"@babel/runtime/helpers/interopRequireDefault":17,"@babel/runtime/helpers/typeof":18,"_process":528,"bowser":42,"loglevel":509}],13:[function(require,module,exports){
 "use strict";

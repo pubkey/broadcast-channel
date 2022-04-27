@@ -80,3 +80,9 @@ export function are3PCSupported() {
 }
 
 export const log = loglevel.getLogger('broadcast-channel');
+
+log.setLevel('error');
+
+export const setLogLevel = (level) => {
+    log.setLevel(level);
+};
