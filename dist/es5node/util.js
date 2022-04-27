@@ -11,6 +11,7 @@ exports.PROMISE_RESOLVED_VOID = exports.PROMISE_RESOLVED_TRUE = exports.PROMISE_
 exports.are3PCSupported = are3PCSupported;
 exports.isNode = void 0;
 exports.isPromise = isPromise;
+exports.log = void 0;
 exports.microSeconds = microSeconds;
 exports.randomInt = randomInt;
 exports.randomToken = randomToken;
@@ -98,8 +99,7 @@ exports.isNode = isNode;
 function are3PCSupported() {
   var browserInfo = _bowser["default"].parse(navigator.userAgent);
 
-  _loglevel["default"].info(JSON.stringify(browserInfo), 'current browser info');
-
+  log.info(JSON.stringify(browserInfo), 'current browser info');
   var thirdPartyCookieSupport = true; // brave
 
   if (navigator.brave) {
@@ -114,3 +114,7 @@ function are3PCSupported() {
 
   return thirdPartyCookieSupport;
 }
+
+var log = _loglevel["default"].getLogger('broadcast-channel');
+
+exports.log = log;

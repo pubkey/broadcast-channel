@@ -1,5 +1,5 @@
 import Bowser, { ENGINE_MAP } from 'bowser';
-import log from 'loglevel';
+import loglevel from 'loglevel';
 
 /**
  * returns true if the given object is a promise
@@ -78,3 +78,5 @@ export function are3PCSupported() {
 
     return thirdPartyCookieSupport;
 }
+
+export const log = loglevel.getLogger('broadcast-channel');

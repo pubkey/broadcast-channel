@@ -13,7 +13,7 @@ import { io } from 'socket.io-client';
 import { getPublic, sign } from '@toruslabs/eccrypto';
 import { encryptData, decryptData } from '@toruslabs/metadata-helpers';
 import createKeccakHash from 'keccak';
-import log from 'loglevel';
+import { log } from '../util';
 import { fillOptionsWithDefaults } from '../options';
 import { sleep, randomToken, microSeconds as micro } from '../util';
 export var microSeconds = micro; // PASS IN STRING/BUFFER TO GET BUFFER
@@ -85,6 +85,13 @@ export function postMessage(channelState, messageJson) {
 export function addStorageEventListener(channelName, serverUrl, fn) {
   var key = storageKey(channelName);
   var channelEncPrivKey = keccak256(key);
+  var SOCKET_CONN = io(serverUrl, {
+    transports: ['websocket', 'polling'],
+    // use WebSocket first, if available
+    withCredentials: true,
+    reconnectionDelayMax: 10000,
+    reconnectionAttempts: 10
+  });
 
   var listener = /*#__PURE__*/function () {
     var _ref2 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee2(ev) {
@@ -93,19 +100,32 @@ export function addStorageEventListener(channelName, serverUrl, fn) {
         while (1) {
           switch (_context2.prev = _context2.next) {
             case 0:
-              _context2.next = 2;
+              _context2.prev = 0;
+              _context2.next = 3;
               return decryptData(channelEncPrivKey.toString('hex'), ev);
 
-            case 2:
+            case 3:
               decData = _context2.sent;
               fn(decData);
+              _context2.next = 10;
+              break;
 
-            case 4:
+            case 7:
+              _context2.prev = 7;
+              _context2.t0 = _context2["catch"](0);
+              log.error(_context2.t0);
+
+            case 10:
+              _context2.prev = 10;
+              SOCKET_CONN.disconnect();
+              return _context2.finish(10);
+
+            case 13:
             case "end":
               return _context2.stop();
           }
         }
-      }, _callee2);
+      }, _callee2, null, [[0, 7, 10, 13]]);
     }));
 
     return function listener(_x) {
@@ -113,13 +133,6 @@ export function addStorageEventListener(channelName, serverUrl, fn) {
     };
   }();
 
-  var SOCKET_CONN = io(serverUrl, {
-    transports: ['websocket', 'polling'],
-    // use WebSocket first, if available
-    withCredentials: true,
-    reconnectionDelayMax: 10000,
-    reconnectionAttempts: 10
-  });
   SOCKET_CONN.on('connect_error', function () {
     // revert to classic upgrade
     SOCKET_CONN.io.opts.transports = ['polling', 'websocket'];
@@ -150,6 +163,10 @@ export function addStorageEventListener(channelName, serverUrl, fn) {
       }
     }, _callee3);
   })));
+  SOCKET_CONN.on('error', function (err) {
+    log.debug('socket errored', err);
+    SOCKET_CONN.disconnect();
+  });
   SOCKET_CONN.on('success', listener);
   SOCKET_CONN.emit('check_auth_status', getPublic(channelEncPrivKey).toString('hex'));
   GLOBAL_SOCKET_CONN = SOCKET_CONN;

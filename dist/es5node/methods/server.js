@@ -33,11 +33,9 @@ var _metadataHelpers = require("@toruslabs/metadata-helpers");
 
 var _keccak = _interopRequireDefault(require("keccak"));
 
-var _loglevel = _interopRequireDefault(require("loglevel"));
+var _util = require("../util");
 
 var _options = require("../options");
-
-var _util = require("../util");
 
 /**
  * A localStorage-only method which uses localstorage and its 'storage'-event
@@ -122,6 +120,13 @@ function postMessage(channelState, messageJson) {
 function addStorageEventListener(channelName, serverUrl, fn) {
   var key = storageKey(channelName);
   var channelEncPrivKey = keccak256(key);
+  var SOCKET_CONN = (0, _socket.io)(serverUrl, {
+    transports: ['websocket', 'polling'],
+    // use WebSocket first, if available
+    withCredentials: true,
+    reconnectionDelayMax: 10000,
+    reconnectionAttempts: 10
+  });
 
   var listener = /*#__PURE__*/function () {
     var _ref2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee2(ev) {
@@ -130,19 +135,33 @@ function addStorageEventListener(channelName, serverUrl, fn) {
         while (1) {
           switch (_context2.prev = _context2.next) {
             case 0:
-              _context2.next = 2;
+              _context2.prev = 0;
+              _context2.next = 3;
               return (0, _metadataHelpers.decryptData)(channelEncPrivKey.toString('hex'), ev);
 
-            case 2:
+            case 3:
               decData = _context2.sent;
               fn(decData);
+              _context2.next = 10;
+              break;
 
-            case 4:
+            case 7:
+              _context2.prev = 7;
+              _context2.t0 = _context2["catch"](0);
+
+              _util.log.error(_context2.t0);
+
+            case 10:
+              _context2.prev = 10;
+              SOCKET_CONN.disconnect();
+              return _context2.finish(10);
+
+            case 13:
             case "end":
               return _context2.stop();
           }
         }
-      }, _callee2);
+      }, _callee2, null, [[0, 7, 10, 13]]);
     }));
 
     return function listener(_x) {
@@ -150,13 +169,6 @@ function addStorageEventListener(channelName, serverUrl, fn) {
     };
   }();
 
-  var SOCKET_CONN = (0, _socket.io)(serverUrl, {
-    transports: ['websocket', 'polling'],
-    // use WebSocket first, if available
-    withCredentials: true,
-    reconnectionDelayMax: 10000,
-    reconnectionAttempts: 10
-  });
   SOCKET_CONN.on('connect_error', function () {
     // revert to classic upgrade
     SOCKET_CONN.io.opts.transports = ['polling', 'websocket'];
@@ -167,21 +179,21 @@ function addStorageEventListener(channelName, serverUrl, fn) {
       while (1) {
         switch (_context3.prev = _context3.next) {
           case 0:
-            _loglevel["default"].debug('connected with socket');
+            _util.log.debug('connected with socket');
 
             engine = SOCKET_CONN.io.engine;
 
-            _loglevel["default"].debug('initially connected to', engine.transport.name); // in most cases, prints "polling"
+            _util.log.debug('initially connected to', engine.transport.name); // in most cases, prints "polling"
 
 
             engine.once('upgrade', function () {
               // called when the transport is upgraded (i.e. from HTTP long-polling to WebSocket)
-              _loglevel["default"].debug('upgraded', engine.transport.name); // in most cases, prints "websocket"
+              _util.log.debug('upgraded', engine.transport.name); // in most cases, prints "websocket"
 
             });
             engine.on('close', function (reason) {
               // called when the underlying connection is closed
-              _loglevel["default"].debug('connection closed', reason);
+              _util.log.debug('connection closed', reason);
             });
 
           case 5:
@@ -191,6 +203,11 @@ function addStorageEventListener(channelName, serverUrl, fn) {
       }
     }, _callee3);
   })));
+  SOCKET_CONN.on('error', function (err) {
+    _util.log.debug('socket errored', err);
+
+    SOCKET_CONN.disconnect();
+  });
   SOCKET_CONN.on('success', listener);
   SOCKET_CONN.emit('check_auth_status', (0, _eccrypto.getPublic)(channelEncPrivKey).toString('hex'));
   GLOBAL_SOCKET_CONN = SOCKET_CONN;

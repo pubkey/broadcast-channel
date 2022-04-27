@@ -11,7 +11,7 @@ import { io } from 'socket.io-client';
 import { getPublic, sign } from '@toruslabs/eccrypto';
 import { encryptData, decryptData } from '@toruslabs/metadata-helpers';
 import createKeccakHash from 'keccak';
-import log from 'loglevel';
+import { log } from '../util';
 import { fillOptionsWithDefaults } from '../options';
 
 import { sleep, randomToken, microSeconds as micro } from '../util';
