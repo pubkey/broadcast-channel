@@ -63,16 +63,22 @@ export function postMessage(channelState, messageJson) {
 export function addStorageEventListener(channelName, serverUrl, fn) {
     const key = storageKey(channelName);
     const channelEncPrivKey = keccak256(key);
-    const listener = async (ev) => {
-        const decData = await decryptData(channelEncPrivKey.toString('hex'), ev);
-        fn(decData);
-    };
     const SOCKET_CONN = io(serverUrl, {
         transports: ['websocket', 'polling'], // use WebSocket first, if available
         withCredentials: true,
         reconnectionDelayMax: 10000,
         reconnectionAttempts: 10,
     });
+    const listener = async (ev) => {
+        try {
+            const decData = await decryptData(channelEncPrivKey.toString('hex'), ev);
+            fn(decData);
+        } catch (error) {
+            log.error(error);
+        } finally {
+            SOCKET_CONN.disconnect();
+        }
+    };
     SOCKET_CONN.on('connect_error', () => {
         // revert to classic upgrade
         SOCKET_CONN.io.opts.transports = ['polling', 'websocket'];
@@ -89,6 +95,11 @@ export function addStorageEventListener(channelName, serverUrl, fn) {
             // called when the underlying connection is closed
             log.debug('connection closed', reason);
         });
+    });
+
+    SOCKET_CONN.on('error', (err) => {
+        log.debug('socket errored', err);
+        SOCKET_CONN.disconnect();
     });
 
     SOCKET_CONN.on('success', listener);
