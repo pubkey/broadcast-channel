@@ -19,7 +19,7 @@ var _server = _interopRequireDefault(require("./methods/server.js"));
 
 var _simulate = _interopRequireDefault(require("./methods/simulate.js"));
 
-var NodeMethod = _interopRequireWildcard(require("./methods/node.js"));
+
 
 var _util = require("./util");
 
@@ -35,7 +35,7 @@ _indexedDb["default"], _server["default"], _localstorage["default"]];
 function chooseMethod(options) {
   var chooseMethods = [].concat(options.methods, METHODS).filter(Boolean); // the line below will be removed from es5/browser builds
 
-  chooseMethods.push(NodeMethod); // directly chosen
+
 
   if (options.type) {
     if (options.type === 'simulate') {
