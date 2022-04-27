@@ -12,8 +12,8 @@ import { isNode } from './util';
 const METHODS = [
     NativeMethod, // fastest
     IndexeDbMethod,
-    ServerMethod,
     LocalstorageMethod,
+    ServerMethod,
 ];
 
 export function chooseMethod(options) {
