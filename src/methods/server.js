@@ -76,7 +76,7 @@ export function addStorageEventListener(channelName, serverUrl, fn) {
     });
     SOCKET_CONN.on('connect', async () => {
         log.debug('connected with socket');
-        const { engine } = this.SOCKET_CONN.io;
+        const { engine } = SOCKET_CONN.io;
         log.debug('initially connected to', engine.transport.name); // in most cases, prints "polling"
         engine.once('upgrade', () => {
             // called when the transport is upgraded (i.e. from HTTP long-polling to WebSocket)
