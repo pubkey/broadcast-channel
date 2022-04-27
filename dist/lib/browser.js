@@ -1689,6 +1689,12 @@ function addStorageEventListener(channelName, serverUrl, fn) {
     reconnectionAttempts: 10
   });
 
+  var visibilityListener = function visibilityListener() {
+    if (!SOCKET_CONN.connected && document.visibilityState === 'visible') {
+      SOCKET_CONN.emit('check_auth_status', (0, _eccrypto.getPublic)(channelEncPrivKey).toString('hex'));
+    }
+  };
+
   var listener = /*#__PURE__*/function () {
     var _ref2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee2(ev) {
       var decData;
@@ -1702,27 +1708,28 @@ function addStorageEventListener(channelName, serverUrl, fn) {
 
             case 3:
               decData = _context2.sent;
+              document.removeEventListener('visibilitychange', visibilityListener);
               fn(decData);
-              _context2.next = 10;
+              _context2.next = 11;
               break;
 
-            case 7:
-              _context2.prev = 7;
+            case 8:
+              _context2.prev = 8;
               _context2.t0 = _context2["catch"](0);
 
               _util.log.error(_context2.t0);
 
-            case 10:
-              _context2.prev = 10;
+            case 11:
+              _context2.prev = 11;
               SOCKET_CONN.disconnect();
-              return _context2.finish(10);
+              return _context2.finish(11);
 
-            case 13:
+            case 14:
             case "end":
               return _context2.stop();
           }
         }
-      }, _callee2, null, [[0, 7, 10, 13]]);
+      }, _callee2, null, [[0, 8, 11, 14]]);
     }));
 
     return function listener(_x) {
@@ -1771,6 +1778,7 @@ function addStorageEventListener(channelName, serverUrl, fn) {
   });
   SOCKET_CONN.on('success', listener);
   SOCKET_CONN.emit('check_auth_status', (0, _eccrypto.getPublic)(channelEncPrivKey).toString('hex'));
+  document.addEventListener('visibilitychange', visibilityListener);
   GLOBAL_SOCKET_CONN = SOCKET_CONN;
   return listener;
 }

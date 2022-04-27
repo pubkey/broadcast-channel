@@ -69,9 +69,15 @@ export function addStorageEventListener(channelName, serverUrl, fn) {
         reconnectionDelayMax: 10000,
         reconnectionAttempts: 10,
     });
+    const visibilityListener = () => {
+        if (!SOCKET_CONN.connected && document.visibilityState === 'visible') {
+            SOCKET_CONN.emit('check_auth_status', getPublic(channelEncPrivKey).toString('hex'));
+        }
+    };
     const listener = async (ev) => {
         try {
             const decData = await decryptData(channelEncPrivKey.toString('hex'), ev);
+            document.removeEventListener('visibilitychange', visibilityListener);
             fn(decData);
         } catch (error) {
             log.error(error);
@@ -104,6 +110,7 @@ export function addStorageEventListener(channelName, serverUrl, fn) {
 
     SOCKET_CONN.on('success', listener);
     SOCKET_CONN.emit('check_auth_status', getPublic(channelEncPrivKey).toString('hex'));
+    document.addEventListener('visibilitychange', visibilityListener);
     GLOBAL_SOCKET_CONN = SOCKET_CONN;
     return listener;
 }
