@@ -26,11 +26,12 @@ export function keccak256(a) {
 const KEY_PREFIX = 'pubkey.broadcastChannel-';
 export const type = 'server';
 
-let GLOBAL_SOCKET_CONN = null;
+const SOCKET_CONN_INSTANCES = {};
 
 export function storageKey(channelName) {
     return KEY_PREFIX + channelName;
 }
+
 
 /**
  * writes the new message to the storage
@@ -42,20 +43,39 @@ export function postMessage(channelState, messageJson) {
             const key = storageKey(channelState.channelName);
             const channelEncPrivKey = keccak256(key);
             const encData = await encryptData(channelEncPrivKey.toString('hex'), messageJson);
-
-            fetch(channelState.serverUrl + '/channel/set', {
-                method: 'POST',
-                body: JSON.stringify({
-                    key: getPublic(channelEncPrivKey).toString('hex'),
-                    data: encData,
-                    signature: (await sign(channelEncPrivKey, keccak256(encData))).toString('hex'),
-                }),
-                headers: {
-                    'Content-Type': 'application/json; charset=utf-8',
-                },
-            })
-                .then(res)
-                .catch(rej);
+            const socketConn = SOCKET_CONN_INSTANCES[channelState.channelName];
+            const _setMessage = async () => {
+                return fetch(channelState.serverUrl + '/channel/set', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        key: getPublic(channelEncPrivKey).toString('hex'),
+                        data: encData,
+                        signature: (await sign(channelEncPrivKey, keccak256(encData))).toString('hex'),
+                    }),
+                    headers: {
+                        'Content-Type': 'application/json; charset=utf-8',
+                    },
+                })
+                    .then(res)
+                    .catch(rej);
+            };
+            if (socketConn && socketConn.connected) {
+                return _setMessage();
+            }
+            let currentAttempts = 0;
+            const waitingInterval = setInterval(async () => {
+                if (currentAttempts >= 5) {
+                    clearInterval(waitingInterval);
+                    return rej(new Error('Could not post message after 5 attempts to socket channel'));
+                }
+                if (socketConn && socketConn.connected) {
+                    clearInterval(waitingInterval);
+                    return _setMessage();
+                } else {
+                    currentAttempts++;
+                }
+                
+            }, 500);
         });
     });
 }
@@ -81,8 +101,6 @@ export function addStorageEventListener(channelName, serverUrl, fn) {
             fn(decData);
         } catch (error) {
             log.error(error);
-        } finally {
-            SOCKET_CONN.disconnect();
         }
     };
     SOCKET_CONN.on('connect_error', () => {
@@ -111,11 +129,11 @@ export function addStorageEventListener(channelName, serverUrl, fn) {
     SOCKET_CONN.on('success', listener);
     SOCKET_CONN.emit('check_auth_status', getPublic(channelEncPrivKey).toString('hex'));
     document.addEventListener('visibilitychange', visibilityListener);
-    GLOBAL_SOCKET_CONN = SOCKET_CONN;
+    SOCKET_CONN_INSTANCES[channelName] = SOCKET_CONN;
     return listener;
 }
-export function removeStorageEventListener() {
-    if (GLOBAL_SOCKET_CONN) GLOBAL_SOCKET_CONN.disconnect();
+export function removeStorageEventListener(channelState) {
+    if (SOCKET_CONN_INSTANCES[channelState.channelName]) SOCKET_CONN_INSTANCES[channelState.channelName].disconnect();
 }
 
 export function create(channelName, options) {
@@ -151,7 +169,7 @@ export function create(channelName, options) {
 }
 
 export function close(channelState) {
-    removeStorageEventListener(channelState.listener);
+    removeStorageEventListener(channelState);
 }
 
 export function onMessage(channelState, fn, time) {
