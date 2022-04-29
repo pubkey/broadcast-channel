@@ -104,7 +104,7 @@ export function postMessage(channelState, messageJson) {
 
             case 9:
               currentAttempts = 0;
-              waitingInterval = setInterval( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee2() {
+              waitingInterval = window.setInterval( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee2() {
                 return _regeneratorRuntime.wrap(function _callee2$(_context2) {
                   while (1) {
                     switch (_context2.prev = _context2.next) {
@@ -114,7 +114,7 @@ export function postMessage(channelState, messageJson) {
                           break;
                         }
 
-                        clearInterval(waitingInterval);
+                        window.clearInterval(waitingInterval);
                         return _context2.abrupt("return", rej(new Error('Could not post message after 5 attempts to socket channel')));
 
                       case 3:
@@ -123,7 +123,7 @@ export function postMessage(channelState, messageJson) {
                           break;
                         }
 
-                        clearInterval(waitingInterval);
+                        window.clearInterval(waitingInterval);
                         return _context2.abrupt("return", _setMessage());
 
                       case 8:
@@ -274,6 +274,7 @@ export function create(channelName, options) {
 }
 export function close(channelState) {
   removeStorageEventListener(channelState);
+  delete SOCKET_CONN_INSTANCES[channelState.channelName];
 }
 export function onMessage(channelState, fn, time) {
   channelState.messagesCallbackTime = time;

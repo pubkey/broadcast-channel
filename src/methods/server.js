@@ -32,7 +32,6 @@ export function storageKey(channelName) {
     return KEY_PREFIX + channelName;
 }
 
-
 /**
  * writes the new message to the storage
  * and fires the storage-event so other readers can find it
@@ -63,18 +62,17 @@ export function postMessage(channelState, messageJson) {
                 return _setMessage();
             }
             let currentAttempts = 0;
-            const waitingInterval = setInterval(async () => {
+            const waitingInterval = window.setInterval(async () => {
                 if (currentAttempts >= 5) {
-                    clearInterval(waitingInterval);
+                    window.clearInterval(waitingInterval);
                     return rej(new Error('Could not post message after 5 attempts to socket channel'));
                 }
                 if (socketConn && socketConn.connected) {
-                    clearInterval(waitingInterval);
+                    window.clearInterval(waitingInterval);
                     return _setMessage();
                 } else {
                     currentAttempts++;
                 }
-                
             }, 500);
         });
     });
@@ -170,6 +168,7 @@ export function create(channelName, options) {
 
 export function close(channelState) {
     removeStorageEventListener(channelState);
+    delete SOCKET_CONN_INSTANCES[channelState.channelName];
 }
 
 export function onMessage(channelState, fn, time) {

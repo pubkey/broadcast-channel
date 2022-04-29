@@ -1699,7 +1699,7 @@ function postMessage(channelState, messageJson) {
 
             case 9:
               currentAttempts = 0;
-              waitingInterval = setInterval( /*#__PURE__*/(0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee2() {
+              waitingInterval = window.setInterval( /*#__PURE__*/(0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee2() {
                 return _regenerator["default"].wrap(function _callee2$(_context2) {
                   while (1) {
                     switch (_context2.prev = _context2.next) {
@@ -1709,7 +1709,7 @@ function postMessage(channelState, messageJson) {
                           break;
                         }
 
-                        clearInterval(waitingInterval);
+                        window.clearInterval(waitingInterval);
                         return _context2.abrupt("return", rej(new Error('Could not post message after 5 attempts to socket channel')));
 
                       case 3:
@@ -1718,7 +1718,7 @@ function postMessage(channelState, messageJson) {
                           break;
                         }
 
-                        clearInterval(waitingInterval);
+                        window.clearInterval(waitingInterval);
                         return _context2.abrupt("return", _setMessage());
 
                       case 8:
@@ -1879,6 +1879,7 @@ function create(channelName, options) {
 
 function close(channelState) {
   removeStorageEventListener(channelState);
+  delete SOCKET_CONN_INSTANCES[channelState.channelName];
 }
 
 function onMessage(channelState, fn, time) {
