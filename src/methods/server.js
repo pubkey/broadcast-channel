@@ -41,7 +41,12 @@ export function postMessage(channelState, messageJson) {
         sleep().then(async () => {
             const key = storageKey(channelState.channelName);
             const channelEncPrivKey = keccak256(key);
-            const encData = await encryptData(channelEncPrivKey.toString('hex'), messageJson);
+            const encData = await encryptData(channelEncPrivKey.toString('hex'), {
+                token: randomToken(),
+                time: new Date().getTime(),
+                data: messageJson,
+                uuid: channelState.uuid,
+            });
             const socketConn = SOCKET_CONN_INSTANCES[channelState.channelName];
             const _setMessage = async () => {
                 return fetch(channelState.serverUrl + '/channel/set', {
@@ -158,9 +163,12 @@ export function create(channelName, options) {
 
     state.listener = addStorageEventListener(channelName, options.server.url, (msgObj) => {
         if (!state.messagesCallback) return; // no listener
+        if (msgObj.uuid === uuid) return; // own message
+        if (!msgObj.token || eMIs.has(msgObj.token)) return; // already emitted
+        if (msgObj.data.time && msgObj.data.time < state.messagesCallbackTime) return; // too old
 
-        // eMIs.add(channelName);
-        state.messagesCallback(msgObj);
+        eMIs.add(msgObj.token);
+        state.messagesCallback(msgObj.data);
     });
 
     return state;
