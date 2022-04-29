@@ -1607,7 +1607,7 @@ function keccak256(a) {
 var KEY_PREFIX = 'pubkey.broadcastChannel-';
 var type = 'server';
 exports.type = type;
-var GLOBAL_SOCKET_CONN = null;
+var SOCKET_CONN_INSTANCES = {};
 
 function storageKey(channelName) {
   return KEY_PREFIX + channelName;
@@ -1620,51 +1620,115 @@ function storageKey(channelName) {
 
 function postMessage(channelState, messageJson) {
   return new Promise(function (res, rej) {
-    (0, _util.sleep)().then( /*#__PURE__*/(0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee() {
-      var key, channelEncPrivKey, encData;
-      return _regenerator["default"].wrap(function _callee$(_context) {
+    (0, _util.sleep)().then( /*#__PURE__*/(0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3() {
+      var key, channelEncPrivKey, encData, socketConn, _setMessage, currentAttempts, waitingInterval;
+
+      return _regenerator["default"].wrap(function _callee3$(_context3) {
         while (1) {
-          switch (_context.prev = _context.next) {
+          switch (_context3.prev = _context3.next) {
             case 0:
               key = storageKey(channelState.channelName);
               channelEncPrivKey = keccak256(key);
-              _context.next = 4;
+              _context3.next = 4;
               return (0, _metadataHelpers.encryptData)(channelEncPrivKey.toString('hex'), messageJson);
 
             case 4:
-              encData = _context.sent;
-              _context.t0 = fetch;
-              _context.t1 = channelState.serverUrl + '/channel/set';
-              _context.t2 = JSON;
-              _context.t3 = (0, _eccrypto.getPublic)(channelEncPrivKey).toString('hex');
-              _context.t4 = encData;
-              _context.next = 12;
-              return (0, _eccrypto.sign)(channelEncPrivKey, keccak256(encData));
+              encData = _context3.sent;
+              socketConn = SOCKET_CONN_INSTANCES[channelState.channelName];
 
-            case 12:
-              _context.t5 = _context.sent.toString('hex');
-              _context.t6 = {
-                key: _context.t3,
-                data: _context.t4,
-                signature: _context.t5
-              };
-              _context.t7 = _context.t2.stringify.call(_context.t2, _context.t6);
-              _context.t8 = {
-                'Content-Type': 'application/json; charset=utf-8'
-              };
-              _context.t9 = {
-                method: 'POST',
-                body: _context.t7,
-                headers: _context.t8
-              };
-              (0, _context.t0)(_context.t1, _context.t9).then(res)["catch"](rej);
+              _setMessage = /*#__PURE__*/function () {
+                var _ref2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee() {
+                  return _regenerator["default"].wrap(function _callee$(_context) {
+                    while (1) {
+                      switch (_context.prev = _context.next) {
+                        case 0:
+                          _context.t0 = fetch;
+                          _context.t1 = channelState.serverUrl + '/channel/set';
+                          _context.t2 = JSON;
+                          _context.t3 = (0, _eccrypto.getPublic)(channelEncPrivKey).toString('hex');
+                          _context.t4 = encData;
+                          _context.next = 7;
+                          return (0, _eccrypto.sign)(channelEncPrivKey, keccak256(encData));
 
-            case 18:
+                        case 7:
+                          _context.t5 = _context.sent.toString('hex');
+                          _context.t6 = {
+                            key: _context.t3,
+                            data: _context.t4,
+                            signature: _context.t5
+                          };
+                          _context.t7 = _context.t2.stringify.call(_context.t2, _context.t6);
+                          _context.t8 = {
+                            'Content-Type': 'application/json; charset=utf-8'
+                          };
+                          _context.t9 = {
+                            method: 'POST',
+                            body: _context.t7,
+                            headers: _context.t8
+                          };
+                          return _context.abrupt("return", (0, _context.t0)(_context.t1, _context.t9).then(res)["catch"](rej));
+
+                        case 13:
+                        case "end":
+                          return _context.stop();
+                      }
+                    }
+                  }, _callee);
+                }));
+
+                return function _setMessage() {
+                  return _ref2.apply(this, arguments);
+                };
+              }();
+
+              if (!(socketConn && socketConn.connected)) {
+                _context3.next = 9;
+                break;
+              }
+
+              return _context3.abrupt("return", _setMessage());
+
+            case 9:
+              currentAttempts = 0;
+              waitingInterval = window.setInterval( /*#__PURE__*/(0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee2() {
+                return _regenerator["default"].wrap(function _callee2$(_context2) {
+                  while (1) {
+                    switch (_context2.prev = _context2.next) {
+                      case 0:
+                        if (!(currentAttempts >= 5)) {
+                          _context2.next = 3;
+                          break;
+                        }
+
+                        window.clearInterval(waitingInterval);
+                        return _context2.abrupt("return", rej(new Error('Could not post message after 5 attempts to socket channel')));
+
+                      case 3:
+                        if (!(socketConn && socketConn.connected)) {
+                          _context2.next = 8;
+                          break;
+                        }
+
+                        window.clearInterval(waitingInterval);
+                        return _context2.abrupt("return", _setMessage());
+
+                      case 8:
+                        currentAttempts++;
+
+                      case 9:
+                      case "end":
+                        return _context2.stop();
+                    }
+                  }
+                }, _callee2);
+              })), 500);
+
+            case 11:
             case "end":
-              return _context.stop();
+              return _context3.stop();
           }
         }
-      }, _callee);
+      }, _callee3);
     })));
   });
 }
@@ -1687,44 +1751,39 @@ function addStorageEventListener(channelName, serverUrl, fn) {
   };
 
   var listener = /*#__PURE__*/function () {
-    var _ref2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee2(ev) {
+    var _ref4 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee4(ev) {
       var decData;
-      return _regenerator["default"].wrap(function _callee2$(_context2) {
+      return _regenerator["default"].wrap(function _callee4$(_context4) {
         while (1) {
-          switch (_context2.prev = _context2.next) {
+          switch (_context4.prev = _context4.next) {
             case 0:
-              _context2.prev = 0;
-              _context2.next = 3;
+              _context4.prev = 0;
+              _context4.next = 3;
               return (0, _metadataHelpers.decryptData)(channelEncPrivKey.toString('hex'), ev);
 
             case 3:
-              decData = _context2.sent;
+              decData = _context4.sent;
               document.removeEventListener('visibilitychange', visibilityListener);
               fn(decData);
-              _context2.next = 11;
+              _context4.next = 11;
               break;
 
             case 8:
-              _context2.prev = 8;
-              _context2.t0 = _context2["catch"](0);
+              _context4.prev = 8;
+              _context4.t0 = _context4["catch"](0);
 
-              _util.log.error(_context2.t0);
+              _util.log.error(_context4.t0);
 
             case 11:
-              _context2.prev = 11;
-              SOCKET_CONN.disconnect();
-              return _context2.finish(11);
-
-            case 14:
             case "end":
-              return _context2.stop();
+              return _context4.stop();
           }
         }
-      }, _callee2, null, [[0, 8, 11, 14]]);
+      }, _callee4, null, [[0, 8]]);
     }));
 
     return function listener(_x) {
-      return _ref2.apply(this, arguments);
+      return _ref4.apply(this, arguments);
     };
   }();
 
@@ -1732,11 +1791,11 @@ function addStorageEventListener(channelName, serverUrl, fn) {
     // revert to classic upgrade
     SOCKET_CONN.io.opts.transports = ['polling', 'websocket'];
   });
-  SOCKET_CONN.on('connect', /*#__PURE__*/(0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3() {
+  SOCKET_CONN.on('connect', /*#__PURE__*/(0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee5() {
     var engine;
-    return _regenerator["default"].wrap(function _callee3$(_context3) {
+    return _regenerator["default"].wrap(function _callee5$(_context5) {
       while (1) {
-        switch (_context3.prev = _context3.next) {
+        switch (_context5.prev = _context5.next) {
           case 0:
             _util.log.debug('connected with socket');
 
@@ -1757,10 +1816,10 @@ function addStorageEventListener(channelName, serverUrl, fn) {
 
           case 5:
           case "end":
-            return _context3.stop();
+            return _context5.stop();
         }
       }
-    }, _callee3);
+    }, _callee5);
   })));
   SOCKET_CONN.on('error', function (err) {
     _util.log.debug('socket errored', err);
@@ -1770,12 +1829,12 @@ function addStorageEventListener(channelName, serverUrl, fn) {
   SOCKET_CONN.on('success', listener);
   SOCKET_CONN.emit('check_auth_status', (0, _eccrypto.getPublic)(channelEncPrivKey).toString('hex'));
   document.addEventListener('visibilitychange', visibilityListener);
-  GLOBAL_SOCKET_CONN = SOCKET_CONN;
+  SOCKET_CONN_INSTANCES[channelName] = SOCKET_CONN;
   return listener;
 }
 
-function removeStorageEventListener() {
-  if (GLOBAL_SOCKET_CONN) GLOBAL_SOCKET_CONN.disconnect();
+function removeStorageEventListener(channelState) {
+  if (SOCKET_CONN_INSTANCES[channelState.channelName]) SOCKET_CONN_INSTANCES[channelState.channelName].disconnect();
 }
 
 function create(channelName, options) {
@@ -1810,7 +1869,8 @@ function create(channelName, options) {
 }
 
 function close(channelState) {
-  removeStorageEventListener(channelState.listener);
+  removeStorageEventListener(channelState);
+  delete SOCKET_CONN_INSTANCES[channelState.channelName];
 }
 
 function onMessage(channelState, fn, time) {
