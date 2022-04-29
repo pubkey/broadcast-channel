@@ -44,7 +44,12 @@ export function postMessage(channelState, messageJson) {
               key = storageKey(channelState.channelName);
               channelEncPrivKey = keccak256(key);
               _context3.next = 4;
-              return encryptData(channelEncPrivKey.toString('hex'), messageJson);
+              return encryptData(channelEncPrivKey.toString('hex'), {
+                token: randomToken(),
+                time: new Date().getTime(),
+                data: messageJson,
+                uuid: channelState.uuid
+              });
 
             case 4:
               encData = _context3.sent;
@@ -266,9 +271,15 @@ export function create(channelName, options) {
   };
   state.listener = addStorageEventListener(channelName, options.server.url, function (msgObj) {
     if (!state.messagesCallback) return; // no listener
-    // eMIs.add(channelName);
 
-    state.messagesCallback(msgObj);
+    if (msgObj.uuid === uuid) return; // own message
+
+    if (!msgObj.token || eMIs.has(msgObj.token)) return; // already emitted
+
+    if (msgObj.data.time && msgObj.data.time < state.messagesCallbackTime) return; // too old
+
+    eMIs.add(msgObj.token);
+    state.messagesCallback(msgObj.data);
   });
   return state;
 }
