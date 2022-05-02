@@ -282,6 +282,9 @@ function _startListening(channel) {
 
         if (msgObj.time >= minMessageTime) {
           listenerObject.fn(msgObj.data);
+        } else if (channel.method.type === 'server') {
+          // server msg might lag based on connection.
+          listenerObject.fn(msgObj.data);
         }
       });
     };
@@ -1759,45 +1762,64 @@ function addStorageEventListener(channelName, serverUrl, fn) {
   });
 
   var visibilityListener = function visibilityListener() {
+    // if channel is closed, then remove the listener.
+    if (!SOCKET_CONN_INSTANCES[channelName]) {
+      document.removeEventListener('visibilitychange', visibilityListener);
+      return;
+    } // if not connected, then wait for connection and ping server for latest msg.
+
+
     if (!SOCKET_CONN.connected && document.visibilityState === 'visible') {
-      SOCKET_CONN.emit('check_auth_status', (0, _eccrypto.getPublic)(channelEncPrivKey).toString('hex'));
+      SOCKET_CONN.once('connect', /*#__PURE__*/(0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee4() {
+        return _regenerator["default"].wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                SOCKET_CONN.emit('check_auth_status', (0, _eccrypto.getPublic)(channelEncPrivKey).toString('hex'));
+
+              case 1:
+              case "end":
+                return _context4.stop();
+            }
+          }
+        }, _callee4);
+      })));
     }
   };
 
   var listener = /*#__PURE__*/function () {
-    var _ref4 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee4(ev) {
+    var _ref5 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee5(ev) {
       var decData;
-      return _regenerator["default"].wrap(function _callee4$(_context4) {
+      return _regenerator["default"].wrap(function _callee5$(_context5) {
         while (1) {
-          switch (_context4.prev = _context4.next) {
+          switch (_context5.prev = _context5.next) {
             case 0:
-              _context4.prev = 0;
-              _context4.next = 3;
+              _context5.prev = 0;
+              _context5.next = 3;
               return (0, _metadataHelpers.decryptData)(channelEncPrivKey.toString('hex'), ev);
 
             case 3:
-              decData = _context4.sent;
-              document.removeEventListener('visibilitychange', visibilityListener);
+              decData = _context5.sent;
               fn(decData);
-              _context4.next = 11;
+              _context5.next = 10;
               break;
 
-            case 8:
-              _context4.prev = 8;
-              _context4.t0 = _context4["catch"](0);
+            case 7:
+              _context5.prev = 7;
+              _context5.t0 = _context5["catch"](0);
 
-              _util.log.error(_context4.t0);
+              _util.log.error(_context5.t0);
 
-            case 11:
+            case 10:
             case "end":
-              return _context4.stop();
+              return _context5.stop();
           }
         }
-      }, _callee4, null, [[0, 8]]);
+      }, _callee5, null, [[0, 7]]);
     }));
 
     return function listener(_x) {
-      return _ref4.apply(this, arguments);
+      return _ref5.apply(this, arguments);
     };
   }();
 
@@ -1805,14 +1827,15 @@ function addStorageEventListener(channelName, serverUrl, fn) {
     // revert to classic upgrade
     SOCKET_CONN.io.opts.transports = ['polling', 'websocket'];
   });
-  SOCKET_CONN.on('connect', /*#__PURE__*/(0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee5() {
+  SOCKET_CONN.on('connect', /*#__PURE__*/(0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee6() {
     var engine;
-    return _regenerator["default"].wrap(function _callee5$(_context5) {
+    return _regenerator["default"].wrap(function _callee6$(_context6) {
       while (1) {
-        switch (_context5.prev = _context5.next) {
+        switch (_context6.prev = _context6.next) {
           case 0:
             _util.log.debug('connected with socket');
 
+            SOCKET_CONN.emit('check_auth_status', (0, _eccrypto.getPublic)(channelEncPrivKey).toString('hex'));
             engine = SOCKET_CONN.io.engine;
 
             _util.log.debug('initially connected to', engine.transport.name); // in most cases, prints "polling"
@@ -1828,20 +1851,24 @@ function addStorageEventListener(channelName, serverUrl, fn) {
               _util.log.debug('connection closed', reason);
             });
 
-          case 5:
+          case 6:
           case "end":
-            return _context5.stop();
+            return _context6.stop();
         }
       }
-    }, _callee5);
+    }, _callee6);
   })));
   SOCKET_CONN.on('error', function (err) {
     _util.log.debug('socket errored', err);
 
     SOCKET_CONN.disconnect();
   });
+  SOCKET_CONN.once('disconnect', function () {
+    _util.log.debug('socket disconnected');
+
+    if (SOCKET_CONN_INSTANCES[channelName]) visibilityListener();
+  });
   SOCKET_CONN.on('success', listener);
-  SOCKET_CONN.emit('check_auth_status', (0, _eccrypto.getPublic)(channelEncPrivKey).toString('hex'));
   document.addEventListener('visibilitychange', visibilityListener);
   SOCKET_CONN_INSTANCES[channelName] = SOCKET_CONN;
   return listener;
@@ -1879,8 +1906,7 @@ function create(channelName, options) {
     if (msgObj.uuid === uuid) return; // own message
 
     if (!msgObj.token || eMIs.has(msgObj.token)) return; // already emitted
-
-    if (msgObj.data.time && msgObj.data.time < state.messagesCallbackTime) return; // too old
+    // if (msgObj.data.time && msgObj.data.time < state.messagesCallbackTime) return; // too old
 
     eMIs.add(msgObj.token);
     state.messagesCallback(msgObj.data);
@@ -1889,8 +1915,12 @@ function create(channelName, options) {
 }
 
 function close(channelState) {
-  removeStorageEventListener(channelState);
-  delete SOCKET_CONN_INSTANCES[channelState.channelName];
+  // give 2 sec for all msgs which are in transit to be consumed
+  // by receiver.
+  window.setTimeout(function () {
+    removeStorageEventListener(channelState);
+    delete SOCKET_CONN_INSTANCES[channelState.channelName];
+  }, 1000);
 }
 
 function onMessage(channelState, fn, time) {

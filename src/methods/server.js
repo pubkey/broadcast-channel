@@ -93,14 +93,21 @@ export function addStorageEventListener(channelName, serverUrl, fn) {
         reconnectionAttempts: 10,
     });
     const visibilityListener = () => {
+        // if channel is closed, then remove the listener.
+        if (!SOCKET_CONN_INSTANCES[channelName]) {
+            document.removeEventListener('visibilitychange', visibilityListener);
+            return;
+        }
+        // if not connected, then wait for connection and ping server for latest msg.
         if (!SOCKET_CONN.connected && document.visibilityState === 'visible') {
-            SOCKET_CONN.emit('check_auth_status', getPublic(channelEncPrivKey).toString('hex'));
+            SOCKET_CONN.once('connect', async () => {
+                SOCKET_CONN.emit('check_auth_status', getPublic(channelEncPrivKey).toString('hex'));
+            });
         }
     };
     const listener = async (ev) => {
         try {
             const decData = await decryptData(channelEncPrivKey.toString('hex'), ev);
-            document.removeEventListener('visibilitychange', visibilityListener);
             fn(decData);
         } catch (error) {
             log.error(error);
@@ -112,6 +119,7 @@ export function addStorageEventListener(channelName, serverUrl, fn) {
     });
     SOCKET_CONN.on('connect', async () => {
         log.debug('connected with socket');
+        SOCKET_CONN.emit('check_auth_status', getPublic(channelEncPrivKey).toString('hex'));
         const { engine } = SOCKET_CONN.io;
         log.debug('initially connected to', engine.transport.name); // in most cases, prints "polling"
         engine.once('upgrade', () => {
@@ -128,9 +136,12 @@ export function addStorageEventListener(channelName, serverUrl, fn) {
         log.debug('socket errored', err);
         SOCKET_CONN.disconnect();
     });
+    SOCKET_CONN.once('disconnect', () => {
+        log.debug('socket disconnected');
+        if (SOCKET_CONN_INSTANCES[channelName]) visibilityListener();
+    });
 
     SOCKET_CONN.on('success', listener);
-    SOCKET_CONN.emit('check_auth_status', getPublic(channelEncPrivKey).toString('hex'));
     document.addEventListener('visibilitychange', visibilityListener);
     SOCKET_CONN_INSTANCES[channelName] = SOCKET_CONN;
     return listener;
@@ -165,7 +176,7 @@ export function create(channelName, options) {
         if (!state.messagesCallback) return; // no listener
         if (msgObj.uuid === uuid) return; // own message
         if (!msgObj.token || eMIs.has(msgObj.token)) return; // already emitted
-        if (msgObj.data.time && msgObj.data.time < state.messagesCallbackTime) return; // too old
+        // if (msgObj.data.time && msgObj.data.time < state.messagesCallbackTime) return; // too old
 
         eMIs.add(msgObj.token);
         state.messagesCallback(msgObj.data);
@@ -175,8 +186,12 @@ export function create(channelName, options) {
 }
 
 export function close(channelState) {
-    removeStorageEventListener(channelState);
-    delete SOCKET_CONN_INSTANCES[channelState.channelName];
+    // give 2 sec for all msgs which are in transit to be consumed
+    // by receiver.
+    window.setTimeout(() => {
+        removeStorageEventListener(channelState);
+        delete SOCKET_CONN_INSTANCES[channelState.channelName];
+    }, 1000);
 }
 
 export function onMessage(channelState, fn, time) {

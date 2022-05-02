@@ -281,6 +281,9 @@ function _startListening(channel) {
 
         if (msgObj.time >= minMessageTime) {
           listenerObject.fn(msgObj.data);
+        } else if (channel.method.type === 'server') {
+          // server msg might lag based on connection.
+          listenerObject.fn(msgObj.data);
         }
       });
     };
