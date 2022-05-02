@@ -1908,7 +1908,7 @@ function create(channelName, options) {
 function close(channelState) {
   // give 2 sec for all msgs which are in transit to be consumed
   // by receiver.
-  setTimeout(function () {
+  window.setTimeout(function () {
     removeStorageEventListener(channelState);
     delete SOCKET_CONN_INSTANCES[channelState.channelName];
   }, 1000);

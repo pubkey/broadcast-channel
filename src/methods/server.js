@@ -188,11 +188,10 @@ export function create(channelName, options) {
 export function close(channelState) {
     // give 2 sec for all msgs which are in transit to be consumed
     // by receiver.
-    setTimeout(() => {
+    window.setTimeout(() => {
         removeStorageEventListener(channelState);
         delete SOCKET_CONN_INSTANCES[channelState.channelName];
     }, 1000);
-   
 }
 
 export function onMessage(channelState, fn, time) {
