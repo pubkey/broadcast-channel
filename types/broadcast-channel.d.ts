@@ -1,4 +1,4 @@
-declare type MethodType = 'node' | 'idb' | 'native' | 'localstorage' | 'simulate';
+declare type MethodType = 'node' | 'idb' | 'native' | 'localstorage' | 'simulate' | 'server';
 
 interface BroadcastChannelEventMap {
     message: MessageEvent;
