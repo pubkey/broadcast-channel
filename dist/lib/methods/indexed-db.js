@@ -397,7 +397,6 @@ function onMessage(channelState, fn, time) {
 }
 
 function canBeUsed(options) {
-  if (_util.isNode) return false;
   if (!options.support3PC) return false;
   var idb = getIdb();
   if (!idb) return false;

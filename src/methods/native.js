@@ -1,4 +1,4 @@
-import { microSeconds as micro, isNode, PROMISE_RESOLVED_VOID } from '../util';
+import { microSeconds as micro, PROMISE_RESOLVED_VOID } from '../util';
 
 export const microSeconds = micro;
 
@@ -43,7 +43,7 @@ export function canBeUsed(options) {
      * in the electron-renderer, isNode will be true even if we are in browser-context
      * so we also check if window is undefined
      */
-    if (isNode && typeof window === 'undefined') return false;
+    if (typeof window === 'undefined') return false;
     if (!options.support3PC) return false;
 
     if (typeof BroadcastChannel === 'function') {

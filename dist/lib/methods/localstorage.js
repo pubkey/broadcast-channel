@@ -156,7 +156,6 @@ function onMessage(channelState, fn, time) {
 }
 
 function canBeUsed(options) {
-  if (_util.isNode) return false;
   if (!options.support3PC) return false;
   var ls = getLocalStorage();
   if (!ls) return false;

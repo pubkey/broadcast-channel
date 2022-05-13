@@ -1,13 +1,9 @@
 {
     "name": "@toruslabs/broadcast-channel",
     "version": "4.13.0",
-    "description": "A BroadcastChannel that works in New Browsers, Old Browsers, WebWorkers and NodeJs",
+    "description": "A BroadcastChannel that works in New Browsers, Old Browsers, WebWorkers",
     "exports": {
         ".": {
-            "node": {
-                "import": "./dist/esnode/index.js",
-                "default": "./dist/es5node/index.js"
-            },
             "browser": {
                 "import": "./dist/esbrowser/index.js",
                 "default": "./dist/lib/index.es5.js"
@@ -24,9 +20,7 @@
         "localstorage",
         "indexeddb",
         "postMessage",
-        "crosstab",
-        "ipc",
-        "leader-election"
+        "crosstab"
     ],
     "repository": {
         "type": "git",
@@ -37,15 +31,11 @@
     "bugs": {
         "url": "https://github.com/pubkey/broadcast-channel/issues"
     },
-    "main": "./dist/es5node/index.js",
-    "module": "./dist/esnode/index.js",
     "browser": "./dist/lib/index.es5.js",
     "sideEffects": false,
     "types": "./types/index.d.ts",
     "scripts": {
-        "test": "echo \"RUN ALL:\" && npm run test:node && npm run test:browser && npm run test:e2e",
-        "test:node": "npm run build:es5node && mocha ./test/index.test.js -b --timeout 6000 --exit",
-        "test:node:loop": "npm run test:node && npm run test:node:loop",
+        "test": "echo \"RUN ALL:\" && npm run test:browser && npm run test:e2e",
         "test:browser": "npm run build && karma start ./config/karma.conf.js --single-run",
         "test:e2e": "concurrently \"npm run docs:serve\" \"sleep 20 && testcafe -b && testcafe chrome -e test/e2e.test.js --hostname localhost\" --kill-others --success first",
         "test:typings": "npm run build && mocha ./test/typings.test.js -b --timeout 12000 --exit",
@@ -58,19 +48,16 @@
         "size:rollup": "npm run build && rollup --config ./config/rollup.config.js && echo \"Build-Size Rollup (minified+gzip):\" && gzip-size --raw ./test_tmp/rollup.bundle.js",
         "lint": "eslint src test config --cache",
         "clear": "rimraf -rf ./dist && rimraf -rf ./gen",
-        "build:es6node": "rimraf -rf dist/esnode && cross-env NODE_ENV=es6 babel src --out-dir dist/esnode",
-        "build:es6browser": "rimraf -rf dist/esbrowser && cross-env NODE_ENV=es6 babel src --out-dir dist/esbrowser && grep -rl NodeMethod dist/esbrowser/ | xargs sed -i '' 's/.*NodeMethod.*//'",
-        "build:es5node": "cross-env NODE_ENV=es5 babel src --out-dir dist/es5node",
-        "build:es5browser": "cross-env NODE_ENV=es5 babel src --out-dir dist/lib && grep -rl NodeMethod dist/lib/ | xargs sed -i '' 's/.*NodeMethod.*//'",
+        "build:es6browser": "rimraf -rf dist/esbrowser && cross-env NODE_ENV=es6 babel src --out-dir dist/esbrowser",
+        "build:es5browser": "cross-env NODE_ENV=es5 babel src --out-dir dist/lib",
         "build:test": "cross-env NODE_ENV=es5 babel test --out-dir test_tmp",
         "build:index": "browserify test_tmp/scripts/index.js > docs/index.js",
         "build:browser": "browserify test_tmp/scripts/e2e.js > docs/e2e.js",
         "build:worker": "browserify test_tmp/scripts/worker.js > docs/worker.js",
         "build:iframe": "browserify test_tmp/scripts/iframe.js > docs/iframe.js",
-        "build:leader-iframe": "browserify test_tmp/scripts/leader-iframe.js > docs/leader-iframe.js",
         "build:lib-browser": "browserify dist/lib/browserify.index.js > dist/lib/browser.js",
         "build:lib-browser:min": "uglifyjs --compress --mangle --output dist/lib/browser.min.js -- dist/lib/browser.js",
-        "build": "npm run clear && concurrently \"npm run build:es6node\" \"npm run build:es6browser\" \"npm run build:es5node\" \"npm run build:es5browser\" \"npm run build:test\" && concurrently \"npm run build:index\" \"npm run build:browser\" \"npm run build:worker\" \"npm run build:iframe\" \"npm run build:leader-iframe\" && npm run build:lib-browser && npm run build:lib-browser:min",
+        "build": "npm run clear && concurrently \"npm run build:es6browser\" \"npm run build:es5browser\" \"npm run build:test\" && concurrently \"npm run build:index\" \"npm run build:browser\" \"npm run build:worker\" \"npm run build:iframe\" && npm run build:lib-browser && npm run build:lib-browser:min",
         "build:min": "uglifyjs --compress --mangle --output dist/lib/browserify.min.js -- dist/lib/browserify.index.js",
         "docs:only": "http-server ./docs --silent",
         "docs:serve": "npm run build && echo \"Open http://localhost:8080/\" && npm run docs:only"
@@ -83,17 +70,14 @@
         "@toruslabs/eccrypto": "^1.1.8",
         "@toruslabs/metadata-helpers": "^2.5.0",
         "bowser": "^2.11.0",
-        "detect-node": "^2.1.0",
         "keccak": "^3.0.2",
         "loglevel": "^1.8.0",
-        "microtime": "3.0.0",
         "oblivious-set": "1.1.1",
-        "p-queue": "6.6.2",
-        "rimraf": "^3.0.2",
         "socket.io-client": "^4.5.0",
         "unload": "^2.3.1"
     },
     "devDependencies": {
+        "rimraf": "^3.0.2",
         "@babel/cli": "7.17.6",
         "@babel/core": "7.17.9",
         "@babel/plugin-proposal-object-rest-spread": "7.17.3",

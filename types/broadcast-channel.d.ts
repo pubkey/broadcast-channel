@@ -39,7 +39,7 @@ export type BroadcastChannelOptions = {
     };
 };
 
-declare type EventContext = 'message' | 'internal' | 'leader';
+declare type EventContext = 'message' | 'internal';
 
 declare type OnMessageHandler<T> = ((this: BroadcastChannel, ev: T) => any) | null;
 
@@ -66,7 +66,6 @@ export class BroadcastChannel<T = any> {
     removeEventListener(type: EventContext, handler: OnMessageHandler<T>): void;
 }
 // statics
-export function clearNodeFolder(opts?: BroadcastChannelOptions): Promise<boolean>;
 export function enforceOptions(opts?: BroadcastChannelOptions | false | null): void;
 
 export const OPEN_BROADCAST_CHANNELS: Set<BroadcastChannel>;

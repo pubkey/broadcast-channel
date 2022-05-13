@@ -1,4 +1,3 @@
-
 <p align="center">
   <a href="https://github.com/pubkey/broadcast-channel">
     <img src="../docs/files/icon.png" width="150px" />
@@ -20,12 +19,12 @@
 
 ![demo.gif](../docs/files/demo.gif)
 
-* * *
+---
 
 A BroadcastChannel that allows you to send data between different browser-tabs or nodejs-processes.
 
-- It works completely **client-side** and **offline**,
-- Tested on **old browsers**, **new browsers**, **WebWorkers**, **Iframes** and **NodeJs**.
+-   It works completely **client-side** and **offline**,
+-   Tested on **old browsers**, **new browsers**, **WebWorkers**, **Iframes** and **NodeJs**.
 
 This behaves similar to the [BroadcastChannel-API](https://developer.mozilla.org/en-US/docs/Web/API/Broadcast_Channel_API) which is currently only featured in [some browsers](https://caniuse.com/#feat=broadcastchannel).
 
@@ -48,10 +47,9 @@ channel.postMessage('I am not alone');
 ```ts
 import { BroadcastChannel } from 'broadcast-channel';
 const channel = new BroadcastChannel('foobar');
-channel.onmessage = msg => console.dir(msg);
+channel.onmessage = (msg) => console.dir(msg);
 // > 'I am not alone'
 ```
-
 
 #### Add and remove multiple eventlisteners
 
@@ -59,7 +57,7 @@ channel.onmessage = msg => console.dir(msg);
 import { BroadcastChannel } from 'broadcast-channel';
 const channel = new BroadcastChannel('foobar');
 
-const handler = msg => console.log(msg);
+const handler = (msg) => console.log(msg);
 channel.addEventListener('message', handler);
 
 // remove it
@@ -67,6 +65,7 @@ channel.removeEventListener('message', handler);
 ```
 
 #### Close the channel if you do not need it anymore
+
 Returns a `Promise` which is resolved when everything is processed.
 
 ```js
@@ -88,11 +87,11 @@ const channel = new BroadcastChannel('foobar', options);
 ```typescript
 import { BroadcastChannel } from 'broadcast-channel';
 declare type Message = {
-  foo: string;
+    foo: string;
 };
 const channel: BroadcastChannel<Message> = new BroadcastChannel('foobar');
 channel.postMessage({
-  foo: 'bar'
+    foo: 'bar',
 });
 ```
 
@@ -105,35 +104,11 @@ import { enforceOptions } from 'broadcast-channel';
 
 // enforce this config for all channels
 enforceOptions({
-  type: 'simulate'
+    type: 'simulate',
 });
 
 // reset the enforcement
 enforceOptions(null);
-```
-
-
-#### Clear tmp-folder
-
-When used in NodeJs, the BroadcastChannel will communicate with other processes over filesystem sockets.
-When you create a huge amount of channels, like you would do when running unit tests, you might get problems because there are too many folders in the tmp-directory. Calling `BroadcastChannel.clearNodeFolder()` will clear the tmp-folder. It is recommended to run this at the beginning of your test-suite.
-
-```typescript
-import { clearNodeFolder } from 'broadcast-channel';
-// jest
-beforeAll(async () => {
-  const hasRun = await clearNodeFolder();
-  console.log(hasRun); // > true on NodeJs, false on Browsers
-})
-```
-
-```typescript
-import { clearNodeFolder } from 'broadcast-channel';
-// mocha
-before(async () => {
-  const hasRun = await clearNodeFolder();
-  console.log(hasRun); // > true on NodeJs, false on Browsers
-})
 ```
 
 #### Handling IndexedDB onclose events
@@ -148,21 +123,21 @@ import { BroadcastChannel } from 'broadcast-channel';
 let channel;
 
 const createChannel = () => {
-  channel = new BroadcastChannel(CHANNEL_NAME, {
-    idb: {
-      onclose: () => {
-        // the onclose event is just the IndexedDB closing.
-        // you should also close the channel before creating
-        // a new one.
-        channel.close();
-        createChannel();
-      },
-    },
-  });
+    channel = new BroadcastChannel(CHANNEL_NAME, {
+        idb: {
+            onclose: () => {
+                // the onclose event is just the IndexedDB closing.
+                // you should also close the channel before creating
+                // a new one.
+                channel.close();
+                createChannel();
+            },
+        },
+    });
 
-  channel.onmessage = message => {
-    // handle message
-  };
+    channel.onmessage = (message) => {
+        // handle message
+    };
 };
 ```
 
@@ -170,15 +145,13 @@ const createChannel = () => {
 
 Depending in which environment this is used, a proper method is automatically selected to ensure it always works.
 
-| Method           | Used in                                                         | Description                                                                                                                                             |
-| ---------------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Native**       | [Modern Browsers](https://caniuse.com/broadcastchannel)         | If the browser supports the BroadcastChannel-API, this method will be used because it is the fastest                                                    |
-| **IndexedDB**    | [Browsers with WebWorkers](https://caniuse.com/#feat=indexeddb) | If there is no native BroadcastChannel support, the IndexedDB method is used because it supports messaging between browser-tabs, iframes and WebWorkers |
-| **LocalStorage** | [Older Browsers](https://caniuse.com/#feat=namevalue-storage)   | In older browsers that do not support IndexedDb, a localstorage-method is used                                                                          |
-| **Sockets**      | NodeJs                                                          | In NodeJs the communication is handled by sockets that send each other messages                                                                         |
-| **Simulate**      | none per default                                                          | This method simulates the behavior of the other methods but only runs in the current process without sharing data between processes. Use this method in your test-suite because it is much faster.                                                                  |
-
-
+| Method           | Used in                                                         | Description                                                                                                                                                                                        |
+| ---------------- | --------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Native**       | [Modern Browsers](https://caniuse.com/broadcastchannel)         | If the browser supports the BroadcastChannel-API, this method will be used because it is the fastest                                                                                               |
+| **IndexedDB**    | [Browsers with WebWorkers](https://caniuse.com/#feat=indexeddb) | If there is no native BroadcastChannel support, the IndexedDB method is used because it supports messaging between browser-tabs, iframes and WebWorkers                                            |
+| **LocalStorage** | [Older Browsers](https://caniuse.com/#feat=namevalue-storage)   | In older browsers that do not support IndexedDb, a localstorage-method is used                                                                                                                     |
+| **Sockets**      | NodeJs                                                          | In NodeJs the communication is handled by sockets that send each other messages                                                                                                                    |
+| **Simulate**     | none per default                                                | This method simulates the behavior of the other methods but only runs in the current process without sharing data between processes. Use this method in your test-suite because it is much faster. |
 
 ## Using the LeaderElection
 
@@ -188,14 +161,10 @@ For example if you have a stable connection from the frontend to your server, yo
 In this example the leader is marked with the crown ♛:
 ![leader-election.gif](../docs/files/leader-election.gif)
 
-
 Create a channel and an elector:
 
 ```ts
-import {
-  BroadcastChannel,
-  createLeaderElection
-} from 'broadcast-channel';
+import { BroadcastChannel, createLeaderElection } from 'broadcast-channel';
 const channel = new BroadcastChannel('foobar');
 const elector = createLeaderElection(channel);
 ```
@@ -205,9 +174,9 @@ Wait until the elector becomes leader:
 ```js
 import { createLeaderElection } from 'broadcast-channel';
 const elector = createLeaderElection(channel);
-elector.awaitLeadership().then(()=> {
-  console.log('this tab is now leader');
-})
+elector.awaitLeadership().then(() => {
+    console.log('this tab is now leader');
+});
 ```
 
 Check if there is a leader at this point in time. `hasLeader` is true when there is a leader. It becomes false, if the leader is dead. Then it becomes true again when a new leader is elected.
@@ -222,12 +191,12 @@ If more than one tab is becoming leader adjust `LeaderElectionOptions` configura
 ```js
 import { createLeaderElection } from 'broadcast-channel';
 const elector = createLeaderElection(channel, {
-  fallbackInterval: 2000, // optional configuration for how often will renegotiation for leader occur
-  responseTime: 1000, // optional configuration for how long will instances have to respond
+    fallbackInterval: 2000, // optional configuration for how often will renegotiation for leader occur
+    responseTime: 1000, // optional configuration for how long will instances have to respond
 });
-elector.awaitLeadership().then(()=> {
-  console.log('this tab is now leader');
-})
+elector.awaitLeadership().then(() => {
+    console.log('this tab is now leader');
+});
 ```
 
 Let the leader die. (automatically happens if a tab is closed or the process exits).
@@ -244,29 +213,29 @@ Duplicate leadership can happen on rare occurences like when the [CPU is on 100%
 ```js
 const elector = createLeaderElection(channel);
 elector.onduplicate = () => {
-  alert('have duplicate leaders!');
-}
+    alert('have duplicate leaders!');
+};
 ```
-
 
 ## What this is
 
 This module is optimised for:
 
-- **low latency**: When you `postMessage` to a channel, it will be delivered to other channels as soon as possible,
-- **lossless**: When you send a message, it should be impossible that the message is lost before other channels recieved it,
-- **low idle workload**: During the time when no messages are send, there should be a low processor footprint.
+-   **low latency**: When you `postMessage` to a channel, it will be delivered to other channels as soon as possible,
+-   **lossless**: When you send a message, it should be impossible that the message is lost before other channels recieved it,
+-   **low idle workload**: During the time when no messages are send, there should be a low processor footprint.
 
 ## What this is not
 
 -   This is not a polyfill. Do not set this module to `window.BroadcastChannel`. This implementation behaves similiar to the [BroadcastChannel-Standard](https://developer.mozilla.org/en-US/docs/Web/API/Broadcast_Channel_API) with these limitations:
-    - You can only send data that can be `JSON.stringify`-ed,
-    - While the offical API emits [onmessage-events](https://developer.mozilla.org/en-US/docs/Web/API/BroadcastChannel/onmessage), this module directly emitts the data which was posted.
+    -   You can only send data that can be `JSON.stringify`-ed,
+    -   While the offical API emits [onmessage-events](https://developer.mozilla.org/en-US/docs/Web/API/BroadcastChannel/onmessage), this module directly emitts the data which was posted.
 -   This is not a replacement for a message queue. If you use this in NodeJs and want send more than 50 messages per second, you should use proper [IPC-Tooling](https://en.wikipedia.org/wiki/Message_queue).
 
-
 ## Browser Support
+
 I have tested this in all browsers that I could find. For ie8 and ie9 you must transpile the code before you can use this. If you want to know if this works with your browser, [open the demo page](https://pubkey.github.io/broadcast-channel/e2e.html).
 
 ## Thanks
+
 Thanks to [Hemanth.HM](https://github.com/hemanth) for the module name.

@@ -1,14 +1,6 @@
-import {
-    isPromise,
-    PROMISE_RESOLVED_FALSE,
-    PROMISE_RESOLVED_VOID
-} from './util.js';
-import {
-    chooseMethod
-} from './method-chooser.js';
-import {
-    fillOptionsWithDefaults
-} from './options.js';
+import { isPromise, PROMISE_RESOLVED_VOID } from './util.js';
+import { chooseMethod } from './method-chooser.js';
+import { fillOptionsWithDefaults } from './options.js';
 
 /**
  * Contains all open channels,
@@ -46,7 +38,7 @@ export const BroadcastChannel = function (name, options) {
      */
     this._addEL = {
         message: [],
-        internal: []
+        internal: [],
     };
 
     /**
@@ -80,20 +72,6 @@ export const BroadcastChannel = function (name, options) {
 BroadcastChannel._pubkey = true;
 
 /**
- * clears the tmp-folder if is node
- * @return {Promise<boolean>} true if has run, false if not node
- */
-export function clearNodeFolder(options) {
-    options = fillOptionsWithDefaults(options);
-    const method = chooseMethod(options);
-    if (method.type === 'node') {
-        return method.clearNodeFolder().then(() => true);
-    } else {
-        return PROMISE_RESOLVED_FALSE;
-    }
-}
-
-/**
  * if set, this method is enforced,
  * no mather what the options are
  */
@@ -102,20 +80,19 @@ export function enforceOptions(options) {
     ENFORCED_OPTIONS = options;
 }
 
-
 // PROTOTYPE
 BroadcastChannel.prototype = {
     postMessage(msg) {
         if (this.closed) {
             throw new Error(
                 'BroadcastChannel.postMessage(): ' +
-                'Cannot post message after channel has closed ' +
-                /**
-                 * In the past when this error appeared, it was realy hard to debug.
-                 * So now we log the msg together with the error so it at least
-                 * gives some clue about where in your application this happens.
-                 */
-                JSON.stringify(msg)
+                    'Cannot post message after channel has closed ' +
+                    /**
+                     * In the past when this error appeared, it was realy hard to debug.
+                     * So now we log the msg together with the error so it at least
+                     * gives some clue about where in your application this happens.
+                     */
+                    JSON.stringify(msg)
             );
         }
         return _post(this, 'message', msg);
@@ -127,7 +104,7 @@ BroadcastChannel.prototype = {
         const time = this.method.microSeconds();
         const listenObj = {
             time,
-            fn
+            fn,
         };
         _removeListenerObject(this, 'message', this._onML);
         if (fn && typeof fn === 'function') {
@@ -142,12 +119,12 @@ BroadcastChannel.prototype = {
         const time = this.method.microSeconds();
         const listenObj = {
             time,
-            fn
+            fn,
         };
         _addListenerObject(this, type, listenObj);
     },
     removeEventListener(type, fn) {
-        const obj = this._addEL[type].find(obj => obj.fn === fn);
+        const obj = this._addEL[type].find((obj) => obj.fn === fn);
         _removeListenerObject(this, type, obj);
     },
 
@@ -162,22 +139,23 @@ BroadcastChannel.prototype = {
         this._onML = null;
         this._addEL.message = [];
 
-        return awaitPrepare
-            // wait until all current sending are processed
-            .then(() => Promise.all(Array.from(this._uMP)))
-            // run before-close hooks
-            .then(() => Promise.all(this._befC.map(fn => fn())))
-            // close the channel
-            .then(() => this.method.close(this._state));
+        return (
+            awaitPrepare
+                // wait until all current sending are processed
+                .then(() => Promise.all(Array.from(this._uMP)))
+                // run before-close hooks
+                .then(() => Promise.all(this._befC.map((fn) => fn())))
+                // close the channel
+                .then(() => this.method.close(this._state))
+        );
     },
     get type() {
         return this.method.type;
     },
     get isClosed() {
         return this.closed;
-    }
+    },
 };
-
 
 /**
  * Post a message over the channel
@@ -188,22 +166,16 @@ function _post(broadcastChannel, type, msg) {
     const msgObj = {
         time,
         type,
-        data: msg
+        data: msg,
     };
 
     const awaitPrepare = broadcastChannel._prepP ? broadcastChannel._prepP : PROMISE_RESOLVED_VOID;
     return awaitPrepare.then(() => {
-
-        const sendPromise = broadcastChannel.method.postMessage(
-            broadcastChannel._state,
-            msgObj
-        );
+        const sendPromise = broadcastChannel.method.postMessage(broadcastChannel._state, msgObj);
 
         // add/remove to unsend messages list
         broadcastChannel._uMP.add(sendPromise);
-        sendPromise
-            .catch()
-            .then(() => broadcastChannel._uMP.delete(sendPromise));
+        sendPromise.catch().then(() => broadcastChannel._uMP.delete(sendPromise));
 
         return sendPromise;
     });
@@ -213,7 +185,7 @@ function _prepareChannel(channel) {
     const maybePromise = channel.method.create(channel.name, channel.options);
     if (isPromise(maybePromise)) {
         channel._prepP = maybePromise;
-        maybePromise.then(s => {
+        maybePromise.then((s) => {
             // used in tests to simulate slow runtime
             /*if (channel.options.prepareDelay) {
                  await new Promise(res => setTimeout(res, this.options.prepareDelay));
@@ -224,7 +196,6 @@ function _prepareChannel(channel) {
         channel._state = maybePromise;
     }
 }
-
 
 function _hasMessageListeners(channel) {
     if (channel._addEL.message.length > 0) return true;
@@ -238,7 +209,7 @@ function _addListenerObject(channel, type, obj) {
 }
 
 function _removeListenerObject(channel, type, obj) {
-    channel._addEL[type] = channel._addEL[type].filter(o => o !== obj);
+    channel._addEL[type] = channel._addEL[type].filter((o) => o !== obj);
     _stopListening(channel);
 }
 
@@ -246,47 +217,38 @@ function _startListening(channel) {
     if (!channel._iL && _hasMessageListeners(channel)) {
         // someone is listening, start subscribing
 
-        const listenerFn = msgObj => {
-            channel._addEL[msgObj.type]
-                .forEach(listenerObject => {
-                    /**
-                     * Getting the current time in JavaScript has no good precision.
-                     * So instead of only listening to events that happend 'after' the listener
-                     * was added, we also listen to events that happended 100ms before it.
-                     * This ensures that when another process, like a WebWorker, sends events
-                     * we do not miss them out because their timestamp is a bit off compared to the main process.
-                     * Not doing this would make messages missing when we send data directly after subscribing and awaiting a response.
-                     * @link https://johnresig.com/blog/accuracy-of-javascript-time/
-                     */
-                    const hundredMsInMicro = 100 * 1000;
-                    const minMessageTime = listenerObject.time - hundredMsInMicro;
+        const listenerFn = (msgObj) => {
+            channel._addEL[msgObj.type].forEach((listenerObject) => {
+                /**
+                 * Getting the current time in JavaScript has no good precision.
+                 * So instead of only listening to events that happend 'after' the listener
+                 * was added, we also listen to events that happended 100ms before it.
+                 * This ensures that when another process, like a WebWorker, sends events
+                 * we do not miss them out because their timestamp is a bit off compared to the main process.
+                 * Not doing this would make messages missing when we send data directly after subscribing and awaiting a response.
+                 * @link https://johnresig.com/blog/accuracy-of-javascript-time/
+                 */
+                const hundredMsInMicro = 100 * 1000;
+                const minMessageTime = listenerObject.time - hundredMsInMicro;
 
-                    if (msgObj.time >= minMessageTime) {
-                        listenerObject.fn(msgObj.data);
-                    } else if (channel.method.type === 'server') {
-                        // server msg might lag based on connection.
-                        listenerObject.fn(msgObj.data);
-                    }
-                });
+                if (msgObj.time >= minMessageTime) {
+                    listenerObject.fn(msgObj.data);
+                } else if (channel.method.type === 'server') {
+                    // server msg might lag based on connection.
+                    listenerObject.fn(msgObj.data);
+                }
+            });
         };
 
         const time = channel.method.microSeconds();
         if (channel._prepP) {
             channel._prepP.then(() => {
                 channel._iL = true;
-                channel.method.onMessage(
-                    channel._state,
-                    listenerFn,
-                    time
-                );
+                channel.method.onMessage(channel._state, listenerFn, time);
             });
         } else {
             channel._iL = true;
-            channel.method.onMessage(
-                channel._state,
-                listenerFn,
-                time
-            );
+            channel.method.onMessage(channel._state, listenerFn, time);
         }
     }
 }
@@ -296,10 +258,6 @@ function _stopListening(channel) {
         // noone is listening, stop subscribing
         channel._iL = false;
         const time = channel.method.microSeconds();
-        channel.method.onMessage(
-            channel._state,
-            null,
-            time
-        );
+        channel.method.onMessage(channel._state, null, time);
     }
 }

@@ -1,29 +1,22 @@
 const AsyncTestUtil = require('async-test-util');
-const {
-    BroadcastChannel,
-    clearNodeFolder,
-    createLeaderElection
-} = require('../');
+const { BroadcastChannel } = require('../');
 
 const benchmark = {
     openClose: {},
-    sendRecieve: {}
+    sendRecieve: {},
 };
 
 const options = {
     node: {
-        useFastPath: false
-    }
+        useFastPath: false,
+    },
 };
 
-const elapsedTime = before => {
+const elapsedTime = (before) => {
     return AsyncTestUtil.performanceNow() - before;
 };
 
 describe('performance.test.js', () => {
-    it('clear tmp-folder', async () => {
-        await clearNodeFolder();
-    });
     it('wait a bit for jit etc..', async () => {
         await AsyncTestUtil.wait(2000);
     });
@@ -38,9 +31,7 @@ describe('performance.test.js', () => {
             const channel = new BroadcastChannel(channelName, options);
             channels.push(channel);
         }
-        await Promise.all(
-            channels.map(c => c.close())
-        );
+        await Promise.all(channels.map((c) => c.close()));
 
         const elapsed = elapsedTime(startTime);
         benchmark.openClose = elapsed;
@@ -51,7 +42,7 @@ describe('performance.test.js', () => {
         const channelReciever = new BroadcastChannel(channelName, options);
         const msgAmount = 2000;
         let emittedCount = 0;
-        const waitPromise = new Promise(res => {
+        const waitPromise = new Promise((res) => {
             channelReciever.onmessage = () => {
                 emittedCount++;
                 if (emittedCount === msgAmount) {
@@ -79,12 +70,11 @@ describe('performance.test.js', () => {
         const msgAmount = 600;
         let emittedCount = 0;
 
-
         channelReciever.onmessage = () => {
             channelReciever.postMessage('pong');
         };
 
-        const waitPromise = new Promise(res => {
+        const waitPromise = new Promise((res) => {
             channelSender.onmessage = () => {
                 emittedCount++;
                 if (emittedCount === msgAmount) {
@@ -104,46 +94,6 @@ describe('performance.test.js', () => {
 
         const elapsed = elapsedTime(startTime);
         benchmark.sendRecieve.series = elapsed;
-    });
-    it('leaderElection', async () => {
-        const startTime = AsyncTestUtil.performanceNow();
-
-        let t = 10;
-        const channelsToClose = [];
-        while (t > 0) {
-            t--;
-            const channelName = AsyncTestUtil.randomString(10);
-            const channelA = new BroadcastChannel(channelName, options);
-            channelsToClose.push(channelA);
-            const channelB = new BroadcastChannel(channelName, options);
-            channelsToClose.push(channelB);
-            const leaderElectorA = createLeaderElection(channelA);
-            const leaderElectorB = createLeaderElection(channelB);
-
-            leaderElectorA.applyOnce();
-            leaderElectorB.applyOnce();
-
-            while (
-                !leaderElectorA.isLeader &&
-                !leaderElectorB.isLeader
-            ) {
-                await Promise.all([
-                    leaderElectorA.applyOnce(),
-                    leaderElectorB.applyOnce(),
-                    /**
-                     * We apply twice to better simulate
-                     * real world usage.
-                     */
-                    leaderElectorA.applyOnce(),
-                    leaderElectorB.applyOnce()
-                ]);
-            }
-        }
-
-        const elapsed = elapsedTime(startTime);
-        benchmark.leaderElection = elapsed;
-
-        await channelsToClose.forEach(channel => channel.close());
     });
     it('show result', () => {
         console.log('benchmark result:');

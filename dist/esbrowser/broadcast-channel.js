@@ -1,4 +1,4 @@
-import { isPromise, PROMISE_RESOLVED_FALSE, PROMISE_RESOLVED_VOID } from './util.js';
+import { isPromise, PROMISE_RESOLVED_VOID } from './util.js';
 import { chooseMethod } from './method-chooser.js';
 import { fillOptionsWithDefaults } from './options.js';
 /**
@@ -67,23 +67,6 @@ export var BroadcastChannel = function BroadcastChannel(name, options) {
  */
 
 BroadcastChannel._pubkey = true;
-/**
- * clears the tmp-folder if is node
- * @return {Promise<boolean>} true if has run, false if not node
- */
-
-export function clearNodeFolder(options) {
-  options = fillOptionsWithDefaults(options);
-  var method = chooseMethod(options);
-
-  if (method.type === 'node') {
-    return method.clearNodeFolder().then(function () {
-      return true;
-    });
-  } else {
-    return PROMISE_RESOLVED_FALSE;
-  }
-}
 /**
  * if set, this method is enforced,
  * no mather what the options are

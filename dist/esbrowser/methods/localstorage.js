@@ -7,7 +7,7 @@
  */
 import { ObliviousSet } from 'oblivious-set';
 import { fillOptionsWithDefaults } from '../options';
-import { sleep, randomToken, microSeconds as micro, isNode } from '../util';
+import { sleep, randomToken, microSeconds as micro } from '../util';
 export var microSeconds = micro;
 var KEY_PREFIX = 'pubkey.broadcastChannel-';
 export var type = 'localstorage';
@@ -123,7 +123,6 @@ export function onMessage(channelState, fn, time) {
   channelState.messagesCallback = fn;
 }
 export function canBeUsed(options) {
-  if (isNode) return false;
   if (!options.support3PC) return false;
   var ls = getLocalStorage();
   if (!ls) return false;

@@ -3,14 +3,7 @@ const assert = require('assert');
 const isNode = require('detect-node');
 const clone = require('clone');
 const unload = require('unload');
-const {
-    BroadcastChannel,
-    OPEN_BROADCAST_CHANNELS,
-    createLeaderElection,
-    clearNodeFolder,
-    enforceOptions,
-    beLeader
-} = require('../');
+const { BroadcastChannel, OPEN_BROADCAST_CHANNELS, enforceOptions } = require('../');
 
 if (isNode) {
     process.on('uncaughtException', (err, origin) => {
@@ -48,11 +41,7 @@ function runTest(channelOptions) {
                     const channelName = AsyncTestUtil.randomString(12);
                     const channel = new BroadcastChannel(channelName, channelOptions);
                     channel.close();
-                    await AsyncTestUtil.assertThrows(
-                        () => channel.postMessage('foobar'),
-                        Error,
-                        'closed'
-                    );
+                    await AsyncTestUtil.assertThrows(() => channel.postMessage('foobar'), Error, 'closed');
                 });
             });
             describe('.close()', () => {
@@ -80,9 +69,9 @@ function runTest(channelOptions) {
                     const channel = new BroadcastChannel(channelName, channelOptions);
 
                     const emitted = [];
-                    channel.onmessage = msg => emitted.push(msg);
+                    channel.onmessage = (msg) => emitted.push(msg);
                     await channel.postMessage({
-                        foo: 'bar'
+                        foo: 'bar',
                     });
 
                     await AsyncTestUtil.wait(100);
@@ -95,11 +84,10 @@ function runTest(channelOptions) {
                     const channel = new BroadcastChannel(channelName, channelOptions);
                     const otherChannel = new BroadcastChannel(channelName, channelOptions);
 
-
                     const emitted = [];
-                    otherChannel.onmessage = msg => emitted.push(msg);
+                    otherChannel.onmessage = (msg) => emitted.push(msg);
                     await channel.postMessage({
-                        foo: 'bar'
+                        foo: 'bar',
                     });
                     await AsyncTestUtil.waitUntil(() => emitted.length === 1);
                     assert.equal(emitted[0].foo, 'bar');
@@ -112,9 +100,9 @@ function runTest(channelOptions) {
                     const otherChannel = new BroadcastChannel(channelName, channelOptions);
 
                     const emitted = [];
-                    otherChannel.onmessage = msg => emitted.push(msg);
+                    otherChannel.onmessage = (msg) => emitted.push(msg);
                     await channel.postMessage({
-                        foo: 'bar'
+                        foo: 'bar',
                     });
                     await AsyncTestUtil.waitUntil(() => emitted.length === 1);
                     assert.equal(emitted[0].foo, 'bar');
@@ -127,13 +115,12 @@ function runTest(channelOptions) {
                     const channel2 = new BroadcastChannel(channelName, channelOptions);
 
                     const emitted = [];
-                    channel2.onmessage = msg => emitted.push(msg);
+                    channel2.onmessage = (msg) => emitted.push(msg);
 
                     const msgJson = {
-                        foo: 'bar'
+                        foo: 'bar',
                     };
                     await channel1.postMessage(msgJson);
-
 
                     await AsyncTestUtil.waitUntil(() => emitted.length === 1);
                     assert.deepEqual(emitted[0], msgJson);
@@ -147,7 +134,7 @@ function runTest(channelOptions) {
                     const channel2 = new BroadcastChannel(channelName, channelOptions);
 
                     const emitted = [];
-                    channel2.onmessage = msg => emitted.push(msg);
+                    channel2.onmessage = (msg) => emitted.push(msg);
 
                     const msgJson = {
                         one: AsyncTestUtil.randomString(1000),
@@ -155,7 +142,6 @@ function runTest(channelOptions) {
                         three: AsyncTestUtil.randomString(1000),
                     };
                     await channel1.postMessage(msgJson);
-
 
                     await AsyncTestUtil.waitUntil(() => emitted.length === 1);
                     assert.deepEqual(emitted[0], msgJson);
@@ -171,13 +157,12 @@ function runTest(channelOptions) {
                     const channel2 = new BroadcastChannel(channelName, slowerOptions);
 
                     const emitted = [];
-                    channel2.onmessage = msg => emitted.push(msg);
+                    channel2.onmessage = (msg) => emitted.push(msg);
 
                     const msgJson = {
-                        foo: 'bar'
+                        foo: 'bar',
                     };
                     await channel1.postMessage(msgJson);
-
 
                     await AsyncTestUtil.waitUntil(() => emitted.length === 1);
                     assert.deepEqual(emitted[0], msgJson);
@@ -201,7 +186,7 @@ function runTest(channelOptions) {
                     await AsyncTestUtil.wait(200);
 
                     const emitted = [];
-                    channel2.onmessage = msg => emitted.push(msg);
+                    channel2.onmessage = (msg) => emitted.push(msg);
 
                     channel1.postMessage('foo3');
 
@@ -221,14 +206,13 @@ function runTest(channelOptions) {
                     channel1.postMessage('foo1');
                     channel1.postMessage('foo2');
 
-
                     await AsyncTestUtil.wait(50);
 
                     const emitted = [];
-                    channel2.onmessage = msg => emitted.push(msg);
+                    channel2.onmessage = (msg) => emitted.push(msg);
 
                     const msgJson = {
-                        foo: 'bar'
+                        foo: 'bar',
                     };
                     channel1.postMessage(msgJson);
 
@@ -244,9 +228,9 @@ function runTest(channelOptions) {
                     const otherChannel = new BroadcastChannel(AsyncTestUtil.randomString(12), channelOptions);
 
                     const emitted = [];
-                    otherChannel.onmessage = msg => emitted.push(msg);
+                    otherChannel.onmessage = (msg) => emitted.push(msg);
                     await channel.postMessage({
-                        foo: 'bar'
+                        foo: 'bar',
                     });
                     await AsyncTestUtil.wait(100);
                     assert.equal(emitted.length, 0);
@@ -265,7 +249,7 @@ function runTest(channelOptions) {
 
                     const otherChannel = new BroadcastChannel(channelName, channelOptions);
                     const emittedOther = [];
-                    otherChannel.onmessage = msg => emittedOther.push(msg);
+                    otherChannel.onmessage = (msg) => emittedOther.push(msg);
 
                     await channel.postMessage('foo2');
                     await channel.postMessage('foo3');
@@ -286,10 +270,10 @@ function runTest(channelOptions) {
                     const emitted1 = [];
                     const emitted2 = [];
 
-                    channel2.onmessage = msg => {
+                    channel2.onmessage = (msg) => {
                         emitted1.push(msg);
                     };
-                    channel2.onmessage = msg => {
+                    channel2.onmessage = (msg) => {
                         emitted2.push(msg);
                     };
 
@@ -314,11 +298,11 @@ function runTest(channelOptions) {
                     const emitted1 = [];
                     const emitted2 = [];
 
-                    otherChannel.addEventListener('message', msg => emitted1.push(msg));
-                    otherChannel.addEventListener('message', msg => emitted2.push(msg));
+                    otherChannel.addEventListener('message', (msg) => emitted1.push(msg));
+                    otherChannel.addEventListener('message', (msg) => emitted2.push(msg));
 
                     const msg = {
-                        foo: 'bar'
+                        foo: 'bar',
                     };
                     await channel.postMessage(msg);
 
@@ -339,11 +323,11 @@ function runTest(channelOptions) {
                     const otherChannel = new BroadcastChannel(channelName, channelOptions);
 
                     const emitted = [];
-                    const fn = msg => emitted.push(msg);
+                    const fn = (msg) => emitted.push(msg);
                     otherChannel.addEventListener('message', fn);
 
                     const msg = {
-                        foo: 'bar'
+                        foo: 'bar',
                     };
                     await channel.postMessage(msg);
 
@@ -362,10 +346,7 @@ function runTest(channelOptions) {
             });
             describe('.type', () => {
                 it('should get a type', async () => {
-                    const channel = new BroadcastChannel(
-                        AsyncTestUtil.randomString(12),
-                        channelOptions
-                    );
+                    const channel = new BroadcastChannel(AsyncTestUtil.randomString(12), channelOptions);
                     const type = channel.type;
                     assert.equal(typeof type, 'string');
                     assert.notEqual(type, '');
@@ -374,25 +355,12 @@ function runTest(channelOptions) {
                     channel.close();
                 });
             });
-            describe('.clearNodeFolder()', () => {
-                it('should run or now throw at browsers', async () => {
-                    const hasRun = await clearNodeFolder();
-                    if (isNode) {
-                        assert.equal(hasRun, true);
-                    } else {
-                        assert.equal(hasRun, false);
-                    }
-                });
-            });
             describe('.enforceOptions()', () => {
                 it('should enforce the simulate method, even when ' + channelOptions.type + ' is set', async () => {
                     enforceOptions({
-                        type: 'simulate'
+                        type: 'simulate',
                     });
-                    const channel = new BroadcastChannel(
-                        AsyncTestUtil.randomString(12),
-                        channelOptions
-                    );
+                    const channel = new BroadcastChannel(AsyncTestUtil.randomString(12), channelOptions);
 
                     assert.equal(channel.type, 'simulate');
 
@@ -400,10 +368,7 @@ function runTest(channelOptions) {
                 });
                 it('should redo the enforcement when null is given', async () => {
                     enforceOptions(null);
-                    const channel = new BroadcastChannel(
-                        AsyncTestUtil.randomString(12),
-                        channelOptions
-                    );
+                    const channel = new BroadcastChannel(AsyncTestUtil.randomString(12), channelOptions);
                     assert.equal(channel.type, channelOptions.type);
 
                     channel.close();
@@ -418,11 +383,11 @@ function runTest(channelOptions) {
                         enumerable: false,
                         configurable: false,
                         writable: true,
-                        value: false
+                        value: false,
                     });
 
                     const options = {
-                        webWorkerSupport: false
+                        webWorkerSupport: false,
                     };
                     const channel = new BroadcastChannel(AsyncTestUtil.randomString(12), options);
                     assert.equal(channel.type, 'localstorage');
@@ -435,14 +400,14 @@ function runTest(channelOptions) {
                     const otherChannel = new BroadcastChannel(channelName, channelOptions);
 
                     const emitted = [];
-                    otherChannel.onmessage = msg => emitted.push(msg);
+                    otherChannel.onmessage = (msg) => emitted.push(msg);
 
                     const amount = 300;
                     let nr = 0;
                     new Array(amount).fill(0).forEach(() => {
                         channel.postMessage({
                             nr,
-                            long: AsyncTestUtil.randomString(512)
+                            long: AsyncTestUtil.randomString(512),
                         });
                         nr++;
                     });
@@ -450,7 +415,7 @@ function runTest(channelOptions) {
                     await AsyncTestUtil.waitUntil(() => emitted.length === amount);
 
                     let checkNr = 0;
-                    emitted.forEach(msg => {
+                    emitted.forEach((msg) => {
                         assert.equal(checkNr, msg.nr);
                         checkNr++;
                     });
@@ -467,329 +432,7 @@ function runTest(channelOptions) {
                         unload.runAll();
                         channels.push(channel);
                     }
-                    channels.forEach(channel => channel.close());
-                });
-            });
-        });
-        describe('LeaderElection', () => {
-            describe('.create()', () => {
-                it('should create an elector', () => {
-                    const channelName = AsyncTestUtil.randomString(12);
-                    const channel = new BroadcastChannel(channelName, channelOptions);
-                    const elector = createLeaderElection(channel);
-                    assert.ok(elector.broadcastChannel);
-                    channel.close();
-                });
-            });
-            describe('election', () => {
-                it('should elect single elector as leader', async () => {
-                    const channelName = AsyncTestUtil.randomString(12);
-                    const channel = new BroadcastChannel(channelName, channelOptions);
-                    const elector = createLeaderElection(channel);
-
-                    await elector.applyOnce();
-                    assert.ok(elector.isLeader);
-
-                    channel.close();
-                });
-                // run this multiple times because it failed randomly
-                new Array(2).fill(0).forEach((_i, idx) => {
-                    it('from two electors, only one should become leader (' + idx + ')', async () => {
-                        const channelName = AsyncTestUtil.randomString(12);
-                        const channel = new BroadcastChannel(channelName, channelOptions);
-                        const channel2 = new BroadcastChannel(channelName, channelOptions);
-                        const elector = createLeaderElection(channel);
-                        const elector2 = createLeaderElection(channel2);
-
-                        await Promise.all([
-                            elector.applyOnce(),
-                            elector2.applyOnce()
-                        ]);
-
-                        await AsyncTestUtil.waitUntil(() => elector.isLeader || elector2.isLeader);
-                        await AsyncTestUtil.wait(200);
-
-                        assert.notEqual(elector.isLeader, elector2.isLeader);
-
-                        channel.close();
-                        channel2.close();
-                    });
-                });
-                it('from many electors, only one should become leader', async () => {
-                    const channelName = AsyncTestUtil.randomString(12);
-                    const clients = new Array(20).fill(0).map(() => {
-                        const channel = new BroadcastChannel(channelName, channelOptions);
-                        const elector = createLeaderElection(channel);
-                        return {
-                            channel,
-                            elector
-                        };
-                    });
-
-                    await Promise.all(clients.map(c => c.elector.applyOnce()));
-                    await AsyncTestUtil.waitUntil(() => clients.find(c => c.elector.isLeader));
-                    await AsyncTestUtil.wait(200);
-
-                    const leaderCount = clients.filter(c => c.elector.isLeader).length;
-                    assert.equal(leaderCount, 1);
-
-                    clients.forEach(c => c.channel.close());
-                });
-                it('running applyOnce() in a loop should not block the process', async () => {
-                    const channelName = AsyncTestUtil.randomString(12);
-                    const channel = new BroadcastChannel(channelName, channelOptions);
-                    const channel2 = new BroadcastChannel(channelName, channelOptions);
-                    const elector = createLeaderElection(channel);
-                    const elector2 = createLeaderElection(channel2);
-
-                    let t = 0;
-                    while (!elector.hasLeader) {
-                        t++;
-                        await elector2.applyOnce();
-                        // ensure we do not full block the test runner so it cannot exit
-                        if (t > 50) {
-                            throw new Error('this should never happen');
-                        }
-                    }
-
-                    assert.ok(elector);
-                    channel.close();
-                    channel2.close();
-                });
-            });
-            describe('.die()', () => {
-                it('if leader dies, other should be able to become leader', async () => {
-                    const channelName = AsyncTestUtil.randomString(12);
-                    const channel = new BroadcastChannel(channelName, channelOptions);
-                    const channel2 = new BroadcastChannel(channelName, channelOptions);
-                    const elector = createLeaderElection(channel);
-                    const elector2 = createLeaderElection(channel2);
-
-                    await elector.applyOnce();
-
-                    await elector.die();
-                    await AsyncTestUtil.wait(200);
-
-                    await elector2.applyOnce();
-                    assert.ok(elector2.isLeader);
-
-                    channel.close();
-                    channel2.close();
-                });
-                it('if channel is closed, leader should die', async () => {
-                    const channelName = AsyncTestUtil.randomString(12);
-                    const channel = new BroadcastChannel(channelName, channelOptions);
-                    const channel2 = new BroadcastChannel(channelName, channelOptions);
-                    const elector = createLeaderElection(channel);
-                    const elector2 = createLeaderElection(channel2);
-
-                    await elector.applyOnce();
-                    await channel.close();
-                    assert.ok(elector.isDead);
-                    await AsyncTestUtil.wait(200);
-
-                    await elector2.applyOnce();
-                    assert.ok(elector2.isLeader);
-
-                    channel2.close();
-                });
-                it('should clean up all unloaded when dead', async () => {
-                    // wait until all unloads are cleaned up from before
-                    await AsyncTestUtil.waitUntil(async () => {
-                        const mustBe0 = unload.getSize();
-                        return mustBe0 === 0;
-                    });
-
-                    const unloadSizeBefore = unload.getSize();
-                    const channelName = AsyncTestUtil.randomString(12);
-                    const channel = new BroadcastChannel(channelName, channelOptions);
-                    const elector = createLeaderElection(channel);
-                    await elector.awaitLeadership();
-                    await channel.close();
-
-                    await AsyncTestUtil.waitUntil(async () => {
-                        const unloadSizeAfter = unload.getSize();
-                        return unloadSizeAfter === unloadSizeBefore;
-                    });
-                });
-            });
-            describe('.awaitLeadership()', () => {
-                it('should resolve when elector becomes leader', async () => {
-                    const channelName = AsyncTestUtil.randomString(12);
-                    const channel = new BroadcastChannel(channelName, channelOptions);
-                    const elector = createLeaderElection(channel);
-
-                    await elector.awaitLeadership();
-
-                    channel.close();
-                });
-                it('should resolve when other leader dies', async () => {
-                    const channelName = AsyncTestUtil.randomString(12);
-                    const channel = new BroadcastChannel(channelName, channelOptions);
-                    const channel2 = new BroadcastChannel(channelName, channelOptions);
-                    const elector = createLeaderElection(channel);
-                    const elector2 = createLeaderElection(channel2);
-
-                    await elector.awaitLeadership();
-
-                    let resolved = false;
-                    elector2.awaitLeadership().then(() => resolved = true);
-
-                    elector.die();
-
-                    await AsyncTestUtil.waitUntil(() => resolved === true);
-
-                    channel.close();
-                    channel2.close();
-                });
-                it('should resolve when other leader no longers responds', async () => {
-                    const channelName = AsyncTestUtil.randomString(12);
-                    const channel = new BroadcastChannel(channelName, channelOptions);
-                    const channel2 = new BroadcastChannel(channelName, channelOptions);
-                    const elector = createLeaderElection(channel);
-                    const elector2 = createLeaderElection(channel2);
-
-                    await elector.awaitLeadership();
-                    await AsyncTestUtil.wait(200);
-
-                    let resolved = false;
-                    elector2.awaitLeadership().then(() => {
-                        resolved = true;
-                    });
-
-                    // wait for the applyQueue to be done
-                    // to not accientially skip testing the fallbackInterval election cycle.
-                    await elector2._aplQ;
-
-                    // overwrite postInternal to simulate non-responding leader
-                    channel.postInternal = () => Promise.resolve();
-
-                    await AsyncTestUtil.waitUntil(() => resolved === true);
-
-                    channel.close();
-                    channel2.close();
-                });
-                it('should resolve when leader-process exits', async () => {
-                    await AsyncTestUtil.wait(150);
-                    const channelName = AsyncTestUtil.randomString(12);
-                    const channel = new BroadcastChannel(channelName, channelOptions);
-                    const channel2 = new BroadcastChannel(channelName, channelOptions);
-                    const elector = createLeaderElection(channel);
-                    const elector2 = createLeaderElection(channel2);
-
-                    await elector.awaitLeadership();
-
-                    let resolved = false;
-                    elector2.awaitLeadership().then(() => resolved = true);
-
-                    // run all unloads to simulate closing process
-                    unload.runAll();
-                    unload.removeAll();
-
-                    await AsyncTestUtil.waitUntil(() => resolved === true);
-
-                    channel.close();
-                    channel2.close();
-                });
-                it('log', () => {
-                    console.log('Finished: ' + JSON.stringify(channelOptions));
-                });
-            });
-            describe('.hasLeader', () => {
-                it('should have hasLeader=true after election has run', async () => {
-                    const channelName = AsyncTestUtil.randomString(12);
-                    const channel = new BroadcastChannel(channelName, channelOptions);
-                    const channel2 = new BroadcastChannel(channelName, channelOptions);
-                    const elector = createLeaderElection(channel);
-                    const elector2 = createLeaderElection(channel2);
-
-                    await Promise.race([
-                        elector.awaitLeadership(),
-                        elector2.awaitLeadership()
-                    ]);
-
-                    await AsyncTestUtil.waitUntil(() => elector.hasLeader === true);
-                    await AsyncTestUtil.waitUntil(() => elector2.hasLeader === true);
-
-                    channel.close();
-                    channel2.close();
-                });
-                it('should have hasLeader=false after leader dies', async () => {
-                    const channelName = AsyncTestUtil.randomString(12);
-                    const channel = new BroadcastChannel(channelName, channelOptions);
-                    const channel2 = new BroadcastChannel(channelName, channelOptions);
-                    const elector = createLeaderElection(channel);
-                    const elector2 = createLeaderElection(channel2);
-
-                    await Promise.race([
-                        elector.awaitLeadership(),
-                        elector2.awaitLeadership()
-                    ]);
-
-                    const both = [elector, elector2];
-                    const leadingElector = both.find(e => e.isLeader);
-                    const nonLeadingElector = both.find(e => !e.isLeader);
-
-                    // First hasLeader should become false
-                    const waitForFalse = AsyncTestUtil.waitUntil(() => nonLeadingElector.hasLeader === false, 1000, 10);
-                    leadingElector.die();
-                    await waitForFalse;
-
-                    // Then it should become true again when the new leader was elected.
-                    await AsyncTestUtil.waitUntil(() => nonLeadingElector.hasLeader === true, 1000, 10);
-
-                    channel.close();
-                    channel2.close();
-                });
-            });
-            describe('.onduplicate', () => {
-                it('should fire when duplicate leaders', async () => {
-                    const channelName = AsyncTestUtil.randomString(12);
-                    const channel = new BroadcastChannel(channelName, channelOptions);
-                    const channel2 = new BroadcastChannel(channelName, channelOptions);
-                    const elector = createLeaderElection(channel);
-                    const elector2 = createLeaderElection(channel2);
-
-                    const emitted = [];
-                    elector.onduplicate = () => {
-                        emitted.push(1);
-                    };
-                    elector2.onduplicate = () => {
-                        emitted.push(2);
-                    };
-
-                    beLeader(elector);
-                    beLeader(elector2);
-
-                    await AsyncTestUtil.waitUntil(() => emitted.length === 2);
-
-                    assert.ok(emitted.includes(1));
-                    assert.ok(emitted.includes(2));
-
-                    channel.close();
-                    channel2.close();
-                });
-                it('should NOT fire when no duplicated', async () => {
-                    const channelName = AsyncTestUtil.randomString(12);
-                    const channel = new BroadcastChannel(channelName, channelOptions);
-                    const channel2 = new BroadcastChannel(channelName, channelOptions);
-                    const elector = createLeaderElection(channel);
-                    const elector2 = createLeaderElection(channel2);
-
-                    const emitted = [];
-                    elector.onduplicate = () => emitted.push(true);
-                    elector2.onduplicate = () => emitted.push(true);
-
-                    await Promise.race([
-                        elector.awaitLeadership(),
-                        elector2.awaitLeadership()
-                    ]);
-
-                    await AsyncTestUtil.wait(150);
-                    assert.strictEqual(emitted.length, 0);
-
-                    channel.close();
-                    channel2.close();
+                    channels.forEach((channel) => channel.close());
                 });
             });
         });
@@ -797,49 +440,45 @@ function runTest(channelOptions) {
     describe('final', () => {
         it('should have closed all channels', () => {
             if (isNode) {
-                assert.strictEqual(
-                    OPEN_BROADCAST_CHANNELS.size,
-                    0
-                );
+                assert.strictEqual(OPEN_BROADCAST_CHANNELS.size, 0);
             }
-
         });
     });
 }
 
 const useOptions = [
     {
-        type: 'simulate'
-    }
+        type: 'simulate',
+    },
 ];
 
 if (isNode) {
     useOptions.push({
         type: 'node',
         node: {
-            useFastPath: true
-        }
+            useFastPath: true,
+        },
     });
     useOptions.push({
         type: 'node',
         node: {
-            useFastPath: false
-        }
+            useFastPath: false,
+        },
     });
 } else {
     if (window.BroadcastChannel) {
         useOptions.push({
-            type: 'native'
+            type: 'native',
         });
     } else {
         console.log('skip native option since windonw.BroadcastChannel is undefined');
     }
     useOptions.push({
-        type: 'idb'
+        type: 'idb',
     });
     useOptions.push({
-        type: 'localstorage'
+        type: 'localstorage',
     });
 }
 
-useOptions.forEach(o => runTest(o));
+useOptions.forEach((o) => runTest(o));
