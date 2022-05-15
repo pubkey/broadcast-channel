@@ -10,7 +10,7 @@ import { ObliviousSet } from 'oblivious-set';
 
 import { fillOptionsWithDefaults } from '../options';
 
-import { sleep, randomToken, microSeconds as micro, isNode } from '../util';
+import { sleep, randomToken, microSeconds as micro } from '../util';
 
 export const microSeconds = micro;
 
@@ -130,7 +130,6 @@ export function onMessage(channelState, fn, time) {
 }
 
 export function canBeUsed(options) {
-    if (isNode) return false;
     if (!options.support3PC) return false;
     const ls = getLocalStorage();
 

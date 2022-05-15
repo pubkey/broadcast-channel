@@ -7,7 +7,7 @@
  * @link https://rxdb.info/slow-indexeddb.html
  */
 
-import { sleep, randomInt, randomToken, microSeconds as micro, isNode, PROMISE_RESOLVED_VOID } from '../util.js';
+import { sleep, randomInt, randomToken, microSeconds as micro, PROMISE_RESOLVED_VOID } from '../util.js';
 
 export const microSeconds = micro;
 import { ObliviousSet } from 'oblivious-set';
@@ -347,7 +347,6 @@ export function onMessage(channelState, fn, time) {
 }
 
 export function canBeUsed(options) {
-    if (isNode) return false;
     if (!options.support3PC) return false;
     const idb = getIdb();
 

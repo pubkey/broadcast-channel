@@ -10,9 +10,7 @@ describe('typings.test.ts', () => {
     const mainPath = path.join(__dirname, '../');
     const codeBase = `
         import { 
-            BroadcastChannel,
-            createLeaderElection,
-            clearNodeFolder
+            BroadcastChannel
         } from '${mainPath}';
         declare type Message = {
             foo: string;
@@ -26,18 +24,15 @@ describe('typings.test.ts', () => {
         const tsConfig = {
             target: 'es6',
             strict: true,
-            isolatedModules: false
+            isolatedModules: false,
         };
-        const promise = spawn('ts-node', [
-            '--compiler-options', JSON.stringify(tsConfig),
-            '-e', codeBase + '\n' + code
-        ]);
+        const promise = spawn('ts-node', ['--compiler-options', JSON.stringify(tsConfig), '-e', codeBase + '\n' + code]);
         const childProcess = promise.childProcess;
-        childProcess.stdout.on('data', data => {
+        childProcess.stdout.on('data', (data) => {
             // console.dir(data.toString());
             stdout.push(data.toString());
         });
-        childProcess.stderr.on('data', data => {
+        childProcess.stderr.on('data', (data) => {
             // console.log('err:');
             // console.dir(data.toString());
             stderr.push(data.toString());
@@ -70,18 +65,6 @@ describe('typings.test.ts', () => {
             assert.ok(thrown);
         });
     });
-    describe('statics', () => {
-        it('.clearNodeFolder()', async () => {
-            const code = `
-                (async() => {
-                    let b: boolean = false;
-                    b = await clearNodeFolder();
-                })();
-            `;
-            await transpileCode(code);
-        });
-
-    });
     describe('non-typed channel', () => {
         it('should be ok to create post and recieve', async () => {
             const code = `
@@ -106,9 +89,7 @@ describe('typings.test.ts', () => {
                     channel.close();
                 })();
             `;
-            await AsyncTestUtil.assertThrows(
-                () => transpileCode(code)
-            );
+            await AsyncTestUtil.assertThrows(() => transpileCode(code));
         });
     });
     describe('typed channel', () => {
@@ -144,23 +125,7 @@ describe('typings.test.ts', () => {
                     channel.close();
                 })();
             `;
-            await AsyncTestUtil.assertThrows(
-                () => transpileCode(code)
-            );
-        });
-    });
-    describe('LeaderElection', () => {
-        it('call all methods', async () => {
-            const code = `
-                (async() => {
-                    const channel = new BroadcastChannel<Message>('foobar');
-                    const elector = createLeaderElection(channel, {});
-                    await elector.awaitLeadership();
-                    await elector.die();
-                    channel.close();
-                })();
-            `;
-            await transpileCode(code);
+            await AsyncTestUtil.assertThrows(() => transpileCode(code));
         });
     });
 });

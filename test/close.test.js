@@ -1,20 +1,15 @@
 import BroadcastChannel from 'broadcast-channel';
 
 class Foo {
-    constructor () {
+    constructor() {
         this.bc = new BroadcastChannel.BroadcastChannel('test');
         this.bc.addEventListener('message', this.cb);
     }
 
-    cb () {}
+    cb() {}
 }
 
-
 describe('Broadcast Channel', () => {
-    beforeEach(async () => {
-        await BroadcastChannel.clearNodeFolder();
-    });
-
     test('local', async () => {
         const foo = new Foo();
 

@@ -12,8 +12,5 @@ var _index = require("./index.js");
  */
 module.exports = {
   BroadcastChannel: _index.BroadcastChannel,
-  createLeaderElection: _index.createLeaderElection,
-  clearNodeFolder: _index.clearNodeFolder,
-  enforceOptions: _index.enforceOptions,
-  beLeader: _index.beLeader
+  enforceOptions: _index.enforceOptions
 };

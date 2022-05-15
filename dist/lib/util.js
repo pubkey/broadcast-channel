@@ -7,7 +7,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.PROMISE_RESOLVED_VOID = exports.PROMISE_RESOLVED_TRUE = exports.PROMISE_RESOLVED_FALSE = void 0;
 exports.are3PCSupported = are3PCSupported;
-exports.isNode = void 0;
 exports.isPromise = isPromise;
 exports.log = void 0;
 exports.microSeconds = microSeconds;
@@ -81,17 +80,10 @@ function microSeconds() {
     return ms * 1000;
   }
 }
-/**
- * copied from the 'detect-node' npm module
- * We cannot use the module directly because it causes problems with rollup
- * @link https://github.com/iliakan/detect-node/blob/master/index.js
- */
-
-
-var isNode = Object.prototype.toString.call(typeof process !== 'undefined' ? process : 0) === '[object process]';
-exports.isNode = isNode;
 
 function are3PCSupported() {
+  if (typeof navigator === 'undefined') return false;
+
   var browserInfo = _bowser["default"].parse(navigator.userAgent);
 
   log.info(JSON.stringify(browserInfo), 'current browser info');

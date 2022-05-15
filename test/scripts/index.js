@@ -3,21 +3,11 @@
  * used in docs/index.html
  */
 require('@babel/polyfill');
-var {
-    BroadcastChannel,
-    createLeaderElection
-} = require('../../');
+var { BroadcastChannel } = require('../../');
 
 var channelName = 'demo';
 
 var channel = new BroadcastChannel(channelName);
-
-// leader election
-var leaderElector = createLeaderElection(channel);
-leaderElector.awaitLeadership().then(function () {
-    console.log('is leader');
-    document.title = '♛ Is Leader!';
-});
 
 var messageInput = document.getElementById('message-input');
 var submitButton = document.getElementById('submit-button');
@@ -36,7 +26,7 @@ submitButton.onclick = function () {
         addTextToMessageBox('send: ' + messageInput.value);
         messageInput.value = '';
     }
-}
+};
 
 function addTextToMessageBox(text) {
     var textnode = document.createTextNode(text);
@@ -48,4 +38,4 @@ function addTextToMessageBox(text) {
 channel.onmessage = function (message) {
     console.dir('recieved message: ' + message);
     addTextToMessageBox('recieved: ' + message);
-}
+};

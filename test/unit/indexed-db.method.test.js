@@ -32,7 +32,7 @@ describe('unit/indexed-db.method.test.js', () => {
             const readerUuid = AsyncTestUtil.randomString(10);
             const db = await IndexedDbMethod.createDatabase(channelName);
             await IndexedDbMethod.writeMessage(db, readerUuid, {
-                foo: 'bar'
+                foo: 'bar',
             });
         });
     });
@@ -42,7 +42,7 @@ describe('unit/indexed-db.method.test.js', () => {
             const readerUuid = AsyncTestUtil.randomString(10);
             const db = await IndexedDbMethod.createDatabase(channelName);
             await IndexedDbMethod.writeMessage(db, readerUuid, {
-                foo: 'bar'
+                foo: 'bar',
             });
 
             const messages = await IndexedDbMethod.getAllMessages(db);
@@ -54,10 +54,10 @@ describe('unit/indexed-db.method.test.js', () => {
             const readerUuid = AsyncTestUtil.randomString(10);
             const db = await IndexedDbMethod.createDatabase(channelName);
             await IndexedDbMethod.writeMessage(db, readerUuid, {
-                foo: 'bar'
+                foo: 'bar',
             });
             await IndexedDbMethod.writeMessage(db, readerUuid, {
-                foo: 'bar2'
+                foo: 'bar2',
             });
 
             const messages = await IndexedDbMethod.getAllMessages(db);
@@ -70,25 +70,19 @@ describe('unit/indexed-db.method.test.js', () => {
             const readerUuid = AsyncTestUtil.randomString(10);
             const db = await IndexedDbMethod.createDatabase(channelName);
             const msgJson = {
-                foo: 'old'
+                foo: 'old',
             };
 
             // write 10 messages
-            await Promise.all(
-                new Array(10).fill()
-                .map(() => IndexedDbMethod.writeMessage(db, readerUuid, msgJson))
-            );
+            await Promise.all(new Array(10).fill().map(() => IndexedDbMethod.writeMessage(db, readerUuid, msgJson)));
             await AsyncTestUtil.wait(500);
 
             // write 2 new messages
-            await Promise.all(
-                new Array(10).fill()
-                .map(() => IndexedDbMethod.writeMessage(db, readerUuid, msgJson))
-            );
+            await Promise.all(new Array(10).fill().map(() => IndexedDbMethod.writeMessage(db, readerUuid, msgJson)));
 
             const tooOld = await IndexedDbMethod.getOldMessages(db, 200);
             assert.equal(tooOld.length, 10);
-            tooOld.forEach(msg => {
+            tooOld.forEach((msg) => {
                 assert.equal(msg.data.foo, 'old');
             });
         });
@@ -99,7 +93,7 @@ describe('unit/indexed-db.method.test.js', () => {
             const readerUuid = AsyncTestUtil.randomString(10);
             const db = await IndexedDbMethod.createDatabase(channelName);
             const msgJson = {
-                foo: 'bar'
+                foo: 'bar',
             };
             await IndexedDbMethod.writeMessage(db, readerUuid, msgJson);
 
@@ -118,14 +112,11 @@ describe('unit/indexed-db.method.test.js', () => {
             const readerUuid = AsyncTestUtil.randomString(10);
             const db = await IndexedDbMethod.createDatabase(channelName);
             const msgJson = {
-                foo: 'bar'
+                foo: 'bar',
             };
 
             // write 10 messages
-            await Promise.all(
-                new Array(10).fill()
-                .map(() => IndexedDbMethod.writeMessage(db, readerUuid, msgJson))
-            );
+            await Promise.all(new Array(10).fill().map(() => IndexedDbMethod.writeMessage(db, readerUuid, msgJson)));
 
             // get last 5 messages
             const lastFive = await IndexedDbMethod.getMessagesHigherThan(db, 5);
@@ -158,7 +149,7 @@ describe('unit/indexed-db.method.test.js', () => {
                 const channelState = await IndexedDbMethod.create(channelName, {
                     idb: {
                         onclose: () => callbackCount++,
-                    }
+                    },
                 });
                 assert.ok(channelState);
 
@@ -174,14 +165,14 @@ describe('unit/indexed-db.method.test.js', () => {
                 const channelState = await IndexedDbMethod.create(channelName);
                 assert.ok(channelState);
                 await IndexedDbMethod.postMessage(channelState, {
-                    foo: 'bar'
+                    foo: 'bar',
                 });
                 IndexedDbMethod.close(channelState);
             });
         });
         describe('.canBeUsed()', () => {
             it('should be true on browsers', async () => {
-                const ok = IndexedDbMethod.canBeUsed();
+                const ok = IndexedDbMethod.canBeUsed({ support3PC: true });
                 assert.ok(ok);
             });
         });
@@ -193,10 +184,10 @@ describe('unit/indexed-db.method.test.js', () => {
 
                 const emittedOther = [];
                 const msgJson = {
-                    foo: 'bar'
+                    foo: 'bar',
                 };
 
-                IndexedDbMethod.onMessage(channelStateOther, msg => emittedOther.push(msg), new Date().getTime());
+                IndexedDbMethod.onMessage(channelStateOther, (msg) => emittedOther.push(msg), new Date().getTime());
                 await IndexedDbMethod.postMessage(channelStateOwn, msgJson);
 
                 await AsyncTestUtil.waitUntil(() => emittedOther.length === 1);
@@ -220,18 +211,17 @@ describe('unit/indexed-db.method.test.js', () => {
                     enumerable: false,
                     configurable: false,
                     writable: true,
-                    value: false
+                    value: false,
                 });
-
 
                 const emittedOther = [];
                 const channelStateOther = await IndexedDbMethod.create(channelName);
-                IndexedDbMethod.onMessage(channelStateOther, msg => emittedOther.push(msg), new Date().getTime());
+                IndexedDbMethod.onMessage(channelStateOther, (msg) => emittedOther.push(msg), new Date().getTime());
                 await AsyncTestUtil.wait(100);
 
                 const channelStateOwn = await IndexedDbMethod.create(channelName);
                 const msgJson = {
-                    foo: 'bar'
+                    foo: 'bar',
                 };
                 await IndexedDbMethod.postMessage(channelStateOwn, msgJson);
 
@@ -245,24 +235,21 @@ describe('unit/indexed-db.method.test.js', () => {
         });
     });
     describe('other', () => {
-        it('should have cleaned up the messages', async function() {
+        it('should have cleaned up the messages', async function () {
             const channelOptions = {
                 idb: {
-                    ttl: 500
-                }
+                    ttl: 500,
+                },
             };
             const channelName = AsyncTestUtil.randomString(12);
             const channelStateOther = await IndexedDbMethod.create(channelName, channelOptions);
             const channelStateOwn = await IndexedDbMethod.create(channelName, channelOptions);
             const msgJson = {
-                foo: 'bar'
+                foo: 'bar',
             };
 
             // send 100 messages
-            await Promise.all(
-                new Array(100).fill(0)
-                .map(() => IndexedDbMethod.postMessage(channelStateOwn, msgJson))
-            );
+            await Promise.all(new Array(100).fill(0).map(() => IndexedDbMethod.postMessage(channelStateOwn, msgJson)));
 
             // w8 until ttl has reached
             await AsyncTestUtil.wait(channelOptions.idb.ttl);

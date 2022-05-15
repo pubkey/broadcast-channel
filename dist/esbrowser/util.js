@@ -54,14 +54,8 @@ export function microSeconds() {
     return ms * 1000;
   }
 }
-/**
- * copied from the 'detect-node' npm module
- * We cannot use the module directly because it causes problems with rollup
- * @link https://github.com/iliakan/detect-node/blob/master/index.js
- */
-
-export var isNode = Object.prototype.toString.call(typeof process !== 'undefined' ? process : 0) === '[object process]';
 export function are3PCSupported() {
+  if (typeof navigator === 'undefined') return false;
   var browserInfo = Bowser.parse(navigator.userAgent);
   log.info(JSON.stringify(browserInfo), 'current browser info');
   var thirdPartyCookieSupport = true; // brave

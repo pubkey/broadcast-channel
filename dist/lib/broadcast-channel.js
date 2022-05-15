@@ -4,7 +4,6 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.OPEN_BROADCAST_CHANNELS = exports.BroadcastChannel = void 0;
-exports.clearNodeFolder = clearNodeFolder;
 exports.enforceOptions = enforceOptions;
 
 var _util = require("./util.js");
@@ -83,27 +82,9 @@ var BroadcastChannel = function BroadcastChannel(name, options) {
 exports.BroadcastChannel = BroadcastChannel;
 BroadcastChannel._pubkey = true;
 /**
- * clears the tmp-folder if is node
- * @return {Promise<boolean>} true if has run, false if not node
- */
-
-function clearNodeFolder(options) {
-  options = (0, _options.fillOptionsWithDefaults)(options);
-  var method = (0, _methodChooser.chooseMethod)(options);
-
-  if (method.type === 'node') {
-    return method.clearNodeFolder().then(function () {
-      return true;
-    });
-  } else {
-    return _util.PROMISE_RESOLVED_FALSE;
-  }
-}
-/**
  * if set, this method is enforced,
  * no mather what the options are
  */
-
 
 var ENFORCED_OPTIONS;
 
