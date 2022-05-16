@@ -9,7 +9,7 @@
 import { sleep, randomInt, randomToken, microSeconds as micro, isNode, PROMISE_RESOLVED_VOID } from '../util.js';
 export var microSeconds = micro;
 import { ObliviousSet } from 'oblivious-set';
-import { fillOptionsWithDefaults } from '../options';
+import { fillOptionsWithDefaults } from '../options.js';
 var DB_PREFIX = 'pubkey.broadcast-channel-0-';
 var OBJECT_STORE_ID = 'messages';
 /**
