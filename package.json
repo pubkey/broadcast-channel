@@ -43,7 +43,7 @@
   "sideEffects": false,
   "types": "./types/index.d.ts",
   "scripts": {
-    "test": "echo \"RUN ALL:\" && npm run test:node && npm run test:browser && npm run test:e2e",
+    "test": "echo \"RUN ALL:\" && npm run test:node && npm run test:browser && npm run test:e2e && npm run test:modules",
     "test:modules": "npm run test:module:esm && npm run test:module:cjs",
     "test:module:esm": "npm run build:es6node && mocha ./test/module.esm.test.mjs -b --timeout 6000 --exit",
     "test:module:cjs": "npm run build:es5node && mocha ./test/module.cjs.test.js -b --timeout 6000 --exit",
