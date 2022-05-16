@@ -65,6 +65,9 @@ jobs:
       - name: test typings
         run: npm run test:typings
 
+      - name: test modules
+        run: npm run test:modules
+
       - name: test browser
         uses: GabrielBB/xvfb-action@v1
         with:
