@@ -1,4 +1,4 @@
-import { microSeconds as micro } from '../util';
+import { microSeconds as micro } from "../util.mjs";
 export var microSeconds = micro;
 export var type = 'simulate';
 var SIMULATE_CHANNELS = new Set();

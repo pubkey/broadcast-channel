@@ -6,7 +6,7 @@
  * but
  * var BroadcastChannel = require('broadcast-channel');
  */
-import { BroadcastChannel, createLeaderElection, clearNodeFolder, enforceOptions, beLeader } from './index.js';
+import { BroadcastChannel, createLeaderElection, clearNodeFolder, enforceOptions, beLeader } from "./index.mjs";
 module.exports = {
   BroadcastChannel: BroadcastChannel,
   createLeaderElection: createLeaderElection,
