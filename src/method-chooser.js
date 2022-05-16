@@ -7,7 +7,7 @@ import * as NodeMethod from './methods/node.js';
 
 import {
     isNode
-} from './util';
+} from './util.js';
 
 // order is important
 const METHODS = [
