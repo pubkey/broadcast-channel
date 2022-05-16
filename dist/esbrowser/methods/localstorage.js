@@ -6,8 +6,8 @@
  * @link https://caniuse.com/#feat=indexeddb
  */
 import { ObliviousSet } from 'oblivious-set';
-import { fillOptionsWithDefaults } from '../options.js';
-import { sleep, randomToken, microSeconds as micro, isNode } from '../util.js';
+import { fillOptionsWithDefaults } from '../options';
+import { sleep, randomToken, microSeconds as micro, isNode } from '../util';
 export var microSeconds = micro;
 var KEY_PREFIX = 'pubkey.broadcastChannel-';
 export var type = 'localstorage';

@@ -1,4 +1,4 @@
-import { microSeconds as micro, isNode, PROMISE_RESOLVED_VOID } from '../util.js';
+import { microSeconds as micro, isNode, PROMISE_RESOLVED_VOID } from '../util';
 export var microSeconds = micro;
 export var type = 'native';
 export function create(channelName) {
