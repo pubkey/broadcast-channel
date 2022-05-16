@@ -27,7 +27,7 @@ var _util = require("../util.js");
 
 var _obliviousSet = require("oblivious-set");
 
-var _options = require("../options.js");
+var _options = require("../options");
 
 /**
  * this method uses indexeddb to store the messages

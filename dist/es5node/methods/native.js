@@ -12,7 +12,7 @@ exports.onMessage = onMessage;
 exports.postMessage = postMessage;
 exports.type = void 0;
 
-var _util = require("../util.js");
+var _util = require("../util");
 
 var microSeconds = _util.microSeconds;
 exports.microSeconds = microSeconds;

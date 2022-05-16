@@ -40,6 +40,6 @@ Object.defineProperty(exports, "enforceOptions", {
   }
 });
 
-var _broadcastChannel = require("./broadcast-channel.js");
+var _broadcastChannel = require("./broadcast-channel");
 
-var _leaderElection = require("./leader-election.js");
+var _leaderElection = require("./leader-election");
