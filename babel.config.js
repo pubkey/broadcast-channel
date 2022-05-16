@@ -9,20 +9,6 @@ let presets = [
         }
     ]
 ];
-if (process.env['NODE_ENV'] === 'es5') {
-    presets = [
-        ['@babel/env', {
-            targets: {
-                edge: '17',
-                firefox: '60',
-                chrome: '67',
-                safari: '11.1',
-                ie: '11'
-            },
-            useBuiltIns: false
-        }]
-    ];
-}
 
 const plugins = [
     ['@babel/transform-template-literals', {
@@ -55,6 +41,30 @@ const plugins = [
         'regenerator': true
     }]
 ];
+
+if (process.env['NODE_ENV'] === 'es5') {
+    presets = [
+        ['@babel/env', {
+            targets: {
+                edge: '17',
+                firefox: '60',
+                chrome: '67',
+                safari: '11.1',
+                ie: '11'
+            },
+            useBuiltIns: false
+        }]
+    ];
+}
+
+if (process.env['NODE_ENV'] === 'es6node') {
+    plugins.push([
+        'replace-import-extension',
+        {
+            'extMapping': { '.js': '.mjs' }
+        }
+    ]);
+}
 
 module.exports = {
     presets,
