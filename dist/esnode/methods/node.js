@@ -17,8 +17,8 @@ import rimraf from 'rimraf';
 import isNode from 'detect-node';
 import PQueue from 'p-queue';
 import { add as unloadAdd } from 'unload';
-import { fillOptionsWithDefaults } from "../options.mjs";
-import { randomInt, randomToken, PROMISE_RESOLVED_VOID } from "../util.mjs";
+import { fillOptionsWithDefaults } from '../options.js';
+import { randomInt, randomToken, PROMISE_RESOLVED_VOID } from '../util.js';
 import { ObliviousSet } from 'oblivious-set';
 /**
  * windows sucks, so we have handle windows-type of socket-paths

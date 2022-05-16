@@ -6,10 +6,10 @@
  * When working on this, ensure to use these performance optimizations:
  * @link https://rxdb.info/slow-indexeddb.html
  */
-import { sleep, randomInt, randomToken, microSeconds as micro, isNode, PROMISE_RESOLVED_VOID } from "../util.mjs";
+import { sleep, randomInt, randomToken, microSeconds as micro, isNode, PROMISE_RESOLVED_VOID } from '../util.js';
 export var microSeconds = micro;
 import { ObliviousSet } from 'oblivious-set';
-import { fillOptionsWithDefaults } from "../options.mjs";
+import { fillOptionsWithDefaults } from '../options';
 var DB_PREFIX = 'pubkey.broadcast-channel-0-';
 var OBJECT_STORE_ID = 'messages';
 /**

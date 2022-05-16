@@ -1,4 +1,4 @@
-import { sleep, randomToken, PROMISE_RESOLVED_VOID, PROMISE_RESOLVED_TRUE } from "./util.mjs";
+import { sleep, randomToken, PROMISE_RESOLVED_VOID, PROMISE_RESOLVED_TRUE } from './util.js';
 import { add as unloadAdd } from 'unload';
 
 var LeaderElection = function LeaderElection(broadcastChannel, options) {
