@@ -371,10 +371,10 @@ Object.defineProperty(exports, "enforceOptions", {
   }
 });
 
-var _broadcastChannel = require("./broadcast-channel.js");
+var _broadcastChannel = require("./broadcast-channel");
 
-var _leaderElection = require("./leader-election.js");
-},{"./broadcast-channel.js":1,"./leader-election.js":4}],4:[function(require,module,exports){
+var _leaderElection = require("./leader-election");
+},{"./broadcast-channel":1,"./leader-election":4}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -789,7 +789,7 @@ var _simulate = _interopRequireDefault(require("./methods/simulate.js"));
 
 
 
-var _util = require("./util.js");
+var _util = require("./util");
 
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 
@@ -835,7 +835,7 @@ function chooseMethod(options) {
     return m.type;
   })));else return useMethod;
 }
-},{"./methods/indexed-db.js":6,"./methods/localstorage.js":7,"./methods/native.js":8,"./methods/simulate.js":9,"./util.js":11,"@babel/runtime/helpers/interopRequireDefault":14,"@babel/runtime/helpers/typeof":15}],6:[function(require,module,exports){
+},{"./methods/indexed-db.js":6,"./methods/localstorage.js":7,"./methods/native.js":8,"./methods/simulate.js":9,"./util":11,"@babel/runtime/helpers/interopRequireDefault":14,"@babel/runtime/helpers/typeof":15}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -865,7 +865,7 @@ var _util = require("../util.js");
 
 var _obliviousSet = require("oblivious-set");
 
-var _options = require("../options.js");
+var _options = require("../options");
 
 /**
  * this method uses indexeddb to store the messages
@@ -1256,7 +1256,7 @@ var _default = {
   microSeconds: microSeconds
 };
 exports["default"] = _default;
-},{"../options.js":10,"../util.js":11,"oblivious-set":322}],7:[function(require,module,exports){
+},{"../options":10,"../util.js":11,"oblivious-set":322}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1278,9 +1278,9 @@ exports.type = void 0;
 
 var _obliviousSet = require("oblivious-set");
 
-var _options = require("../options.js");
+var _options = require("../options");
 
-var _util = require("../util.js");
+var _util = require("../util");
 
 /**
  * A localStorage-only method which uses localstorage and its 'storage'-event
@@ -1456,7 +1456,7 @@ var _default = {
   microSeconds: microSeconds
 };
 exports["default"] = _default;
-},{"../options.js":10,"../util.js":11,"oblivious-set":322}],8:[function(require,module,exports){
+},{"../options":10,"../util":11,"oblivious-set":322}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1471,7 +1471,7 @@ exports.onMessage = onMessage;
 exports.postMessage = postMessage;
 exports.type = void 0;
 
-var _util = require("../util.js");
+var _util = require("../util");
 
 var microSeconds = _util.microSeconds;
 exports.microSeconds = microSeconds;
@@ -1544,7 +1544,7 @@ var _default = {
   microSeconds: microSeconds
 };
 exports["default"] = _default;
-},{"../util.js":11}],9:[function(require,module,exports){
+},{"../util":11}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1559,7 +1559,7 @@ exports.onMessage = onMessage;
 exports.postMessage = postMessage;
 exports.type = void 0;
 
-var _util = require("../util.js");
+var _util = require("../util");
 
 var microSeconds = _util.microSeconds;
 exports.microSeconds = microSeconds;
@@ -1621,7 +1621,7 @@ var _default = {
   microSeconds: microSeconds
 };
 exports["default"] = _default;
-},{"../util.js":11}],10:[function(require,module,exports){
+},{"../util":11}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -8253,35 +8253,29 @@ exports.now = exports.removeTooOldValues = exports.ObliviousSet = void 0;
 var ObliviousSet = /** @class */ (function () {
     function ObliviousSet(ttl) {
         this.ttl = ttl;
-        this.map = new Map();
-        /**
-         * Creating calls to setTimeout() is expensive,
-         * so we only do that if there is not timeout already open.
-         */
-        this._to = false;
+        this.set = new Set();
+        this.timeMap = new Map();
     }
     ObliviousSet.prototype.has = function (value) {
-        return this.map.has(value);
+        return this.set.has(value);
     };
     ObliviousSet.prototype.add = function (value) {
         var _this = this;
-        this.map.set(value, now());
+        this.timeMap.set(value, now());
+        this.set.add(value);
         /**
          * When a new value is added,
          * start the cleanup at the next tick
          * to not block the cpu for more important stuff
          * that might happen.
          */
-        if (!this._to) {
-            this._to = true;
-            setTimeout(function () {
-                _this._to = false;
-                removeTooOldValues(_this);
-            }, 0);
-        }
+        setTimeout(function () {
+            removeTooOldValues(_this);
+        }, 0);
     };
     ObliviousSet.prototype.clear = function () {
-        this.map.clear();
+        this.set.clear();
+        this.timeMap.clear();
     };
     return ObliviousSet;
 }());
@@ -8292,20 +8286,20 @@ exports.ObliviousSet = ObliviousSet;
  */
 function removeTooOldValues(obliviousSet) {
     var olderThen = now() - obliviousSet.ttl;
-    var iterator = obliviousSet.map[Symbol.iterator]();
+    var iterator = obliviousSet.set[Symbol.iterator]();
     /**
      * Because we can assume the new values are added at the bottom,
      * we start from the top and stop as soon as we reach a non-too-old value.
      */
     while (true) {
-        var next = iterator.next().value;
-        if (!next) {
+        var value = iterator.next().value;
+        if (!value) {
             return; // no more elements
         }
-        var value = next[0];
-        var time = next[1];
+        var time = obliviousSet.timeMap.get(value);
         if (time < olderThen) {
-            obliviousSet.map.delete(value);
+            obliviousSet.timeMap.delete(value);
+            obliviousSet.set.delete(value);
         }
         else {
             // We reached a value that is not old enough
