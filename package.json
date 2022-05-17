@@ -46,7 +46,7 @@
         "size:webpack": "npm run size:prewebpack && echo \"Build-Size Webpack (minified+gzip):\" && gzip-size --raw ./test_tmp/webpack.bundle.js",
         "size:browserify": "npm run build && rimraf test_tmp/browserify.js && browserify --no-builtins dist/lib/browserify.index.js > test_tmp/browserify.js && uglifyjs --compress --mangle --output test_tmp/browserify.min.js -- test_tmp/browserify.js && echo \"Build-Size browserify (minified+gzip):\" && gzip-size --raw test_tmp/browserify.min.js",
         "size:rollup": "npm run build && rollup --config ./config/rollup.config.js && echo \"Build-Size Rollup (minified+gzip):\" && gzip-size --raw ./test_tmp/rollup.bundle.js",
-        "lint": "eslint src test config --cache",
+        "lint": "eslint src test --cache",
         "clear": "rimraf -rf ./dist && rimraf -rf ./gen",
         "build:es6browser": "rimraf -rf dist/esbrowser && cross-env NODE_ENV=es6 babel src --out-dir dist/esbrowser",
         "build:es5browser": "cross-env NODE_ENV=es5 babel src --out-dir dist/lib",
