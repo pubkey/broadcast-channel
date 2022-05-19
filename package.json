@@ -1,6 +1,6 @@
 {
     "name": "@toruslabs/broadcast-channel",
-    "version": "5.0.1",
+    "version": "5.0.2",
     "description": "A BroadcastChannel that works in New Browsers, Old Browsers, WebWorkers",
     "exports": {
         ".": {
