@@ -2237,150 +2237,98 @@ exports.decrypt = function(privateKey, opts) {
 
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("buffer").Buffer)
 },{"buffer":84,"crypto":92,"elliptic":106}],19:[function(require,module,exports){
-module.exports =
-/******/ (function(modules) { // webpackBootstrap
-/******/ 	// The module cache
-/******/ 	var installedModules = {};
-/******/
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/
-/******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId]) {
-/******/ 			return installedModules[moduleId].exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = installedModules[moduleId] = {
-/******/ 			i: moduleId,
-/******/ 			l: false,
-/******/ 			exports: {}
-/******/ 		};
-/******/
-/******/ 		// Execute the module function
-/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/
-/******/ 		// Flag the module as loaded
-/******/ 		module.l = true;
-/******/
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/
-/******/
-/******/ 	// expose the modules object (__webpack_modules__)
-/******/ 	__webpack_require__.m = modules;
-/******/
-/******/ 	// expose the module cache
-/******/ 	__webpack_require__.c = installedModules;
-/******/
-/******/ 	// define getter function for harmony exports
-/******/ 	__webpack_require__.d = function(exports, name, getter) {
-/******/ 		if(!__webpack_require__.o(exports, name)) {
-/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
-/******/ 		}
-/******/ 	};
-/******/
-/******/ 	// define __esModule on exports
-/******/ 	__webpack_require__.r = function(exports) {
-/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-/******/ 		}
-/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 	};
-/******/
-/******/ 	// create a fake namespace object
-/******/ 	// mode & 1: value is a module id, require it
-/******/ 	// mode & 2: merge all properties of value into the ns
-/******/ 	// mode & 4: return value when already ns object
-/******/ 	// mode & 8|1: behave like require
-/******/ 	__webpack_require__.t = function(value, mode) {
-/******/ 		if(mode & 1) value = __webpack_require__(value);
-/******/ 		if(mode & 8) return value;
-/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
-/******/ 		var ns = Object.create(null);
-/******/ 		__webpack_require__.r(ns);
-/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
-/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
-/******/ 		return ns;
-/******/ 	};
-/******/
-/******/ 	// getDefaultExport function for compatibility with non-harmony modules
-/******/ 	__webpack_require__.n = function(module) {
-/******/ 		var getter = module && module.__esModule ?
-/******/ 			function getDefault() { return module['default']; } :
-/******/ 			function getModuleExports() { return module; };
-/******/ 		__webpack_require__.d(getter, 'a', getter);
-/******/ 		return getter;
-/******/ 	};
-/******/
-/******/ 	// Object.prototype.hasOwnProperty.call
-/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
-/******/
-/******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "";
-/******/
-/******/
-/******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 3);
-/******/ })
+/******/ (() => { // webpackBootstrap
+/******/ 	"use strict";
+/******/ 	// The require scope
+/******/ 	var __webpack_require__ = {};
+/******/ 	
 /************************************************************************/
-/******/ ([
-/* 0 */
-/***/ (function(module, exports) {
-
-module.exports = require("lodash.merge");
-
-/***/ }),
-/* 1 */
-/***/ (function(module, exports) {
-
-module.exports = require("loglevel");
-
-/***/ }),
-/* 2 */
-/***/ (function(module, exports) {
-
-module.exports = require("@babel/runtime/helpers/defineProperty");
-
-/***/ }),
-/* 3 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
+/******/ 	/* webpack/runtime/compat get default export */
+/******/ 	(() => {
+/******/ 		// getDefaultExport function for compatibility with non-harmony modules
+/******/ 		__webpack_require__.n = (module) => {
+/******/ 			var getter = module && module.__esModule ?
+/******/ 				() => (module['default']) :
+/******/ 				() => (module);
+/******/ 			__webpack_require__.d(getter, { a: getter });
+/******/ 			return getter;
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/define property getters */
+/******/ 	(() => {
+/******/ 		// define getter functions for harmony exports
+/******/ 		__webpack_require__.d = (exports, definition) => {
+/******/ 			for(var key in definition) {
+/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
+/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 				}
+/******/ 			}
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	(() => {
+/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__webpack_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/************************************************************************/
+var __webpack_exports__ = {};
+// ESM COMPAT FLAG
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "gatewayAuthHeader", function() { return gatewayAuthHeader; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "gatewayEmbedHostHeader", function() { return gatewayEmbedHostHeader; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setEmbedHost", function() { return setEmbedHost; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "clearEmbedHost", function() { return clearEmbedHost; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getEmbedHost", function() { return getEmbedHost; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setAPIKey", function() { return setAPIKey; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "clearAPIKey", function() { return clearAPIKey; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getAPIKey", function() { return getAPIKey; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setLogLevel", function() { return setLogLevel; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "promiseTimeout", function() { return promiseTimeout; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "get", function() { return get; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "post", function() { return post; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "patch", function() { return patch; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "remove", function() { return remove; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "generateJsonRPCObject", function() { return generateJsonRPCObject; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "promiseRace", function() { return promiseRace; });
-/* harmony import */ var _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2);
-/* harmony import */ var _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var lodash_merge__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(0);
-/* harmony import */ var lodash_merge__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(lodash_merge__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var loglevel__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(1);
-/* harmony import */ var loglevel__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(loglevel__WEBPACK_IMPORTED_MODULE_2__);
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, {
+  "clearAPIKey": () => (/* binding */ clearAPIKey),
+  "clearEmbedHost": () => (/* binding */ clearEmbedHost),
+  "gatewayAuthHeader": () => (/* binding */ gatewayAuthHeader),
+  "gatewayEmbedHostHeader": () => (/* binding */ gatewayEmbedHostHeader),
+  "generateJsonRPCObject": () => (/* binding */ generateJsonRPCObject),
+  "get": () => (/* binding */ get),
+  "getAPIKey": () => (/* binding */ getAPIKey),
+  "getEmbedHost": () => (/* binding */ getEmbedHost),
+  "patch": () => (/* binding */ patch),
+  "post": () => (/* binding */ post),
+  "promiseRace": () => (/* binding */ promiseRace),
+  "promiseTimeout": () => (/* binding */ promiseTimeout),
+  "remove": () => (/* binding */ remove),
+  "setAPIKey": () => (/* binding */ setAPIKey),
+  "setEmbedHost": () => (/* binding */ setEmbedHost),
+  "setLogLevel": () => (/* binding */ setLogLevel)
+});
+
+;// CONCATENATED MODULE: external "@babel/runtime/helpers/defineProperty"
+const defineProperty_namespaceObject = require("@babel/runtime/helpers/defineProperty");
+var defineProperty_default = /*#__PURE__*/__webpack_require__.n(defineProperty_namespaceObject);
+;// CONCATENATED MODULE: external "lodash.merge"
+const external_lodash_merge_namespaceObject = require("lodash.merge");
+var external_lodash_merge_default = /*#__PURE__*/__webpack_require__.n(external_lodash_merge_namespaceObject);
+;// CONCATENATED MODULE: external "loglevel"
+const external_loglevel_namespaceObject = require("loglevel");
+var external_loglevel_default = /*#__PURE__*/__webpack_require__.n(external_loglevel_namespaceObject);
+;// CONCATENATED MODULE: ./src/index.ts
 
 
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
 
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { defineProperty_default()(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
 
 /* eslint-disable @typescript-eslint/no-throw-literal */
 
 
-const log = loglevel__WEBPACK_IMPORTED_MODULE_2___default.a.getLogger("http-helpers");
-log.setLevel(loglevel__WEBPACK_IMPORTED_MODULE_2__["levels"].INFO);
+const log = external_loglevel_default().getLogger("http-helpers");
+log.setLevel(external_loglevel_namespaceObject.levels.INFO);
 let apiKey = "torus-default";
 let embedHost = ""; // #region API Keys
 
@@ -2442,7 +2390,7 @@ const get = async function (url) {
     defaultOptions.headers = _objectSpread(_objectSpread({}, defaultOptions.headers), getApiKeyHeaders());
   }
 
-  const options = lodash_merge__WEBPACK_IMPORTED_MODULE_1___default()(defaultOptions, options_, {
+  const options = external_lodash_merge_default()(defaultOptions, options_, {
     method: "GET"
   });
   const response = await fetch(url, options);
@@ -2469,7 +2417,7 @@ const post = function (url) {
     defaultOptions.headers = _objectSpread(_objectSpread({}, defaultOptions.headers), getApiKeyHeaders());
   }
 
-  const options = lodash_merge__WEBPACK_IMPORTED_MODULE_1___default()(defaultOptions, options_, {
+  const options = external_lodash_merge_default()(defaultOptions, options_, {
     method: "POST"
   }); // deep merge changes the structure of form data and url encoded data ,
   // so we should not deepmerge body data
@@ -2511,7 +2459,7 @@ const patch = async function (url) {
     defaultOptions.headers = _objectSpread(_objectSpread({}, defaultOptions.headers), getApiKeyHeaders());
   }
 
-  const options = lodash_merge__WEBPACK_IMPORTED_MODULE_1___default()(defaultOptions, options_, {
+  const options = external_lodash_merge_default()(defaultOptions, options_, {
     method: "PATCH"
   }); // deep merge changes the structure of form data and url encoded data ,
   // so we should not deepmerge body data
@@ -2553,7 +2501,7 @@ const remove = async function (url) {
     defaultOptions.headers = _objectSpread(_objectSpread({}, defaultOptions.headers), getApiKeyHeaders());
   }
 
-  const options = lodash_merge__WEBPACK_IMPORTED_MODULE_1___default()(defaultOptions, options_, {
+  const options = external_lodash_merge_default()(defaultOptions, options_, {
     method: "DELETE"
   });
 
@@ -2591,184 +2539,101 @@ const promiseRace = function (url, options) {
     }, timeout);
   })]);
 };
-
-/***/ })
-/******/ ]);
+module.exports = __webpack_exports__;
+/******/ })()
+;
 
 },{"@babel/runtime/helpers/defineProperty":14,"lodash.merge":200,"loglevel":201}],20:[function(require,module,exports){
 (function (Buffer){(function (){
-module.exports =
-/******/ (function(modules) { // webpackBootstrap
-/******/ 	// The module cache
-/******/ 	var installedModules = {};
-/******/
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/
-/******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId]) {
-/******/ 			return installedModules[moduleId].exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = installedModules[moduleId] = {
-/******/ 			i: moduleId,
-/******/ 			l: false,
-/******/ 			exports: {}
-/******/ 		};
-/******/
-/******/ 		// Execute the module function
-/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/
-/******/ 		// Flag the module as loaded
-/******/ 		module.l = true;
-/******/
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/
-/******/
-/******/ 	// expose the modules object (__webpack_modules__)
-/******/ 	__webpack_require__.m = modules;
-/******/
-/******/ 	// expose the module cache
-/******/ 	__webpack_require__.c = installedModules;
-/******/
-/******/ 	// define getter function for harmony exports
-/******/ 	__webpack_require__.d = function(exports, name, getter) {
-/******/ 		if(!__webpack_require__.o(exports, name)) {
-/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
-/******/ 		}
-/******/ 	};
-/******/
-/******/ 	// define __esModule on exports
-/******/ 	__webpack_require__.r = function(exports) {
-/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-/******/ 		}
-/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 	};
-/******/
-/******/ 	// create a fake namespace object
-/******/ 	// mode & 1: value is a module id, require it
-/******/ 	// mode & 2: merge all properties of value into the ns
-/******/ 	// mode & 4: return value when already ns object
-/******/ 	// mode & 8|1: behave like require
-/******/ 	__webpack_require__.t = function(value, mode) {
-/******/ 		if(mode & 1) value = __webpack_require__(value);
-/******/ 		if(mode & 8) return value;
-/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
-/******/ 		var ns = Object.create(null);
-/******/ 		__webpack_require__.r(ns);
-/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
-/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
-/******/ 		return ns;
-/******/ 	};
-/******/
-/******/ 	// getDefaultExport function for compatibility with non-harmony modules
-/******/ 	__webpack_require__.n = function(module) {
-/******/ 		var getter = module && module.__esModule ?
-/******/ 			function getDefault() { return module['default']; } :
-/******/ 			function getModuleExports() { return module; };
-/******/ 		__webpack_require__.d(getter, 'a', getter);
-/******/ 		return getter;
-/******/ 	};
-/******/
-/******/ 	// Object.prototype.hasOwnProperty.call
-/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
-/******/
-/******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "";
-/******/
-/******/
-/******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 6);
-/******/ })
+/******/ (() => { // webpackBootstrap
+/******/ 	"use strict";
+/******/ 	// The require scope
+/******/ 	var __webpack_require__ = {};
+/******/ 	
 /************************************************************************/
-/******/ ([
-/* 0 */
-/***/ (function(module, exports) {
-
-module.exports = require("@toruslabs/eccrypto");
-
-/***/ }),
-/* 1 */
-/***/ (function(module, exports) {
-
-module.exports = require("@toruslabs/http-helpers");
-
-/***/ }),
-/* 2 */
-/***/ (function(module, exports) {
-
-module.exports = require("@babel/runtime/helpers/defineProperty");
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports) {
-
-module.exports = require("json-stable-stringify");
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports) {
-
-module.exports = require("elliptic");
-
-/***/ }),
-/* 5 */
-/***/ (function(module, exports) {
-
-module.exports = require("keccak");
-
-/***/ }),
-/* 6 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
+/******/ 	/* webpack/runtime/compat get default export */
+/******/ 	(() => {
+/******/ 		// getDefaultExport function for compatibility with non-harmony modules
+/******/ 		__webpack_require__.n = (module) => {
+/******/ 			var getter = module && module.__esModule ?
+/******/ 				() => (module['default']) :
+/******/ 				() => (module);
+/******/ 			__webpack_require__.d(getter, { a: getter });
+/******/ 			return getter;
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/define property getters */
+/******/ 	(() => {
+/******/ 		// define getter functions for harmony exports
+/******/ 		__webpack_require__.d = (exports, definition) => {
+/******/ 			for(var key in definition) {
+/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
+/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 				}
+/******/ 			}
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	(() => {
+/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__webpack_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/************************************************************************/
+var __webpack_exports__ = {};
 // ESM COMPAT FLAG
 __webpack_require__.r(__webpack_exports__);
 
 // EXPORTS
-__webpack_require__.d(__webpack_exports__, "default", function() { return /* reexport */ src_MetadataStorageLayer; });
-__webpack_require__.d(__webpack_exports__, "keccak256", function() { return /* reexport */ keccak256; });
-__webpack_require__.d(__webpack_exports__, "ec", function() { return /* reexport */ ec; });
-__webpack_require__.d(__webpack_exports__, "encParamsHexToBuf", function() { return /* reexport */ encParamsHexToBuf; });
-__webpack_require__.d(__webpack_exports__, "encParamsBufToHex", function() { return /* reexport */ encParamsBufToHex; });
-__webpack_require__.d(__webpack_exports__, "encryptData", function() { return /* reexport */ encryptData; });
-__webpack_require__.d(__webpack_exports__, "decryptData", function() { return /* reexport */ decryptData; });
-__webpack_require__.d(__webpack_exports__, "getAndDecryptData", function() { return /* reexport */ getAndDecryptData; });
-__webpack_require__.d(__webpack_exports__, "encryptAndSetData", function() { return /* reexport */ encryptAndSetData; });
-__webpack_require__.d(__webpack_exports__, "setTorusShare", function() { return /* reexport */ setTorusShare; });
-__webpack_require__.d(__webpack_exports__, "setDeviceShare", function() { return /* reexport */ setDeviceShare; });
-__webpack_require__.d(__webpack_exports__, "getTorusShare", function() { return /* reexport */ getTorusShare; });
-__webpack_require__.d(__webpack_exports__, "getDeviceShare", function() { return /* reexport */ getDeviceShare; });
+__webpack_require__.d(__webpack_exports__, {
+  "decryptData": () => (/* reexport */ decryptData),
+  "default": () => (/* reexport */ src_MetadataStorageLayer),
+  "ec": () => (/* reexport */ ec),
+  "encParamsBufToHex": () => (/* reexport */ encParamsBufToHex),
+  "encParamsHexToBuf": () => (/* reexport */ encParamsHexToBuf),
+  "encryptAndSetData": () => (/* reexport */ encryptAndSetData),
+  "encryptData": () => (/* reexport */ encryptData),
+  "getAndDecryptData": () => (/* reexport */ getAndDecryptData),
+  "getDeviceShare": () => (/* reexport */ getDeviceShare),
+  "getTorusShare": () => (/* reexport */ getTorusShare),
+  "keccak256": () => (/* reexport */ keccak256),
+  "setDeviceShare": () => (/* reexport */ setDeviceShare),
+  "setTorusShare": () => (/* reexport */ setTorusShare)
+});
 
-// EXTERNAL MODULE: external "@babel/runtime/helpers/defineProperty"
-var defineProperty_ = __webpack_require__(2);
-var defineProperty_default = /*#__PURE__*/__webpack_require__.n(defineProperty_);
-
-// EXTERNAL MODULE: external "@toruslabs/http-helpers"
-var http_helpers_ = __webpack_require__(1);
-
-// EXTERNAL MODULE: external "json-stable-stringify"
-var external_json_stable_stringify_ = __webpack_require__(3);
-var external_json_stable_stringify_default = /*#__PURE__*/__webpack_require__.n(external_json_stable_stringify_);
-
-// EXTERNAL MODULE: external "elliptic"
-var external_elliptic_ = __webpack_require__(4);
-
-// EXTERNAL MODULE: external "keccak"
-var external_keccak_ = __webpack_require__(5);
-var external_keccak_default = /*#__PURE__*/__webpack_require__.n(external_keccak_);
-
-// CONCATENATED MODULE: ./src/utils.ts
+;// CONCATENATED MODULE: external "@babel/runtime/helpers/defineProperty"
+const defineProperty_namespaceObject = require("@babel/runtime/helpers/defineProperty");
+var defineProperty_default = /*#__PURE__*/__webpack_require__.n(defineProperty_namespaceObject);
+;// CONCATENATED MODULE: external "@toruslabs/http-helpers"
+const http_helpers_namespaceObject = require("@toruslabs/http-helpers");
+;// CONCATENATED MODULE: external "json-stable-stringify"
+const external_json_stable_stringify_namespaceObject = require("json-stable-stringify");
+var external_json_stable_stringify_default = /*#__PURE__*/__webpack_require__.n(external_json_stable_stringify_namespaceObject);
+;// CONCATENATED MODULE: external "elliptic"
+const external_elliptic_namespaceObject = require("elliptic");
+;// CONCATENATED MODULE: external "keccak"
+const external_keccak_namespaceObject = require("keccak");
+var external_keccak_default = /*#__PURE__*/__webpack_require__.n(external_keccak_namespaceObject);
+;// CONCATENATED MODULE: ./src/utils.ts
 
 
 function keccak256(a) {
   return external_keccak_default()("keccak256").update(a).digest();
 }
-const ec = new external_elliptic_["ec"]("secp256k1");
-// CONCATENATED MODULE: ./src/MetadataStorageLayer.ts
+const ec = new external_elliptic_namespaceObject.ec("secp256k1");
+;// CONCATENATED MODULE: ./src/MetadataStorageLayer.ts
 
 
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
@@ -2779,7 +2644,7 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 
 
-class MetadataStorageLayer_MetadataStorageLayer {
+class MetadataStorageLayer {
   // ms
   constructor() {
     let metadataHost = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "https://metadata.tor.us";
@@ -2794,11 +2659,11 @@ class MetadataStorageLayer_MetadataStorageLayer {
   }
 
   static setAPIKey(apiKey) {
-    Object(http_helpers_["setAPIKey"])(apiKey);
+    (0,http_helpers_namespaceObject.setAPIKey)(apiKey);
   }
 
   static setEmbedHost(embedHost) {
-    Object(http_helpers_["setEmbedHost"])(embedHost);
+    (0,http_helpers_namespaceObject.setEmbedHost)(embedHost);
   }
 
   generateMetadataParams(message, privateKeyHex) {
@@ -2830,7 +2695,7 @@ class MetadataStorageLayer_MetadataStorageLayer {
     const params = namespace !== null ? _objectSpread(_objectSpread({}, data), {}, {
       namespace
     }) : data;
-    const metadataResponse = await Object(http_helpers_["post"])("".concat(this.metadataHost, "/set"), params, options, {
+    const metadataResponse = await (0,http_helpers_namespaceObject.post)("".concat(this.metadataHost, "/set"), params, options, {
       useAPIKey: true
     });
     return metadataResponse.message;
@@ -2840,7 +2705,7 @@ class MetadataStorageLayer_MetadataStorageLayer {
     const params = namespace !== null ? _objectSpread(_objectSpread({}, pubKey), {}, {
       namespace
     }) : pubKey;
-    const metadataResponse = await Object(http_helpers_["post"])("".concat(this.metadataHost, "/get"), params, options, {
+    const metadataResponse = await (0,http_helpers_namespaceObject.post)("".concat(this.metadataHost, "/get"), params, options, {
       useAPIKey: true
     });
     return metadataResponse.message;
@@ -2848,11 +2713,10 @@ class MetadataStorageLayer_MetadataStorageLayer {
 
 }
 
-/* harmony default export */ var src_MetadataStorageLayer = (MetadataStorageLayer_MetadataStorageLayer);
-// EXTERNAL MODULE: external "@toruslabs/eccrypto"
-var eccrypto_ = __webpack_require__(0);
-
-// CONCATENATED MODULE: ./src/webAuthnShareResolver.ts
+/* harmony default export */ const src_MetadataStorageLayer = (MetadataStorageLayer);
+;// CONCATENATED MODULE: external "@toruslabs/eccrypto"
+const eccrypto_namespaceObject = require("@toruslabs/eccrypto");
+;// CONCATENATED MODULE: ./src/webAuthnShareResolver.ts
 
 
 const WEBAUTHN_TORUS_SHARE = "webauthn_torus_share";
@@ -2876,7 +2740,7 @@ function encParamsBufToHex(encParams) {
 async function encryptData(privKeyHex, d) {
   const serializedDec = JSON.stringify(d);
   const serializedBuf = Buffer.from(serializedDec, "utf-8");
-  const encParams = await Object(eccrypto_["encrypt"])(Object(eccrypto_["getPublic"])(Buffer.from(privKeyHex, "hex")), serializedBuf);
+  const encParams = await (0,eccrypto_namespaceObject.encrypt)((0,eccrypto_namespaceObject.getPublic)(Buffer.from(privKeyHex, "hex")), serializedBuf);
   const encParamsHex = encParamsBufToHex(encParams);
   const sData = JSON.stringify(encParamsHex);
   return sData;
@@ -2885,7 +2749,7 @@ async function decryptData(privKeyHex, d) {
   const encParamsHex = JSON.parse(d);
   const encParams = encParamsHexToBuf(encParamsHex);
   const keyPair = ec.keyFromPrivate(privKeyHex);
-  const serializedBuf = await Object(eccrypto_["decrypt"])(Buffer.from(keyPair.getPrivate().toString("hex", 64), "hex"), encParams);
+  const serializedBuf = await (0,eccrypto_namespaceObject.decrypt)(Buffer.from(keyPair.getPrivate().toString("hex", 64), "hex"), encParams);
   const serializedDec = serializedBuf.toString("utf-8");
   const data = JSON.parse(serializedDec);
   return data;
@@ -2922,7 +2786,7 @@ async function setTorusShare(m, webAuthnPubKey, webAuthnRefHex, subspace, subspa
   if (data) d = data;
   const serializedSubspaceData = JSON.stringify(subspaceData);
   const serializedSubspaceDataBuf = Buffer.from(serializedSubspaceData, "utf-8");
-  const encSubspaceData = await Object(eccrypto_["encrypt"])(Buffer.from(pubKey.getPublic("hex"), "hex"), serializedSubspaceDataBuf);
+  const encSubspaceData = await (0,eccrypto_namespaceObject.encrypt)(Buffer.from(pubKey.getPublic("hex"), "hex"), serializedSubspaceDataBuf);
   const encSubspaceDataHex = encParamsBufToHex(encSubspaceData);
   d[subspace] = encSubspaceDataHex;
   await encryptAndSetData(m, privKey.toString("hex", 64), d, WEBAUTHN_TORUS_SHARE);
@@ -2944,7 +2808,7 @@ async function getTorusShare(m, webAuthnKeyHex, webAuthnRefHex, subspace) {
   const encParams = encParamsHexToBuf(encParamsHex);
   const keyPair = ec.keyFromPrivate(webAuthnKeyHex);
   const privKey = keyPair.getPrivate();
-  const serializedSubspaceDataBuf = await Object(eccrypto_["decrypt"])(Buffer.from(privKey.toString("hex", 64), "hex"), encParams);
+  const serializedSubspaceDataBuf = await (0,eccrypto_namespaceObject.decrypt)(Buffer.from(privKey.toString("hex", 64), "hex"), encParams);
   const serializedSubspaceData = serializedSubspaceDataBuf.toString("utf-8");
   const subspaceData = JSON.parse(serializedSubspaceData);
   return subspaceData;
@@ -2954,14 +2818,14 @@ async function getDeviceShare(m, webAuthnRefHex, subspace) {
   if (data) return data[subspace];
   return null;
 }
-// CONCATENATED MODULE: ./src/index.ts
+;// CONCATENATED MODULE: ./src/index.ts
 
 
 
 
-
-/***/ })
-/******/ ]);
+module.exports = __webpack_exports__;
+/******/ })()
+;
 
 }).call(this)}).call(this,require("buffer").Buffer)
 },{"@babel/runtime/helpers/defineProperty":14,"@toruslabs/eccrypto":18,"@toruslabs/http-helpers":19,"buffer":84,"elliptic":106,"json-stable-stringify":175,"keccak":179}],21:[function(require,module,exports){
