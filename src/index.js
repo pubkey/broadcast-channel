@@ -3,8 +3,8 @@ export {
     clearNodeFolder,
     enforceOptions,
     OPEN_BROADCAST_CHANNELS
-} from './broadcast-channel';
+} from './broadcast-channel.js';
 export {
     createLeaderElection,
     beLeader
-} from './leader-election';
+} from './leader-election.js';

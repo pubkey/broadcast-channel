@@ -5,7 +5,7 @@
   "exports": {
     ".": {
       "node": {
-        "import": "./dist/esnode/index.js",
+        "import": "./dist/esnode/index.mjs",
         "default": "./dist/es5node/index.js"
       },
       "browser": {
@@ -38,12 +38,15 @@
     "url": "https://github.com/pubkey/broadcast-channel/issues"
   },
   "main": "./dist/es5node/index.js",
-  "module": "./dist/esnode/index.js",
+  "module": "./dist/esnode/index.mjs",
   "browser": "./dist/lib/index.es5.js",
   "sideEffects": false,
   "types": "./types/index.d.ts",
   "scripts": {
-    "test": "echo \"RUN ALL:\" && npm run test:node && npm run test:browser && npm run test:e2e",
+    "test": "echo \"RUN ALL:\" && npm run test:node && npm run test:browser && npm run test:e2e && npm run test:modules",
+    "test:modules": "npm run test:module:esm && npm run test:module:cjs",
+    "test:module:esm": "npm run build:es6node && mocha ./test/module.esm.test.mjs -b --timeout 6000 --exit",
+    "test:module:cjs": "npm run build:es5node && mocha ./test/module.cjs.test.js -b --timeout 6000 --exit",
     "test:node": "npm run build:es5node && mocha ./test/index.test.js -b --timeout 6000 --exit",
     "test:node:loop": "npm run test:node && npm run test:node:loop",
     "test:browser": "npm run build && karma start ./config/karma.conf.js --single-run",
@@ -58,7 +61,7 @@
     "size:rollup": "npm run build && rollup --config ./config/rollup.config.js && echo \"Build-Size Rollup (minified+gzip):\" && gzip-size --raw ./test_tmp/rollup.bundle.js",
     "lint": "eslint src test config --cache",
     "clear": "rimraf -rf ./dist && rimraf -rf ./gen",
-    "build:es6node": "rimraf -rf dist/esnode && cross-env NODE_ENV=es6 babel src --out-dir dist/esnode",
+    "build:es6node": "rimraf -rf dist/esnode && cross-env NODE_ENV=es6node babel src --out-dir dist/esnode --out-file-extension .mjs",
     "build:es6browser": "rimraf -rf dist/esbrowser && cross-env NODE_ENV=es6 babel src --out-dir dist/esbrowser && grep -rl NodeMethod dist/esbrowser/ | xargs sed -i 's/.*NodeMethod.*//'",
     "build:es5node": "cross-env NODE_ENV=es5 babel src --out-dir dist/es5node",
     "build:es5browser": "cross-env NODE_ENV=es5 babel src --out-dir dist/lib && grep -rl NodeMethod dist/lib/ | xargs sed -i 's/.*NodeMethod.*//'",
@@ -101,6 +104,7 @@
     "@types/core-js": "2.5.5",
     "assert": "2.0.0",
     "async-test-util": "2.0.0",
+    "babel-plugin-replace-import-extension": "1.1.3",
     "browserify": "17.0.0",
     "child-process-promise": "2.2.1",
     "clone": "2.1.2",
@@ -119,6 +123,7 @@
     "karma-coverage": "2.2.0",
     "karma-detect-browsers": "2.3.3",
     "karma-edge-launcher": "0.4.2",
+    "karma-env-preprocessor": "0.1.1",
     "karma-firefox-launcher": "2.1.2",
     "karma-ie-launcher": "1.0.0",
     "karma-mocha": "2.0.1",

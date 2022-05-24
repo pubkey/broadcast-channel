@@ -10,14 +10,14 @@ import { ObliviousSet } from 'oblivious-set';
 
 import {
     fillOptionsWithDefaults
-} from '../options';
+} from '../options.js';
 
 import {
     sleep,
     randomToken,
     microSeconds as micro,
     isNode
-} from '../util';
+} from '../util.js';
 
 export const microSeconds = micro;
 

@@ -45,14 +45,19 @@ const configuration = {
         'karma-ie-launcher',
         'karma-opera-launcher',
         'karma-safari-launcher',
-        'karma-detect-browsers'
+        'karma-detect-browsers',
+        'karma-env-preprocessor'
     ],
 
     // Source files that you wanna generate coverage for.
     // Do not include tests or libraries (these files will be instrumented by Istanbul)
     preprocessors: {
-        '../test/*.test.js': ['browserify']
+        '../test/*.test.js': ['browserify', 'env']
     },
+
+    envPreprocessor: [
+        'GITHUB_ACTIONS',
+    ],
 
     client: {
         mocha: {

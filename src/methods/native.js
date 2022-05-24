@@ -2,7 +2,7 @@ import {
     microSeconds as micro,
     isNode,
     PROMISE_RESOLVED_VOID
-} from '../util';
+} from '../util.js';
 
 export const microSeconds = micro;
 

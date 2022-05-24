@@ -21,7 +21,7 @@ import { ObliviousSet } from 'oblivious-set';
 
 import {
     fillOptionsWithDefaults
-} from '../options';
+} from '../options.js';
 
 const DB_PREFIX = 'pubkey.broadcast-channel-0-';
 const OBJECT_STORE_ID = 'messages';
