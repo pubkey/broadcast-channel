@@ -11,6 +11,7 @@ const {
     enforceOptions,
     beLeader
 } = require('../');
+const __env__ = typeof window !== 'undefined' && window.__env__ || {};
 
 if (isNode) {
     process.on('uncaughtException', (err, origin) => {
@@ -543,11 +544,12 @@ function runTest(channelOptions) {
                     const elector2 = createLeaderElection(channel2);
 
                     let t = 0;
+                    const max = channelOptions.type == 'idb' && __env__.GITHUB_ACTIONS ? 150 : 50;
                     while (!elector.hasLeader) {
                         t++;
                         await elector2.applyOnce();
                         // ensure we do not full block the test runner so it cannot exit
-                        if (t > 50) {
+                        if (t > max) {
                             throw new Error('this should never happen');
                         }
                     }
