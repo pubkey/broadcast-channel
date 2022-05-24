@@ -3,6 +3,8 @@
 
 ## X.X.X (comming soon)
 
+- FIX ES module for Node.js Thanks [denysoblohin-okta](https://github.com/denysoblohin-okta)
+
 ## 4.11.0 (12 April 2022)
 
 - Replaced `nano-time` with `microtime`.
