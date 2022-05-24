@@ -1,6 +1,6 @@
-import { isPromise, PROMISE_RESOLVED_FALSE, PROMISE_RESOLVED_VOID } from './util.js';
-import { chooseMethod } from './method-chooser.js';
-import { fillOptionsWithDefaults } from './options.js';
+import { isPromise, PROMISE_RESOLVED_FALSE, PROMISE_RESOLVED_VOID } from "./util.mjs";
+import { chooseMethod } from "./method-chooser.mjs";
+import { fillOptionsWithDefaults } from "./options.mjs";
 /**
  * Contains all open channels,
  * used in tests to ensure everything is closed.
