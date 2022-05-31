@@ -57,15 +57,6 @@ if (process.env['NODE_ENV'] === 'es5') {
     ];
 }
 
-if (process.env['NODE_ENV'] === 'es6node') {
-    plugins.push([
-        'replace-import-extension',
-        {
-            'extMapping': { '.js': '.mjs' }
-        }
-    ]);
-}
-
 module.exports = {
     presets,
     plugins
