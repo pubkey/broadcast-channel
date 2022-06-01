@@ -3,6 +3,10 @@
 
 ## X.X.X (comming soon)
 
+## 4.13.0 (1 June 2022)
+
+- FIX ES module for Node.js [#972](https://github.com/pubkey/broadcast-channel/pull/972)
+
 ## 4.12.0 (25 May 2022)
 
 - FIX ES module for Node.js Thanks [denysoblohin-okta](https://github.com/denysoblohin-okta)

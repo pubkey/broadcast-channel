@@ -1,10 +1,10 @@
-import NativeMethod from "./methods/native.mjs";
-import IndexeDbMethod from "./methods/indexed-db.mjs";
-import LocalstorageMethod from "./methods/localstorage.mjs";
-import SimulateMethod from "./methods/simulate.mjs"; // the line below will be removed from es5/browser builds
+import NativeMethod from './methods/native.js';
+import IndexeDbMethod from './methods/indexed-db.js';
+import LocalstorageMethod from './methods/localstorage.js';
+import SimulateMethod from './methods/simulate.js'; // the line below will be removed from es5/browser builds
 
-import * as NodeMethod from "./methods/node.mjs";
-import { isNode } from "./util.mjs"; // order is important
+import * as NodeMethod from './methods/node.js';
+import { isNode } from './util.js'; // order is important
 
 var METHODS = [NativeMethod, // fastest
 IndexeDbMethod, LocalstorageMethod];
