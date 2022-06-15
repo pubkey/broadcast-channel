@@ -107,7 +107,7 @@
     "browserify": "17.0.0",
     "child-process-promise": "2.2.1",
     "clone": "2.1.2",
-    "concurrently": "7.2.1",
+    "concurrently": "7.2.2",
     "convert-hrtime": "5.0.0",
     "copyfiles": "2.4.1",
     "cross-env": "7.0.3",
