@@ -24,6 +24,7 @@ export function keccak256(a) {
 }
 
 const KEY_PREFIX = 'pubkey.broadcastChannel-';
+const IS_PUBLISHER_INSTANCES = {};
 export const type = 'server';
 
 const SOCKET_CONN_INSTANCES = {};
@@ -39,6 +40,7 @@ export function storageKey(channelName) {
 export function postMessage(channelState, messageJson) {
     return new Promise((res, rej) => {
         sleep().then(async () => {
+            IS_PUBLISHER_INSTANCES[channelState.channelName] = true;
             const key = storageKey(channelState.channelName);
             const channelEncPrivKey = keccak256(key);
             const encData = await encryptData(channelEncPrivKey.toString('hex'), {
@@ -66,19 +68,10 @@ export function postMessage(channelState, messageJson) {
             if (socketConn && socketConn.connected) {
                 return _setMessage();
             }
-            let currentAttempts = 0;
-            const waitingInterval = window.setInterval(async () => {
-                if (currentAttempts >= 5) {
-                    window.clearInterval(waitingInterval);
-                    return rej(new Error('Could not post message after 5 attempts to socket channel'));
-                }
-                if (socketConn && socketConn.connected) {
-                    window.clearInterval(waitingInterval);
-                    return _setMessage();
-                } else {
-                    currentAttempts++;
-                }
-            }, 500);
+            socketConn.once('connect', async () => {
+                log.debug('connected with socket');
+                await _setMessage();
+            });
         });
     });
 }
@@ -93,6 +86,7 @@ export function addStorageEventListener(channelName, serverUrl, fn) {
         reconnectionAttempts: 10,
     });
     const visibilityListener = () => {
+        if (IS_PUBLISHER_INSTANCES[channelName]) return;
         // if channel is closed, then remove the listener.
         if (!SOCKET_CONN_INSTANCES[channelName]) {
             document.removeEventListener('visibilitychange', visibilityListener);
@@ -118,6 +112,7 @@ export function addStorageEventListener(channelName, serverUrl, fn) {
         SOCKET_CONN.io.opts.transports = ['polling', 'websocket'];
     });
     SOCKET_CONN.on('connect', async () => {
+        if (IS_PUBLISHER_INSTANCES[channelName]) return;
         log.debug('connected with socket');
         SOCKET_CONN.emit('check_auth_status', getPublic(channelEncPrivKey).toString('hex'));
         const { engine } = SOCKET_CONN.io;
