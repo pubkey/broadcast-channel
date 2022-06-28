@@ -199,7 +199,7 @@ export function onMessage(channelState, fn, time) {
         }
     };
 
-    socketConn.on('success', listener);
+    socketConn.once('success', listener);
 
     document.addEventListener('visibilitychange', visibilityListener);
 }
