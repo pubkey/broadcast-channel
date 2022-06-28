@@ -24,7 +24,6 @@ export function keccak256(a) {
 }
 
 const KEY_PREFIX = 'pubkey.broadcastChannel-';
-const IS_PUBLISHER_INSTANCES = {};
 export const type = 'server';
 
 const SOCKET_CONN_INSTANCES = {};
@@ -40,7 +39,6 @@ export function storageKey(channelName) {
 export function postMessage(channelState, messageJson) {
     return new Promise((res, rej) => {
         sleep().then(async () => {
-            IS_PUBLISHER_INSTANCES[channelState.channelName] = true;
             const key = storageKey(channelState.channelName);
             const channelEncPrivKey = keccak256(key);
             const encData = await encryptData(channelEncPrivKey.toString('hex'), {
@@ -76,52 +74,26 @@ export function postMessage(channelState, messageJson) {
     });
 }
 
-export function addStorageEventListener(channelName, serverUrl, fn) {
-    const key = storageKey(channelName);
-    const channelEncPrivKey = keccak256(key);
+export function addStorageEventListener(channelName, serverUrl) {
     const SOCKET_CONN = io(serverUrl, {
         transports: ['websocket', 'polling'], // use WebSocket first, if available
         withCredentials: true,
         reconnectionDelayMax: 10000,
         reconnectionAttempts: 10,
     });
-    const visibilityListener = () => {
-        if (IS_PUBLISHER_INSTANCES[channelName]) return;
-        // if channel is closed, then remove the listener.
-        if (!SOCKET_CONN_INSTANCES[channelName]) {
-            document.removeEventListener('visibilitychange', visibilityListener);
-            return;
-        }
-        // if not connected, then wait for connection and ping server for latest msg.
-        if (!SOCKET_CONN.connected && document.visibilityState === 'visible') {
-            SOCKET_CONN.once('connect', async () => {
-                SOCKET_CONN.emit('check_auth_status', getPublic(channelEncPrivKey).toString('hex'));
-            });
-        }
-    };
-    const listener = async (ev) => {
-        try {
-            const decData = await decryptData(channelEncPrivKey.toString('hex'), ev);
-            fn(decData);
-        } catch (error) {
-            log.error(error);
-        }
-    };
+
     SOCKET_CONN.on('connect_error', () => {
         // revert to classic upgrade
         SOCKET_CONN.io.opts.transports = ['polling', 'websocket'];
     });
     SOCKET_CONN.on('connect', async () => {
-        if (IS_PUBLISHER_INSTANCES[channelName]) return;
-        log.debug('connected with socket');
-        SOCKET_CONN.emit('check_auth_status', getPublic(channelEncPrivKey).toString('hex'));
         const { engine } = SOCKET_CONN.io;
         log.debug('initially connected to', engine.transport.name); // in most cases, prints "polling"
         engine.once('upgrade', () => {
             // called when the transport is upgraded (i.e. from HTTP long-polling to WebSocket)
             log.debug('upgraded', engine.transport.name); // in most cases, prints "websocket"
         });
-        engine.on('close', (reason) => {
+        engine.once('close', (reason) => {
             // called when the underlying connection is closed
             log.debug('connection closed', reason);
         });
@@ -131,15 +103,11 @@ export function addStorageEventListener(channelName, serverUrl, fn) {
         log.debug('socket errored', err);
         SOCKET_CONN.disconnect();
     });
-    SOCKET_CONN.once('disconnect', () => {
+    SOCKET_CONN.on('disconnect', () => {
         log.debug('socket disconnected');
-        if (SOCKET_CONN_INSTANCES[channelName]) visibilityListener();
     });
 
-    SOCKET_CONN.on('success', listener);
-    document.addEventListener('visibilitychange', visibilityListener);
     SOCKET_CONN_INSTANCES[channelName] = SOCKET_CONN;
-    return listener;
 }
 export function removeStorageEventListener(channelState) {
     if (SOCKET_CONN_INSTANCES[channelState.channelName]) SOCKET_CONN_INSTANCES[channelState.channelName].disconnect();
@@ -167,15 +135,7 @@ export function create(channelName, options) {
         serverUrl: options.server.url,
     };
 
-    state.listener = addStorageEventListener(channelName, options.server.url, (msgObj) => {
-        if (!state.messagesCallback) return; // no listener
-        if (msgObj.uuid === uuid) return; // own message
-        if (!msgObj.token || eMIs.has(msgObj.token)) return; // already emitted
-        // if (msgObj.data.time && msgObj.data.time < state.messagesCallbackTime) return; // too old
-
-        eMIs.add(msgObj.token);
-        state.messagesCallback(msgObj.data);
-    });
+    addStorageEventListener(channelName, options.server.url);
 
     return state;
 }
@@ -192,6 +152,55 @@ export function close(channelState) {
 export function onMessage(channelState, fn, time) {
     channelState.messagesCallbackTime = time;
     channelState.messagesCallback = fn;
+
+    const fn2 = (msgObj) => {
+        if (!channelState.messagesCallback) return; // no listener
+        if (msgObj.uuid === channelState.uuid) return; // own message
+        if (!msgObj.token || channelState.eMIs.has(msgObj.token)) return; // already emitted
+        // if (msgObj.data.time && msgObj.data.time < state.messagesCallbackTime) return; // too old
+
+        channelState.eMIs.add(msgObj.token);
+        channelState.messagesCallback(msgObj.data);
+    };
+    const socketConn = SOCKET_CONN_INSTANCES[channelState.channelName];
+    const key = storageKey(channelState.channelName);
+    const channelEncPrivKey = keccak256(key);
+
+    if (socketConn.connected) {
+        socketConn.emit('check_auth_status', getPublic(channelEncPrivKey).toString('hex'));
+    } else {
+        socketConn.once('connect', () => {
+            log.debug('connected with socket');
+            socketConn.emit('check_auth_status', getPublic(channelEncPrivKey).toString('hex'));
+        });
+    }
+
+    const visibilityListener = () => {
+        // if channel is closed, then remove the listener.
+        if (!SOCKET_CONN_INSTANCES[channelState.channelName]) {
+            document.removeEventListener('visibilitychange', visibilityListener);
+            return;
+        }
+        // if not connected, then wait for connection and ping server for latest msg.
+        if (!socketConn.connected && document.visibilityState === 'visible') {
+            socketConn.once('connect', async () => {
+                socketConn.emit('check_auth_status', getPublic(channelEncPrivKey).toString('hex'));
+            });
+        }
+    };
+
+    const listener = async (ev) => {
+        try {
+            const decData = await decryptData(channelEncPrivKey.toString('hex'), ev);
+            fn2(decData);
+        } catch (error) {
+            log.error(error);
+        }
+    };
+
+    socketConn.on('success', listener);
+
+    document.addEventListener('visibilitychange', visibilityListener);
 }
 
 export function canBeUsed() {
