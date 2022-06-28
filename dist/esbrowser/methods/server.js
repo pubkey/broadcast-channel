@@ -34,16 +34,15 @@ export function storageKey(channelName) {
 
 export function postMessage(channelState, messageJson) {
   return new Promise(function (res, rej) {
-    sleep().then( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee3() {
-      var key, channelEncPrivKey, encData, socketConn, _setMessage, currentAttempts, waitingInterval;
-
-      return _regeneratorRuntime.wrap(function _callee3$(_context3) {
+    sleep().then( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee() {
+      var key, channelEncPrivKey, encData;
+      return _regeneratorRuntime.wrap(function _callee$(_context) {
         while (1) {
-          switch (_context3.prev = _context3.next) {
+          switch (_context.prev = _context.next) {
             case 0:
               key = storageKey(channelState.channelName);
               channelEncPrivKey = keccak256(key);
-              _context3.next = 4;
+              _context.next = 4;
               return encryptData(channelEncPrivKey.toString('hex'), {
                 token: randomToken(),
                 time: new Date().getTime(),
@@ -52,108 +51,47 @@ export function postMessage(channelState, messageJson) {
               });
 
             case 4:
-              encData = _context3.sent;
-              socketConn = SOCKET_CONN_INSTANCES[channelState.channelName];
+              encData = _context.sent;
+              _context.t0 = fetch;
+              _context.t1 = channelState.serverUrl + '/channel/set';
+              _context.t2 = JSON;
+              _context.t3 = getPublic(channelEncPrivKey).toString('hex');
+              _context.t4 = encData;
+              _context.next = 12;
+              return sign(channelEncPrivKey, keccak256(encData));
 
-              _setMessage = /*#__PURE__*/function () {
-                var _ref2 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee() {
-                  return _regeneratorRuntime.wrap(function _callee$(_context) {
-                    while (1) {
-                      switch (_context.prev = _context.next) {
-                        case 0:
-                          _context.t0 = fetch;
-                          _context.t1 = channelState.serverUrl + '/channel/set';
-                          _context.t2 = JSON;
-                          _context.t3 = getPublic(channelEncPrivKey).toString('hex');
-                          _context.t4 = encData;
-                          _context.next = 7;
-                          return sign(channelEncPrivKey, keccak256(encData));
+            case 12:
+              _context.t5 = _context.sent.toString('hex');
+              _context.t6 = {
+                key: _context.t3,
+                data: _context.t4,
+                signature: _context.t5
+              };
+              _context.t7 = _context.t2.stringify.call(_context.t2, _context.t6);
+              _context.t8 = {
+                'Content-Type': 'application/json; charset=utf-8'
+              };
+              _context.t9 = {
+                method: 'POST',
+                body: _context.t7,
+                headers: _context.t8
+              };
+              return _context.abrupt("return", (0, _context.t0)(_context.t1, _context.t9).then(res)["catch"](rej));
 
-                        case 7:
-                          _context.t5 = _context.sent.toString('hex');
-                          _context.t6 = {
-                            key: _context.t3,
-                            data: _context.t4,
-                            signature: _context.t5
-                          };
-                          _context.t7 = _context.t2.stringify.call(_context.t2, _context.t6);
-                          _context.t8 = {
-                            'Content-Type': 'application/json; charset=utf-8'
-                          };
-                          _context.t9 = {
-                            method: 'POST',
-                            body: _context.t7,
-                            headers: _context.t8
-                          };
-                          return _context.abrupt("return", (0, _context.t0)(_context.t1, _context.t9).then(res)["catch"](rej));
-
-                        case 13:
-                        case "end":
-                          return _context.stop();
-                      }
-                    }
-                  }, _callee);
-                }));
-
-                return function _setMessage() {
-                  return _ref2.apply(this, arguments);
-                };
-              }();
-
-              if (!(socketConn && socketConn.connected)) {
-                _context3.next = 9;
-                break;
-              }
-
-              return _context3.abrupt("return", _setMessage());
-
-            case 9:
-              currentAttempts = 0;
-              waitingInterval = window.setInterval( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee2() {
-                return _regeneratorRuntime.wrap(function _callee2$(_context2) {
-                  while (1) {
-                    switch (_context2.prev = _context2.next) {
-                      case 0:
-                        if (!(currentAttempts >= 5)) {
-                          _context2.next = 3;
-                          break;
-                        }
-
-                        window.clearInterval(waitingInterval);
-                        return _context2.abrupt("return", rej(new Error('Could not post message after 5 attempts to socket channel')));
-
-                      case 3:
-                        if (!(socketConn && socketConn.connected)) {
-                          _context2.next = 8;
-                          break;
-                        }
-
-                        window.clearInterval(waitingInterval);
-                        return _context2.abrupt("return", _setMessage());
-
-                      case 8:
-                        currentAttempts++;
-
-                      case 9:
-                      case "end":
-                        return _context2.stop();
-                    }
-                  }
-                }, _callee2);
-              })), 500);
-
-            case 11:
+            case 18:
             case "end":
-              return _context3.stop();
+              return _context.stop();
           }
         }
-      }, _callee3);
+      }, _callee);
     })));
   });
 }
-export function addStorageEventListener(channelName, serverUrl, fn) {
-  var key = storageKey(channelName);
-  var channelEncPrivKey = keccak256(key);
+export function getSocketForChannel(channelName, serverUrl) {
+  if (SOCKET_CONN_INSTANCES[channelName]) {
+    return SOCKET_CONN_INSTANCES[channelName];
+  }
+
   var SOCKET_CONN = io(serverUrl, {
     transports: ['websocket', 'polling'],
     // use WebSocket first, if available
@@ -161,80 +99,17 @@ export function addStorageEventListener(channelName, serverUrl, fn) {
     reconnectionDelayMax: 10000,
     reconnectionAttempts: 10
   });
-
-  var visibilityListener = function visibilityListener() {
-    // if channel is closed, then remove the listener.
-    if (!SOCKET_CONN_INSTANCES[channelName]) {
-      document.removeEventListener('visibilitychange', visibilityListener);
-      return;
-    } // if not connected, then wait for connection and ping server for latest msg.
-
-
-    if (!SOCKET_CONN.connected && document.visibilityState === 'visible') {
-      SOCKET_CONN.once('connect', /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee4() {
-        return _regeneratorRuntime.wrap(function _callee4$(_context4) {
-          while (1) {
-            switch (_context4.prev = _context4.next) {
-              case 0:
-                SOCKET_CONN.emit('check_auth_status', getPublic(channelEncPrivKey).toString('hex'));
-
-              case 1:
-              case "end":
-                return _context4.stop();
-            }
-          }
-        }, _callee4);
-      })));
-    }
-  };
-
-  var listener = /*#__PURE__*/function () {
-    var _ref5 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee5(ev) {
-      var decData;
-      return _regeneratorRuntime.wrap(function _callee5$(_context5) {
-        while (1) {
-          switch (_context5.prev = _context5.next) {
-            case 0:
-              _context5.prev = 0;
-              _context5.next = 3;
-              return decryptData(channelEncPrivKey.toString('hex'), ev);
-
-            case 3:
-              decData = _context5.sent;
-              fn(decData);
-              _context5.next = 10;
-              break;
-
-            case 7:
-              _context5.prev = 7;
-              _context5.t0 = _context5["catch"](0);
-              log.error(_context5.t0);
-
-            case 10:
-            case "end":
-              return _context5.stop();
-          }
-        }
-      }, _callee5, null, [[0, 7]]);
-    }));
-
-    return function listener(_x) {
-      return _ref5.apply(this, arguments);
-    };
-  }();
-
-  SOCKET_CONN.on('connect_error', function () {
+  SOCKET_CONN.on('connect_error', function (err) {
     // revert to classic upgrade
     SOCKET_CONN.io.opts.transports = ['polling', 'websocket'];
+    log.error('connect error', err);
   });
-  SOCKET_CONN.on('connect', /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee6() {
+  SOCKET_CONN.on('connect', /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee2() {
     var engine;
-    return _regeneratorRuntime.wrap(function _callee6$(_context6) {
+    return _regeneratorRuntime.wrap(function _callee2$(_context2) {
       while (1) {
-        switch (_context6.prev = _context6.next) {
+        switch (_context2.prev = _context2.next) {
           case 0:
-            log.debug('connected with socket');
-            SOCKET_CONN.emit('check_auth_status', getPublic(channelEncPrivKey).toString('hex'));
             engine = SOCKET_CONN.io.engine;
             log.debug('initially connected to', engine.transport.name); // in most cases, prints "polling"
 
@@ -242,30 +117,27 @@ export function addStorageEventListener(channelName, serverUrl, fn) {
               // called when the transport is upgraded (i.e. from HTTP long-polling to WebSocket)
               log.debug('upgraded', engine.transport.name); // in most cases, prints "websocket"
             });
-            engine.on('close', function (reason) {
+            engine.once('close', function (reason) {
               // called when the underlying connection is closed
               log.debug('connection closed', reason);
             });
 
-          case 6:
+          case 4:
           case "end":
-            return _context6.stop();
+            return _context2.stop();
         }
       }
-    }, _callee6);
+    }, _callee2);
   })));
   SOCKET_CONN.on('error', function (err) {
-    log.debug('socket errored', err);
+    log.error('socket errored', err);
     SOCKET_CONN.disconnect();
   });
-  SOCKET_CONN.once('disconnect', function () {
+  SOCKET_CONN.on('disconnect', function () {
     log.debug('socket disconnected');
-    if (SOCKET_CONN_INSTANCES[channelName]) visibilityListener();
   });
-  SOCKET_CONN.on('success', listener);
-  document.addEventListener('visibilitychange', visibilityListener);
   SOCKET_CONN_INSTANCES[channelName] = SOCKET_CONN;
-  return listener;
+  return SOCKET_CONN;
 }
 export function removeStorageEventListener(channelState) {
   if (SOCKET_CONN_INSTANCES[channelState.channelName]) SOCKET_CONN_INSTANCES[channelState.channelName].disconnect();
@@ -292,17 +164,6 @@ export function create(channelName, options) {
     // emittedMessagesIds
     serverUrl: options.server.url
   };
-  state.listener = addStorageEventListener(channelName, options.server.url, function (msgObj) {
-    if (!state.messagesCallback) return; // no listener
-
-    if (msgObj.uuid === uuid) return; // own message
-
-    if (!msgObj.token || eMIs.has(msgObj.token)) return; // already emitted
-    // if (msgObj.data.time && msgObj.data.time < state.messagesCallbackTime) return; // too old
-
-    eMIs.add(msgObj.token);
-    state.messagesCallback(msgObj.data);
-  });
   return state;
 }
 export function close(channelState) {
@@ -316,6 +177,96 @@ export function close(channelState) {
 export function onMessage(channelState, fn, time) {
   channelState.messagesCallbackTime = time;
   channelState.messagesCallback = fn;
+
+  var fn2 = function fn2(msgObj) {
+    debugger;
+    if (!channelState.messagesCallback) return; // no listener
+
+    if (msgObj.uuid === channelState.uuid) return; // own message
+
+    if (!msgObj.token || channelState.eMIs.has(msgObj.token)) return; // already emitted
+    // if (msgObj.data.time && msgObj.data.time < state.messagesCallbackTime) return; // too old
+
+    channelState.eMIs.add(msgObj.token);
+    channelState.messagesCallback(msgObj.data);
+  };
+
+  var socketConn = getSocketForChannel(channelState.channelName, channelState.serverUrl);
+  var key = storageKey(channelState.channelName);
+  var channelEncPrivKey = keccak256(key);
+
+  if (socketConn.connected) {
+    socketConn.emit('check_auth_status', getPublic(channelEncPrivKey).toString('hex'));
+  } else {
+    socketConn.once('connect', function () {
+      log.debug('connected with socket');
+      socketConn.emit('check_auth_status', getPublic(channelEncPrivKey).toString('hex'));
+    });
+  }
+
+  var visibilityListener = function visibilityListener() {
+    // if channel is closed, then remove the listener.
+    if (!SOCKET_CONN_INSTANCES[channelState.channelName]) {
+      document.removeEventListener('visibilitychange', visibilityListener);
+      return;
+    } // if not connected, then wait for connection and ping server for latest msg.
+
+
+    if (!socketConn.connected && document.visibilityState === 'visible') {
+      socketConn.once('connect', /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee3() {
+        return _regeneratorRuntime.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                socketConn.emit('check_auth_status', getPublic(channelEncPrivKey).toString('hex'));
+
+              case 1:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3);
+      })));
+    }
+  };
+
+  var listener = /*#__PURE__*/function () {
+    var _ref4 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee4(ev) {
+      var decData;
+      return _regeneratorRuntime.wrap(function _callee4$(_context4) {
+        while (1) {
+          switch (_context4.prev = _context4.next) {
+            case 0:
+              _context4.prev = 0;
+              _context4.next = 3;
+              return decryptData(channelEncPrivKey.toString('hex'), ev);
+
+            case 3:
+              decData = _context4.sent;
+              fn2(decData);
+              _context4.next = 10;
+              break;
+
+            case 7:
+              _context4.prev = 7;
+              _context4.t0 = _context4["catch"](0);
+              log.error(_context4.t0);
+
+            case 10:
+            case "end":
+              return _context4.stop();
+          }
+        }
+      }, _callee4, null, [[0, 7]]);
+    }));
+
+    return function listener(_x) {
+      return _ref4.apply(this, arguments);
+    };
+  }();
+
+  socketConn.once('success', listener);
+  document.addEventListener('visibilitychange', visibilityListener);
 }
 export function canBeUsed() {
   return true;

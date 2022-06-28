@@ -47,34 +47,27 @@ export function postMessage(channelState, messageJson) {
                 data: messageJson,
                 uuid: channelState.uuid,
             });
-            const socketConn = SOCKET_CONN_INSTANCES[channelState.channelName];
-            const _setMessage = async () => {
-                return fetch(channelState.serverUrl + '/channel/set', {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        key: getPublic(channelEncPrivKey).toString('hex'),
-                        data: encData,
-                        signature: (await sign(channelEncPrivKey, keccak256(encData))).toString('hex'),
-                    }),
-                    headers: {
-                        'Content-Type': 'application/json; charset=utf-8',
-                    },
-                })
-                    .then(res)
-                    .catch(rej);
-            };
-            if (socketConn && socketConn.connected) {
-                return _setMessage();
-            }
-            socketConn.once('connect', async () => {
-                log.debug('connected with socket');
-                await _setMessage();
-            });
+            return fetch(channelState.serverUrl + '/channel/set', {
+                method: 'POST',
+                body: JSON.stringify({
+                    key: getPublic(channelEncPrivKey).toString('hex'),
+                    data: encData,
+                    signature: (await sign(channelEncPrivKey, keccak256(encData))).toString('hex'),
+                }),
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8',
+                },
+            })
+                .then(res)
+                .catch(rej);
         });
     });
 }
 
-export function addStorageEventListener(channelName, serverUrl) {
+export function getSocketForChannel(channelName, serverUrl) {
+    if (SOCKET_CONN_INSTANCES[channelName]) {
+        return SOCKET_CONN_INSTANCES[channelName];
+    }
     const SOCKET_CONN = io(serverUrl, {
         transports: ['websocket', 'polling'], // use WebSocket first, if available
         withCredentials: true,
@@ -82,9 +75,10 @@ export function addStorageEventListener(channelName, serverUrl) {
         reconnectionAttempts: 10,
     });
 
-    SOCKET_CONN.on('connect_error', () => {
+    SOCKET_CONN.on('connect_error', (err) => {
         // revert to classic upgrade
         SOCKET_CONN.io.opts.transports = ['polling', 'websocket'];
+        log.error('connect error', err);
     });
     SOCKET_CONN.on('connect', async () => {
         const { engine } = SOCKET_CONN.io;
@@ -100,7 +94,7 @@ export function addStorageEventListener(channelName, serverUrl) {
     });
 
     SOCKET_CONN.on('error', (err) => {
-        log.debug('socket errored', err);
+        log.error('socket errored', err);
         SOCKET_CONN.disconnect();
     });
     SOCKET_CONN.on('disconnect', () => {
@@ -108,7 +102,9 @@ export function addStorageEventListener(channelName, serverUrl) {
     });
 
     SOCKET_CONN_INSTANCES[channelName] = SOCKET_CONN;
+    return SOCKET_CONN;
 }
+
 export function removeStorageEventListener(channelState) {
     if (SOCKET_CONN_INSTANCES[channelState.channelName]) SOCKET_CONN_INSTANCES[channelState.channelName].disconnect();
 }
@@ -135,8 +131,6 @@ export function create(channelName, options) {
         serverUrl: options.server.url,
     };
 
-    addStorageEventListener(channelName, options.server.url);
-
     return state;
 }
 
@@ -154,6 +148,7 @@ export function onMessage(channelState, fn, time) {
     channelState.messagesCallback = fn;
 
     const fn2 = (msgObj) => {
+        debugger;
         if (!channelState.messagesCallback) return; // no listener
         if (msgObj.uuid === channelState.uuid) return; // own message
         if (!msgObj.token || channelState.eMIs.has(msgObj.token)) return; // already emitted
@@ -162,8 +157,8 @@ export function onMessage(channelState, fn, time) {
         channelState.eMIs.add(msgObj.token);
         channelState.messagesCallback(msgObj.data);
     };
-    const socketConn = SOCKET_CONN_INSTANCES[channelState.channelName];
-    if (!socketConn) return;
+    const socketConn = getSocketForChannel(channelState.channelName, channelState.serverUrl);
+
     const key = storageKey(channelState.channelName);
     const channelEncPrivKey = keccak256(key);
 
