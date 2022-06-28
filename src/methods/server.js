@@ -163,6 +163,7 @@ export function onMessage(channelState, fn, time) {
         channelState.messagesCallback(msgObj.data);
     };
     const socketConn = SOCKET_CONN_INSTANCES[channelState.channelName];
+    if (!socketConn) return;
     const key = storageKey(channelState.channelName);
     const channelEncPrivKey = keccak256(key);
 
