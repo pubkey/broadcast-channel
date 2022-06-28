@@ -73,7 +73,7 @@ export function are3PCSupported() {
   return thirdPartyCookieSupport;
 }
 export var log = loglevel.getLogger('broadcast-channel');
-log.setLevel('error');
+log.setLevel('debug');
 export var setLogLevel = function setLogLevel(level) {
   log.setLevel(level);
 };

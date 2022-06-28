@@ -105,7 +105,7 @@ function are3PCSupported() {
 var log = _loglevel["default"].getLogger('broadcast-channel');
 
 exports.log = log;
-log.setLevel('error');
+log.setLevel('debug');
 
 var setLogLevel = function setLogLevel(level) {
   log.setLevel(level);

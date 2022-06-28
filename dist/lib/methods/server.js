@@ -10,12 +10,13 @@ exports.canBeUsed = canBeUsed;
 exports.close = close;
 exports.create = create;
 exports["default"] = void 0;
-exports.getSocketForChannel = getSocketForChannel;
+exports.getSocketInstance = getSocketInstance;
 exports.keccak256 = keccak256;
 exports.microSeconds = void 0;
 exports.onMessage = onMessage;
 exports.postMessage = postMessage;
 exports.removeStorageEventListener = removeStorageEventListener;
+exports.setupSocketConnection = setupSocketConnection;
 exports.storageKey = storageKey;
 exports.type = void 0;
 
@@ -55,7 +56,7 @@ function keccak256(a) {
 var KEY_PREFIX = 'pubkey.broadcastChannel-';
 var type = 'server';
 exports.type = type;
-var SOCKET_CONN_INSTANCES = {};
+var SOCKET_CONN_INSTANCE = null;
 
 function storageKey(channelName) {
   return KEY_PREFIX + channelName;
@@ -122,9 +123,9 @@ function postMessage(channelState, messageJson) {
   });
 }
 
-function getSocketForChannel(channelName, serverUrl) {
-  if (SOCKET_CONN_INSTANCES[channelName]) {
-    return SOCKET_CONN_INSTANCES[channelName];
+function getSocketInstance(serverUrl) {
+  if (SOCKET_CONN_INSTANCE) {
+    return SOCKET_CONN_INSTANCE;
   }
 
   var SOCKET_CONN = (0, _socket.io)(serverUrl, {
@@ -176,82 +177,29 @@ function getSocketForChannel(channelName, serverUrl) {
   SOCKET_CONN.on('disconnect', function () {
     _util.log.debug('socket disconnected');
   });
-  SOCKET_CONN_INSTANCES[channelName] = SOCKET_CONN;
+  SOCKET_CONN_INSTANCE = SOCKET_CONN;
   return SOCKET_CONN;
 }
 
-function removeStorageEventListener(channelState) {
-  if (SOCKET_CONN_INSTANCES[channelState.channelName]) SOCKET_CONN_INSTANCES[channelState.channelName].disconnect();
-}
-
-function create(channelName, options) {
-  options = (0, _options.fillOptionsWithDefaults)(options);
-
-  if (!canBeUsed(options)) {
-    throw new Error('BroadcastChannel: server cannot be used');
-  }
-
-  var uuid = (0, _util.randomToken)();
-  /**
-   * eMIs
-   * contains all messages that have been emitted before
-   * @type {ObliviousSet}
-   */
-
-  var eMIs = new _obliviousSet.ObliviousSet(options.server.removeTimeout);
-  var state = {
-    channelName: channelName,
-    uuid: uuid,
-    eMIs: eMIs,
-    // emittedMessagesIds
-    serverUrl: options.server.url
-  };
-  return state;
-}
-
-function close(channelState) {
-  // give 2 sec for all msgs which are in transit to be consumed
-  // by receiver.
-  window.setTimeout(function () {
-    removeStorageEventListener(channelState);
-    delete SOCKET_CONN_INSTANCES[channelState.channelName];
-  }, 1000);
-}
-
-function onMessage(channelState, fn, time) {
-  channelState.messagesCallbackTime = time;
-  channelState.messagesCallback = fn;
-
-  var fn2 = function fn2(msgObj) {
-    debugger;
-    if (!channelState.messagesCallback) return; // no listener
-
-    if (msgObj.uuid === channelState.uuid) return; // own message
-
-    if (!msgObj.token || channelState.eMIs.has(msgObj.token)) return; // already emitted
-    // if (msgObj.data.time && msgObj.data.time < state.messagesCallbackTime) return; // too old
-
-    channelState.eMIs.add(msgObj.token);
-    channelState.messagesCallback(msgObj.data);
-  };
-
-  var socketConn = getSocketForChannel(channelState.channelName, channelState.serverUrl);
-  var key = storageKey(channelState.channelName);
+function setupSocketConnection(serverUrl, channelName, fn) {
+  var socketConn = getSocketInstance(serverUrl);
+  var key = storageKey(channelName);
   var channelEncPrivKey = keccak256(key);
+  var channelPubKey = (0, _eccrypto.getPublic)(channelEncPrivKey).toString('hex');
 
   if (socketConn.connected) {
-    socketConn.emit('check_auth_status', (0, _eccrypto.getPublic)(channelEncPrivKey).toString('hex'));
+    socketConn.emit('check_auth_status', channelPubKey);
   } else {
     socketConn.once('connect', function () {
       _util.log.debug('connected with socket');
 
-      socketConn.emit('check_auth_status', (0, _eccrypto.getPublic)(channelEncPrivKey).toString('hex'));
+      socketConn.emit('check_auth_status', channelPubKey);
     });
   }
 
   var visibilityListener = function visibilityListener() {
     // if channel is closed, then remove the listener.
-    if (!SOCKET_CONN_INSTANCES[channelState.channelName]) {
+    if (!socketConn) {
       document.removeEventListener('visibilitychange', visibilityListener);
       return;
     } // if not connected, then wait for connection and ping server for latest msg.
@@ -263,7 +211,7 @@ function onMessage(channelState, fn, time) {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                socketConn.emit('check_auth_status', (0, _eccrypto.getPublic)(channelEncPrivKey).toString('hex'));
+                socketConn.emit('check_auth_status', channelPubKey);
 
               case 1:
               case "end":
@@ -288,22 +236,25 @@ function onMessage(channelState, fn, time) {
 
             case 3:
               decData = _context4.sent;
-              fn2(decData);
-              _context4.next = 10;
+
+              _util.log.info(decData);
+
+              fn(decData);
+              _context4.next = 11;
               break;
 
-            case 7:
-              _context4.prev = 7;
+            case 8:
+              _context4.prev = 8;
               _context4.t0 = _context4["catch"](0);
 
               _util.log.error(_context4.t0);
 
-            case 10:
+            case 11:
             case "end":
               return _context4.stop();
           }
         }
-      }, _callee4, null, [[0, 7]]);
+      }, _callee4, null, [[0, 8]]);
     }));
 
     return function listener(_x) {
@@ -311,8 +262,64 @@ function onMessage(channelState, fn, time) {
     };
   }();
 
-  socketConn.once('success', listener);
+  socketConn.on(channelPubKey + "_success", listener);
   document.addEventListener('visibilitychange', visibilityListener);
+  return socketConn;
+}
+
+function removeStorageEventListener() {
+  if (SOCKET_CONN_INSTANCE) {
+    SOCKET_CONN_INSTANCE.disconnect();
+  }
+}
+
+function create(channelName, options) {
+  options = (0, _options.fillOptionsWithDefaults)(options);
+
+  if (!canBeUsed(options)) {
+    throw new Error('BroadcastChannel: server cannot be used');
+  }
+
+  var uuid = (0, _util.randomToken)();
+  /**
+   * eMIs
+   * contains all messages that have been emitted before
+   * @type {ObliviousSet}
+   */
+
+  var eMIs = new _obliviousSet.ObliviousSet(options.server.removeTimeout);
+  var state = {
+    channelName: channelName,
+    uuid: uuid,
+    eMIs: eMIs,
+    // emittedMessagesIds
+    serverUrl: options.server.url
+  };
+  setupSocketConnection(options.server.url, channelName, function (msgObj) {
+    if (!state.messagesCallback) return; // no listener
+
+    if (msgObj.uuid === state.uuid) return; // own message
+
+    if (!msgObj.token || state.eMIs.has(msgObj.token)) return; // already emitted
+    // if (msgObj.data.time && msgObj.data.time < state.messagesCallbackTime) return; // too old
+
+    state.eMIs.add(msgObj.token);
+    state.messagesCallback(msgObj.data);
+  });
+  return state;
+}
+
+function close() {// give 2 sec for all msgs which are in transit to be consumed
+  // by receiver.
+  // window.setTimeout(() => {
+  //     removeStorageEventListener(channelState);
+  //     SOCKET_CONN_INSTANCE = null;
+  // }, 1000);
+}
+
+function onMessage(channelState, fn, time) {
+  channelState.messagesCallbackTime = time;
+  channelState.messagesCallback = fn;
 }
 
 function canBeUsed() {
