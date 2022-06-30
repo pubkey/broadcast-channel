@@ -47,13 +47,15 @@ export function postMessage(channelState, messageJson) {
                 data: messageJson,
                 uuid: channelState.uuid,
             });
+            const body = {
+                key: getPublic(channelEncPrivKey).toString('hex'),
+                data: encData,
+                signature: (await sign(channelEncPrivKey, keccak256(encData))).toString('hex'),
+            };
+            if (channelState.timeout) body.timeout = channelState.timeout;
             return fetch(channelState.serverUrl + '/channel/set', {
                 method: 'POST',
-                body: JSON.stringify({
-                    key: getPublic(channelEncPrivKey).toString('hex'),
-                    data: encData,
-                    signature: (await sign(channelEncPrivKey, keccak256(encData))).toString('hex'),
-                }),
+                body: JSON.stringify(body),
                 headers: {
                     'Content-Type': 'application/json; charset=utf-8',
                 },
@@ -177,6 +179,8 @@ export function create(channelName, options) {
         eMIs, // emittedMessagesIds
         serverUrl: options.server.url,
     };
+    if (options.server.timeout !== null || options.server.timeout !== undefined)
+        state.timeout = options.server.timeout;
 
     setupSocketConnection(options.server.url, channelName, (msgObj) => {
         if (!state.messagesCallback) return; // no listener
