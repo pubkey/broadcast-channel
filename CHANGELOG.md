@@ -3,6 +3,10 @@
 
 ## X.X.X (comming soon)
 
+## 4.14.0 (18 Juli June 2022)
+
+- Updated dependencies.
+
 ## 4.13.0 (1 June 2022)
 
 - FIX ES module for Node.js [#972](https://github.com/pubkey/broadcast-channel/pull/972)
