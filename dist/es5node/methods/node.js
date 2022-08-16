@@ -54,8 +54,6 @@ var _net = _interopRequireDefault(require("net"));
 
 var _path = _interopRequireDefault(require("path"));
 
-var _microtime = _interopRequireDefault(require("microtime"));
-
 var _rimraf = _interopRequireDefault(require("rimraf"));
 
 var _detectNode = _interopRequireDefault(require("detect-node"));
@@ -1182,5 +1180,5 @@ function averageResponseTime() {
 }
 
 function microSeconds() {
-  return parseInt(_microtime["default"].now());
+  return parseInt(Number(process.hrtime.bigint()) / 1000);
 }
