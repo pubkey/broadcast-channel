@@ -356,7 +356,7 @@ export function readMessage(messageObj) {
 }
 
 export async function cleanOldMessages(messageObjects, ttl) {
-    const olderThen = microSeconds() - (ttl * 1000);  // convert ttl to microseconds
+    const olderThen = microSeconds() - (ttl * 1000); // convert ttl to microseconds
     await Promise.all(
         messageObjects
             .filter(obj => obj.time < olderThen)
@@ -683,5 +683,5 @@ export function microSeconds() {
 }
 
 function now() {
-    return Number(process.hrtime.bigint());     // returns nanoseconds
+    return Number(process.hrtime.bigint()); // returns nanoseconds
 }
