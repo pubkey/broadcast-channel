@@ -3,14 +3,12 @@ import IndexeDbMethod from './methods/indexed-db.js';
 import LocalstorageMethod from './methods/localstorage.js';
 import SimulateMethod from './methods/simulate.js'; // the line below will be removed from es5/browser builds
 
-
 import { isNode } from './util.js'; // order is important
 
 var METHODS = [NativeMethod, // fastest
 IndexeDbMethod, LocalstorageMethod];
 export function chooseMethod(options) {
   var chooseMethods = [].concat(options.methods, METHODS).filter(Boolean); // the line below will be removed from es5/browser builds
-
 
 
   if (options.type) {
