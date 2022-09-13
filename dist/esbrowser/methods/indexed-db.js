@@ -6,7 +6,7 @@
  * When working on this, ensure to use these performance optimizations:
  * @link https://rxdb.info/slow-indexeddb.html
  */
-import { sleep, randomInt, randomToken, microSeconds as micro, isNode, PROMISE_RESOLVED_VOID } from '../util.js';
+import { sleep, randomInt, randomToken, microSeconds as micro, PROMISE_RESOLVED_VOID } from '../util.js';
 export var microSeconds = micro;
 import { ObliviousSet } from 'oblivious-set';
 import { fillOptionsWithDefaults } from '../options.js';
@@ -353,9 +353,12 @@ export function onMessage(channelState, fn, time) {
   readNewMessages(channelState);
 }
 export function canBeUsed() {
-  if (isNode) return false;
   var idb = getIdb();
-  if (!idb) return false;
+
+  if (!idb) {
+    return false;
+  }
+
   return true;
 }
 export function averageResponseTime(options) {

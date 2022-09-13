@@ -788,8 +788,6 @@ var _localstorage = _interopRequireDefault(require("./methods/localstorage.js"))
 var _simulate = _interopRequireDefault(require("./methods/simulate.js"));
 
 
-var _util = require("./util.js");
-
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== "object" && typeof obj !== "function") { return { "default": obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj["default"] = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
@@ -820,7 +818,7 @@ function chooseMethod(options) {
    */
 
 
-  if (!options.webWorkerSupport && !_util.isNode) {
+  if (!options.webWorkerSupport) {
     chooseMethods = chooseMethods.filter(function (m) {
       return m.type !== 'idb';
     });
@@ -833,7 +831,7 @@ function chooseMethod(options) {
     return m.type;
   })));else return useMethod;
 }
-},{"./methods/indexed-db.js":6,"./methods/localstorage.js":7,"./methods/native.js":8,"./methods/simulate.js":9,"./util.js":11,"@babel/runtime/helpers/interopRequireDefault":14,"@babel/runtime/helpers/typeof":15}],6:[function(require,module,exports){
+},{"./methods/indexed-db.js":6,"./methods/localstorage.js":7,"./methods/native.js":8,"./methods/simulate.js":9,"@babel/runtime/helpers/interopRequireDefault":14,"@babel/runtime/helpers/typeof":15}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1233,9 +1231,12 @@ function onMessage(channelState, fn, time) {
 }
 
 function canBeUsed() {
-  if (_util.isNode) return false;
   var idb = getIdb();
-  if (!idb) return false;
+
+  if (!idb) {
+    return false;
+  }
+
   return true;
 }
 
@@ -1413,7 +1414,6 @@ function onMessage(channelState, fn, time) {
 }
 
 function canBeUsed() {
-  if (_util.isNode) return false;
   var ls = getLocalStorage();
   if (!ls) return false;
 
@@ -1512,11 +1512,9 @@ function onMessage(channelState, fn) {
 }
 
 function canBeUsed() {
-  /**
-   * in the electron-renderer, isNode will be true even if we are in browser-context
-   * so we also check if window is undefined
-   */
-  if (_util.isNode && typeof window === 'undefined') return false;
+  if (typeof window === 'undefined') {
+    return false;
+  }
 
   if (typeof BroadcastChannel === 'function') {
     if (BroadcastChannel._pubkey) {
@@ -1524,7 +1522,9 @@ function canBeUsed() {
     }
 
     return true;
-  } else return false;
+  } else {
+    return false;
+  }
 }
 
 function averageResponseTime() {
@@ -1658,13 +1658,12 @@ function fillOptionsWithDefaults() {
   return options;
 }
 },{}],11:[function(require,module,exports){
-(function (process){(function (){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.isNode = exports.PROMISE_RESOLVED_VOID = exports.PROMISE_RESOLVED_TRUE = exports.PROMISE_RESOLVED_FALSE = void 0;
+exports.PROMISE_RESOLVED_VOID = exports.PROMISE_RESOLVED_TRUE = exports.PROMISE_RESOLVED_FALSE = void 0;
 exports.isPromise = isPromise;
 exports.microSeconds = microSeconds;
 exports.randomInt = randomInt;
@@ -1732,17 +1731,7 @@ function microSeconds() {
     return ms * 1000;
   }
 }
-/**
- * copied from the 'detect-node' npm module
- * We cannot use the module directly because it causes problems with rollup
- * @link https://github.com/iliakan/detect-node/blob/master/index.js
- */
-
-
-var isNode = Object.prototype.toString.call(typeof process !== 'undefined' ? process : 0) === '[object process]';
-exports.isNode = isNode;
-}).call(this)}).call(this,require('_process'))
-},{"_process":348}],12:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 
 require("./noConflict");

@@ -3,7 +3,6 @@ import IndexeDbMethod from './methods/indexed-db.js';
 import LocalstorageMethod from './methods/localstorage.js';
 import SimulateMethod from './methods/simulate.js'; // the line below will be removed from es5/browser builds
 
-import { isNode } from './util.js'; // order is important
 
 var METHODS = [NativeMethod, // fastest
 IndexeDbMethod, LocalstorageMethod];
@@ -28,7 +27,7 @@ export function chooseMethod(options) {
    */
 
 
-  if (!options.webWorkerSupport && !isNode) {
+  if (!options.webWorkerSupport) {
     chooseMethods = chooseMethods.filter(function (m) {
       return m.type !== 'idb';
     });

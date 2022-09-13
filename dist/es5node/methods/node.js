@@ -56,8 +56,6 @@ var _path = _interopRequireDefault(require("path"));
 
 var _rimraf = _interopRequireDefault(require("rimraf"));
 
-var _detectNode = _interopRequireDefault(require("detect-node"));
-
 var _pQueue = _interopRequireDefault(require("p-queue"));
 
 var _unload = require("unload");
@@ -1166,7 +1164,11 @@ function close(channelState) {
 }
 
 function canBeUsed() {
-  return _detectNode["default"];
+  if (typeof _fs["default"].mkdir === 'function') {
+    return true;
+  } else {
+    return false;
+  }
 }
 /**
  * on node we use a relatively height averageResponseTime,

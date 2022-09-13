@@ -156,7 +156,6 @@ function onMessage(channelState, fn, time) {
 }
 
 function canBeUsed() {
-  if (_util.isNode) return false;
   var ls = getLocalStorage();
   if (!ls) return false;
 

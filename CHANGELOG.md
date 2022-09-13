@@ -3,6 +3,13 @@
 
 ## X.X.X (comming soon)
 
+## 4.17.0 (13 September 2022)
+
+- REMOVE the `isNode` utility function so that we do not access the `process` variable in browsers.
+
+## 4.16.0 (13 September 2022)
+
+- Rerelase because npm got stuck
 ## 4.15.0 (13 September 2022)
 
 - Remove `microtime` dependency [https://github.com/pubkey/broadcast-channel/pull/1036](#1036) [jaredperreault-okta](https://github.com/jaredperreault-okta)

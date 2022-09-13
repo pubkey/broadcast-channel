@@ -1,4 +1,4 @@
-import { microSeconds as micro, isNode, PROMISE_RESOLVED_VOID } from '../util.js';
+import { microSeconds as micro, PROMISE_RESOLVED_VOID } from '../util.js';
 export var microSeconds = micro;
 export var type = 'native';
 export function create(channelName) {
@@ -33,11 +33,9 @@ export function onMessage(channelState, fn) {
   channelState.messagesCallback = fn;
 }
 export function canBeUsed() {
-  /**
-   * in the electron-renderer, isNode will be true even if we are in browser-context
-   * so we also check if window is undefined
-   */
-  if (isNode && typeof window === 'undefined') return false;
+  if (typeof window === 'undefined') {
+    return false;
+  }
 
   if (typeof BroadcastChannel === 'function') {
     if (BroadcastChannel._pubkey) {
@@ -45,7 +43,9 @@ export function canBeUsed() {
     }
 
     return true;
-  } else return false;
+  } else {
+    return false;
+  }
 }
 export function averageResponseTime() {
   return 150;

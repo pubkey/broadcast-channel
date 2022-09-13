@@ -13,7 +13,6 @@ import events from 'events';
 import net from 'net';
 import path from 'path';
 import rimraf from 'rimraf';
-import isNode from 'detect-node';
 import PQueue from 'p-queue';
 import { add as unloadAdd } from 'unload';
 import { fillOptionsWithDefaults } from '../options.js';
@@ -1072,7 +1071,11 @@ export function close(channelState) {
   });
 }
 export function canBeUsed() {
-  return isNode;
+  if (typeof fs.mkdir === 'function') {
+    return true;
+  } else {
+    return false;
+  }
 }
 /**
  * on node we use a relatively height averageResponseTime,

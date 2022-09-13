@@ -55,11 +55,9 @@ function onMessage(channelState, fn) {
 }
 
 function canBeUsed() {
-  /**
-   * in the electron-renderer, isNode will be true even if we are in browser-context
-   * so we also check if window is undefined
-   */
-  if (_util.isNode && typeof window === 'undefined') return false;
+  if (typeof window === 'undefined') {
+    return false;
+  }
 
   if (typeof BroadcastChannel === 'function') {
     if (BroadcastChannel._pubkey) {
@@ -67,7 +65,9 @@ function canBeUsed() {
     }
 
     return true;
-  } else return false;
+  } else {
+    return false;
+  }
 }
 
 function averageResponseTime() {
