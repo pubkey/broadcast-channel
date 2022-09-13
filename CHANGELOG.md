@@ -3,6 +3,10 @@
 
 ## X.X.X (comming soon)
 
+## 4.15.0 (13 September 2022)
+
+- Remove `microtime` dependency [https://github.com/pubkey/broadcast-channel/pull/1036](#1036) [jaredperreault-okta](https://github.com/jaredperreault-okta)
+
 ## 4.14.0 (18 Juli June 2022)
 
 - Updated dependencies.
