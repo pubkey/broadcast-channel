@@ -5,10 +5,6 @@ import SimulateMethod from './methods/simulate.js';
 // the line below will be removed from es5/browser builds
 import * as NodeMethod from './methods/node.js';
 
-import {
-    isNode
-} from './util.js';
-
 // order is important
 const METHODS = [
     NativeMethod, // fastest
@@ -37,7 +33,7 @@ export function chooseMethod(options) {
      * if no webworker support is needed,
      * remove idb from the list so that localstorage is been chosen
      */
-    if (!options.webWorkerSupport && !isNode) {
+    if (!options.webWorkerSupport) {
         chooseMethods = chooseMethods.filter(m => m.type !== 'idb');
     }
 

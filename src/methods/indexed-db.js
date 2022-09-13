@@ -12,7 +12,6 @@ import {
     randomInt,
     randomToken,
     microSeconds as micro,
-    isNode,
     PROMISE_RESOLVED_VOID
 } from '../util.js';
 
@@ -372,10 +371,10 @@ export function onMessage(channelState, fn, time) {
 }
 
 export function canBeUsed() {
-    if (isNode) return false;
     const idb = getIdb();
-
-    if (!idb) return false;
+    if (!idb) {
+        return false;
+    }
     return true;
 }
 

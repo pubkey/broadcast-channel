@@ -15,8 +15,7 @@ import {
 import {
     sleep,
     randomToken,
-    microSeconds as micro,
-    isNode
+    microSeconds as micro
 } from '../util.js';
 
 export const microSeconds = micro;
@@ -143,9 +142,7 @@ export function onMessage(channelState, fn, time) {
 }
 
 export function canBeUsed() {
-    if (isNode) return false;
     const ls = getLocalStorage();
-
     if (!ls) return false;
 
     try {
