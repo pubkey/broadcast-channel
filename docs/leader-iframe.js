@@ -788,6 +788,7 @@ var _localstorage = _interopRequireDefault(require("./methods/localstorage.js"))
 var _simulate = _interopRequireDefault(require("./methods/simulate.js"));
 
 
+
 var _util = require("./util.js");
 
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
@@ -801,6 +802,7 @@ _indexedDb["default"], _localstorage["default"]];
 
 function chooseMethod(options) {
   var chooseMethods = [].concat(options.methods, METHODS).filter(Boolean); // the line below will be removed from es5/browser builds
+
 
 
   if (options.type) {

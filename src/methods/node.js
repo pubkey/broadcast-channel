@@ -10,6 +10,7 @@ import os from 'os';
 import events from 'events';
 import net from 'net';
 import path from 'path';
+import micro from 'microtime';
 import rimraf from 'rimraf';
 import isNode from 'detect-node';
 import PQueue from 'p-queue';
@@ -356,13 +357,15 @@ export function readMessage(messageObj) {
 }
 
 export async function cleanOldMessages(messageObjects, ttl) {
-    const olderThen = microSeconds() - (ttl * 1000); // convert ttl to microseconds
+    const olderThen = Date.now() - ttl;
     await Promise.all(
         messageObjects
-            .filter(obj => obj.time < olderThen)
+            .filter(obj => (obj.time / 1000) < olderThen)
             .map(obj => unlink(obj.path).catch(() => null))
     );
 }
+
+
 
 export const type = 'node';
 
@@ -678,10 +681,5 @@ export function averageResponseTime() {
 }
 
 export function microSeconds() {
-    // convert nano to micro seconds
-    return parseInt(now() / 1000);
-}
-
-function now() {
-    return Number(process.hrtime.bigint()); // returns nanoseconds
+    return parseInt(micro.now());
 }

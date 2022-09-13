@@ -8,4 +8,3 @@ shelljs_*
 test_tmp/
 tmp/
 .eslintcache
-dist/**/*.bak

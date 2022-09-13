@@ -12,6 +12,7 @@ import os from 'os';
 import events from 'events';
 import net from 'net';
 import path from 'path';
+import micro from 'microtime';
 import rimraf from 'rimraf';
 import isNode from 'detect-node';
 import PQueue from 'p-queue';
@@ -592,11 +593,10 @@ function _cleanOldMessages() {
       while (1) {
         switch (_context15.prev = _context15.next) {
           case 0:
-            olderThen = microSeconds() - ttl * 1000; // convert ttl to microseconds
-
+            olderThen = Date.now() - ttl;
             _context15.next = 3;
             return Promise.all(messageObjects.filter(function (obj) {
-              return obj.time < olderThen;
+              return obj.time / 1000 < olderThen;
             }).map(function (obj) {
               return unlink(obj.path)["catch"](function () {
                 return null;
@@ -1085,10 +1085,5 @@ export function averageResponseTime() {
   return 200;
 }
 export function microSeconds() {
-  // convert nano to micro seconds
-  return parseInt(now() / 1000);
-}
-
-function now() {
-  return Number(process.hrtime.bigint()); // returns nanoseconds
+  return parseInt(micro.now());
 }
