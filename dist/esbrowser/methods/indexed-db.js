@@ -225,7 +225,7 @@ export function getOldMessages(db, ttl) {
   });
 }
 export function cleanOldMessages(channelState) {
-  return getOldMessages(channelState.db, channelState.options.ttl).then(function (tooOld) {
+  return getOldMessages(channelState.db, channelState.options.idb.ttl).then(function (tooOld) {
     return removeMessagesById(channelState, tooOld.map(function (msg) {
       return msg.id;
     }));
