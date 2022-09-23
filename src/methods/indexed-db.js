@@ -232,7 +232,7 @@ export function getOldMessages(db, ttl) {
 }
 
 export function cleanOldMessages(channelState) {
-    return getOldMessages(channelState.db, channelState.options.ttl)
+    return getOldMessages(channelState.db, channelState.options.idb.ttl)
         .then(tooOld => {
             return removeMessagesById(
                 channelState,
