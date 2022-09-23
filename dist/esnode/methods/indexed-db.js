@@ -180,8 +180,12 @@ export function getMessagesHigherThan(db, lastCursorId) {
     };
   });
 }
-export function removeMessagesById(db, ids) {
-  var tx = db.transaction([OBJECT_STORE_ID], 'readwrite', TRANSACTION_SETTINGS);
+export function removeMessagesById(channelState, ids) {
+  if (channelState.closed) {
+    return Promise.resolve([]);
+  }
+
+  var tx = channelState.db.transaction([OBJECT_STORE_ID], 'readwrite', TRANSACTION_SETTINGS);
   var objectStore = tx.objectStore(OBJECT_STORE_ID);
   return Promise.all(ids.map(function (id) {
     var deleteRequest = objectStore["delete"](id);
@@ -220,9 +224,9 @@ export function getOldMessages(db, ttl) {
     };
   });
 }
-export function cleanOldMessages(db, ttl) {
-  return getOldMessages(db, ttl).then(function (tooOld) {
-    return removeMessagesById(db, tooOld.map(function (msg) {
+export function cleanOldMessages(channelState) {
+  return getOldMessages(channelState.db, channelState.options.ttl).then(function (tooOld) {
+    return removeMessagesById(channelState, tooOld.map(function (msg) {
       return msg.id;
     }));
   });
@@ -342,7 +346,7 @@ export function postMessage(channelState, messageJson) {
   }).then(function () {
     if (randomInt(0, 10) === 0) {
       /* await (do not await) */
-      cleanOldMessages(channelState.db, channelState.options.idb.ttl);
+      cleanOldMessages(channelState);
     }
   });
   return channelState.writeBlockPromise;
