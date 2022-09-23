@@ -1057,7 +1057,7 @@ function removeMessagesById(channelState, ids) {
     return Promise.resolve([]);
   }
 
-  var tx = channelState.db.transaction([OBJECT_STORE_ID], 'readwrite', TRANSACTION_SETTINGS);
+  var tx = channelState.db.transaction(OBJECT_STORE_ID, 'readwrite', TRANSACTION_SETTINGS);
   var objectStore = tx.objectStore(OBJECT_STORE_ID);
   return Promise.all(ids.map(function (id) {
     var deleteRequest = objectStore["delete"](id);
