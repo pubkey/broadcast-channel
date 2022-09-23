@@ -191,7 +191,7 @@ export function removeMessagesById(channelState, ids) {
         return Promise.resolve([]);
     }
 
-    const tx = channelState.db.transaction([OBJECT_STORE_ID], 'readwrite', TRANSACTION_SETTINGS);
+    const tx = channelState.db.transaction(OBJECT_STORE_ID, 'readwrite', TRANSACTION_SETTINGS);
     const objectStore = tx.objectStore(OBJECT_STORE_ID);
 
     return Promise.all(
