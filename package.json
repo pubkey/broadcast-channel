@@ -135,7 +135,7 @@
     "testcafe": "2.0.0",
     "ts-node": "10.9.1",
     "typescript": "4.8.3",
-    "uglify-js": "3.17.1",
+    "uglify-js": "3.17.2",
     "watchify": "4.0.0",
     "webpack": "5.74.0",
     "webpack-cli": "4.10.0"
