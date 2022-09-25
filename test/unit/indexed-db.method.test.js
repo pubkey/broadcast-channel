@@ -97,18 +97,24 @@ describe('unit/indexed-db.method.test.js', () => {
         it('should clean up old messages', async () => {
             const channelName = AsyncTestUtil.randomString(10);
             const readerUuid = AsyncTestUtil.randomString(10);
-            const db = await IndexedDbMethod.createDatabase(channelName);
+            const channelOptions = {
+                idb: {
+                    ttl: 200
+                }
+            };
             const msgJson = {
                 foo: 'bar'
             };
-            await IndexedDbMethod.writeMessage(db, readerUuid, msgJson);
+            const channelState = await IndexedDbMethod.create(channelName, channelOptions);
+            
+            await IndexedDbMethod.writeMessage(channelState.db, readerUuid, msgJson);
 
             await AsyncTestUtil.wait(500);
 
-            await IndexedDbMethod.cleanOldMessages(db, 200);
+            await IndexedDbMethod.cleanOldMessages(channelState);
 
-            IndexedDbMethod.getAllMessages(db); // call parallel
-            const messagesAfter = await IndexedDbMethod.getAllMessages(db);
+            IndexedDbMethod.getAllMessages(channelState.db); // call parallel
+            const messagesAfter = await IndexedDbMethod.getAllMessages(channelState.db);
             assert.equal(messagesAfter.length, 0);
         });
     });

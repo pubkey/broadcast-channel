@@ -186,8 +186,12 @@ export function getMessagesHigherThan(db, lastCursorId) {
     });
 }
 
-export function removeMessagesById(db, ids) {
-    const tx = db.transaction([OBJECT_STORE_ID], 'readwrite', TRANSACTION_SETTINGS);
+export function removeMessagesById(channelState, ids) {
+    if (channelState.closed) {
+        return Promise.resolve([]);
+    }
+
+    const tx = channelState.db.transaction(OBJECT_STORE_ID, 'readwrite', TRANSACTION_SETTINGS);
     const objectStore = tx.objectStore(OBJECT_STORE_ID);
 
     return Promise.all(
@@ -227,11 +231,11 @@ export function getOldMessages(db, ttl) {
     });
 }
 
-export function cleanOldMessages(db, ttl) {
-    return getOldMessages(db, ttl)
+export function cleanOldMessages(channelState) {
+    return getOldMessages(channelState.db, channelState.options.idb.ttl)
         .then(tooOld => {
             return removeMessagesById(
-                db,
+                channelState,
                 tooOld.map(msg => msg.id)
             );
         });
@@ -354,10 +358,7 @@ export function postMessage(channelState, messageJson) {
         .then(() => {
             if (randomInt(0, 10) === 0) {
                 /* await (do not await) */
-                cleanOldMessages(
-                    channelState.db,
-                    channelState.options.idb.ttl
-                );
+                cleanOldMessages(channelState);
             }
         });
 
