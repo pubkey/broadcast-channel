@@ -3,6 +3,12 @@
 
 ## X.X.X (comming soon)
 
+## 4.18.0 (6 October 2022)
+
+
+- FIX fix(indexedDB): Can't start a transaction on a closed database [#1042](https://github.com/pubkey/broadcast-channel/pull/1042) [nabigraphics](https://github.com/nabigraphics)
+
+
 ## 4.17.0 (13 September 2022)
 
 - REMOVE the `isNode` utility function so that we do not access the `process` variable in browsers.

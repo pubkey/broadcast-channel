@@ -1,6 +1,6 @@
 {
   "name": "broadcast-channel",
-  "version": "4.17.0",
+  "version": "4.18.0",
   "description": "A BroadcastChannel that works in New Browsers, Old Browsers, WebWorkers and NodeJs",
   "exports": {
     ".": {
@@ -21,6 +21,8 @@
     "broadcastchannel",
     "broadcast",
     "polyfill",
+    "shim",
+    "events",
     "localstorage",
     "indexeddb",
     "postMessage",
@@ -37,6 +39,7 @@
   "bugs": {
     "url": "https://github.com/pubkey/broadcast-channel/issues"
   },
+  "funding": "https://github.com/sponsors/pubkey",
   "main": "./dist/es5node/index.js",
   "module": "./dist/esnode/index.js",
   "browser": "./dist/lib/index.es5.js",
