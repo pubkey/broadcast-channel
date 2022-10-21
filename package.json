@@ -101,7 +101,7 @@
     "@babel/polyfill": "7.12.1",
     "@babel/preset-env": "7.19.4",
     "@babel/types": "7.19.4",
-    "@rollup/plugin-node-resolve": "15.0.0",
+    "@rollup/plugin-node-resolve": "15.0.1",
     "@types/core-js": "2.5.5",
     "assert": "2.0.0",
     "async-test-util": "2.0.0",
