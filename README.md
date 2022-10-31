@@ -23,7 +23,8 @@
 <p align="center">
     <a href="https://twitter.com/pubkeypubkey">
         <img src="https://img.shields.io/twitter/follow/pubkeypubkey.svg?style=social&logo=twitter"
-            alt="follow on Twitter"></a>
+            alt="follow on Twitter" />
+    </a>
 </p>
 
 ![demo.gif](docs/files/demo.gif)
@@ -34,3 +35,19 @@ A BroadcastChannel that allows you to send data between different browser-tabs o
 And a LeaderElection over the channels.
 
 # [Read the full documentation on github](https://github.com/pubkey/broadcast-channel)
+
+
+# Sponsored by
+
+<p align="center">
+    <a href="https://rxdb.info/?utm_source=github&utm_medium=repo&utm_campaign=github-broadcast-channel-npm">
+        <img
+            src="https://github.com/pubkey/rxdb/raw/master/docs-src/files/logo/logo_text.svg"
+            alt="Sponsored by RxDB"
+            width="300"
+         />
+         <br />
+         <br />
+         <span>The <b>JavaScript Database</b></span>
+    </a>
+</p>

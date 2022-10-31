@@ -1,7 +1,6 @@
 "use strict";
 
 var _index = require("./index.js");
-
 /**
  * because babel can only export on default-attribute,
  * we use this for the non-module-build
@@ -10,6 +9,7 @@ var _index = require("./index.js");
  * but
  * var BroadcastChannel = require('broadcast-channel');
  */
+
 module.exports = {
   BroadcastChannel: _index.BroadcastChannel,
   createLeaderElection: _index.createLeaderElection,

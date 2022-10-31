@@ -29,6 +29,22 @@ A BroadcastChannel that allows you to send data between different browser-tabs o
 
 This behaves similar to the [BroadcastChannel-API](https://developer.mozilla.org/en-US/docs/Web/API/Broadcast_Channel_API) which is currently only featured in [some browsers](https://caniuse.com/#feat=broadcastchannel).
 
+
+# Sponsored by
+
+<p align="center">
+    <a href="https://rxdb.info/?utm_source=github&utm_medium=repo&utm_campaign=github-broadcast-channel-readme">
+        <img
+            src="https://github.com/pubkey/rxdb/raw/master/docs-src/files/logo/logo_text.svg"
+            alt="Sponsored by RxDB"
+            width="300"
+         />
+         <br />
+         <br />
+         <span>The <b>JavaScript Database</b></span>
+    </a>
+</p>
+
 ## Using the BroadcastChannel
 
 ```bash

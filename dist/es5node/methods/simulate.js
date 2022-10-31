@@ -11,15 +11,12 @@ exports.microSeconds = exports["default"] = void 0;
 exports.onMessage = onMessage;
 exports.postMessage = postMessage;
 exports.type = void 0;
-
 var _util = require("../util.js");
-
 var microSeconds = _util.microSeconds;
 exports.microSeconds = microSeconds;
 var type = 'simulate';
 exports.type = type;
 var SIMULATE_CHANNELS = new Set();
-
 function create(channelName) {
   var state = {
     name: channelName,
@@ -28,11 +25,9 @@ function create(channelName) {
   SIMULATE_CHANNELS.add(state);
   return state;
 }
-
 function close(channelState) {
   SIMULATE_CHANNELS["delete"](channelState);
 }
-
 function postMessage(channelState, messageJson) {
   return new Promise(function (res) {
     return setTimeout(function () {
@@ -50,19 +45,15 @@ function postMessage(channelState, messageJson) {
     }, 5);
   });
 }
-
 function onMessage(channelState, fn) {
   channelState.messagesCallback = fn;
 }
-
 function canBeUsed() {
   return true;
 }
-
 function averageResponseTime() {
   return 5;
 }
-
 var _default = {
   create: create,
   close: close,
