@@ -1,5 +1,5 @@
 import NativeMethod from './methods/native.js';
-import IndexeDbMethod from './methods/indexed-db.js';
+import IndexedDbMethod from './methods/indexed-db.js';
 import LocalstorageMethod from './methods/localstorage.js';
 import SimulateMethod from './methods/simulate.js';
 // the line below will be removed from es5/browser builds
@@ -8,7 +8,7 @@ import * as NodeMethod from './methods/node.js';
 // order is important
 const METHODS = [
     NativeMethod, // fastest
-    IndexeDbMethod,
+    IndexedDbMethod,
     LocalstorageMethod
 ];
 
@@ -31,7 +31,7 @@ export function chooseMethod(options) {
 
     /**
      * if no webworker support is needed,
-     * remove idb from the list so that localstorage is been chosen
+     * remove idb from the list so that localstorage will be chosen
      */
     if (!options.webWorkerSupport) {
         chooseMethods = chooseMethods.filter(m => m.type !== 'idb');
@@ -39,7 +39,7 @@ export function chooseMethod(options) {
 
     const useMethod = chooseMethods.find(method => method.canBeUsed());
     if (!useMethod)
-        throw new Error(`No useable method found in ${JSON.stringify(METHODS.map(m => m.type))}`);
+        throw new Error(`No usable method found in ${JSON.stringify(METHODS.map(m => m.type))}`);
     else
         return useMethod;
 }
