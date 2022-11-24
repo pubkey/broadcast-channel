@@ -37,7 +37,7 @@ export declare class LeaderElector {
 
     /**
      * True if this or another instance is leader.
-     * False if there is not leader at the moment
+     * False if there is no leader at the moment
      * and we must wait for the election cycle.
      */
     readonly hasLeader: boolean;

@@ -152,11 +152,10 @@ export function socketPath(channelName, readerUuid, paths) {
 
 export function socketInfoPath(channelName, readerUuid, paths) {
     paths = paths || getPaths(channelName);
-    const socketPath = path.join(
+    return path.join(
         paths.readers,
         readerUuid + '.json'
     );
-    return socketPath;
 }
 
 
@@ -189,7 +188,7 @@ export async function countChannelFolders() {
 async function connectionError(originalError) {
     const count = await countChannelFolders();
 
-    // we only show the augmented message if there are more then 30 channels
+    // we only show the augmented message if there are more than 30 channels
     // because we then assume that BroadcastChannel is used in unit-tests
     if (count < 30) return originalError;
 
@@ -200,8 +199,7 @@ async function connectionError(originalError) {
         'like when you use BroadcastChannel in unit-tests.' +
         'Try using BroadcastChannel.clearNodeFolder() to clear the tmp-folder before each test.' +
         'See https://github.com/pubkey/broadcast-channel#clear-tmp-folder';
-    const newError = new Error(text + ': ' + JSON.stringify(addObj, null, 2));
-    return newError;
+    return new Error(text + ': ' + JSON.stringify(addObj, null, 2));
 }
 
 /**
@@ -307,11 +305,10 @@ export async function getReadersUuids(channelName, paths) {
 export async function messagePath(channelName, time, token, writerUuid) {
     const fileName = time + '_' + writerUuid + '_' + token + '.json';
 
-    const msgPath = path.join(
+    return path.join(
         getPaths(channelName).messages,
         fileName
     );
-    return msgPath;
 }
 
 export async function getAllMessages(channelName, paths) {
@@ -355,10 +352,10 @@ export function readMessage(messageObj) {
 }
 
 export async function cleanOldMessages(messageObjects, ttl) {
-    const olderThen = microSeconds() - (ttl * 1000); // convert ttl to microseconds
+    const olderThan = microSeconds() - (ttl * 1000); // convert ttl to microseconds
     await Promise.all(
         messageObjects
-            .filter(obj => obj.time < olderThen)
+            .filter(obj => obj.time < olderThan)
             .map(obj => unlink(obj.path).catch(() => null))
     );
 }
@@ -387,12 +384,12 @@ export async function create(channelName, options = {}) {
         /**
          * Used to ensure we do not write too many files at once
          * which could throw an error.
-         * Must always be smaller then options.node.maxParallelWrites
+         * Must always be smaller than options.node.maxParallelWrites
          */
         writeFileQueue: new PQueue({ concurrency: options.node.maxParallelWrites }),
         messagesCallbackTime: null,
         messagesCallback: null,
-        // ensures we do not read messages in parrallel
+        // ensures we do not read messages in parallel
         writeBlockPromise: PROMISE_RESOLVED_VOID,
         otherReaderClients: {},
         // ensure if process crashes, everything is cleaned up
@@ -525,7 +522,7 @@ export function refreshReaderClients(channelState) {
                                 channelState.otherReaderClients[readerUuid] = client;
                             } catch (err) {
                                 // this can throw when the cleanup of another channel was interrupted
-                                // or the socket-file does not exits yet
+                                // or the socket-file does not exist yet
                             }
                         } catch (err) {
                             // this might throw if the other channel is closed at the same time when this one is running refresh
@@ -627,7 +624,7 @@ export function onMessage(channelState, fn, time = microSeconds()) {
  * @return {Promise}
  */
 export function close(channelState) {
-    if (channelState.closed) return;
+    if (channelState.closed) return PROMISE_RESOLVED_VOID;
     channelState.closed = true;
     channelState.emittedMessagesIds.clear();
     OTHER_INSTANCES[channelState.channelName] = OTHER_INSTANCES[channelState.channelName].filter(o => o !== channelState);
@@ -663,18 +660,14 @@ export function close(channelState) {
 
 
 export function canBeUsed() {
-    if (typeof fs.mkdir === 'function') {
-        return true;
-    } else {
-        return false;
-    }
+    return typeof fs.mkdir === 'function';
 }
 
 /**
- * on node we use a relatively height averageResponseTime,
+ * on node we use a relatively high averageResponseTime,
  * because the file-io might be in use.
  * Also it is more important that the leader-election is reliable,
- * then to have a fast election.
+ * than to have a fast election.
  */
 export function averageResponseTime() {
     return 200;

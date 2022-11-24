@@ -62,7 +62,7 @@ export class BroadcastChannel<T = any> {
 
     onmessage: OnMessageHandler<T>;
 
-    // not defined in the offical standard
+    // not defined in the official standard
     addEventListener(type: EventContext, handler: OnMessageHandler<T>): void;
     removeEventListener(type: EventContext, handler: OnMessageHandler<T>): void;
 

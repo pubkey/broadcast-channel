@@ -50,7 +50,7 @@ export const BroadcastChannel = function (name, options) {
     };
 
     /**
-     * Unsend message promises
+     * Unsent message promises
      * where the sending is still in progress
      * @type {Set<Promise>}
      */
@@ -111,7 +111,7 @@ BroadcastChannel.prototype = {
                 'BroadcastChannel.postMessage(): ' +
                 'Cannot post message after channel has closed ' +
                 /**
-                 * In the past when this error appeared, it was realy hard to debug.
+                 * In the past when this error appeared, it was really hard to debug.
                  * So now we log the msg together with the error so it at least
                  * gives some clue about where in your application this happens.
                  */
@@ -199,7 +199,7 @@ function _post(broadcastChannel, type, msg) {
             msgObj
         );
 
-        // add/remove to unsend messages list
+        // add/remove to unsent messages list
         broadcastChannel._uMP.add(sendPromise);
         sendPromise
             .catch()
@@ -251,8 +251,8 @@ function _startListening(channel) {
                 .forEach(listenerObject => {
                     /**
                      * Getting the current time in JavaScript has no good precision.
-                     * So instead of only listening to events that happend 'after' the listener
-                     * was added, we also listen to events that happended 100ms before it.
+                     * So instead of only listening to events that happened 'after' the listener
+                     * was added, we also listen to events that happened 100ms before it.
                      * This ensures that when another process, like a WebWorker, sends events
                      * we do not miss them out because their timestamp is a bit off compared to the main process.
                      * Not doing this would make messages missing when we send data directly after subscribing and awaiting a response.
@@ -290,7 +290,7 @@ function _startListening(channel) {
 
 function _stopListening(channel) {
     if (channel._iL && !_hasMessageListeners(channel)) {
-        // noone is listening, stop subscribing
+        // no one is listening, stop subscribing
         channel._iL = false;
         const time = channel.method.microSeconds();
         channel.method.onMessage(

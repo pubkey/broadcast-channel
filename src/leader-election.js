@@ -72,7 +72,7 @@ LeaderElection.prototype = {
         }
 
         /**
-         * Already applying more then once,
+         * Already applying more than once,
          * -> wait for the apply queue to be finished.
          */
         if (this._aplQC > 1) {
@@ -105,10 +105,8 @@ LeaderElection.prototype = {
                     res();
                 };
             });
-            const recieved = [];
             const handleMessage = (msg) => {
                 if (msg.context === 'leader' && msg.token != this.token) {
-                    recieved.push(msg);
                     if (msg.action === 'apply') {
                         // other is applying
                         if (msg.token > this.token) {
@@ -133,7 +131,7 @@ LeaderElection.prototype = {
              * If the applyOnce() call came from the fallbackInterval,
              * we can assume that the election runs in the background and
              * not critical process is waiting for it.
-             * When this is true, we give the other intances
+             * When this is true, we give the other instances
              * more time to answer to messages in the election cycle.
              * This makes it less likely to elect duplicate leaders.
              * But also it takes longer which is not a problem because we anyway
@@ -141,7 +139,7 @@ LeaderElection.prototype = {
              */
             const waitForAnswerTime = isFromFallbackInterval ? this._options.responseTime * 4 : this._options.responseTime;
 
-            const applyPromise = _sendMessage(this, 'apply') // send out that this one is applying
+            return _sendMessage(this, 'apply') // send out that this one is applying
                 .then(() => Promise.race([
                     sleep(waitForAnswerTime),
                     stopCriteriaPromise.then(() => Promise.reject(new Error()))
@@ -164,7 +162,6 @@ LeaderElection.prototype = {
                         return false;
                     }
                 });
-            return applyPromise;
         };
         this._aplQC = this._aplQC + 1;
         this._aplQ = this._aplQ
