@@ -3,12 +3,12 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.LocalstorageMethod = void 0;
 exports.addStorageEventListener = addStorageEventListener;
 exports.averageResponseTime = averageResponseTime;
 exports.canBeUsed = canBeUsed;
 exports.close = close;
 exports.create = create;
-exports["default"] = void 0;
 exports.getLocalStorage = getLocalStorage;
 exports.microSeconds = void 0;
 exports.onMessage = onMessage;
@@ -21,8 +21,8 @@ var _options = require("../options.js");
 var _util = require("../util.js");
 /**
  * A localStorage-only method which uses localstorage and its 'storage'-event
- * This does not work inside of webworkers because they have no access to locastorage
- * This is basically implemented to support IE9 or your grandmothers toaster.
+ * This does not work inside webworkers because they have no access to localstorage
+ * This is basically implemented to support IE9 or your grandmother's toaster.
  * @link https://caniuse.com/#feat=namevalue-storage
  * @link https://caniuse.com/#feat=indexeddb
  */
@@ -159,7 +159,7 @@ function averageResponseTime() {
   }
   return defaultTime;
 }
-var _default = {
+var LocalstorageMethod = {
   create: create,
   close: close,
   onMessage: onMessage,
@@ -169,4 +169,4 @@ var _default = {
   averageResponseTime: averageResponseTime,
   microSeconds: microSeconds
 };
-exports["default"] = _default;
+exports.LocalstorageMethod = LocalstorageMethod;

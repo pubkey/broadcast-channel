@@ -13,11 +13,7 @@ exports.sleep = sleep;
  * returns true if the given object is a promise
  */
 function isPromise(obj) {
-  if (obj && typeof obj.then === 'function') {
-    return true;
-  } else {
-    return false;
-  }
+  return obj && typeof obj.then === 'function';
 }
 var PROMISE_RESOLVED_FALSE = Promise.resolve(false);
 exports.PROMISE_RESOLVED_FALSE = PROMISE_RESOLVED_FALSE;

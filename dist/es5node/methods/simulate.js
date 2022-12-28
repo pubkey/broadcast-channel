@@ -3,11 +3,12 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.SimulateMethod = void 0;
 exports.averageResponseTime = averageResponseTime;
 exports.canBeUsed = canBeUsed;
 exports.close = close;
 exports.create = create;
-exports.microSeconds = exports["default"] = void 0;
+exports.microSeconds = void 0;
 exports.onMessage = onMessage;
 exports.postMessage = postMessage;
 exports.type = void 0;
@@ -54,7 +55,7 @@ function canBeUsed() {
 function averageResponseTime() {
   return 5;
 }
-var _default = {
+var SimulateMethod = {
   create: create,
   close: close,
   onMessage: onMessage,
@@ -64,4 +65,4 @@ var _default = {
   averageResponseTime: averageResponseTime,
   microSeconds: microSeconds
 };
-exports["default"] = _default;
+exports.SimulateMethod = SimulateMethod;

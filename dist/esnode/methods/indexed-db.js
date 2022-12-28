@@ -61,7 +61,7 @@ export function createDatabase(channelName) {
       autoIncrement: true
     });
   };
-  var dbPromise = new Promise(function (res, rej) {
+  return new Promise(function (res, rej) {
     openRequest.onerror = function (ev) {
       return rej(ev);
     };
@@ -69,7 +69,6 @@ export function createDatabase(channelName) {
       res(openRequest.result);
     };
   });
-  return dbPromise;
 }
 
 /**
@@ -201,7 +200,6 @@ export function getOldMessages(db, ttl) {
           // no more old messages,
           commitIndexedDBTransaction(tx);
           res(ret);
-          return;
         }
       } else {
         res(ret);
@@ -231,7 +229,7 @@ export function create(channelName, options) {
        * @type {ObliviousSet}
        */
       eMIs: new ObliviousSet(options.idb.ttl * 2),
-      // ensures we do not read messages in parrallel
+      // ensures we do not read messages in parallel
       writeBlockPromise: PROMISE_RESOLVED_VOID,
       messagesCallback: null,
       readQueuePromises: [],
@@ -285,7 +283,7 @@ function readNewMessages(state) {
   return getMessagesHigherThan(state.db, state.lastCursorId).then(function (newerMessages) {
     var useMessages = newerMessages
     /**
-     * there is a bug in iOS where the msgObj can be undefined some times
+     * there is a bug in iOS where the msgObj can be undefined sometimes
      * so we filter them out
      * @link https://github.com/pubkey/broadcast-channel/issues/19
      */.filter(function (msgObj) {
@@ -330,16 +328,12 @@ export function onMessage(channelState, fn, time) {
   readNewMessages(channelState);
 }
 export function canBeUsed() {
-  var idb = getIdb();
-  if (!idb) {
-    return false;
-  }
-  return true;
+  return !!getIdb();
 }
 export function averageResponseTime(options) {
   return options.idb.fallbackInterval * 2;
 }
-export default {
+export var IndexedDBMethod = {
   create: create,
   close: close,
   onMessage: onMessage,

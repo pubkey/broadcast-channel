@@ -47,7 +47,7 @@ var BroadcastChannel = function BroadcastChannel(name, options) {
   };
 
   /**
-   * Unsend message promises
+   * Unsent message promises
    * where the sending is still in progress
    * @type {Set<Promise>}
    */
@@ -108,7 +108,7 @@ BroadcastChannel.prototype = {
     if (this.closed) {
       throw new Error('BroadcastChannel.postMessage(): ' + 'Cannot post message after channel has closed ' +
       /**
-       * In the past when this error appeared, it was realy hard to debug.
+       * In the past when this error appeared, it was really hard to debug.
        * So now we log the msg together with the error so it at least
        * gives some clue about where in your application this happens.
        */
@@ -196,7 +196,7 @@ function _post(broadcastChannel, type, msg) {
   return awaitPrepare.then(function () {
     var sendPromise = broadcastChannel.method.postMessage(broadcastChannel._state, msgObj);
 
-    // add/remove to unsend messages list
+    // add/remove to unsent messages list
     broadcastChannel._uMP.add(sendPromise);
     sendPromise["catch"]().then(function () {
       return broadcastChannel._uMP["delete"](sendPromise);
@@ -242,8 +242,8 @@ function _startListening(channel) {
       channel._addEL[msgObj.type].forEach(function (listenerObject) {
         /**
          * Getting the current time in JavaScript has no good precision.
-         * So instead of only listening to events that happend 'after' the listener
-         * was added, we also listen to events that happended 100ms before it.
+         * So instead of only listening to events that happened 'after' the listener
+         * was added, we also listen to events that happened 100ms before it.
          * This ensures that when another process, like a WebWorker, sends events
          * we do not miss them out because their timestamp is a bit off compared to the main process.
          * Not doing this would make messages missing when we send data directly after subscribing and awaiting a response.
@@ -270,7 +270,7 @@ function _startListening(channel) {
 }
 function _stopListening(channel) {
   if (channel._iL && !_hasMessageListeners(channel)) {
-    // noone is listening, stop subscribing
+    // no one is listening, stop subscribing
     channel._iL = false;
     var time = channel.method.microSeconds();
     channel.method.onMessage(channel._state, null, time);
@@ -418,7 +418,7 @@ LeaderElection.prototype = {
     }
 
     /**
-     * Already applying more then once,
+     * Already applying more than once,
      * -> wait for the apply queue to be finished.
      */
     if (this._aplQC > 1) {
@@ -451,10 +451,8 @@ LeaderElection.prototype = {
           res();
         };
       });
-      var recieved = [];
       var handleMessage = function handleMessage(msg) {
         if (msg.context === 'leader' && msg.token != _this2.token) {
-          recieved.push(msg);
           if (msg.action === 'apply') {
             // other is applying
             if (msg.token > _this2.token) {
@@ -478,14 +476,14 @@ LeaderElection.prototype = {
        * If the applyOnce() call came from the fallbackInterval,
        * we can assume that the election runs in the background and
        * not critical process is waiting for it.
-       * When this is true, we give the other intances
+       * When this is true, we give the other instances
        * more time to answer to messages in the election cycle.
        * This makes it less likely to elect duplicate leaders.
        * But also it takes longer which is not a problem because we anyway
        * run in the background.
        */
       var waitForAnswerTime = isFromFallbackInterval ? _this2._options.responseTime * 4 : _this2._options.responseTime;
-      var applyPromise = _sendMessage(_this2, 'apply') // send out that this one is applying
+      return _sendMessage(_this2, 'apply') // send out that this one is applying
       .then(function () {
         return Promise.race([(0, _util.sleep)(waitForAnswerTime), stopCriteriaPromise.then(function () {
           return Promise.reject(new Error());
@@ -512,7 +510,6 @@ LeaderElection.prototype = {
           return false;
         }
       });
-      return applyPromise;
     };
     this._aplQC = this._aplQC + 1;
     this._aplQ = this._aplQ.then(function () {
@@ -682,27 +679,26 @@ function createLeaderElection(channel, options) {
   channel._leaderElector = elector;
   return elector;
 }
-},{"./util.js":12,"unload":19}],6:[function(require,module,exports){
+},{"./util.js":12,"unload":18}],6:[function(require,module,exports){
 "use strict";
 
-var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 var _typeof = require("@babel/runtime/helpers/typeof");
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.chooseMethod = chooseMethod;
-var _native = _interopRequireDefault(require("./methods/native.js"));
-var _indexedDb = _interopRequireDefault(require("./methods/indexed-db.js"));
-var _localstorage = _interopRequireDefault(require("./methods/localstorage.js"));
-var _simulate = _interopRequireDefault(require("./methods/simulate.js"));
+var _native = require("./methods/native.js");
+var _indexedDb = require("./methods/indexed-db.js");
+var _localstorage = require("./methods/localstorage.js");
+var _simulate = require("./methods/simulate.js");
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== "object" && typeof obj !== "function") { return { "default": obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj["default"] = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 // the line below will be removed from es5/browser builds
 
 // order is important
-var METHODS = [_native["default"],
+var METHODS = [_native.NativeMethod,
 // fastest
-_indexedDb["default"], _localstorage["default"]];
+_indexedDb.IndexedDBMethod, _localstorage.LocalstorageMethod];
 function chooseMethod(options) {
   var chooseMethods = [].concat(options.methods, METHODS).filter(Boolean);
 
@@ -712,7 +708,7 @@ function chooseMethod(options) {
   if (options.type) {
     if (options.type === 'simulate') {
       // only use simulate-method if directly chosen
-      return _simulate["default"];
+      return _simulate.SimulateMethod;
     }
     var ret = chooseMethods.find(function (m) {
       return m.type === options.type;
@@ -722,7 +718,7 @@ function chooseMethod(options) {
 
   /**
    * if no webworker support is needed,
-   * remove idb from the list so that localstorage is been chosen
+   * remove idb from the list so that localstorage will be chosen
    */
   if (!options.webWorkerSupport) {
     chooseMethods = chooseMethods.filter(function (m) {
@@ -732,17 +728,17 @@ function chooseMethod(options) {
   var useMethod = chooseMethods.find(function (method) {
     return method.canBeUsed();
   });
-  if (!useMethod) throw new Error("No useable method found in " + JSON.stringify(METHODS.map(function (m) {
+  if (!useMethod) throw new Error("No usable method found in " + JSON.stringify(METHODS.map(function (m) {
     return m.type;
   })));else return useMethod;
 }
-},{"./methods/indexed-db.js":7,"./methods/localstorage.js":8,"./methods/native.js":9,"./methods/simulate.js":10,"@babel/runtime/helpers/interopRequireDefault":13,"@babel/runtime/helpers/typeof":14}],7:[function(require,module,exports){
+},{"./methods/indexed-db.js":7,"./methods/localstorage.js":8,"./methods/native.js":9,"./methods/simulate.js":10,"@babel/runtime/helpers/typeof":13}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.TRANSACTION_SETTINGS = void 0;
+exports.TRANSACTION_SETTINGS = exports.IndexedDBMethod = void 0;
 exports.averageResponseTime = averageResponseTime;
 exports.canBeUsed = canBeUsed;
 exports.cleanOldMessages = cleanOldMessages;
@@ -750,7 +746,6 @@ exports.close = close;
 exports.commitIndexedDBTransaction = commitIndexedDBTransaction;
 exports.create = create;
 exports.createDatabase = createDatabase;
-exports["default"] = void 0;
 exports.getAllMessages = getAllMessages;
 exports.getIdb = getIdb;
 exports.getMessagesHigherThan = getMessagesHigherThan;
@@ -827,7 +822,7 @@ function createDatabase(channelName) {
       autoIncrement: true
     });
   };
-  var dbPromise = new Promise(function (res, rej) {
+  return new Promise(function (res, rej) {
     openRequest.onerror = function (ev) {
       return rej(ev);
     };
@@ -835,7 +830,6 @@ function createDatabase(channelName) {
       res(openRequest.result);
     };
   });
-  return dbPromise;
 }
 
 /**
@@ -967,7 +961,6 @@ function getOldMessages(db, ttl) {
           // no more old messages,
           commitIndexedDBTransaction(tx);
           res(ret);
-          return;
         }
       } else {
         res(ret);
@@ -997,7 +990,7 @@ function create(channelName, options) {
        * @type {ObliviousSet}
        */
       eMIs: new _obliviousSet.ObliviousSet(options.idb.ttl * 2),
-      // ensures we do not read messages in parrallel
+      // ensures we do not read messages in parallel
       writeBlockPromise: _util.PROMISE_RESOLVED_VOID,
       messagesCallback: null,
       readQueuePromises: [],
@@ -1051,7 +1044,7 @@ function readNewMessages(state) {
   return getMessagesHigherThan(state.db, state.lastCursorId).then(function (newerMessages) {
     var useMessages = newerMessages
     /**
-     * there is a bug in iOS where the msgObj can be undefined some times
+     * there is a bug in iOS where the msgObj can be undefined sometimes
      * so we filter them out
      * @link https://github.com/pubkey/broadcast-channel/issues/19
      */.filter(function (msgObj) {
@@ -1096,16 +1089,12 @@ function onMessage(channelState, fn, time) {
   readNewMessages(channelState);
 }
 function canBeUsed() {
-  var idb = getIdb();
-  if (!idb) {
-    return false;
-  }
-  return true;
+  return !!getIdb();
 }
 function averageResponseTime(options) {
   return options.idb.fallbackInterval * 2;
 }
-var _default = {
+var IndexedDBMethod = {
   create: create,
   close: close,
   onMessage: onMessage,
@@ -1115,19 +1104,19 @@ var _default = {
   averageResponseTime: averageResponseTime,
   microSeconds: microSeconds
 };
-exports["default"] = _default;
-},{"../options.js":11,"../util.js":12,"oblivious-set":17}],8:[function(require,module,exports){
+exports.IndexedDBMethod = IndexedDBMethod;
+},{"../options.js":11,"../util.js":12,"oblivious-set":15}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.LocalstorageMethod = void 0;
 exports.addStorageEventListener = addStorageEventListener;
 exports.averageResponseTime = averageResponseTime;
 exports.canBeUsed = canBeUsed;
 exports.close = close;
 exports.create = create;
-exports["default"] = void 0;
 exports.getLocalStorage = getLocalStorage;
 exports.microSeconds = void 0;
 exports.onMessage = onMessage;
@@ -1140,8 +1129,8 @@ var _options = require("../options.js");
 var _util = require("../util.js");
 /**
  * A localStorage-only method which uses localstorage and its 'storage'-event
- * This does not work inside of webworkers because they have no access to locastorage
- * This is basically implemented to support IE9 or your grandmothers toaster.
+ * This does not work inside webworkers because they have no access to localstorage
+ * This is basically implemented to support IE9 or your grandmother's toaster.
  * @link https://caniuse.com/#feat=namevalue-storage
  * @link https://caniuse.com/#feat=indexeddb
  */
@@ -1278,7 +1267,7 @@ function averageResponseTime() {
   }
   return defaultTime;
 }
-var _default = {
+var LocalstorageMethod = {
   create: create,
   close: close,
   onMessage: onMessage,
@@ -1288,18 +1277,19 @@ var _default = {
   averageResponseTime: averageResponseTime,
   microSeconds: microSeconds
 };
-exports["default"] = _default;
-},{"../options.js":11,"../util.js":12,"oblivious-set":17}],9:[function(require,module,exports){
+exports.LocalstorageMethod = LocalstorageMethod;
+},{"../options.js":11,"../util.js":12,"oblivious-set":15}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.NativeMethod = void 0;
 exports.averageResponseTime = averageResponseTime;
 exports.canBeUsed = canBeUsed;
 exports.close = close;
 exports.create = create;
-exports.microSeconds = exports["default"] = void 0;
+exports.microSeconds = void 0;
 exports.onMessage = onMessage;
 exports.postMessage = postMessage;
 exports.type = void 0;
@@ -1353,7 +1343,7 @@ function canBeUsed() {
 function averageResponseTime() {
   return 150;
 }
-var _default = {
+var NativeMethod = {
   create: create,
   close: close,
   onMessage: onMessage,
@@ -1363,18 +1353,19 @@ var _default = {
   averageResponseTime: averageResponseTime,
   microSeconds: microSeconds
 };
-exports["default"] = _default;
+exports.NativeMethod = NativeMethod;
 },{"../util.js":12}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.SimulateMethod = void 0;
 exports.averageResponseTime = averageResponseTime;
 exports.canBeUsed = canBeUsed;
 exports.close = close;
 exports.create = create;
-exports.microSeconds = exports["default"] = void 0;
+exports.microSeconds = void 0;
 exports.onMessage = onMessage;
 exports.postMessage = postMessage;
 exports.type = void 0;
@@ -1421,7 +1412,7 @@ function canBeUsed() {
 function averageResponseTime() {
   return 5;
 }
-var _default = {
+var SimulateMethod = {
   create: create,
   close: close,
   onMessage: onMessage,
@@ -1431,7 +1422,7 @@ var _default = {
   averageResponseTime: averageResponseTime,
   microSeconds: microSeconds
 };
-exports["default"] = _default;
+exports.SimulateMethod = SimulateMethod;
 },{"../util.js":12}],11:[function(require,module,exports){
 "use strict";
 
@@ -1488,11 +1479,7 @@ exports.sleep = sleep;
  * returns true if the given object is a promise
  */
 function isPromise(obj) {
-  if (obj && typeof obj.then === 'function') {
-    return true;
-  } else {
-    return false;
-  }
+  return obj && typeof obj.then === 'function';
 }
 var PROMISE_RESOLVED_FALSE = Promise.resolve(false);
 exports.PROMISE_RESOLVED_FALSE = PROMISE_RESOLVED_FALSE;
@@ -1540,13 +1527,6 @@ function microSeconds() {
   }
 }
 },{}],13:[function(require,module,exports){
-function _interopRequireDefault(obj) {
-  return obj && obj.__esModule ? obj : {
-    "default": obj
-  };
-}
-module.exports = _interopRequireDefault, module.exports.__esModule = true, module.exports["default"] = module.exports;
-},{}],14:[function(require,module,exports){
 function _typeof(obj) {
   "@babel/helpers - typeof";
 
@@ -1557,13 +1537,9 @@ function _typeof(obj) {
   }, module.exports.__esModule = true, module.exports["default"] = module.exports), _typeof(obj);
 }
 module.exports = _typeof, module.exports.__esModule = true, module.exports["default"] = module.exports;
+},{}],14:[function(require,module,exports){
+
 },{}],15:[function(require,module,exports){
-
-},{}],16:[function(require,module,exports){
-module.exports = false;
-
-
-},{}],17:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.now = exports.removeTooOldValues = exports.ObliviousSet = void 0;
@@ -1641,54 +1617,247 @@ function now() {
 }
 exports.now = now;
 
-},{}],18:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
+// shim for using process in browser
+var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
+(function () {
+    try {
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
+        }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
+    }
+    try {
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
+    }
+} ())
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = runTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    runClearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        runTimeout(drainQueue);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
+
+process.listeners = function (name) { return [] }
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+},{}],17:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports["default"] = void 0;
-
+exports.addBrowser = addBrowser;
 /* global WorkerGlobalScope */
-function add(fn) {
-  if (typeof WorkerGlobalScope === 'function' && self instanceof WorkerGlobalScope) {// this is run inside of a webworker
+
+function addBrowser(fn) {
+  if (typeof WorkerGlobalScope === 'function' && self instanceof WorkerGlobalScope) {
+    /**
+     * Because killing a worker does directly stop the excution
+     * of the code, our only chance is to overwrite the close function
+     * which could work some times.
+     * @link https://stackoverflow.com/q/72903255/3443137
+     */
+    var oldClose = self.close.bind(self);
+    self.close = function () {
+      fn();
+      return oldClose();
+    };
   } else {
     /**
      * if we are on react-native, there is no window.addEventListener
      * @link https://github.com/pubkey/unload/issues/6
      */
-    if (typeof window.addEventListener !== 'function') return;
+    if (typeof window.addEventListener !== 'function') {
+      return;
+    }
+
     /**
      * for normal browser-windows, we use the beforeunload-event
      */
-
     window.addEventListener('beforeunload', function () {
       fn();
     }, true);
+
     /**
      * for iframes, we have to use the unload-event
      * @link https://stackoverflow.com/q/47533670/3443137
      */
-
     window.addEventListener('unload', function () {
       fn();
     }, true);
   }
+
   /**
    * TODO add fallback for safari-mobile
    * @link https://stackoverflow.com/a/26193516/3443137
    */
-
 }
-
-var _default = {
-  add: add
-};
-exports["default"] = _default;
-},{}],19:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
+(function (process){(function (){
 "use strict";
-
-var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -1697,26 +1866,29 @@ exports.add = add;
 exports.getSize = getSize;
 exports.removeAll = removeAll;
 exports.runAll = runAll;
-
-var _detectNode = _interopRequireDefault(require("detect-node"));
-
-var _browser = _interopRequireDefault(require("./browser.js"));
-
-var _node = _interopRequireDefault(require("./node.js"));
-
-var USE_METHOD = _detectNode["default"] ? _node["default"] : _browser["default"];
+var _browser = require("./browser.js");
+var _node = require("./node.js");
+/**
+ * Use the code directly to prevent import problems
+ * with the detect-node package.
+ * @link https://github.com/iliakan/detect-node/blob/master/index.js
+ */
+var isNode = Object.prototype.toString.call(typeof process !== 'undefined' ? process : 0) === '[object process]';
+var USE_METHOD = isNode ? _node.addNode : _browser.addBrowser;
 var LISTENERS = new Set();
 var startedListening = false;
-
 function startListening() {
-  if (startedListening) return;
+  if (startedListening) {
+    return;
+  }
   startedListening = true;
-  USE_METHOD.add(runAll);
+  USE_METHOD(runAll);
 }
-
 function add(fn) {
   startListening();
-  if (typeof fn !== 'function') throw new Error('Listener is no function');
+  if (typeof fn !== 'function') {
+    throw new Error('Listener is no function');
+  }
   LISTENERS.add(fn);
   var addReturn = {
     remove: function remove() {
@@ -1729,7 +1901,6 @@ function add(fn) {
   };
   return addReturn;
 }
-
 function runAll() {
   var promises = [];
   LISTENERS.forEach(function (fn) {
@@ -1738,12 +1909,11 @@ function runAll() {
   });
   return Promise.all(promises);
 }
-
 function removeAll() {
   LISTENERS.clear();
 }
-
 function getSize() {
   return LISTENERS.size;
 }
-},{"./browser.js":18,"./node.js":15,"@babel/runtime/helpers/interopRequireDefault":13,"detect-node":16}]},{},[2]);
+}).call(this)}).call(this,require('_process'))
+},{"./browser.js":17,"./node.js":14,"_process":16}]},{},[2]);

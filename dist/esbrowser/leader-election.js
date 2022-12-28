@@ -60,7 +60,7 @@ LeaderElection.prototype = {
     }
 
     /**
-     * Already applying more then once,
+     * Already applying more than once,
      * -> wait for the apply queue to be finished.
      */
     if (this._aplQC > 1) {
@@ -93,10 +93,8 @@ LeaderElection.prototype = {
           res();
         };
       });
-      var recieved = [];
       var handleMessage = function handleMessage(msg) {
         if (msg.context === 'leader' && msg.token != _this2.token) {
-          recieved.push(msg);
           if (msg.action === 'apply') {
             // other is applying
             if (msg.token > _this2.token) {
@@ -120,14 +118,14 @@ LeaderElection.prototype = {
        * If the applyOnce() call came from the fallbackInterval,
        * we can assume that the election runs in the background and
        * not critical process is waiting for it.
-       * When this is true, we give the other intances
+       * When this is true, we give the other instances
        * more time to answer to messages in the election cycle.
        * This makes it less likely to elect duplicate leaders.
        * But also it takes longer which is not a problem because we anyway
        * run in the background.
        */
       var waitForAnswerTime = isFromFallbackInterval ? _this2._options.responseTime * 4 : _this2._options.responseTime;
-      var applyPromise = _sendMessage(_this2, 'apply') // send out that this one is applying
+      return _sendMessage(_this2, 'apply') // send out that this one is applying
       .then(function () {
         return Promise.race([sleep(waitForAnswerTime), stopCriteriaPromise.then(function () {
           return Promise.reject(new Error());
@@ -154,7 +152,6 @@ LeaderElection.prototype = {
           return false;
         }
       });
-      return applyPromise;
     };
     this._aplQC = this._aplQC + 1;
     this._aplQ = this._aplQ.then(function () {

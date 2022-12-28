@@ -39,7 +39,7 @@ export function canBeUsed() {
 export function averageResponseTime() {
   return 5;
 }
-export default {
+export var SimulateMethod = {
   create: create,
   close: close,
   onMessage: onMessage,

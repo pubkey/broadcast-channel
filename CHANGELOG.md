@@ -3,6 +3,10 @@
 
 ## X.X.X (comming soon)
 
+## 4.19.0 (28 December 2022)
+
+- Updated dependencies
+
 ## 4.18.1 (31 October 2022)
 
 - Updated dependencies

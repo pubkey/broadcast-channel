@@ -46,7 +46,7 @@ export function canBeUsed() {
 export function averageResponseTime() {
   return 150;
 }
-export default {
+export var NativeMethod = {
   create: create,
   close: close,
   onMessage: onMessage,

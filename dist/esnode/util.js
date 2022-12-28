@@ -2,11 +2,7 @@
  * returns true if the given object is a promise
  */
 export function isPromise(obj) {
-  if (obj && typeof obj.then === 'function') {
-    return true;
-  } else {
-    return false;
-  }
+  return obj && typeof obj.then === 'function';
 }
 export var PROMISE_RESOLVED_FALSE = Promise.resolve(false);
 export var PROMISE_RESOLVED_TRUE = Promise.resolve(true);

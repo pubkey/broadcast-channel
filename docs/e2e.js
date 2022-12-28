@@ -47,7 +47,7 @@ var BroadcastChannel = function BroadcastChannel(name, options) {
   };
 
   /**
-   * Unsend message promises
+   * Unsent message promises
    * where the sending is still in progress
    * @type {Set<Promise>}
    */
@@ -108,7 +108,7 @@ BroadcastChannel.prototype = {
     if (this.closed) {
       throw new Error('BroadcastChannel.postMessage(): ' + 'Cannot post message after channel has closed ' +
       /**
-       * In the past when this error appeared, it was realy hard to debug.
+       * In the past when this error appeared, it was really hard to debug.
        * So now we log the msg together with the error so it at least
        * gives some clue about where in your application this happens.
        */
@@ -196,7 +196,7 @@ function _post(broadcastChannel, type, msg) {
   return awaitPrepare.then(function () {
     var sendPromise = broadcastChannel.method.postMessage(broadcastChannel._state, msgObj);
 
-    // add/remove to unsend messages list
+    // add/remove to unsent messages list
     broadcastChannel._uMP.add(sendPromise);
     sendPromise["catch"]().then(function () {
       return broadcastChannel._uMP["delete"](sendPromise);
@@ -242,8 +242,8 @@ function _startListening(channel) {
       channel._addEL[msgObj.type].forEach(function (listenerObject) {
         /**
          * Getting the current time in JavaScript has no good precision.
-         * So instead of only listening to events that happend 'after' the listener
-         * was added, we also listen to events that happended 100ms before it.
+         * So instead of only listening to events that happened 'after' the listener
+         * was added, we also listen to events that happened 100ms before it.
          * This ensures that when another process, like a WebWorker, sends events
          * we do not miss them out because their timestamp is a bit off compared to the main process.
          * Not doing this would make messages missing when we send data directly after subscribing and awaiting a response.
@@ -270,7 +270,7 @@ function _startListening(channel) {
 }
 function _stopListening(channel) {
   if (channel._iL && !_hasMessageListeners(channel)) {
-    // noone is listening, stop subscribing
+    // no one is listening, stop subscribing
     channel._iL = false;
     var time = channel.method.microSeconds();
     channel.method.onMessage(channel._state, null, time);
@@ -410,7 +410,7 @@ LeaderElection.prototype = {
     }
 
     /**
-     * Already applying more then once,
+     * Already applying more than once,
      * -> wait for the apply queue to be finished.
      */
     if (this._aplQC > 1) {
@@ -443,10 +443,8 @@ LeaderElection.prototype = {
           res();
         };
       });
-      var recieved = [];
       var handleMessage = function handleMessage(msg) {
         if (msg.context === 'leader' && msg.token != _this2.token) {
-          recieved.push(msg);
           if (msg.action === 'apply') {
             // other is applying
             if (msg.token > _this2.token) {
@@ -470,14 +468,14 @@ LeaderElection.prototype = {
        * If the applyOnce() call came from the fallbackInterval,
        * we can assume that the election runs in the background and
        * not critical process is waiting for it.
-       * When this is true, we give the other intances
+       * When this is true, we give the other instances
        * more time to answer to messages in the election cycle.
        * This makes it less likely to elect duplicate leaders.
        * But also it takes longer which is not a problem because we anyway
        * run in the background.
        */
       var waitForAnswerTime = isFromFallbackInterval ? _this2._options.responseTime * 4 : _this2._options.responseTime;
-      var applyPromise = _sendMessage(_this2, 'apply') // send out that this one is applying
+      return _sendMessage(_this2, 'apply') // send out that this one is applying
       .then(function () {
         return Promise.race([(0, _util.sleep)(waitForAnswerTime), stopCriteriaPromise.then(function () {
           return Promise.reject(new Error());
@@ -504,7 +502,6 @@ LeaderElection.prototype = {
           return false;
         }
       });
-      return applyPromise;
     };
     this._aplQC = this._aplQC + 1;
     this._aplQ = this._aplQ.then(function () {
@@ -674,27 +671,26 @@ function createLeaderElection(channel, options) {
   channel._leaderElector = elector;
   return elector;
 }
-},{"./util.js":11,"unload":354}],5:[function(require,module,exports){
+},{"./util.js":11,"unload":353}],5:[function(require,module,exports){
 "use strict";
 
-var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 var _typeof = require("@babel/runtime/helpers/typeof");
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.chooseMethod = chooseMethod;
-var _native = _interopRequireDefault(require("./methods/native.js"));
-var _indexedDb = _interopRequireDefault(require("./methods/indexed-db.js"));
-var _localstorage = _interopRequireDefault(require("./methods/localstorage.js"));
-var _simulate = _interopRequireDefault(require("./methods/simulate.js"));
+var _native = require("./methods/native.js");
+var _indexedDb = require("./methods/indexed-db.js");
+var _localstorage = require("./methods/localstorage.js");
+var _simulate = require("./methods/simulate.js");
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== "object" && typeof obj !== "function") { return { "default": obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj["default"] = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 // the line below will be removed from es5/browser builds
 
 // order is important
-var METHODS = [_native["default"],
+var METHODS = [_native.NativeMethod,
 // fastest
-_indexedDb["default"], _localstorage["default"]];
+_indexedDb.IndexedDBMethod, _localstorage.LocalstorageMethod];
 function chooseMethod(options) {
   var chooseMethods = [].concat(options.methods, METHODS).filter(Boolean);
 
@@ -704,7 +700,7 @@ function chooseMethod(options) {
   if (options.type) {
     if (options.type === 'simulate') {
       // only use simulate-method if directly chosen
-      return _simulate["default"];
+      return _simulate.SimulateMethod;
     }
     var ret = chooseMethods.find(function (m) {
       return m.type === options.type;
@@ -714,7 +710,7 @@ function chooseMethod(options) {
 
   /**
    * if no webworker support is needed,
-   * remove idb from the list so that localstorage is been chosen
+   * remove idb from the list so that localstorage will be chosen
    */
   if (!options.webWorkerSupport) {
     chooseMethods = chooseMethods.filter(function (m) {
@@ -724,17 +720,17 @@ function chooseMethod(options) {
   var useMethod = chooseMethods.find(function (method) {
     return method.canBeUsed();
   });
-  if (!useMethod) throw new Error("No useable method found in " + JSON.stringify(METHODS.map(function (m) {
+  if (!useMethod) throw new Error("No usable method found in " + JSON.stringify(METHODS.map(function (m) {
     return m.type;
   })));else return useMethod;
 }
-},{"./methods/indexed-db.js":6,"./methods/localstorage.js":7,"./methods/native.js":8,"./methods/simulate.js":9,"@babel/runtime/helpers/interopRequireDefault":15,"@babel/runtime/helpers/typeof":17}],6:[function(require,module,exports){
+},{"./methods/indexed-db.js":6,"./methods/localstorage.js":7,"./methods/native.js":8,"./methods/simulate.js":9,"@babel/runtime/helpers/typeof":17}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.TRANSACTION_SETTINGS = void 0;
+exports.TRANSACTION_SETTINGS = exports.IndexedDBMethod = void 0;
 exports.averageResponseTime = averageResponseTime;
 exports.canBeUsed = canBeUsed;
 exports.cleanOldMessages = cleanOldMessages;
@@ -742,7 +738,6 @@ exports.close = close;
 exports.commitIndexedDBTransaction = commitIndexedDBTransaction;
 exports.create = create;
 exports.createDatabase = createDatabase;
-exports["default"] = void 0;
 exports.getAllMessages = getAllMessages;
 exports.getIdb = getIdb;
 exports.getMessagesHigherThan = getMessagesHigherThan;
@@ -819,7 +814,7 @@ function createDatabase(channelName) {
       autoIncrement: true
     });
   };
-  var dbPromise = new Promise(function (res, rej) {
+  return new Promise(function (res, rej) {
     openRequest.onerror = function (ev) {
       return rej(ev);
     };
@@ -827,7 +822,6 @@ function createDatabase(channelName) {
       res(openRequest.result);
     };
   });
-  return dbPromise;
 }
 
 /**
@@ -959,7 +953,6 @@ function getOldMessages(db, ttl) {
           // no more old messages,
           commitIndexedDBTransaction(tx);
           res(ret);
-          return;
         }
       } else {
         res(ret);
@@ -989,7 +982,7 @@ function create(channelName, options) {
        * @type {ObliviousSet}
        */
       eMIs: new _obliviousSet.ObliviousSet(options.idb.ttl * 2),
-      // ensures we do not read messages in parrallel
+      // ensures we do not read messages in parallel
       writeBlockPromise: _util.PROMISE_RESOLVED_VOID,
       messagesCallback: null,
       readQueuePromises: [],
@@ -1043,7 +1036,7 @@ function readNewMessages(state) {
   return getMessagesHigherThan(state.db, state.lastCursorId).then(function (newerMessages) {
     var useMessages = newerMessages
     /**
-     * there is a bug in iOS where the msgObj can be undefined some times
+     * there is a bug in iOS where the msgObj can be undefined sometimes
      * so we filter them out
      * @link https://github.com/pubkey/broadcast-channel/issues/19
      */.filter(function (msgObj) {
@@ -1088,16 +1081,12 @@ function onMessage(channelState, fn, time) {
   readNewMessages(channelState);
 }
 function canBeUsed() {
-  var idb = getIdb();
-  if (!idb) {
-    return false;
-  }
-  return true;
+  return !!getIdb();
 }
 function averageResponseTime(options) {
   return options.idb.fallbackInterval * 2;
 }
-var _default = {
+var IndexedDBMethod = {
   create: create,
   close: close,
   onMessage: onMessage,
@@ -1107,19 +1096,19 @@ var _default = {
   averageResponseTime: averageResponseTime,
   microSeconds: microSeconds
 };
-exports["default"] = _default;
-},{"../options.js":10,"../util.js":11,"oblivious-set":350}],7:[function(require,module,exports){
+exports.IndexedDBMethod = IndexedDBMethod;
+},{"../options.js":10,"../util.js":11,"oblivious-set":349}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.LocalstorageMethod = void 0;
 exports.addStorageEventListener = addStorageEventListener;
 exports.averageResponseTime = averageResponseTime;
 exports.canBeUsed = canBeUsed;
 exports.close = close;
 exports.create = create;
-exports["default"] = void 0;
 exports.getLocalStorage = getLocalStorage;
 exports.microSeconds = void 0;
 exports.onMessage = onMessage;
@@ -1132,8 +1121,8 @@ var _options = require("../options.js");
 var _util = require("../util.js");
 /**
  * A localStorage-only method which uses localstorage and its 'storage'-event
- * This does not work inside of webworkers because they have no access to locastorage
- * This is basically implemented to support IE9 or your grandmothers toaster.
+ * This does not work inside webworkers because they have no access to localstorage
+ * This is basically implemented to support IE9 or your grandmother's toaster.
  * @link https://caniuse.com/#feat=namevalue-storage
  * @link https://caniuse.com/#feat=indexeddb
  */
@@ -1270,7 +1259,7 @@ function averageResponseTime() {
   }
   return defaultTime;
 }
-var _default = {
+var LocalstorageMethod = {
   create: create,
   close: close,
   onMessage: onMessage,
@@ -1280,18 +1269,19 @@ var _default = {
   averageResponseTime: averageResponseTime,
   microSeconds: microSeconds
 };
-exports["default"] = _default;
-},{"../options.js":10,"../util.js":11,"oblivious-set":350}],8:[function(require,module,exports){
+exports.LocalstorageMethod = LocalstorageMethod;
+},{"../options.js":10,"../util.js":11,"oblivious-set":349}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.NativeMethod = void 0;
 exports.averageResponseTime = averageResponseTime;
 exports.canBeUsed = canBeUsed;
 exports.close = close;
 exports.create = create;
-exports.microSeconds = exports["default"] = void 0;
+exports.microSeconds = void 0;
 exports.onMessage = onMessage;
 exports.postMessage = postMessage;
 exports.type = void 0;
@@ -1345,7 +1335,7 @@ function canBeUsed() {
 function averageResponseTime() {
   return 150;
 }
-var _default = {
+var NativeMethod = {
   create: create,
   close: close,
   onMessage: onMessage,
@@ -1355,18 +1345,19 @@ var _default = {
   averageResponseTime: averageResponseTime,
   microSeconds: microSeconds
 };
-exports["default"] = _default;
+exports.NativeMethod = NativeMethod;
 },{"../util.js":11}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.SimulateMethod = void 0;
 exports.averageResponseTime = averageResponseTime;
 exports.canBeUsed = canBeUsed;
 exports.close = close;
 exports.create = create;
-exports.microSeconds = exports["default"] = void 0;
+exports.microSeconds = void 0;
 exports.onMessage = onMessage;
 exports.postMessage = postMessage;
 exports.type = void 0;
@@ -1413,7 +1404,7 @@ function canBeUsed() {
 function averageResponseTime() {
   return 5;
 }
-var _default = {
+var SimulateMethod = {
   create: create,
   close: close,
   onMessage: onMessage,
@@ -1423,7 +1414,7 @@ var _default = {
   averageResponseTime: averageResponseTime,
   microSeconds: microSeconds
 };
-exports["default"] = _default;
+exports.SimulateMethod = SimulateMethod;
 },{"../util.js":11}],10:[function(require,module,exports){
 "use strict";
 
@@ -1480,11 +1471,7 @@ exports.sleep = sleep;
  * returns true if the given object is a promise
  */
 function isPromise(obj) {
-  if (obj && typeof obj.then === 'function') {
-    return true;
-  } else {
-    return false;
-  }
+  return obj && typeof obj.then === 'function';
 }
 var PROMISE_RESOLVED_FALSE = Promise.resolve(false);
 exports.PROMISE_RESOLVED_FALSE = PROMISE_RESOLVED_FALSE;
@@ -1575,7 +1562,7 @@ require("core-js/fn/promise/finally");
 require("core-js/web");
 
 require("regenerator-runtime/runtime");
-},{"core-js/es6":40,"core-js/fn/array/flat-map":41,"core-js/fn/array/includes":42,"core-js/fn/object/entries":43,"core-js/fn/object/get-own-property-descriptors":44,"core-js/fn/object/values":45,"core-js/fn/promise/finally":46,"core-js/fn/string/pad-end":47,"core-js/fn/string/pad-start":48,"core-js/fn/string/trim-end":49,"core-js/fn/string/trim-start":50,"core-js/fn/symbol/async-iterator":51,"core-js/web":343,"regenerator-runtime/runtime":352}],14:[function(require,module,exports){
+},{"core-js/es6":40,"core-js/fn/array/flat-map":41,"core-js/fn/array/includes":42,"core-js/fn/object/entries":43,"core-js/fn/object/get-own-property-descriptors":44,"core-js/fn/object/values":45,"core-js/fn/promise/finally":46,"core-js/fn/string/pad-end":47,"core-js/fn/string/pad-start":48,"core-js/fn/string/trim-end":49,"core-js/fn/string/trim-start":50,"core-js/fn/symbol/async-iterator":51,"core-js/web":343,"regenerator-runtime/runtime":351}],14:[function(require,module,exports){
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
   try {
     var info = gen[key](arg);
@@ -1752,14 +1739,9 @@ function _regeneratorRuntime() {
     };
   }
   function maybeInvokeDelegate(delegate, context) {
-    var method = delegate.iterator[context.method];
-    if (undefined === method) {
-      if (context.delegate = null, "throw" === context.method) {
-        if (delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method)) return ContinueSentinel;
-        context.method = "throw", context.arg = new TypeError("The iterator does not provide a 'throw' method");
-      }
-      return ContinueSentinel;
-    }
+    var methodName = context.method,
+      method = delegate.iterator[methodName];
+    if (undefined === method) return context.delegate = null, "throw" === methodName && delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method) || "return" !== methodName && (context.method = "throw", context.arg = new TypeError("The iterator does not provide a '" + methodName + "' method")), ContinueSentinel;
     var record = tryCatch(method, delegate.iterator, context.arg);
     if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel;
     var info = record.arg;
@@ -1788,9 +1770,7 @@ function _regeneratorRuntime() {
       if (!isNaN(iterable.length)) {
         var i = -1,
           next = function next() {
-            for (; ++i < iterable.length;) {
-              if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next;
-            }
+            for (; ++i < iterable.length;) if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next;
             return next.value = undefined, next.done = !0, next;
           };
         return next.next = next;
@@ -1836,9 +1816,7 @@ function _regeneratorRuntime() {
   }), exports.keys = function (val) {
     var object = Object(val),
       keys = [];
-    for (var key in object) {
-      keys.push(key);
-    }
+    for (var key in object) keys.push(key);
     return keys.reverse(), function next() {
       for (; keys.length;) {
         var key = keys.pop();
@@ -1849,9 +1827,7 @@ function _regeneratorRuntime() {
   }, exports.values = values, Context.prototype = {
     constructor: Context,
     reset: function reset(skipTempReset) {
-      if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) {
-        "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined);
-      }
+      if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined);
     },
     stop: function stop() {
       this.done = !0;
@@ -2204,7 +2180,7 @@ function performanceNow() {
 
     return perf.now();
 }
-},{"./require-on-node-only":37,"is-node":349}],25:[function(require,module,exports){
+},{"./require-on-node-only":37,"is-node":348}],25:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -4431,7 +4407,7 @@ function numberIsNaN (obj) {
 }
 
 }).call(this)}).call(this,require("buffer").Buffer)
-},{"base64-js":36,"buffer":38,"ieee754":348}],39:[function(require,module,exports){
+},{"base64-js":36,"buffer":38,"ieee754":347}],39:[function(require,module,exports){
 (function (Buffer){(function (){
 var clone = (function() {
 'use strict';
@@ -11249,10 +11225,6 @@ function shim (obj) {
 }
 
 },{}],347:[function(require,module,exports){
-module.exports = false;
-
-
-},{}],348:[function(require,module,exports){
 /*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
@@ -11339,7 +11311,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],349:[function(require,module,exports){
+},{}],348:[function(require,module,exports){
 (function (process){(function (){
 // Coding standard for this project defined @ https://github.com/MatthewSH/standards/blob/master/JavaScript.md
 'use strict';
@@ -11347,7 +11319,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
 exports = module.exports = !!(typeof process !== 'undefined' && process.versions && process.versions.node);
 
 }).call(this)}).call(this,require('_process'))
-},{"_process":351}],350:[function(require,module,exports){
+},{"_process":350}],349:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.now = exports.removeTooOldValues = exports.ObliviousSet = void 0;
@@ -11425,7 +11397,7 @@ function now() {
 }
 exports.now = now;
 
-},{}],351:[function(require,module,exports){
+},{}],350:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -11611,7 +11583,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],352:[function(require,module,exports){
+},{}],351:[function(require,module,exports){
 /**
  * Copyright (c) 2014-present, Facebook, Inc.
  *
@@ -11943,31 +11915,32 @@ var runtime = (function (exports) {
   // delegate iterator, or by modifying context.method and context.arg,
   // setting context.delegate to null, and returning the ContinueSentinel.
   function maybeInvokeDelegate(delegate, context) {
-    var method = delegate.iterator[context.method];
+    var methodName = context.method;
+    var method = delegate.iterator[methodName];
     if (method === undefined) {
       // A .throw or .return when the delegate iterator has no .throw
-      // method always terminates the yield* loop.
+      // method, or a missing .next mehtod, always terminate the
+      // yield* loop.
       context.delegate = null;
 
-      if (context.method === "throw") {
-        // Note: ["return"] must be used for ES3 parsing compatibility.
-        if (delegate.iterator["return"]) {
-          // If the delegate iterator has a return method, give it a
-          // chance to clean up.
-          context.method = "return";
-          context.arg = undefined;
-          maybeInvokeDelegate(delegate, context);
+      // Note: ["return"] must be used for ES3 parsing compatibility.
+      if (methodName === "throw" && delegate.iterator["return"]) {
+        // If the delegate iterator has a return method, give it a
+        // chance to clean up.
+        context.method = "return";
+        context.arg = undefined;
+        maybeInvokeDelegate(delegate, context);
 
-          if (context.method === "throw") {
-            // If maybeInvokeDelegate(context) changed context.method from
-            // "return" to "throw", let that override the TypeError below.
-            return ContinueSentinel;
-          }
+        if (context.method === "throw") {
+          // If maybeInvokeDelegate(context) changed context.method from
+          // "return" to "throw", let that override the TypeError below.
+          return ContinueSentinel;
         }
-
+      }
+      if (methodName !== "return") {
         context.method = "throw";
         context.arg = new TypeError(
-          "The iterator does not provide a 'throw' method");
+          "The iterator does not provide a '" + methodName + "' method");
       }
 
       return ContinueSentinel;
@@ -12373,54 +12346,61 @@ try {
   }
 }
 
-},{}],353:[function(require,module,exports){
+},{}],352:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports["default"] = void 0;
-
+exports.addBrowser = addBrowser;
 /* global WorkerGlobalScope */
-function add(fn) {
-  if (typeof WorkerGlobalScope === 'function' && self instanceof WorkerGlobalScope) {// this is run inside of a webworker
+
+function addBrowser(fn) {
+  if (typeof WorkerGlobalScope === 'function' && self instanceof WorkerGlobalScope) {
+    /**
+     * Because killing a worker does directly stop the excution
+     * of the code, our only chance is to overwrite the close function
+     * which could work some times.
+     * @link https://stackoverflow.com/q/72903255/3443137
+     */
+    var oldClose = self.close.bind(self);
+    self.close = function () {
+      fn();
+      return oldClose();
+    };
   } else {
     /**
      * if we are on react-native, there is no window.addEventListener
      * @link https://github.com/pubkey/unload/issues/6
      */
-    if (typeof window.addEventListener !== 'function') return;
+    if (typeof window.addEventListener !== 'function') {
+      return;
+    }
+
     /**
      * for normal browser-windows, we use the beforeunload-event
      */
-
     window.addEventListener('beforeunload', function () {
       fn();
     }, true);
+
     /**
      * for iframes, we have to use the unload-event
      * @link https://stackoverflow.com/q/47533670/3443137
      */
-
     window.addEventListener('unload', function () {
       fn();
     }, true);
   }
+
   /**
    * TODO add fallback for safari-mobile
    * @link https://stackoverflow.com/a/26193516/3443137
    */
-
 }
-
-var _default = {
-  add: add
-};
-exports["default"] = _default;
-},{}],354:[function(require,module,exports){
+},{}],353:[function(require,module,exports){
+(function (process){(function (){
 "use strict";
-
-var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -12429,26 +12409,29 @@ exports.add = add;
 exports.getSize = getSize;
 exports.removeAll = removeAll;
 exports.runAll = runAll;
-
-var _detectNode = _interopRequireDefault(require("detect-node"));
-
-var _browser = _interopRequireDefault(require("./browser.js"));
-
-var _node = _interopRequireDefault(require("./node.js"));
-
-var USE_METHOD = _detectNode["default"] ? _node["default"] : _browser["default"];
+var _browser = require("./browser.js");
+var _node = require("./node.js");
+/**
+ * Use the code directly to prevent import problems
+ * with the detect-node package.
+ * @link https://github.com/iliakan/detect-node/blob/master/index.js
+ */
+var isNode = Object.prototype.toString.call(typeof process !== 'undefined' ? process : 0) === '[object process]';
+var USE_METHOD = isNode ? _node.addNode : _browser.addBrowser;
 var LISTENERS = new Set();
 var startedListening = false;
-
 function startListening() {
-  if (startedListening) return;
+  if (startedListening) {
+    return;
+  }
   startedListening = true;
-  USE_METHOD.add(runAll);
+  USE_METHOD(runAll);
 }
-
 function add(fn) {
   startListening();
-  if (typeof fn !== 'function') throw new Error('Listener is no function');
+  if (typeof fn !== 'function') {
+    throw new Error('Listener is no function');
+  }
   LISTENERS.add(fn);
   var addReturn = {
     remove: function remove() {
@@ -12461,7 +12444,6 @@ function add(fn) {
   };
   return addReturn;
 }
-
 function runAll() {
   var promises = [];
   LISTENERS.forEach(function (fn) {
@@ -12470,15 +12452,14 @@ function runAll() {
   });
   return Promise.all(promises);
 }
-
 function removeAll() {
   LISTENERS.clear();
 }
-
 function getSize() {
   return LISTENERS.size;
 }
-},{"./browser.js":353,"./node.js":37,"@babel/runtime/helpers/interopRequireDefault":15,"detect-node":347}],355:[function(require,module,exports){
+}).call(this)}).call(this,require('_process'))
+},{"./browser.js":352,"./node.js":37,"_process":350}],354:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -12549,90 +12530,88 @@ function run() {
   window.startBroadcastChannel = /*#__PURE__*/(0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee() {
     var rand, worker;
     return _regenerator["default"].wrap(function _callee$(_context) {
-      while (1) {
-        switch (_context.prev = _context.next) {
-          case 0:
-            console.log('window.startBroadcastChannel()');
-            stateContainer.innerHTML = 'running..';
-            rand = new Date().getTime();
-            channel.onmessage = function (msg) {
-              answerPool[msg.from] = msg;
-              var textnode = document.createTextNode(JSON.stringify(msg) + '</br>');
-              msgContainer.appendChild(textnode);
-              if (gotAllAnswers(answerPool)) {
-                answerPool = {}; // reset
+      while (1) switch (_context.prev = _context.next) {
+        case 0:
+          console.log('window.startBroadcastChannel()');
+          stateContainer.innerHTML = 'running..';
+          rand = new Date().getTime();
+          channel.onmessage = function (msg) {
+            answerPool[msg.from] = msg;
+            var textnode = document.createTextNode(JSON.stringify(msg) + '</br>');
+            msgContainer.appendChild(textnode);
+            if (gotAllAnswers(answerPool)) {
+              answerPool = {}; // reset
 
-                if (messagesSend >= TEST_MESSAGES) {
-                  // sucess
-                  console.log('main: sucess');
-                  body.style.backgroundColor = 'green';
-                  stateContainer.innerHTML = 'SUCCESS';
-                  var amountTime = new Date().getTime() - startTime;
-                  document.getElementById('time-amount').innerHTML = amountTime + 'ms';
-                } else {
-                  // send next message
-                  messagesSend++;
-                  console.log('main: send next message (' + messagesSend + ') ====================');
-                  messageCountContainer.innerHTML = messagesSend;
-                  channel.postMessage({
-                    from: 'main',
-                    foo: 'bar',
-                    step: messagesSend
-                  });
-                }
+              if (messagesSend >= TEST_MESSAGES) {
+                // sucess
+                console.log('main: sucess');
+                body.style.backgroundColor = 'green';
+                stateContainer.innerHTML = 'SUCCESS';
+                var amountTime = new Date().getTime() - startTime;
+                document.getElementById('time-amount').innerHTML = amountTime + 'ms';
+              } else {
+                // send next message
+                messagesSend++;
+                console.log('main: send next message (' + messagesSend + ') ====================');
+                messageCountContainer.innerHTML = messagesSend;
+                channel.postMessage({
+                  from: 'main',
+                  foo: 'bar',
+                  step: messagesSend
+                });
               }
-            };
-
-            // load iframe
-            iframeEl.src = './iframe.html?channelName=' + channel.name + '&methodType=' + channel.type + '&t=' + rand;
-            _context.next = 7;
-            return new Promise(function (res) {
-              return iframeEl.onload = function () {
-                return res();
-              };
-            });
-          case 7:
-            console.log('main: Iframe has loaded');
-
-            // spawn web-worker if possible
-            if (!(channel.type !== 'localstorage' && typeof window.Worker === 'function')) {
-              _context.next = 14;
-              break;
             }
-            useWorker = true;
-            worker = new Worker('worker.js?t=' + rand);
-            worker.onerror = function (event) {
-              console.error('worker: ' + event.message + " (" + event.filename + ":" + event.lineno + ")");
+          };
+
+          // load iframe
+          iframeEl.src = './iframe.html?channelName=' + channel.name + '&methodType=' + channel.type + '&t=' + rand;
+          _context.next = 7;
+          return new Promise(function (res) {
+            return iframeEl.onload = function () {
+              return res();
             };
+          });
+        case 7:
+          console.log('main: Iframe has loaded');
+
+          // spawn web-worker if possible
+          if (!(channel.type !== 'localstorage' && typeof window.Worker === 'function')) {
             _context.next = 14;
-            return new Promise(function (res) {
-              worker.addEventListener('message', function (e) {
-                // run when message returned, so we know the worker has started
-                setTimeout(function () {
-                  console.log('main: Worker has started');
-                  res();
-                }, 200);
-              }, false);
-              worker.postMessage({
-                'cmd': 'start',
-                'msg': {
-                  channelName: channel.name,
-                  methodType: channel.type
-                }
-              });
+            break;
+          }
+          useWorker = true;
+          worker = new Worker('worker.js?t=' + rand);
+          worker.onerror = function (event) {
+            console.error('worker: ' + event.message + " (" + event.filename + ":" + event.lineno + ")");
+          };
+          _context.next = 14;
+          return new Promise(function (res) {
+            worker.addEventListener('message', function (e) {
+              // run when message returned, so we know the worker has started
+              setTimeout(function () {
+                console.log('main: Worker has started');
+                res();
+              }, 200);
+            }, false);
+            worker.postMessage({
+              'cmd': 'start',
+              'msg': {
+                channelName: channel.name,
+                methodType: channel.type
+              }
             });
-          case 14:
-            console.log('========== START SENDING MESSAGES ' + channel.type);
-            startTime = new Date().getTime();
-            channel.postMessage({
-              from: 'main',
-              step: 0
-            });
-            console.log('main: message send (0)');
-          case 18:
-          case "end":
-            return _context.stop();
-        }
+          });
+        case 14:
+          console.log('========== START SENDING MESSAGES ' + channel.type);
+          startTime = new Date().getTime();
+          channel.postMessage({
+            from: 'main',
+            step: 0
+          });
+          console.log('main: message send (0)');
+        case 18:
+        case "end":
+          return _context.stop();
       }
     }, _callee);
   }));
@@ -12641,56 +12620,54 @@ function run() {
   window.startLeaderElection = /*#__PURE__*/(0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee2() {
     var FRAMES_COUNT, rand, frameSrc, leaderIframes, leaderFramesCache, amountTime;
     return _regenerator["default"].wrap(function _callee2$(_context2) {
-      while (1) {
-        switch (_context2.prev = _context2.next) {
-          case 0:
-            console.log('window.startLeaderElection()');
-            stateContainer.innerHTML = 'running..';
-            FRAMES_COUNT = 5;
-            rand = new Date().getTime();
-            frameSrc = './leader-iframe.html?channelName=' + channel.name + '&methodType=' + channel.type + '&t=' + rand;
-            leaderIframes = document.getElementById('leader-iframes'); // create iframes
-            leaderFramesCache = new Array(FRAMES_COUNT).fill(0).map(function () {
-              var ifrm = document.createElement('iframe');
-              ifrm.setAttribute('src', frameSrc);
-              leaderIframes.appendChild(ifrm);
-              return ifrm;
-            }); // wait until all iframes have loaded
-            _context2.next = 9;
-            return Promise.all(leaderFramesCache.map(function (iframe) {
-              return new Promise(function (res) {
-                return iframe.onload = function () {
-                  return res();
-                };
-              });
-            }));
-          case 9:
-            startTime = new Date().getTime();
+      while (1) switch (_context2.prev = _context2.next) {
+        case 0:
+          console.log('window.startLeaderElection()');
+          stateContainer.innerHTML = 'running..';
+          FRAMES_COUNT = 5;
+          rand = new Date().getTime();
+          frameSrc = './leader-iframe.html?channelName=' + channel.name + '&methodType=' + channel.type + '&t=' + rand;
+          leaderIframes = document.getElementById('leader-iframes'); // create iframes
+          leaderFramesCache = new Array(FRAMES_COUNT).fill(0).map(function () {
+            var ifrm = document.createElement('iframe');
+            ifrm.setAttribute('src', frameSrc);
+            leaderIframes.appendChild(ifrm);
+            return ifrm;
+          }); // wait until all iframes have loaded
+          _context2.next = 9;
+          return Promise.all(leaderFramesCache.map(function (iframe) {
+            return new Promise(function (res) {
+              return iframe.onload = function () {
+                return res();
+              };
+            });
+          }));
+        case 9:
+          startTime = new Date().getTime();
 
-            /**
-             * remove the leader-iframe until no iframe is left
-             */
-          case 10:
-            if (!(leaderFramesCache.length > 0)) {
-              _context2.next = 16;
-              break;
-            }
-            _context2.next = 13;
-            return removeLeaderIframe(leaderFramesCache);
-          case 13:
-            leaderFramesCache = _context2.sent;
-            _context2.next = 10;
+          /**
+           * remove the leader-iframe until no iframe is left
+           */
+        case 10:
+          if (!(leaderFramesCache.length > 0)) {
+            _context2.next = 16;
             break;
-          case 16:
-            // done
-            body.style.backgroundColor = 'green';
-            stateContainer.innerHTML = 'SUCCESS';
-            amountTime = new Date().getTime() - startTime;
-            document.getElementById('time-amount').innerHTML = amountTime + 'ms';
-          case 20:
-          case "end":
-            return _context2.stop();
-        }
+          }
+          _context2.next = 13;
+          return removeLeaderIframe(leaderFramesCache);
+        case 13:
+          leaderFramesCache = _context2.sent;
+          _context2.next = 10;
+          break;
+        case 16:
+          // done
+          body.style.backgroundColor = 'green';
+          stateContainer.innerHTML = 'SUCCESS';
+          amountTime = new Date().getTime() - startTime;
+          document.getElementById('time-amount').innerHTML = amountTime + 'ms';
+        case 20:
+        case "end":
+          return _context2.stop();
       }
     }, _callee2);
   }));
@@ -12698,35 +12675,33 @@ function run() {
     var _ref3 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3(leaderFramesCache) {
       var leaders;
       return _regenerator["default"].wrap(function _callee3$(_context3) {
-        while (1) {
-          switch (_context3.prev = _context3.next) {
-            case 0:
-              leaders = leaderFramesCache.filter(function (frame) {
-                var boxText = frame.contentDocument.getElementById('box').innerHTML;
-                return boxText === 'Leader';
-              });
-              if (!(leaders.length === 0)) {
-                _context3.next = 3;
-                break;
-              }
-              return _context3.abrupt("return", new Promise(function (res) {
-                return setTimeout(function () {
-                  res(leaderFramesCache);
-                }, 50);
-              }));
-            case 3:
-              if (leaders.length > 1) {
-                console.error('LeaderElection: There is more then one leader!');
-              }
-              // remove iframe
-              leaders[0].parentNode.removeChild(leaders[0]);
-              return _context3.abrupt("return", leaderFramesCache.filter(function (f) {
-                return f !== leaders[0];
-              }));
-            case 6:
-            case "end":
-              return _context3.stop();
-          }
+        while (1) switch (_context3.prev = _context3.next) {
+          case 0:
+            leaders = leaderFramesCache.filter(function (frame) {
+              var boxText = frame.contentDocument.getElementById('box').innerHTML;
+              return boxText === 'Leader';
+            });
+            if (!(leaders.length === 0)) {
+              _context3.next = 3;
+              break;
+            }
+            return _context3.abrupt("return", new Promise(function (res) {
+              return setTimeout(function () {
+                res(leaderFramesCache);
+              }, 50);
+            }));
+          case 3:
+            if (leaders.length > 1) {
+              console.error('LeaderElection: There is more then one leader!');
+            }
+            // remove iframe
+            leaders[0].parentNode.removeChild(leaders[0]);
+            return _context3.abrupt("return", leaderFramesCache.filter(function (f) {
+              return f !== leaders[0];
+            }));
+          case 6:
+          case "end":
+            return _context3.stop();
         }
       }, _callee3);
     }));
@@ -12739,115 +12714,111 @@ function run() {
   window.startWorkerTest = /*#__PURE__*/(0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee5() {
     var worker, t, perRun, k, done, amountTime;
     return _regenerator["default"].wrap(function _callee5$(_context5) {
-      while (1) {
-        switch (_context5.prev = _context5.next) {
-          case 0:
-            console.log('window.startWorkerTest()');
-            stateContainer.innerHTML = 'running..';
+      while (1) switch (_context5.prev = _context5.next) {
+        case 0:
+          console.log('window.startWorkerTest()');
+          stateContainer.innerHTML = 'running..';
 
-            // spawn web-worker
-            if (!(channel.type !== 'localstorage' && typeof window.Worker === 'function')) {
-              _context5.next = 8;
-              break;
-            }
-            useWorker = true;
-            worker = new Worker('worker.js?t=' + new Date().getTime());
-            worker.onerror = function (event) {
-              console.error('worker: ' + event.message + " (" + event.filename + ":" + event.lineno + ")");
-            };
+          // spawn web-worker
+          if (!(channel.type !== 'localstorage' && typeof window.Worker === 'function')) {
             _context5.next = 8;
-            return new Promise(function (res) {
-              worker.addEventListener('message', function (e) {
-                // run when message returned, so we know the worker has started
-                setTimeout(function () {
-                  console.log('main: Worker has started');
-                  res();
-                }, 200);
-              }, false);
-              worker.postMessage({
-                'cmd': 'start',
-                'msg': {
-                  channelName: channel.name,
-                  methodType: channel.type
-                }
-              });
-            });
-          case 8:
-            console.log('========== START SENDING MESSAGES ' + channel.type);
-            startTime = new Date().getTime();
-            t = 20;
-            perRun = 100;
-            k = 0;
-            done = 0;
-          case 14:
-            if (!(t > 0)) {
-              _context5.next = 20;
-              break;
-            }
-            t--;
-            _context5.next = 18;
-            return Promise.all(new Array(perRun).fill(0).map( /*#__PURE__*/(0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee4() {
-              var msgId, waitForResponsePromise;
-              return _regenerator["default"].wrap(function _callee4$(_context4) {
-                while (1) {
-                  switch (_context4.prev = _context4.next) {
-                    case 0:
-                      if (!randomBoolean()) {
-                        _context4.next = 3;
-                        break;
-                      }
-                      _context4.next = 3;
-                      return wait(randomNumber(10, 150));
-                    case 3:
-                      msgId = 'worker-test-' + startTime + '-' + k++;
-                      waitForResponsePromise = new Promise(function (res) {
-                        var listener = function listener(msg) {
-                          if (msg.answer == true && msg.original.id === msgId) {
-                            console.dir('msg for response:;:');
-                            console.dir(msg);
-                            done++;
-                            messageCountWorkerContainer.innerHTML = done;
-                            channel.removeEventListener('message', listener);
-                            res();
-                          }
-                        };
-                        channel.addEventListener('message', listener);
-                      });
-                      channel.postMessage({
-                        from: 'main-worker',
-                        id: msgId
-                      });
-                      _context4.next = 8;
-                      return Promise.race([waitForResponsePromise.then(function () {
-                        return false;
-                      }), wait(2000).then(function () {
-                        return true;
-                      })]).then(function (errored) {
-                        if (errored) {
-                          var errorMessage = 'ERROR startWorkerTest() timed out for msgId ' + msgId;
-                          console.error(errorMessage);
-                          throw new Error(errorMessage);
-                        }
-                      });
-                    case 8:
-                    case "end":
-                      return _context4.stop();
-                  }
-                }
-              }, _callee4);
-            }))));
-          case 18:
-            _context5.next = 14;
             break;
-          case 20:
-            body.style.backgroundColor = 'green';
-            stateContainer.innerHTML = 'SUCCESS';
-            amountTime = new Date().getTime() - startTime;
-            document.getElementById('time-amount').innerHTML = amountTime + 'ms';
-          case 24:
-          case "end":
-            return _context5.stop();
-        }
+          }
+          useWorker = true;
+          worker = new Worker('worker.js?t=' + new Date().getTime());
+          worker.onerror = function (event) {
+            console.error('worker: ' + event.message + " (" + event.filename + ":" + event.lineno + ")");
+          };
+          _context5.next = 8;
+          return new Promise(function (res) {
+            worker.addEventListener('message', function (e) {
+              // run when message returned, so we know the worker has started
+              setTimeout(function () {
+                console.log('main: Worker has started');
+                res();
+              }, 200);
+            }, false);
+            worker.postMessage({
+              'cmd': 'start',
+              'msg': {
+                channelName: channel.name,
+                methodType: channel.type
+              }
+            });
+          });
+        case 8:
+          console.log('========== START SENDING MESSAGES ' + channel.type);
+          startTime = new Date().getTime();
+          t = 20;
+          perRun = 100;
+          k = 0;
+          done = 0;
+        case 14:
+          if (!(t > 0)) {
+            _context5.next = 20;
+            break;
+          }
+          t--;
+          _context5.next = 18;
+          return Promise.all(new Array(perRun).fill(0).map( /*#__PURE__*/(0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee4() {
+            var msgId, waitForResponsePromise;
+            return _regenerator["default"].wrap(function _callee4$(_context4) {
+              while (1) switch (_context4.prev = _context4.next) {
+                case 0:
+                  if (!randomBoolean()) {
+                    _context4.next = 3;
+                    break;
+                  }
+                  _context4.next = 3;
+                  return wait(randomNumber(10, 150));
+                case 3:
+                  msgId = 'worker-test-' + startTime + '-' + k++;
+                  waitForResponsePromise = new Promise(function (res) {
+                    var listener = function listener(msg) {
+                      if (msg.answer == true && msg.original.id === msgId) {
+                        console.dir('msg for response:;:');
+                        console.dir(msg);
+                        done++;
+                        messageCountWorkerContainer.innerHTML = done;
+                        channel.removeEventListener('message', listener);
+                        res();
+                      }
+                    };
+                    channel.addEventListener('message', listener);
+                  });
+                  channel.postMessage({
+                    from: 'main-worker',
+                    id: msgId
+                  });
+                  _context4.next = 8;
+                  return Promise.race([waitForResponsePromise.then(function () {
+                    return false;
+                  }), wait(2000).then(function () {
+                    return true;
+                  })]).then(function (errored) {
+                    if (errored) {
+                      var errorMessage = 'ERROR startWorkerTest() timed out for msgId ' + msgId;
+                      console.error(errorMessage);
+                      throw new Error(errorMessage);
+                    }
+                  });
+                case 8:
+                case "end":
+                  return _context4.stop();
+              }
+            }, _callee4);
+          }))));
+        case 18:
+          _context5.next = 14;
+          break;
+        case 20:
+          body.style.backgroundColor = 'green';
+          stateContainer.innerHTML = 'SUCCESS';
+          amountTime = new Date().getTime() - startTime;
+          document.getElementById('time-amount').innerHTML = amountTime + 'ms';
+        case 24:
+        case "end":
+          return _context5.stop();
       }
     }, _callee5);
   }));
@@ -12862,7 +12833,7 @@ try {
   console.log('error in run-function:');
   console.error(error);
 }
-},{"../../":2,"./util.js":356,"@babel/polyfill":12,"@babel/runtime/helpers/asyncToGenerator":14,"@babel/runtime/helpers/interopRequireDefault":15,"@babel/runtime/regenerator":18,"async-test-util":22}],356:[function(require,module,exports){
+},{"../../":2,"./util.js":355,"@babel/polyfill":12,"@babel/runtime/helpers/asyncToGenerator":14,"@babel/runtime/helpers/interopRequireDefault":15,"@babel/runtime/regenerator":18,"async-test-util":22}],355:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -12881,4 +12852,4 @@ function getParameterByName(name, url) {
   if (!results[2]) return '';
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
 }
-},{}]},{},[355]);
+},{}]},{},[354]);

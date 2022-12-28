@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.TRANSACTION_SETTINGS = void 0;
+exports.TRANSACTION_SETTINGS = exports.IndexedDBMethod = void 0;
 exports.averageResponseTime = averageResponseTime;
 exports.canBeUsed = canBeUsed;
 exports.cleanOldMessages = cleanOldMessages;
@@ -11,7 +11,6 @@ exports.close = close;
 exports.commitIndexedDBTransaction = commitIndexedDBTransaction;
 exports.create = create;
 exports.createDatabase = createDatabase;
-exports["default"] = void 0;
 exports.getAllMessages = getAllMessages;
 exports.getIdb = getIdb;
 exports.getMessagesHigherThan = getMessagesHigherThan;
@@ -88,7 +87,7 @@ function createDatabase(channelName) {
       autoIncrement: true
     });
   };
-  var dbPromise = new Promise(function (res, rej) {
+  return new Promise(function (res, rej) {
     openRequest.onerror = function (ev) {
       return rej(ev);
     };
@@ -96,7 +95,6 @@ function createDatabase(channelName) {
       res(openRequest.result);
     };
   });
-  return dbPromise;
 }
 
 /**
@@ -228,7 +226,6 @@ function getOldMessages(db, ttl) {
           // no more old messages,
           commitIndexedDBTransaction(tx);
           res(ret);
-          return;
         }
       } else {
         res(ret);
@@ -258,7 +255,7 @@ function create(channelName, options) {
        * @type {ObliviousSet}
        */
       eMIs: new _obliviousSet.ObliviousSet(options.idb.ttl * 2),
-      // ensures we do not read messages in parrallel
+      // ensures we do not read messages in parallel
       writeBlockPromise: _util.PROMISE_RESOLVED_VOID,
       messagesCallback: null,
       readQueuePromises: [],
@@ -312,7 +309,7 @@ function readNewMessages(state) {
   return getMessagesHigherThan(state.db, state.lastCursorId).then(function (newerMessages) {
     var useMessages = newerMessages
     /**
-     * there is a bug in iOS where the msgObj can be undefined some times
+     * there is a bug in iOS where the msgObj can be undefined sometimes
      * so we filter them out
      * @link https://github.com/pubkey/broadcast-channel/issues/19
      */.filter(function (msgObj) {
@@ -357,16 +354,12 @@ function onMessage(channelState, fn, time) {
   readNewMessages(channelState);
 }
 function canBeUsed() {
-  var idb = getIdb();
-  if (!idb) {
-    return false;
-  }
-  return true;
+  return !!getIdb();
 }
 function averageResponseTime(options) {
   return options.idb.fallbackInterval * 2;
 }
-var _default = {
+var IndexedDBMethod = {
   create: create,
   close: close,
   onMessage: onMessage,
@@ -376,4 +369,4 @@ var _default = {
   averageResponseTime: averageResponseTime,
   microSeconds: microSeconds
 };
-exports["default"] = _default;
+exports.IndexedDBMethod = IndexedDBMethod;

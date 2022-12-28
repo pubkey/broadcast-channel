@@ -1,7 +1,7 @@
 /**
  * A localStorage-only method which uses localstorage and its 'storage'-event
- * This does not work inside of webworkers because they have no access to locastorage
- * This is basically implemented to support IE9 or your grandmothers toaster.
+ * This does not work inside webworkers because they have no access to localstorage
+ * This is basically implemented to support IE9 or your grandmother's toaster.
  * @link https://caniuse.com/#feat=namevalue-storage
  * @link https://caniuse.com/#feat=indexeddb
  */
@@ -139,7 +139,7 @@ export function averageResponseTime() {
   }
   return defaultTime;
 }
-export default {
+export var LocalstorageMethod = {
   create: create,
   close: close,
   onMessage: onMessage,
