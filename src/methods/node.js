@@ -681,3 +681,14 @@ export function microSeconds() {
 function now() {
     return Number(process.hrtime.bigint()); // returns nanoseconds
 }
+
+export const NodeMethod = {
+    create,
+    close,
+    onMessage,
+    postMessage,
+    canBeUsed,
+    type,
+    averageResponseTime,
+    microSeconds
+};
