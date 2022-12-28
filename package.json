@@ -111,6 +111,7 @@
     "convert-hrtime": "5.0.0",
     "copyfiles": "2.4.1",
     "cross-env": "7.0.3",
+    "detect-node": "2.1.0",
     "eslint": "8.26.0",
     "gzip-size-cli": "5.1.0",
     "http-server": "14.1.1",
