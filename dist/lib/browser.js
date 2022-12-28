@@ -679,7 +679,7 @@ function createLeaderElection(channel, options) {
   channel._leaderElector = elector;
   return elector;
 }
-},{"./util.js":12,"unload":18}],6:[function(require,module,exports){
+},{"./util.js":12,"unload":17}],6:[function(require,module,exports){
 "use strict";
 
 var _typeof = require("@babel/runtime/helpers/typeof");
@@ -1105,7 +1105,7 @@ var IndexedDBMethod = {
   microSeconds: microSeconds
 };
 exports.IndexedDBMethod = IndexedDBMethod;
-},{"../options.js":11,"../util.js":12,"oblivious-set":15}],8:[function(require,module,exports){
+},{"../options.js":11,"../util.js":12,"oblivious-set":14}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1278,7 +1278,7 @@ var LocalstorageMethod = {
   microSeconds: microSeconds
 };
 exports.LocalstorageMethod = LocalstorageMethod;
-},{"../options.js":11,"../util.js":12,"oblivious-set":15}],9:[function(require,module,exports){
+},{"../options.js":11,"../util.js":12,"oblivious-set":14}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1538,8 +1538,6 @@ function _typeof(obj) {
 }
 module.exports = _typeof, module.exports.__esModule = true, module.exports["default"] = module.exports;
 },{}],14:[function(require,module,exports){
-
-},{}],15:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.now = exports.removeTooOldValues = exports.ObliviousSet = void 0;
@@ -1617,7 +1615,7 @@ function now() {
 }
 exports.now = now;
 
-},{}],16:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -1803,7 +1801,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],17:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1855,7 +1853,7 @@ function addBrowser(fn) {
    * @link https://stackoverflow.com/a/26193516/3443137
    */
 }
-},{}],18:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 (function (process){(function (){
 "use strict";
 
@@ -1916,4 +1914,43 @@ function getSize() {
   return LISTENERS.size;
 }
 }).call(this)}).call(this,require('_process'))
-},{"./browser.js":17,"./node.js":14,"_process":16}]},{},[2]);
+},{"./browser.js":16,"./node.js":18,"_process":15}],18:[function(require,module,exports){
+(function (process){(function (){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.addNode = addNode;
+function addNode(fn) {
+  process.on('exit', function () {
+    return fn();
+  });
+
+  /**
+   * on the following events,
+   * the process will not end if there are
+   * event-handlers attached,
+   * therefore we have to call process.exit()
+   */
+  process.on('beforeExit', function () {
+    return fn().then(function () {
+      return process.exit();
+    });
+  });
+  // catches ctrl+c event
+  process.on('SIGINT', function () {
+    return fn().then(function () {
+      return process.exit();
+    });
+  });
+  // catches uncaught exceptions
+  process.on('uncaughtException', function (err) {
+    return fn().then(function () {
+      console.trace(err);
+      process.exit(101);
+    });
+  });
+}
+}).call(this)}).call(this,require('_process'))
+},{"_process":15}]},{},[2]);

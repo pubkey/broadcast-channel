@@ -12459,7 +12459,46 @@ function getSize() {
   return LISTENERS.size;
 }
 }).call(this)}).call(this,require('_process'))
-},{"./browser.js":352,"./node.js":37,"_process":350}],354:[function(require,module,exports){
+},{"./browser.js":352,"./node.js":354,"_process":350}],354:[function(require,module,exports){
+(function (process){(function (){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.addNode = addNode;
+function addNode(fn) {
+  process.on('exit', function () {
+    return fn();
+  });
+
+  /**
+   * on the following events,
+   * the process will not end if there are
+   * event-handlers attached,
+   * therefore we have to call process.exit()
+   */
+  process.on('beforeExit', function () {
+    return fn().then(function () {
+      return process.exit();
+    });
+  });
+  // catches ctrl+c event
+  process.on('SIGINT', function () {
+    return fn().then(function () {
+      return process.exit();
+    });
+  });
+  // catches uncaught exceptions
+  process.on('uncaughtException', function (err) {
+    return fn().then(function () {
+      console.trace(err);
+      process.exit(101);
+    });
+  });
+}
+}).call(this)}).call(this,require('_process'))
+},{"_process":350}],355:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -12833,7 +12872,7 @@ try {
   console.log('error in run-function:');
   console.error(error);
 }
-},{"../../":2,"./util.js":355,"@babel/polyfill":12,"@babel/runtime/helpers/asyncToGenerator":14,"@babel/runtime/helpers/interopRequireDefault":15,"@babel/runtime/regenerator":18,"async-test-util":22}],355:[function(require,module,exports){
+},{"../../":2,"./util.js":356,"@babel/polyfill":12,"@babel/runtime/helpers/asyncToGenerator":14,"@babel/runtime/helpers/interopRequireDefault":15,"@babel/runtime/regenerator":18,"async-test-util":22}],356:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -12852,4 +12891,4 @@ function getParameterByName(name, url) {
   if (!results[2]) return '';
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
 }
-},{}]},{},[354]);
+},{}]},{},[355]);

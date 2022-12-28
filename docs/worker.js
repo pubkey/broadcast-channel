@@ -12098,7 +12098,46 @@ function getSize() {
   return LISTENERS.size;
 }
 }).call(this)}).call(this,require('_process'))
-},{"./browser.js":348,"./node.js":33,"_process":346}],350:[function(require,module,exports){
+},{"./browser.js":348,"./node.js":350,"_process":346}],350:[function(require,module,exports){
+(function (process){(function (){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.addNode = addNode;
+function addNode(fn) {
+  process.on('exit', function () {
+    return fn();
+  });
+
+  /**
+   * on the following events,
+   * the process will not end if there are
+   * event-handlers attached,
+   * therefore we have to call process.exit()
+   */
+  process.on('beforeExit', function () {
+    return fn().then(function () {
+      return process.exit();
+    });
+  });
+  // catches ctrl+c event
+  process.on('SIGINT', function () {
+    return fn().then(function () {
+      return process.exit();
+    });
+  });
+  // catches uncaught exceptions
+  process.on('uncaughtException', function (err) {
+    return fn().then(function () {
+      console.trace(err);
+      process.exit(101);
+    });
+  });
+}
+}).call(this)}).call(this,require('_process'))
+},{"_process":346}],351:[function(require,module,exports){
 "use strict";
 
 /* eslint-disable */
@@ -12170,4 +12209,4 @@ self.addEventListener('message', function (e) {
   }
   ;
 }, false);
-},{"../../":2,"@babel/polyfill":12,"async-test-util":18}]},{},[350]);
+},{"../../":2,"@babel/polyfill":12,"async-test-util":18}]},{},[351]);
