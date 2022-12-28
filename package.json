@@ -89,7 +89,7 @@
     "oblivious-set": "1.1.1",
     "p-queue": "6.6.2",
     "rimraf": "3.0.2",
-    "unload": "2.4.0"
+    "unload": "2.4.1"
   },
   "devDependencies": {
     "@babel/cli": "7.20.7",
