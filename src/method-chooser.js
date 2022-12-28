@@ -3,7 +3,7 @@ import { IndexedDBMethod } from './methods/indexed-db.js';
 import { LocalstorageMethod } from './methods/localstorage.js';
 import { SimulateMethod } from './methods/simulate.js';
 // the line below will be removed from es5/browser builds
-import { NodeMethod } from './methods/node.js';
+import * as NodeMethod from './methods/node.js';
 
 // order is important
 const METHODS = [
