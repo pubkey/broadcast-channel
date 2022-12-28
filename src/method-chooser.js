@@ -1,14 +1,14 @@
-import NativeMethod from './methods/native.js';
-import IndexedDbMethod from './methods/indexed-db.js';
-import LocalstorageMethod from './methods/localstorage.js';
-import SimulateMethod from './methods/simulate.js';
+import { NativeMethod } from './methods/native.js';
+import { IndexedDBMethod } from './methods/indexed-db.js';
+import { LocalstorageMethod } from './methods/localstorage.js';
+import { SimulateMethod } from './methods/simulate.js';
 // the line below will be removed from es5/browser builds
 import * as NodeMethod from './methods/node.js';
 
 // order is important
 const METHODS = [
     NativeMethod, // fastest
-    IndexedDbMethod,
+    IndexedDBMethod,
     LocalstorageMethod
 ];
 
