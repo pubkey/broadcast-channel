@@ -376,7 +376,7 @@ export function averageResponseTime(options) {
     return options.idb.fallbackInterval * 2;
 }
 
-export default {
+export const IndexedDBMethod = {
     create,
     close,
     onMessage,

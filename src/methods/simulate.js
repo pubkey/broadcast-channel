@@ -47,7 +47,7 @@ export function averageResponseTime() {
     return 5;
 }
 
-export default {
+export const SimulateMethod = {
     create,
     close,
     onMessage,

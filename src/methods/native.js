@@ -62,7 +62,7 @@ export function averageResponseTime() {
     return 150;
 }
 
-export default {
+export const NativeMethod = {
     create,
     close,
     onMessage,

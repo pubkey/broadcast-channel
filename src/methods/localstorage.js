@@ -170,7 +170,7 @@ export function averageResponseTime() {
     return defaultTime;
 }
 
-export default {
+export const LocalstorageMethod = {
     create,
     close,
     onMessage,
