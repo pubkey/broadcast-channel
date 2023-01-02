@@ -108,9 +108,9 @@ jobs:
             ./node_modules
             ./test-electron/node_modules
           # invalidate cache when any package.json changes
-          key: ${{ runner.os }}-npm-test-node-x1-${{ env.cache-name }}-${{ hashFiles('**/package.json') }}
+          key: ${{ runner.os }}-npm-test-node-x1-${{ matrix.node }}-${{ env.cache-name }}-${{ hashFiles('**/package.json') }}
           restore-keys: |
-            ${{ runner.os }}-npm-test-node-x1-${{ env.cache-name }}-
+            ${{ runner.os }}-npm-test-node-x1-${{ matrix.node }}-${{ env.cache-name }}-
             ${{ runner.os }}-npm-test-node
             ${{ runner.os }}-test-node
 
