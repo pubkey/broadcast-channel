@@ -89,7 +89,7 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        node: ['15.14.0', '16.13.1', '17.3.0' ]
+        node: ['16.13.1', '17.3.0', '18.12.1']
     steps:
       - uses: actions/checkout@v3
       - name: Setup Node.js environment
