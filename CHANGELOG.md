@@ -3,6 +3,7 @@
 
 ## X.X.X (comming soon)
 
+## 4.20.0 (6 January 2023)
 
 - FIX typings did not work with `"moduleResolution": "NodeNext"`
 
