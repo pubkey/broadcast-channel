@@ -6,11 +6,13 @@
     ".": {
       "node": {
         "import": "./dist/esnode/index.js",
-        "default": "./dist/es5node/index.js"
+        "default": "./dist/es5node/index.js",
+        "types": "./types/index.d.ts"
       },
       "browser": {
         "import": "./dist/esbrowser/index.js",
-        "default": "./dist/lib/index.es5.js"
+        "default": "./dist/lib/index.es5.js",
+        "types": "./types/index.d.ts"
       }
     },
     "./package.json": "./package.json"

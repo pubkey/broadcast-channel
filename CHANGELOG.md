@@ -3,6 +3,9 @@
 
 ## X.X.X (comming soon)
 
+
+- FIX typings did not work with `"moduleResolution": "NodeNext"`
+
 ## 4.19.0 (28 December 2022)
 
 - Updated dependencies
