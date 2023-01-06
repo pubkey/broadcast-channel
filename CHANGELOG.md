@@ -3,6 +3,8 @@
 
 ## X.X.X (comming soon)
 
+## 4.20.1 (6 January 2023)
+
 - FIX exports order
 
 ## 4.20.0 (6 January 2023)
