@@ -5,13 +5,13 @@
   "exports": {
     ".": {
       "node": {
-        "import": "./dist/esnode/index.js",
         "types": "./types/index.d.ts",
+        "import": "./dist/esnode/index.js",
         "default": "./dist/es5node/index.js"
       },
       "browser": {
-        "import": "./dist/esbrowser/index.js",
         "types": "./types/index.d.ts",
+        "import": "./dist/esbrowser/index.js",
         "default": "./dist/lib/index.es5.js"
       }
     },
