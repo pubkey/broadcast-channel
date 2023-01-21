@@ -87,7 +87,7 @@
     "lint"
   ],
   "dependencies": {
-    "@babel/runtime": "7.20.7",
+    "@babel/runtime": "7.20.13",
     "oblivious-set": "1.1.1",
     "p-queue": "6.6.2",
     "rimraf": "3.0.2",
