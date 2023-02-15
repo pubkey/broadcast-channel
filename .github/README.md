@@ -35,8 +35,8 @@ This behaves similar to the [BroadcastChannel-API](https://developer.mozilla.org
 <p align="center">
     <a href="https://rxdb.info/?utm_source=github&utm_medium=repo&utm_campaign=github-broadcast-channel-readme">
         <img
-            src="https://github.com/pubkey/rxdb/raw/master/docs-src/files/logo/logo_text.svg"
-            alt="Sponsored by RxDB"
+            src="https://rxdb.info/files/logo/logo_text.svg"
+            alt="JavaScript Database"
             width="300"
          />
          <br />
