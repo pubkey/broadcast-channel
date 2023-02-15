@@ -43,7 +43,7 @@ And a LeaderElection over the channels.
     <a href="https://rxdb.info/?utm_source=github&utm_medium=repo&utm_campaign=github-broadcast-channel-npm">
         <img
             src="https://rxdb.info/files/logo/logo_text.svg"
-            alt="Sponsored by RxDB"
+            alt="JavaScript Database"
             width="300"
          />
          <br />
