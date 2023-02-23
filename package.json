@@ -90,7 +90,7 @@
     "@babel/runtime": "7.21.0",
     "oblivious-set": "1.1.1",
     "p-queue": "6.6.2",
-    "rimraf": "3.0.2",
+    "rimraf": "4.1.2",
     "unload": "2.4.1"
   },
   "devDependencies": {
