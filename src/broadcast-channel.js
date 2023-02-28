@@ -247,7 +247,9 @@ function _startListening(channel) {
         // someone is listening, start subscribing
 
         const listenerFn = msgObj => {
-            channel._addEL[msgObj.type]
+            const isPlainMessage = typeof (msgObj) === "string";
+            const type = isPlainMessage ? "message" : msgObj.type;  
+            channel._addEL[type]
                 .forEach(listenerObject => {
                     /**
                      * Getting the current time in JavaScript has no good precision.
@@ -261,8 +263,8 @@ function _startListening(channel) {
                     const hundredMsInMicro = 100 * 1000;
                     const minMessageTime = listenerObject.time - hundredMsInMicro;
 
-                    if (msgObj.time >= minMessageTime) {
-                        listenerObject.fn(msgObj.data);
+                    if (isPlainMessage || msgObj.time >= minMessageTime) {
+                        listenerObject.fn(isPlainMessage ? msgObj : msgObj.data);
                     }
                 });
         };
