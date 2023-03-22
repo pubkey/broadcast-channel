@@ -11,7 +11,7 @@ import {
 } from 'unload';
 import {
     LeaderElectionWebLock
-} from './leader-election-web-lock';
+} from './leader-election-web-lock.js';
 
 const LeaderElection = function (broadcastChannel, options) {
     this.broadcastChannel = broadcastChannel;
