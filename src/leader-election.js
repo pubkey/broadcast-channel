@@ -200,11 +200,6 @@ LeaderElection.prototype = {
             this.isLeader = false;
         }
         this.isDead = true;
-
-        if (this._wKMC.res) {
-            this._wKMC.res();
-        }
-
         return _sendMessage(this, 'death');
     }
 };
