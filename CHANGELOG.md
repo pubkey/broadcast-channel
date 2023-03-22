@@ -3,6 +3,8 @@
 
 ## X.X.X (comming soon)
 
+## 5.0.0 (23 March 2023)
+
 - Use [Web Locks API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Locks_API) for leader election if possible.
 - `LeaderElector.hasLeader` is now a function that returns a `Promise<boolean>`.
 

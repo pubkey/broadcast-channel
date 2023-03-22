@@ -3,16 +3,16 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.beLeader = beLeader;
 exports.createLeaderElection = createLeaderElection;
 var _util = require("./util.js");
-var _unload = require("unload");
+var _leaderElectionUtil = require("./leader-election-util.js");
+var _leaderElectionWebLock = require("./leader-election-web-lock.js");
 var LeaderElection = function LeaderElection(broadcastChannel, options) {
   var _this = this;
   this.broadcastChannel = broadcastChannel;
   this._options = options;
   this.isLeader = false;
-  this.hasLeader = false;
+  this._hasLeader = false;
   this.isDead = false;
   this.token = (0, _util.randomToken)();
 
@@ -39,10 +39,10 @@ var LeaderElection = function LeaderElection(broadcastChannel, options) {
   var hasLeaderListener = function hasLeaderListener(msg) {
     if (msg.context === 'leader') {
       if (msg.action === 'death') {
-        _this.hasLeader = false;
+        _this._hasLeader = false;
       }
       if (msg.action === 'tell') {
-        _this.hasLeader = true;
+        _this._hasLeader = true;
       }
     }
   };
@@ -50,6 +50,9 @@ var LeaderElection = function LeaderElection(broadcastChannel, options) {
   this._lstns.push(hasLeaderListener);
 };
 LeaderElection.prototype = {
+  hasLeader: function hasLeader() {
+    return Promise.resolve(this._hasLeader);
+  },
   /**
    * Returns true if the instance is leader,
    * false if not.
@@ -115,7 +118,7 @@ LeaderElection.prototype = {
           if (msg.action === 'tell') {
             // other is already leader
             stopCriteriaPromiseResolve();
-            _this2.hasLeader = true;
+            _this2._hasLeader = true;
           }
         }
       };
@@ -132,7 +135,7 @@ LeaderElection.prototype = {
        * run in the background.
        */
       var waitForAnswerTime = isFromFallbackInterval ? _this2._options.responseTime * 4 : _this2._options.responseTime;
-      return _sendMessage(_this2, 'apply') // send out that this one is applying
+      return (0, _leaderElectionUtil.sendLeaderMessage)(_this2, 'apply') // send out that this one is applying
       .then(function () {
         return Promise.race([(0, _util.sleep)(waitForAnswerTime), stopCriteriaPromise.then(function () {
           return Promise.reject(new Error());
@@ -140,7 +143,7 @@ LeaderElection.prototype = {
       })
       // send again in case another instance was just created
       .then(function () {
-        return _sendMessage(_this2, 'apply');
+        return (0, _leaderElectionUtil.sendLeaderMessage)(_this2, 'apply');
       })
       // let others time to respond
       .then(function () {
@@ -151,7 +154,7 @@ LeaderElection.prototype = {
         _this2.broadcastChannel.removeEventListener('internal', handleMessage);
         if (!stopCriteria) {
           // no stop criteria -> own is leader
-          return beLeader(_this2).then(function () {
+          return (0, _leaderElectionUtil.beLeader)(_this2).then(function () {
             return true;
           });
         } else {
@@ -191,11 +194,11 @@ LeaderElection.prototype = {
     });
     this._unl = [];
     if (this.isLeader) {
-      this.hasLeader = false;
+      this._hasLeader = false;
       this.isLeader = false;
     }
     this.isDead = true;
-    return _sendMessage(this, 'death');
+    return (0, _leaderElectionUtil.sendLeaderMessage)(this, 'death');
   }
 };
 
@@ -251,7 +254,7 @@ function _awaitLeadershipOnce(leaderElector) {
     // try when other leader dies
     var whenDeathListener = function whenDeathListener(msg) {
       if (msg.context === 'leader' && msg.action === 'death') {
-        leaderElector.hasLeader = false;
+        leaderElector._hasLeader = false;
         leaderElector.applyOnce().then(function () {
           if (leaderElector.isLeader) {
             finish();
@@ -262,48 +265,6 @@ function _awaitLeadershipOnce(leaderElector) {
     leaderElector.broadcastChannel.addEventListener('internal', whenDeathListener);
     leaderElector._lstns.push(whenDeathListener);
   });
-}
-
-/**
- * sends and internal message over the broadcast-channel
- */
-function _sendMessage(leaderElector, action) {
-  var msgJson = {
-    context: 'leader',
-    action: action,
-    token: leaderElector.token
-  };
-  return leaderElector.broadcastChannel.postInternal(msgJson);
-}
-function beLeader(leaderElector) {
-  leaderElector.isLeader = true;
-  leaderElector.hasLeader = true;
-  var unloadFn = (0, _unload.add)(function () {
-    return leaderElector.die();
-  });
-  leaderElector._unl.push(unloadFn);
-  var isLeaderListener = function isLeaderListener(msg) {
-    if (msg.context === 'leader' && msg.action === 'apply') {
-      _sendMessage(leaderElector, 'tell');
-    }
-    if (msg.context === 'leader' && msg.action === 'tell' && !leaderElector._dpLC) {
-      /**
-       * another instance is also leader!
-       * This can happen on rare events
-       * like when the CPU is at 100% for long time
-       * or the tabs are open very long and the browser throttles them.
-       * @link https://github.com/pubkey/broadcast-channel/issues/414
-       * @link https://github.com/pubkey/broadcast-channel/issues/385
-       */
-      leaderElector._dpLC = true;
-      leaderElector._dpL(); // message the lib user so the app can handle the problem
-      _sendMessage(leaderElector, 'tell'); // ensure other leader also knows the problem
-    }
-  };
-
-  leaderElector.broadcastChannel.addEventListener('internal', isLeaderListener);
-  leaderElector._lstns.push(isLeaderListener);
-  return _sendMessage(leaderElector, 'tell');
 }
 function fillOptionsWithDefaults(options, channel) {
   if (!options) options = {};
@@ -321,7 +282,7 @@ function createLeaderElection(channel, options) {
     throw new Error('BroadcastChannel already has a leader-elector');
   }
   options = fillOptionsWithDefaults(options, channel);
-  var elector = new LeaderElection(channel, options);
+  var elector = (0, _util.supportsWebLockAPI)() ? new _leaderElectionWebLock.LeaderElectionWebLock(channel, options) : new LeaderElection(channel, options);
   channel._befC.push(function () {
     return elector.die();
   });

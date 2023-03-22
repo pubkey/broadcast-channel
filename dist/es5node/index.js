@@ -18,7 +18,7 @@ Object.defineProperty(exports, "OPEN_BROADCAST_CHANNELS", {
 Object.defineProperty(exports, "beLeader", {
   enumerable: true,
   get: function get() {
-    return _leaderElection.beLeader;
+    return _leaderElectionUtil.beLeader;
   }
 });
 Object.defineProperty(exports, "clearNodeFolder", {
@@ -41,3 +41,4 @@ Object.defineProperty(exports, "enforceOptions", {
 });
 var _broadcastChannel = require("./broadcast-channel.js");
 var _leaderElection = require("./leader-election.js");
+var _leaderElectionUtil = require("./leader-election-util.js");

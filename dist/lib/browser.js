@@ -276,7 +276,7 @@ function _stopListening(channel) {
     channel.method.onMessage(channel._state, null, time);
   }
 }
-},{"./method-chooser.js":6,"./options.js":11,"./util.js":12}],2:[function(require,module,exports){
+},{"./method-chooser.js":8,"./options.js":13,"./util.js":14}],2:[function(require,module,exports){
 "use strict";
 
 var _module = require('./index.es5.js');
@@ -325,7 +325,7 @@ Object.defineProperty(exports, "OPEN_BROADCAST_CHANNELS", {
 Object.defineProperty(exports, "beLeader", {
   enumerable: true,
   get: function get() {
-    return _leaderElection.beLeader;
+    return _leaderElectionUtil.beLeader;
   }
 });
 Object.defineProperty(exports, "clearNodeFolder", {
@@ -348,22 +348,162 @@ Object.defineProperty(exports, "enforceOptions", {
 });
 var _broadcastChannel = require("./broadcast-channel.js");
 var _leaderElection = require("./leader-election.js");
-},{"./broadcast-channel.js":1,"./leader-election.js":5}],5:[function(require,module,exports){
+var _leaderElectionUtil = require("./leader-election-util.js");
+},{"./broadcast-channel.js":1,"./leader-election-util.js":5,"./leader-election.js":7}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.beLeader = beLeader;
+exports.sendLeaderMessage = sendLeaderMessage;
+var _unload = require("unload");
+/**
+ * sends and internal message over the broadcast-channel
+ */
+function sendLeaderMessage(leaderElector, action) {
+  var msgJson = {
+    context: 'leader',
+    action: action,
+    token: leaderElector.token
+  };
+  return leaderElector.broadcastChannel.postInternal(msgJson);
+}
+function beLeader(leaderElector) {
+  leaderElector.isLeader = true;
+  leaderElector._hasLeader = true;
+  var unloadFn = (0, _unload.add)(function () {
+    return leaderElector.die();
+  });
+  leaderElector._unl.push(unloadFn);
+  var isLeaderListener = function isLeaderListener(msg) {
+    if (msg.context === 'leader' && msg.action === 'apply') {
+      sendLeaderMessage(leaderElector, 'tell');
+    }
+    if (msg.context === 'leader' && msg.action === 'tell' && !leaderElector._dpLC) {
+      /**
+       * another instance is also leader!
+       * This can happen on rare events
+       * like when the CPU is at 100% for long time
+       * or the tabs are open very long and the browser throttles them.
+       * @link https://github.com/pubkey/broadcast-channel/issues/414
+       * @link https://github.com/pubkey/broadcast-channel/issues/385
+       */
+      leaderElector._dpLC = true;
+      leaderElector._dpL(); // message the lib user so the app can handle the problem
+      sendLeaderMessage(leaderElector, 'tell'); // ensure other leader also knows the problem
+    }
+  };
+
+  leaderElector.broadcastChannel.addEventListener('internal', isLeaderListener);
+  leaderElector._lstns.push(isLeaderListener);
+  return sendLeaderMessage(leaderElector, 'tell');
+}
+},{"unload":19}],6:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.LeaderElectionWebLock = void 0;
+var _util = require("./util.js");
+var _leaderElectionUtil = require("./leader-election-util.js");
+/**
+ * A faster version of the leader elector that uses the WebLock API
+ * @link https://developer.mozilla.org/en-US/docs/Web/API/Web_Locks_API
+ */
+var LeaderElectionWebLock = function LeaderElectionWebLock(broadcastChannel, options) {
+  var _this = this;
+  this.broadcastChannel = broadcastChannel;
+  broadcastChannel._befC.push(function () {
+    return _this.die();
+  });
+  this._options = options;
+  this.isLeader = false;
+  this.isDead = false;
+  this.token = (0, _util.randomToken)();
+  this._lstns = [];
+  this._unl = [];
+  this._dpL = function () {}; // onduplicate listener
+  this._dpLC = false; // true when onduplicate called
+
+  this._wKMC = {}; // stuff for cleanup
+};
+exports.LeaderElectionWebLock = LeaderElectionWebLock;
+LeaderElectionWebLock.prototype = {
+  hasLeader: function hasLeader() {
+    return navigator.locks.query().then(function (locks) {
+      if (locks.held && locks.held.length > 0) {
+        return true;
+      } else {
+        return false;
+      }
+    });
+  },
+  awaitLeadership: function awaitLeadership() {
+    var _this2 = this;
+    if (!this._wLMP) {
+      this._wKMC.c = new AbortController();
+      var returnPromise = new Promise(function (res, rej) {
+        _this2._wKMC.res = res;
+        _this2._wKMC.rej = rej;
+      });
+      this._wLMP = new Promise(function (res) {
+        var lockId = 'pubkey-bc||' + _this2.broadcastChannel.method.type + '||' + _this2.broadcastChannel.name;
+        navigator.locks.request(lockId, {
+          signal: _this2._wKMC.c.signal
+        }, function () {
+          (0, _leaderElectionUtil.beLeader)(_this2);
+          res();
+          return returnPromise;
+        });
+      });
+    }
+    return this._wLMP;
+  },
+  set onduplicate(_fn) {
+    // Do nothing because there are no duplicates in the WebLock version
+  },
+  die: function die() {
+    var _this3 = this;
+    var ret = (0, _leaderElectionUtil.sendLeaderMessage)(this, 'death');
+    this._lstns.forEach(function (listener) {
+      return _this3.broadcastChannel.removeEventListener('internal', listener);
+    });
+    this._lstns = [];
+    this._unl.forEach(function (uFn) {
+      return uFn.remove();
+    });
+    this._unl = [];
+    if (this.isLeader) {
+      this.isLeader = false;
+    }
+    this.isDead = true;
+    if (this._wKMC.res) {
+      this._wKMC.res();
+    }
+    if (this._wKMC.c) {
+      this._wKMC.c.abort();
+    }
+    return ret;
+  }
+};
+},{"./leader-election-util.js":5,"./util.js":14}],7:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports.createLeaderElection = createLeaderElection;
 var _util = require("./util.js");
-var _unload = require("unload");
+var _leaderElectionUtil = require("./leader-election-util.js");
+var _leaderElectionWebLock = require("./leader-election-web-lock.js");
 var LeaderElection = function LeaderElection(broadcastChannel, options) {
   var _this = this;
   this.broadcastChannel = broadcastChannel;
   this._options = options;
   this.isLeader = false;
-  this.hasLeader = false;
+  this._hasLeader = false;
   this.isDead = false;
   this.token = (0, _util.randomToken)();
 
@@ -390,10 +530,10 @@ var LeaderElection = function LeaderElection(broadcastChannel, options) {
   var hasLeaderListener = function hasLeaderListener(msg) {
     if (msg.context === 'leader') {
       if (msg.action === 'death') {
-        _this.hasLeader = false;
+        _this._hasLeader = false;
       }
       if (msg.action === 'tell') {
-        _this.hasLeader = true;
+        _this._hasLeader = true;
       }
     }
   };
@@ -401,6 +541,9 @@ var LeaderElection = function LeaderElection(broadcastChannel, options) {
   this._lstns.push(hasLeaderListener);
 };
 LeaderElection.prototype = {
+  hasLeader: function hasLeader() {
+    return Promise.resolve(this._hasLeader);
+  },
   /**
    * Returns true if the instance is leader,
    * false if not.
@@ -466,7 +609,7 @@ LeaderElection.prototype = {
           if (msg.action === 'tell') {
             // other is already leader
             stopCriteriaPromiseResolve();
-            _this2.hasLeader = true;
+            _this2._hasLeader = true;
           }
         }
       };
@@ -483,7 +626,7 @@ LeaderElection.prototype = {
        * run in the background.
        */
       var waitForAnswerTime = isFromFallbackInterval ? _this2._options.responseTime * 4 : _this2._options.responseTime;
-      return _sendMessage(_this2, 'apply') // send out that this one is applying
+      return (0, _leaderElectionUtil.sendLeaderMessage)(_this2, 'apply') // send out that this one is applying
       .then(function () {
         return Promise.race([(0, _util.sleep)(waitForAnswerTime), stopCriteriaPromise.then(function () {
           return Promise.reject(new Error());
@@ -491,7 +634,7 @@ LeaderElection.prototype = {
       })
       // send again in case another instance was just created
       .then(function () {
-        return _sendMessage(_this2, 'apply');
+        return (0, _leaderElectionUtil.sendLeaderMessage)(_this2, 'apply');
       })
       // let others time to respond
       .then(function () {
@@ -502,7 +645,7 @@ LeaderElection.prototype = {
         _this2.broadcastChannel.removeEventListener('internal', handleMessage);
         if (!stopCriteria) {
           // no stop criteria -> own is leader
-          return beLeader(_this2).then(function () {
+          return (0, _leaderElectionUtil.beLeader)(_this2).then(function () {
             return true;
           });
         } else {
@@ -542,11 +685,11 @@ LeaderElection.prototype = {
     });
     this._unl = [];
     if (this.isLeader) {
-      this.hasLeader = false;
+      this._hasLeader = false;
       this.isLeader = false;
     }
     this.isDead = true;
-    return _sendMessage(this, 'death');
+    return (0, _leaderElectionUtil.sendLeaderMessage)(this, 'death');
   }
 };
 
@@ -602,7 +745,7 @@ function _awaitLeadershipOnce(leaderElector) {
     // try when other leader dies
     var whenDeathListener = function whenDeathListener(msg) {
       if (msg.context === 'leader' && msg.action === 'death') {
-        leaderElector.hasLeader = false;
+        leaderElector._hasLeader = false;
         leaderElector.applyOnce().then(function () {
           if (leaderElector.isLeader) {
             finish();
@@ -613,48 +756,6 @@ function _awaitLeadershipOnce(leaderElector) {
     leaderElector.broadcastChannel.addEventListener('internal', whenDeathListener);
     leaderElector._lstns.push(whenDeathListener);
   });
-}
-
-/**
- * sends and internal message over the broadcast-channel
- */
-function _sendMessage(leaderElector, action) {
-  var msgJson = {
-    context: 'leader',
-    action: action,
-    token: leaderElector.token
-  };
-  return leaderElector.broadcastChannel.postInternal(msgJson);
-}
-function beLeader(leaderElector) {
-  leaderElector.isLeader = true;
-  leaderElector.hasLeader = true;
-  var unloadFn = (0, _unload.add)(function () {
-    return leaderElector.die();
-  });
-  leaderElector._unl.push(unloadFn);
-  var isLeaderListener = function isLeaderListener(msg) {
-    if (msg.context === 'leader' && msg.action === 'apply') {
-      _sendMessage(leaderElector, 'tell');
-    }
-    if (msg.context === 'leader' && msg.action === 'tell' && !leaderElector._dpLC) {
-      /**
-       * another instance is also leader!
-       * This can happen on rare events
-       * like when the CPU is at 100% for long time
-       * or the tabs are open very long and the browser throttles them.
-       * @link https://github.com/pubkey/broadcast-channel/issues/414
-       * @link https://github.com/pubkey/broadcast-channel/issues/385
-       */
-      leaderElector._dpLC = true;
-      leaderElector._dpL(); // message the lib user so the app can handle the problem
-      _sendMessage(leaderElector, 'tell'); // ensure other leader also knows the problem
-    }
-  };
-
-  leaderElector.broadcastChannel.addEventListener('internal', isLeaderListener);
-  leaderElector._lstns.push(isLeaderListener);
-  return _sendMessage(leaderElector, 'tell');
 }
 function fillOptionsWithDefaults(options, channel) {
   if (!options) options = {};
@@ -672,14 +773,14 @@ function createLeaderElection(channel, options) {
     throw new Error('BroadcastChannel already has a leader-elector');
   }
   options = fillOptionsWithDefaults(options, channel);
-  var elector = new LeaderElection(channel, options);
+  var elector = (0, _util.supportsWebLockAPI)() ? new _leaderElectionWebLock.LeaderElectionWebLock(channel, options) : new LeaderElection(channel, options);
   channel._befC.push(function () {
     return elector.die();
   });
   channel._leaderElector = elector;
   return elector;
 }
-},{"./util.js":12,"unload":17}],6:[function(require,module,exports){
+},{"./leader-election-util.js":5,"./leader-election-web-lock.js":6,"./util.js":14}],8:[function(require,module,exports){
 "use strict";
 
 var _typeof = require("@babel/runtime/helpers/typeof");
@@ -728,11 +829,15 @@ function chooseMethod(options) {
   var useMethod = chooseMethods.find(function (method) {
     return method.canBeUsed();
   });
-  if (!useMethod) throw new Error("No usable method found in " + JSON.stringify(METHODS.map(function (m) {
-    return m.type;
-  })));else return useMethod;
+  if (!useMethod) {
+    throw new Error("No usable method found in " + JSON.stringify(METHODS.map(function (m) {
+      return m.type;
+    })));
+  } else {
+    return useMethod;
+  }
 }
-},{"./methods/indexed-db.js":7,"./methods/localstorage.js":8,"./methods/native.js":9,"./methods/simulate.js":10,"@babel/runtime/helpers/typeof":13}],7:[function(require,module,exports){
+},{"./methods/indexed-db.js":9,"./methods/localstorage.js":10,"./methods/native.js":11,"./methods/simulate.js":12,"@babel/runtime/helpers/typeof":15}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1105,7 +1210,7 @@ var IndexedDBMethod = {
   microSeconds: microSeconds
 };
 exports.IndexedDBMethod = IndexedDBMethod;
-},{"../options.js":11,"../util.js":12,"oblivious-set":14}],8:[function(require,module,exports){
+},{"../options.js":13,"../util.js":14,"oblivious-set":16}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1278,7 +1383,7 @@ var LocalstorageMethod = {
   microSeconds: microSeconds
 };
 exports.LocalstorageMethod = LocalstorageMethod;
-},{"../options.js":11,"../util.js":12,"oblivious-set":14}],9:[function(require,module,exports){
+},{"../options.js":13,"../util.js":14,"oblivious-set":16}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1354,7 +1459,7 @@ var NativeMethod = {
   microSeconds: microSeconds
 };
 exports.NativeMethod = NativeMethod;
-},{"../util.js":12}],10:[function(require,module,exports){
+},{"../util.js":14}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1423,7 +1528,7 @@ var SimulateMethod = {
   microSeconds: microSeconds
 };
 exports.SimulateMethod = SimulateMethod;
-},{"../util.js":12}],11:[function(require,module,exports){
+},{"../util.js":14}],13:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1463,7 +1568,7 @@ function fillOptionsWithDefaults() {
   if (typeof options.node.useFastPath === 'undefined') options.node.useFastPath = true;
   return options;
 }
-},{}],12:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1475,6 +1580,7 @@ exports.microSeconds = microSeconds;
 exports.randomInt = randomInt;
 exports.randomToken = randomToken;
 exports.sleep = sleep;
+exports.supportsWebLockAPI = supportsWebLockAPI;
 /**
  * returns true if the given object is a promise
  */
@@ -1526,7 +1632,19 @@ function microSeconds() {
     return ms * 1000;
   }
 }
-},{}],13:[function(require,module,exports){
+
+/**
+ * Check if WebLock API is supported.
+ * @link https://developer.mozilla.org/en-US/docs/Web/API/Web_Locks_API
+ */
+function supportsWebLockAPI() {
+  if (typeof navigator !== 'undefined' && typeof navigator.locks !== 'undefined' && typeof navigator.locks.request === 'function') {
+    return true;
+  } else {
+    return false;
+  }
+}
+},{}],15:[function(require,module,exports){
 function _typeof(obj) {
   "@babel/helpers - typeof";
 
@@ -1537,7 +1655,7 @@ function _typeof(obj) {
   }, module.exports.__esModule = true, module.exports["default"] = module.exports), _typeof(obj);
 }
 module.exports = _typeof, module.exports.__esModule = true, module.exports["default"] = module.exports;
-},{}],14:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.now = exports.removeTooOldValues = exports.ObliviousSet = void 0;
@@ -1615,7 +1733,7 @@ function now() {
 }
 exports.now = now;
 
-},{}],15:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -1801,7 +1919,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],16:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1853,7 +1971,7 @@ function addBrowser(fn) {
    * @link https://stackoverflow.com/a/26193516/3443137
    */
 }
-},{}],17:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 (function (process){(function (){
 "use strict";
 
@@ -1914,7 +2032,7 @@ function getSize() {
   return LISTENERS.size;
 }
 }).call(this)}).call(this,require('_process'))
-},{"./browser.js":16,"./node.js":18,"_process":15}],18:[function(require,module,exports){
+},{"./browser.js":18,"./node.js":20,"_process":17}],20:[function(require,module,exports){
 (function (process){(function (){
 "use strict";
 
@@ -1953,4 +2071,4 @@ function addNode(fn) {
   });
 }
 }).call(this)}).call(this,require('_process'))
-},{"_process":15}]},{},[2]);
+},{"_process":17}]},{},[2]);

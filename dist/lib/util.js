@@ -9,6 +9,7 @@ exports.microSeconds = microSeconds;
 exports.randomInt = randomInt;
 exports.randomToken = randomToken;
 exports.sleep = sleep;
+exports.supportsWebLockAPI = supportsWebLockAPI;
 /**
  * returns true if the given object is a promise
  */
@@ -58,5 +59,17 @@ function microSeconds() {
     lastMs = ms;
     additional = 0;
     return ms * 1000;
+  }
+}
+
+/**
+ * Check if WebLock API is supported.
+ * @link https://developer.mozilla.org/en-US/docs/Web/API/Web_Locks_API
+ */
+function supportsWebLockAPI() {
+  if (typeof navigator !== 'undefined' && typeof navigator.locks !== 'undefined' && typeof navigator.locks.request === 'function') {
+    return true;
+  } else {
+    return false;
   }
 }

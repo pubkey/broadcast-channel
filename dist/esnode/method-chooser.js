@@ -39,7 +39,11 @@ export function chooseMethod(options) {
   var useMethod = chooseMethods.find(function (method) {
     return method.canBeUsed();
   });
-  if (!useMethod) throw new Error("No usable method found in " + JSON.stringify(METHODS.map(function (m) {
-    return m.type;
-  })));else return useMethod;
+  if (!useMethod) {
+    throw new Error("No usable method found in " + JSON.stringify(METHODS.map(function (m) {
+      return m.type;
+    })));
+  } else {
+    return useMethod;
+  }
 }

@@ -46,3 +46,15 @@ export function microSeconds() {
     return ms * 1000;
   }
 }
+
+/**
+ * Check if WebLock API is supported.
+ * @link https://developer.mozilla.org/en-US/docs/Web/API/Web_Locks_API
+ */
+export function supportsWebLockAPI() {
+  if (typeof navigator !== 'undefined' && typeof navigator.locks !== 'undefined' && typeof navigator.locks.request === 'function') {
+    return true;
+  } else {
+    return false;
+  }
+}
