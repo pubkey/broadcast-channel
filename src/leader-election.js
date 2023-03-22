@@ -9,6 +9,9 @@ import {
 import {
     add as unloadAdd
 } from 'unload';
+import {
+    LeaderElectionWebLock
+} from './leader-election-web-lock';
 
 const LeaderElection = function (broadcastChannel, options) {
     this.broadcastChannel = broadcastChannel;
@@ -18,11 +21,6 @@ const LeaderElection = function (broadcastChannel, options) {
     this.hasLeader = false;
     this.isDead = false;
     this.token = randomToken();
-
-
-    // WebLock Mode
-    this._wLM = supportsWebLockAPI();
-    this._wKMC = {}; // stuff for cleanup
 
     /**
      * Apply Queue,
@@ -178,35 +176,13 @@ LeaderElection.prototype = {
     },
 
     awaitLeadership() {
-        if (this._wLM) {
-            // use WebLock mode
-            if (!this._wLMP) {
-                const returnPromise = new Promise((res, rej) => {
-                    this._wKMC.res = res;
-                    this._wKMC.rej = rej;
-                });
-                this._wLMP = new Promise((res) => {
-                    const lockId = 'pubkey-bc||' + this.broadcastChannel.method.type + '||' + this.broadcastChannel.name;
-                    navigator.locks.request(
-                        lockId,
-                        () => {
-                            res();
-                            return returnPromise;
-                        }
-                    );
-                });
-            }
-            return this._wLMP;
-        } else {
-            // use message based mode
-            if (
-                /* _awaitLeadershipPromise */
-                !this._aLP
-            ) {
-                this._aLP = _awaitLeadershipOnce(this);
-            }
-            return this._aLP;
+        if (
+            /* _awaitLeadershipPromise */
+            !this._aLP
+        ) {
+            this._aLP = _awaitLeadershipOnce(this);
         }
+        return this._aLP;
     },
 
     set onduplicate(fn) {
@@ -368,7 +344,9 @@ export function createLeaderElection(channel, options) {
     }
 
     options = fillOptionsWithDefaults(options, channel);
-    const elector = new LeaderElection(channel, options);
+
+
+    const elector = supportsWebLockAPI() ? new LeaderElectionWebLock() : new LeaderElection(channel, options);
     channel._befC.push(() => elector.die());
 
     channel._leaderElector = elector;
