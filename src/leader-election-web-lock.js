@@ -7,7 +7,7 @@ import {
  * A faster version of the leader elector that uses the WebLock API
  * @link https://developer.mozilla.org/en-US/docs/Web/API/Web_Locks_API
  */
-const LeaderElectionWebLock = function (broadcastChannel, options) {
+export const LeaderElectionWebLock = function (broadcastChannel, options) {
     this.broadcastChannel = broadcastChannel;
     this._options = options;
 
