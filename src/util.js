@@ -59,10 +59,8 @@ export function supportsWebLockAPI() {
         typeof navigator.locks !== 'undefined' &&
         typeof navigator.locks.request === 'function'
     ) {
-        console.log('supportsWebLockAPI(): true');
         return true;
     } else {
-        console.log('supportsWebLockAPI(): false');
         return false;
     }
 }

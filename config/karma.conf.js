@@ -26,11 +26,7 @@ const configuration = {
             console.log('availableBrowser:');
             console.dir(availableBrowser);
             const browsers = availableBrowser
-                .filter(b => !['PhantomJS', 'FirefoxAurora', 'FirefoxNightly'].includes(b))
-                .map(b => {
-                    if (process.env.TRAVIS && b === 'Chrome') return 'Chrome_travis_ci';
-                    else return b;
-                });
+                .filter(b => !['PhantomJS', 'FirefoxAurora', 'FirefoxNightly'].includes(b));
             return browsers;
         }
     },
@@ -58,10 +54,9 @@ const configuration = {
     envPreprocessor: [
         'GITHUB_ACTIONS',
     ],
-
     client: {
         mocha: {
-            bail: false,
+            bail: true,
             timeout: 12000
         },
         captureConsole: true
@@ -75,13 +70,9 @@ const configuration = {
             flags: ['--no-sandbox']
         }
     },
-    singleRun: true
+    singleRun: true,
+    concurrency: 1
 };
-
-if (process.env.TRAVIS) {
-    configuration.browsers = ['Chrome_travis_ci'];
-    configuration.concurrency = 1;
-}
 
 module.exports = function (config) {
     config.set(configuration);

@@ -8,10 +8,8 @@ const {
     OPEN_BROADCAST_CHANNELS,
     createLeaderElection,
     clearNodeFolder,
-    enforceOptions,
-    beLeader
+    enforceOptions
 } = require('../');
-const __env__ = typeof window !== 'undefined' && window.__env__ || {};
 
 if (isNode) {
     process.on('uncaughtException', (err, origin) => {
@@ -488,8 +486,8 @@ function runTest(channelOptions) {
                     const channel = new BroadcastChannel(channelName, channelOptions);
                     const elector = createLeaderElection(channel);
 
-                    await elector.applyOnce();
-                    assert.ok(elector.isLeader);
+                    elector.awaitLeadership();
+                    await AsyncTestUtil.waitUntil(() => elector.isLeader === true);
 
                     channel.close();
                 });
@@ -502,10 +500,8 @@ function runTest(channelOptions) {
                         const elector = createLeaderElection(channel);
                         const elector2 = createLeaderElection(channel2);
 
-                        await Promise.all([
-                            elector.applyOnce(),
-                            elector2.applyOnce()
-                        ]);
+                        elector.awaitLeadership();
+                        elector2.awaitLeadership();
 
                         await AsyncTestUtil.waitUntil(() => elector.isLeader || elector2.isLeader);
                         await AsyncTestUtil.wait(200);
@@ -527,7 +523,7 @@ function runTest(channelOptions) {
                         };
                     });
 
-                    await Promise.all(clients.map(c => c.elector.applyOnce()));
+                    clients.map(c => c.elector.awaitLeadership());
                     await AsyncTestUtil.waitUntil(() => clients.find(c => c.elector.isLeader));
                     await AsyncTestUtil.wait(200);
 
@@ -535,28 +531,6 @@ function runTest(channelOptions) {
                     assert.equal(leaderCount, 1);
 
                     clients.forEach(c => c.channel.close());
-                });
-                it('running applyOnce() in a loop should not block the process', async () => {
-                    const channelName = AsyncTestUtil.randomString(12);
-                    const channel = new BroadcastChannel(channelName, channelOptions);
-                    const channel2 = new BroadcastChannel(channelName, channelOptions);
-                    const elector = createLeaderElection(channel);
-                    const elector2 = createLeaderElection(channel2);
-
-                    let t = 0;
-                    const max = channelOptions.type == 'idb' && __env__.GITHUB_ACTIONS ? 150 : 50;
-                    while (!elector.hasLeader) {
-                        t++;
-                        await elector2.applyOnce();
-                        // ensure we do not full block the test runner so it cannot exit
-                        if (t > max) {
-                            throw new Error('this should never happen');
-                        }
-                    }
-
-                    assert.ok(elector);
-                    channel.close();
-                    channel2.close();
                 });
             });
             describe('.die()', () => {
@@ -567,13 +541,13 @@ function runTest(channelOptions) {
                     const elector = createLeaderElection(channel);
                     const elector2 = createLeaderElection(channel2);
 
-                    await elector.applyOnce();
+                    elector.awaitLeadership();
 
                     await elector.die();
                     await AsyncTestUtil.wait(200);
 
-                    await elector2.applyOnce();
-                    assert.ok(elector2.isLeader);
+                    elector2.awaitLeadership();
+                    await AsyncTestUtil.waitUntil(() => elector2.isLeader);
 
                     channel.close();
                     channel2.close();
@@ -585,13 +559,14 @@ function runTest(channelOptions) {
                     const elector = createLeaderElection(channel);
                     const elector2 = createLeaderElection(channel2);
 
-                    await elector.applyOnce();
+                    elector.awaitLeadership();
                     await channel.close();
                     assert.ok(elector.isDead);
                     await AsyncTestUtil.wait(200);
 
-                    await elector2.applyOnce();
-                    assert.ok(elector2.isLeader);
+                    elector2.awaitLeadership();
+                    await AsyncTestUtil.wait(200);
+                    await AsyncTestUtil.waitUntil(() => elector2.isLeader);
 
                     channel2.close();
                 });
@@ -644,33 +619,6 @@ function runTest(channelOptions) {
                     channel.close();
                     channel2.close();
                 });
-                it('should resolve when other leader no longers responds', async () => {
-                    const channelName = AsyncTestUtil.randomString(12);
-                    const channel = new BroadcastChannel(channelName, channelOptions);
-                    const channel2 = new BroadcastChannel(channelName, channelOptions);
-                    const elector = createLeaderElection(channel);
-                    const elector2 = createLeaderElection(channel2);
-
-                    await elector.awaitLeadership();
-                    await AsyncTestUtil.wait(200);
-
-                    let resolved = false;
-                    elector2.awaitLeadership().then(() => {
-                        resolved = true;
-                    });
-
-                    // wait for the applyQueue to be done
-                    // to not accientially skip testing the fallbackInterval election cycle.
-                    await elector2._aplQ;
-
-                    // overwrite postInternal to simulate non-responding leader
-                    channel.postInternal = () => Promise.resolve();
-
-                    await AsyncTestUtil.waitUntil(() => resolved === true);
-
-                    channel.close();
-                    channel2.close();
-                });
                 it('should resolve when leader-process exits', async () => {
                     await AsyncTestUtil.wait(150);
                     const channelName = AsyncTestUtil.randomString(12);
@@ -710,67 +658,14 @@ function runTest(channelOptions) {
                         elector2.awaitLeadership()
                     ]);
 
-                    await AsyncTestUtil.waitUntil(() => elector.hasLeader === true);
-                    await AsyncTestUtil.waitUntil(() => elector2.hasLeader === true);
-
-                    channel.close();
-                    channel2.close();
-                });
-                it('should have hasLeader=false after leader dies', async () => {
-                    const channelName = AsyncTestUtil.randomString(12);
-                    const channel = new BroadcastChannel(channelName, channelOptions);
-                    const channel2 = new BroadcastChannel(channelName, channelOptions);
-                    const elector = createLeaderElection(channel);
-                    const elector2 = createLeaderElection(channel2);
-
-                    await Promise.race([
-                        elector.awaitLeadership(),
-                        elector2.awaitLeadership()
-                    ]);
-
-                    const both = [elector, elector2];
-                    const leadingElector = both.find(e => e.isLeader);
-                    const nonLeadingElector = both.find(e => !e.isLeader);
-
-                    // First hasLeader should become false
-                    const waitForFalse = AsyncTestUtil.waitUntil(() => nonLeadingElector.hasLeader === false, 1000, 10);
-                    leadingElector.die();
-                    await waitForFalse;
-
-                    // Then it should become true again when the new leader was elected.
-                    await AsyncTestUtil.waitUntil(() => nonLeadingElector.hasLeader === true, 1000, 10);
+                    await AsyncTestUtil.waitUntil(async () => (await elector.hasLeader()) === true);
+                    await AsyncTestUtil.waitUntil(async () => (await elector2.hasLeader()) === true);
 
                     channel.close();
                     channel2.close();
                 });
             });
             describe('.onduplicate', () => {
-                it('should fire when duplicate leaders', async () => {
-                    const channelName = AsyncTestUtil.randomString(12);
-                    const channel = new BroadcastChannel(channelName, channelOptions);
-                    const channel2 = new BroadcastChannel(channelName, channelOptions);
-                    const elector = createLeaderElection(channel);
-                    const elector2 = createLeaderElection(channel2);
-
-                    const emitted = [];
-                    elector.onduplicate = () => {
-                        emitted.push(1);
-                    };
-                    elector2.onduplicate = () => {
-                        emitted.push(2);
-                    };
-
-                    beLeader(elector);
-                    beLeader(elector2);
-
-                    await AsyncTestUtil.waitUntil(() => emitted.length === 2);
-
-                    assert.ok(emitted.includes(1));
-                    assert.ok(emitted.includes(2));
-
-                    channel.close();
-                    channel2.close();
-                });
                 it('should NOT fire when no duplicated', async () => {
                     const channelName = AsyncTestUtil.randomString(12);
                     const channel = new BroadcastChannel(channelName, channelOptions);
@@ -804,7 +699,6 @@ function runTest(channelOptions) {
                     0
                 );
             }
-
         });
     });
 }

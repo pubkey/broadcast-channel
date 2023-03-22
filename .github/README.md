@@ -229,11 +229,12 @@ elector.awaitLeadership().then(()=> {
 })
 ```
 
-Check if there is a leader at this point in time. `hasLeader` is true when there is a leader. It becomes false, if the leader is dead. Then it becomes true again when a new leader is elected.
+Check if there is a leader at this point in time. `hasLeader()` returns true when there is a leader. It returns false, if the leader is dead. Then it returns true again when a new leader is elected.
 
 ```js
 const elector = createLeaderElection(channel);
-console.log('leader exists: ' + elector.hasLeader);
+const hasLeader = await elector.hasLeader();
+console.log('leader exists: ' + hasLeader);
 ```
 
 If more than one tab is becoming leader adjust `LeaderElectionOptions` configuration.

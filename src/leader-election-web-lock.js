@@ -1,7 +1,10 @@
 import {
     randomToken
 } from './util.js';
-
+import {
+    sendLeaderMessage,
+    beLeader
+} from './leader-election-util.js';
 
 /**
  * A faster version of the leader elector that uses the WebLock API
@@ -9,13 +12,16 @@ import {
  */
 export const LeaderElectionWebLock = function (broadcastChannel, options) {
     this.broadcastChannel = broadcastChannel;
+    broadcastChannel._befC.push(() => this.die());
     this._options = options;
 
     this.isLeader = false;
-    this.hasLeader = false;
     this.isDead = false;
     this.token = randomToken();
-
+    this._lstns = [];
+    this._unl = [];
+    this._dpL = () => { }; // onduplicate listener
+    this._dpLC = false; // true when onduplicate called
 
     this._wKMC = {}; // stuff for cleanup
 };
@@ -23,6 +29,15 @@ export const LeaderElectionWebLock = function (broadcastChannel, options) {
 
 
 LeaderElectionWebLock.prototype = {
+    hasLeader() {
+        return navigator.locks.query().then(locks => {
+            if (locks.held && locks.held.length > 0) {
+                return true;
+            } else {
+                return false;
+            }
+        });
+    },
     awaitLeadership() {
         if (!this._wLMP) {
             this._wKMC.c = new AbortController();
@@ -31,7 +46,6 @@ LeaderElectionWebLock.prototype = {
                 this._wKMC.rej = rej;
             });
             this._wLMP = new Promise((res) => {
-                console.dir(this);
                 const lockId = 'pubkey-bc||' + this.broadcastChannel.method.type + '||' + this.broadcastChannel.name;
                 navigator.locks.request(
                     lockId,
@@ -39,6 +53,7 @@ LeaderElectionWebLock.prototype = {
                         signal: this._wKMC.c.signal
                     },
                     () => {
+                        beLeader(this);
                         res();
                         return returnPromise;
                     }
@@ -48,13 +63,16 @@ LeaderElectionWebLock.prototype = {
         return this._wLMP;
     },
 
-    set onduplicate(fn) {
-        this._dpL = fn;
+    set onduplicate(_fn) {
+        // Do nothing because there are no duplicates in the WebLock version
     },
-
     die() {
+        const ret = sendLeaderMessage(this, 'death');
+        this._lstns.forEach(listener => this.broadcastChannel.removeEventListener('internal', listener));
+        this._lstns = [];
+        this._unl.forEach(uFn => uFn.remove());
+        this._unl = [];
         if (this.isLeader) {
-            this.hasLeader = false;
             this.isLeader = false;
         }
         this.isDead = true;
@@ -64,5 +82,6 @@ LeaderElectionWebLock.prototype = {
         if (this._wKMC.c) {
             this._wKMC.c.abort();
         }
+        return ret;
     }
 };
