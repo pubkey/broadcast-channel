@@ -17,7 +17,7 @@
     },
     "./package.json": "./package.json"
   },
-  "homepage": "https://github.com/pubkey/broadcast-channel#readme",
+  "homepage": "https://pubkey.github.io/broadcast-channel/",
   "keywords": [
     "broadcast-channel",
     "broadcastchannel",
