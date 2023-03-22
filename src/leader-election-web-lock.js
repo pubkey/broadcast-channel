@@ -31,6 +31,7 @@ LeaderElectionWebLock.prototype = {
                 this._wKMC.rej = rej;
             });
             this._wLMP = new Promise((res) => {
+                console.dir(this);
                 const lockId = 'pubkey-bc||' + this.broadcastChannel.method.type + '||' + this.broadcastChannel.name;
                 navigator.locks.request(
                     lockId,

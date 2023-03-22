@@ -341,7 +341,9 @@ export function createLeaderElection(channel, options) {
     options = fillOptionsWithDefaults(options, channel);
 
 
-    const elector = supportsWebLockAPI() ? new LeaderElectionWebLock() : new LeaderElection(channel, options);
+    const elector = supportsWebLockAPI() ?
+        new LeaderElectionWebLock(channel, options) :
+        new LeaderElection(channel, options);
     channel._befC.push(() => elector.die());
 
     channel._leaderElector = elector;
