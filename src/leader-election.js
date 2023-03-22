@@ -2,7 +2,8 @@ import {
     sleep,
     randomToken,
     PROMISE_RESOLVED_VOID,
-    PROMISE_RESOLVED_TRUE
+    PROMISE_RESOLVED_TRUE,
+    supportsWebLockAPI
 } from './util.js';
 
 import {
@@ -18,6 +19,16 @@ const LeaderElection = function (broadcastChannel, options) {
     this.isDead = false;
     this.token = randomToken();
 
+
+    // WebLock Mode
+    this._wLM = supportsWebLockAPI();
+    if (this._wLM) {
+        this._wKMH = {};
+        this._wLMP = new Promise((res, rej) => {
+            this._wKMH.res = res;
+            this._wKMH.rej = rej;
+        });
+    }
 
     /**
      * Apply Queue,
@@ -173,13 +184,28 @@ LeaderElection.prototype = {
     },
 
     awaitLeadership() {
-        if (
-            /* _awaitLeadershipPromise */
-            !this._aLP
-        ) {
-            this._aLP = _awaitLeadershipOnce(this);
+        if (this._wLM) {
+            // use WebLock mode
+            const lockId = 'pubkey-bc||' + this.broadcastChannel.method.type + '||' + this.broadcastChannel.name;
+            return new Promise((res) => {
+                navigator.locks.request(
+                    lockId,
+                    () => {
+                        res();
+                        return this._wLMP;
+                    }
+                );
+            });
+        } else {
+            // use message based mode
+            if (
+                /* _awaitLeadershipPromise */
+                !this._aLP
+            ) {
+                this._aLP = _awaitLeadershipOnce(this);
+            }
+            return this._aLP;
         }
-        return this._aLP;
     },
 
     set onduplicate(fn) {
