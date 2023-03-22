@@ -337,7 +337,6 @@ AFTER: {
   "leaderElection": 2122.0940190553665
 }
 
-
 {
   "openClose": 885.0331689119339,
   "sendRecieve": {

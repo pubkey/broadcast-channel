@@ -201,6 +201,9 @@ Depending in which environment this is used, a proper method is automatically se
 This module also comes with a leader-election which can be used to elect a leader between different BroadcastChannels.
 For example if you have a stable connection from the frontend to your server, you can use the LeaderElection to save server-side performance by only connecting once, even if the user has opened your website in multiple tabs.
 
+In the background it will use the [Web Locks API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Locks_API) if possible and fall back to a message-based election algorithm if WebLocks is not available.
+
+
 In this example the leader is marked with the crown ♛:
 ![leader-election.gif](../docs/files/leader-election.gif)
 
@@ -223,14 +226,15 @@ import { createLeaderElection } from 'broadcast-channel';
 const elector = createLeaderElection(channel);
 elector.awaitLeadership().then(()=> {
   console.log('this tab is now leader');
-})
+});
 ```
 
-Check if there is a leader at this point in time. `hasLeader` is true when there is a leader. It becomes false, if the leader is dead. Then it becomes true again when a new leader is elected.
+Check if there is a leader at this point in time. `hasLeader()` returns true when there is a leader. It returns false, if the leader is dead. Then it returns true again when a new leader is elected.
 
 ```js
 const elector = createLeaderElection(channel);
-console.log('leader exists: ' + elector.hasLeader);
+const hasLeader = await elector.hasLeader();
+console.log('leader exists: ' + hasLeader);
 ```
 
 If more than one tab is becoming leader adjust `LeaderElectionOptions` configuration.

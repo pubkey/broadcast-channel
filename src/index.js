@@ -5,6 +5,8 @@ export {
     OPEN_BROADCAST_CHANNELS
 } from './broadcast-channel.js';
 export {
-    createLeaderElection,
-    beLeader
+    createLeaderElection
 } from './leader-election.js';
+export {
+    beLeader
+} from './leader-election-util.js';

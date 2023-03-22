@@ -2,22 +2,25 @@ import {
     sleep,
     randomToken,
     PROMISE_RESOLVED_VOID,
-    PROMISE_RESOLVED_TRUE
+    PROMISE_RESOLVED_TRUE,
+    supportsWebLockAPI
 } from './util.js';
-
 import {
-    add as unloadAdd
-} from 'unload';
+    sendLeaderMessage,
+    beLeader
+} from './leader-election-util.js';
+import {
+    LeaderElectionWebLock
+} from './leader-election-web-lock.js';
 
 const LeaderElection = function (broadcastChannel, options) {
     this.broadcastChannel = broadcastChannel;
     this._options = options;
 
     this.isLeader = false;
-    this.hasLeader = false;
+    this._hasLeader = false;
     this.isDead = false;
     this.token = randomToken();
-
 
     /**
      * Apply Queue,
@@ -43,10 +46,10 @@ const LeaderElection = function (broadcastChannel, options) {
     const hasLeaderListener = (msg => {
         if (msg.context === 'leader') {
             if (msg.action === 'death') {
-                this.hasLeader = false;
+                this._hasLeader = false;
             }
             if (msg.action === 'tell') {
-                this.hasLeader = true;
+                this._hasLeader = true;
             }
         }
     });
@@ -55,6 +58,11 @@ const LeaderElection = function (broadcastChannel, options) {
 };
 
 LeaderElection.prototype = {
+    hasLeader() {
+        return Promise.resolve(this._hasLeader);
+    },
+
+
     /**
      * Returns true if the instance is leader,
      * false if not.
@@ -121,7 +129,7 @@ LeaderElection.prototype = {
                     if (msg.action === 'tell') {
                         // other is already leader
                         stopCriteriaPromiseResolve();
-                        this.hasLeader = true;
+                        this._hasLeader = true;
                     }
                 }
             };
@@ -139,13 +147,13 @@ LeaderElection.prototype = {
              */
             const waitForAnswerTime = isFromFallbackInterval ? this._options.responseTime * 4 : this._options.responseTime;
 
-            return _sendMessage(this, 'apply') // send out that this one is applying
+            return sendLeaderMessage(this, 'apply') // send out that this one is applying
                 .then(() => Promise.race([
                     sleep(waitForAnswerTime),
                     stopCriteriaPromise.then(() => Promise.reject(new Error()))
                 ]))
                 // send again in case another instance was just created
-                .then(() => _sendMessage(this, 'apply'))
+                .then(() => sendLeaderMessage(this, 'apply'))
                 // let others time to respond
                 .then(() => Promise.race([
                     sleep(waitForAnswerTime),
@@ -193,11 +201,11 @@ LeaderElection.prototype = {
         this._unl = [];
 
         if (this.isLeader) {
-            this.hasLeader = false;
+            this._hasLeader = false;
             this.isLeader = false;
         }
         this.isDead = true;
-        return _sendMessage(this, 'death');
+        return sendLeaderMessage(this, 'death');
     }
 };
 
@@ -258,7 +266,7 @@ function _awaitLeadershipOnce(leaderElector) {
         // try when other leader dies
         const whenDeathListener = msg => {
             if (msg.context === 'leader' && msg.action === 'death') {
-                leaderElector.hasLeader = false;
+                leaderElector._hasLeader = false;
                 leaderElector.applyOnce()
                     .then(() => {
                         if (leaderElector.isLeader) {
@@ -270,48 +278,6 @@ function _awaitLeadershipOnce(leaderElector) {
         leaderElector.broadcastChannel.addEventListener('internal', whenDeathListener);
         leaderElector._lstns.push(whenDeathListener);
     });
-}
-
-/**
- * sends and internal message over the broadcast-channel
- */
-function _sendMessage(leaderElector, action) {
-    const msgJson = {
-        context: 'leader',
-        action,
-        token: leaderElector.token
-    };
-    return leaderElector.broadcastChannel.postInternal(msgJson);
-}
-
-export function beLeader(leaderElector) {
-    leaderElector.isLeader = true;
-    leaderElector.hasLeader = true;
-    const unloadFn = unloadAdd(() => leaderElector.die());
-    leaderElector._unl.push(unloadFn);
-
-    const isLeaderListener = msg => {
-        if (msg.context === 'leader' && msg.action === 'apply') {
-            _sendMessage(leaderElector, 'tell');
-        }
-
-        if (msg.context === 'leader' && msg.action === 'tell' && !leaderElector._dpLC) {
-            /**
-             * another instance is also leader!
-             * This can happen on rare events
-             * like when the CPU is at 100% for long time
-             * or the tabs are open very long and the browser throttles them.
-             * @link https://github.com/pubkey/broadcast-channel/issues/414
-             * @link https://github.com/pubkey/broadcast-channel/issues/385
-             */
-            leaderElector._dpLC = true;
-            leaderElector._dpL(); // message the lib user so the app can handle the problem
-            _sendMessage(leaderElector, 'tell'); // ensure other leader also knows the problem
-        }
-    };
-    leaderElector.broadcastChannel.addEventListener('internal', isLeaderListener);
-    leaderElector._lstns.push(isLeaderListener);
-    return _sendMessage(leaderElector, 'tell');
 }
 
 
@@ -336,7 +302,11 @@ export function createLeaderElection(channel, options) {
     }
 
     options = fillOptionsWithDefaults(options, channel);
-    const elector = new LeaderElection(channel, options);
+
+
+    const elector = supportsWebLockAPI() ?
+        new LeaderElectionWebLock(channel, options) :
+        new LeaderElection(channel, options);
     channel._befC.push(() => elector.die());
 
     channel._leaderElector = elector;

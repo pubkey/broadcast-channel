@@ -31,16 +31,16 @@ export declare class LeaderElector {
     /**
      * IMPORTANT: The leader election is lazy,
      * it will not start before you call awaitLeadership()
-     * so isLeader will never become true then
+     * so isLeader will never become true then.
      */
     readonly isLeader: boolean;
 
     /**
-     * True if this or another instance is leader.
+     * Returns true if this or another instance is leader.
      * False if there is no leader at the moment
-     * and we must wait for the election cycle.
+     * and we must wait for the election.
      */
-    readonly hasLeader: boolean;
+    hasLeader(): Promise<boolean>;
 
     readonly isDead: boolean;
     readonly token: string;

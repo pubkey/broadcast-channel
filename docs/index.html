@@ -3,7 +3,12 @@
 
 <head>
     <title>BroadcastChannel Demo</title>
-    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/pubkey/broadcast-channel/master/docs/files/icon.png" sizes="32x32">
+    <link
+        rel="icon"
+        type="image/png"
+        href="https://raw.githubusercontent.com/pubkey/broadcast-channel/master/docs/files/icon.png"
+        sizes="32x32"
+    >
     <style>
         body {
             margin: 0;
@@ -28,10 +33,11 @@
             margin-top: 50px;
             padding: 10px;
         }
+
         @media screen and (max-width: 700px) {
-          .box {
-            width: 90%;
-          }
+            .box {
+                width: 90%;
+            }
         }
 
         input {
@@ -49,6 +55,7 @@
             min-height: 10px;
             font-size: 20px;
         }
+
     </style>
 </head>
 
@@ -60,8 +67,15 @@
             Open it in multiple tabs and send messages across them.
         </p>
 
-        <input type="text" placeholder="Insert message.." id="message-input" />
-        <button id="submit-button" disabled>Submit</button>
+        <input
+            type="text"
+            placeholder="Insert message.."
+            id="message-input"
+        />
+        <button
+            id="submit-button"
+            disabled
+        >Submit</button>
 
         <br />
         <br />
@@ -69,8 +83,32 @@
     </div>
     <div class="box">
         <h2>Links</h2>
-        <a href="https://pubkey.github.io/broadcast-channel/e2e.html" target="_blank">Advanced Test-Page</a><br />
-        <a href="https://github.com/pubkey/broadcast-channel" target="_blank">Github Repo</a><br />
+        <a
+            href="./e2e.html"
+            target="_blank"
+        >Advanced Test-Page</a><br />
+        <a
+            href="https://github.com/pubkey/broadcast-channel"
+            target="_blank"
+        >Github Repo</a><br />
+    </div>
+    <div class="box sponsor">
+        <h3>Sponsored by</h3>
+        <p align="center">
+            <a
+                href="https://rxdb.info/?utm_source=github&utm_medium=repo&utm_campaign=github-broadcast-channel-readme"
+                target="_blank"
+            >
+                <img
+                    src="https://rxdb.info/files/logo/logo_text.svg"
+                    alt="JavaScript Database"
+                    width="300"
+                />
+                <br />
+                <br />
+                <span>The <b>JavaScript Database</b></span>
+            </a>
+        </p>
     </div>
     <script src="./index.js"></script>
 </body>
