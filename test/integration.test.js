@@ -542,6 +542,7 @@ function runTest(channelOptions) {
                     const elector2 = createLeaderElection(channel2);
 
                     elector.awaitLeadership();
+                    await AsyncTestUtil.waitUntil(() => elector.isLeader);
 
                     await elector.die();
                     await AsyncTestUtil.wait(200);
@@ -559,7 +560,7 @@ function runTest(channelOptions) {
                     const elector = createLeaderElection(channel);
                     const elector2 = createLeaderElection(channel2);
 
-                    elector.awaitLeadership();
+                    await elector.awaitLeadership();
                     await channel.close();
                     assert.ok(elector.isDead);
                     await AsyncTestUtil.wait(200);

@@ -226,7 +226,7 @@ import { createLeaderElection } from 'broadcast-channel';
 const elector = createLeaderElection(channel);
 elector.awaitLeadership().then(()=> {
   console.log('this tab is now leader');
-})
+});
 ```
 
 Check if there is a leader at this point in time. `hasLeader()` returns true when there is a leader. It returns false, if the leader is dead. Then it returns true again when a new leader is elected.
