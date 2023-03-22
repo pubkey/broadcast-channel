@@ -22,13 +22,7 @@ const LeaderElection = function (broadcastChannel, options) {
 
     // WebLock Mode
     this._wLM = supportsWebLockAPI();
-    if (this._wLM) {
-        this._wKMH = {};
-        this._wLMP = new Promise((res, rej) => {
-            this._wKMH.res = res;
-            this._wKMH.rej = rej;
-        });
-    }
+    this._wKMC = {}; // stuff for cleanup
 
     /**
      * Apply Queue,
@@ -186,16 +180,23 @@ LeaderElection.prototype = {
     awaitLeadership() {
         if (this._wLM) {
             // use WebLock mode
-            const lockId = 'pubkey-bc||' + this.broadcastChannel.method.type + '||' + this.broadcastChannel.name;
-            return new Promise((res) => {
-                navigator.locks.request(
-                    lockId,
-                    () => {
-                        res();
-                        return this._wLMP;
-                    }
-                );
-            });
+            if (!this._wLMP) {
+                const returnPromise = new Promise((res, rej) => {
+                    this._wKMC.res = res;
+                    this._wKMC.rej = rej;
+                });
+                this._wLMP = new Promise((res) => {
+                    const lockId = 'pubkey-bc||' + this.broadcastChannel.method.type + '||' + this.broadcastChannel.name;
+                    navigator.locks.request(
+                        lockId,
+                        () => {
+                            res();
+                            return returnPromise;
+                        }
+                    );
+                });
+            }
+            return this._wLMP;
         } else {
             // use message based mode
             if (
@@ -223,6 +224,11 @@ LeaderElection.prototype = {
             this.isLeader = false;
         }
         this.isDead = true;
+
+        if (this._wKMC.res) {
+            this._wKMC.res();
+        }
+
         return _sendMessage(this, 'death');
     }
 };
