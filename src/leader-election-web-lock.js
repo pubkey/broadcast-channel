@@ -84,7 +84,7 @@ LeaderElectionWebLock.prototype = {
             this._wKMC.res();
         }
         if (this._wKMC.c) {
-            this._wKMC.c.abort();
+            this._wKMC.c.abort('LeaderElectionWebLock.die() called');
         }
         return ret;
     }

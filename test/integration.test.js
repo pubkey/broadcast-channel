@@ -590,6 +590,22 @@ function runTest(channelOptions) {
                         return unloadSizeAfter === unloadSizeBefore;
                     });
                 });
+                it('letting many die at the same time should not cause a problem', async () => {
+                    const channelName = AsyncTestUtil.randomString(12);
+                    const channels = new Array(20).fill(0).map(() => new BroadcastChannel(channelName, channelOptions));
+                    const leaderElectors = channels.map(c => {
+                        const elector = createLeaderElection(c);
+                        elector.awaitLeadership(); // trigger election
+                        return elector;
+                    });
+                    await AsyncTestUtil.wait(200);
+                    await Promise.all(
+                        leaderElectors.map(e => e.die())
+                    );
+                    await Promise.all(
+                        channels.map(c => c.close())
+                    );
+                });
             });
             describe('.awaitLeadership()', () => {
                 it('should resolve when elector becomes leader', async () => {
