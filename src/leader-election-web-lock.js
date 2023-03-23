@@ -57,11 +57,14 @@ LeaderElectionWebLock.prototype = {
                         signal: this._wKMC.c.signal
                     },
                     () => {
+                        // if the lock resolved, we can drop the abort controller
+                        this._wKMC.c = undefined;
+
                         beLeader(this);
                         res();
                         return returnPromise;
                     }
-                );
+                ).catch(() => { });
             });
         }
         return this._wLMP;

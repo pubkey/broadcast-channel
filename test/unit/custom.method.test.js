@@ -11,7 +11,8 @@ describe('unit/custom.method.test.js', () => {
             const method = {
                 type: 'custom',
                 canBeUsed: () => true,
-                create: () => ({})
+                create: () => ({}),
+                close: () => { }
             };
             const channel = new BroadcastChannel(channelName, { methods: method });
             assert.equal(channel.method, method);
@@ -22,7 +23,8 @@ describe('unit/custom.method.test.js', () => {
             const method = {
                 type: 'custom',
                 canBeUsed: () => true,
-                create: () => ({})
+                create: () => ({}),
+                close: () => { }
             };
             const channel = new BroadcastChannel(channelName, { methods: [method] });
             assert.equal(channel.method, method);
