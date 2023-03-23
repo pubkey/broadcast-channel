@@ -646,7 +646,7 @@ function runTest(channelOptions) {
                     console.log('Finished: ' + JSON.stringify(channelOptions));
                 });
             });
-            describe('.hasLeader', () => {
+            describe('.hasLeader()', () => {
                 it('should have hasLeader=true after election has run', async () => {
                     const channelName = AsyncTestUtil.randomString(12);
                     const channel = new BroadcastChannel(channelName, channelOptions);
@@ -661,6 +661,19 @@ function runTest(channelOptions) {
 
                     await AsyncTestUtil.waitUntil(async () => (await elector.hasLeader()) === true);
                     await AsyncTestUtil.waitUntil(async () => (await elector2.hasLeader()) === true);
+
+                    channel.close();
+                    channel2.close();
+                });
+                it('should not mix up hasLeader() state from other channel', async () => {
+                    const channel = new BroadcastChannel(AsyncTestUtil.randomString(12), channelOptions);
+                    const channel2 = new BroadcastChannel(AsyncTestUtil.randomString(12), channelOptions);
+                    const elector = createLeaderElection(channel);
+                    const elector2 = createLeaderElection(channel2);
+
+                    await elector.awaitLeadership();
+                    const has = await elector2.hasLeader();
+                    assert.strictEqual(has, false);
 
                     channel.close();
                     channel2.close();

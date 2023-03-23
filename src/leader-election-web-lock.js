@@ -24,6 +24,10 @@ export const LeaderElectionWebLock = function (broadcastChannel, options) {
     this._dpLC = false; // true when onduplicate called
 
     this._wKMC = {}; // stuff for cleanup
+
+    // lock name
+    this.lN = 'pubkey-bc||' + broadcastChannel.method.type + '||' + broadcastChannel.name;
+
 };
 
 
@@ -31,7 +35,8 @@ export const LeaderElectionWebLock = function (broadcastChannel, options) {
 LeaderElectionWebLock.prototype = {
     hasLeader() {
         return navigator.locks.query().then(locks => {
-            if (locks.held && locks.held.length > 0) {
+            const relevantLocks = locks.held ? locks.held.filter(lock => lock.name === this.lN) : [];
+            if (relevantLocks && relevantLocks.length > 0) {
                 return true;
             } else {
                 return false;
@@ -46,9 +51,8 @@ LeaderElectionWebLock.prototype = {
                 this._wKMC.rej = rej;
             });
             this._wLMP = new Promise((res) => {
-                const lockId = 'pubkey-bc||' + this.broadcastChannel.method.type + '||' + this.broadcastChannel.name;
                 navigator.locks.request(
-                    lockId,
+                    this.lN,
                     {
                         signal: this._wKMC.c.signal
                     },
