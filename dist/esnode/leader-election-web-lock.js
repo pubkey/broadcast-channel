@@ -51,10 +51,12 @@ LeaderElectionWebLock.prototype = {
         navigator.locks.request(_this3.lN, {
           signal: _this3._wKMC.c.signal
         }, function () {
+          // if the lock resolved, we can drop the abort controller
+          _this3._wKMC.c = undefined;
           beLeader(_this3);
           res();
           return returnPromise;
-        });
+        })["catch"](function () {});
       });
     }
     return this._wLMP;

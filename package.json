@@ -1,6 +1,6 @@
 {
   "name": "broadcast-channel",
-  "version": "5.0.2",
+  "version": "5.0.3",
   "description": "A BroadcastChannel that works in New Browsers, Old Browsers, WebWorkers and NodeJs and iframes",
   "exports": {
     ".": {
