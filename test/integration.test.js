@@ -375,7 +375,7 @@ function runTest(channelOptions) {
             });
             describe('.clearNodeFolder()', () => {
                 it('should run or now throw at browsers', async () => {
-                    const hasRun = await clearNodeFolder();
+                    const hasRun = await clearNodeFolder(isNode ? { type: 'node' } : undefined);
                     if (isNode) {
                         assert.equal(hasRun, true);
                     } else {
