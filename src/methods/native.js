@@ -42,10 +42,10 @@ export function onMessage(channelState, fn) {
 }
 
 export function canBeUsed() {
-    if (typeof window === 'undefined') {
-        return false;
-    }
-    if (typeof BroadcastChannel === 'function') {
+    if (
+        (typeof window !== 'undefined' || typeof self !== 'undefined') &&
+        typeof BroadcastChannel === 'function'
+    ) {
         if (BroadcastChannel._pubkey) {
             throw new Error(
                 'BroadcastChannel: Do not overwrite window.BroadcastChannel with this module, this is not a polyfill'
