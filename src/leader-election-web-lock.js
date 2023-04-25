@@ -74,7 +74,6 @@ LeaderElectionWebLock.prototype = {
         // Do nothing because there are no duplicates in the WebLock version
     },
     die() {
-        const ret = sendLeaderMessage(this, 'death');
         this._lstns.forEach(listener => this.broadcastChannel.removeEventListener('internal', listener));
         this._lstns = [];
         this._unl.forEach(uFn => uFn.remove());
@@ -89,6 +88,6 @@ LeaderElectionWebLock.prototype = {
         if (this._wKMC.c) {
             this._wKMC.c.abort('LeaderElectionWebLock.die() called');
         }
-        return ret;
+        return sendLeaderMessage(this, 'death');
     }
 };

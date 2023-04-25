@@ -474,7 +474,6 @@ LeaderElectionWebLock.prototype = {
   },
   die: function die() {
     var _this4 = this;
-    var ret = (0, _leaderElectionUtil.sendLeaderMessage)(this, 'death');
     this._lstns.forEach(function (listener) {
       return _this4.broadcastChannel.removeEventListener('internal', listener);
     });
@@ -493,7 +492,7 @@ LeaderElectionWebLock.prototype = {
     if (this._wKMC.c) {
       this._wKMC.c.abort('LeaderElectionWebLock.die() called');
     }
-    return ret;
+    return (0, _leaderElectionUtil.sendLeaderMessage)(this, 'death');
   }
 };
 },{"./leader-election-util.js":5,"./util.js":14}],7:[function(require,module,exports){
@@ -1441,10 +1440,7 @@ function onMessage(channelState, fn) {
   channelState.messagesCallback = fn;
 }
 function canBeUsed() {
-  if (typeof window === 'undefined') {
-    return false;
-  }
-  if (typeof BroadcastChannel === 'function') {
+  if ((typeof window !== 'undefined' || typeof self !== 'undefined') && typeof BroadcastChannel === 'function') {
     if (BroadcastChannel._pubkey) {
       throw new Error('BroadcastChannel: Do not overwrite window.BroadcastChannel with this module, this is not a polyfill');
     }

@@ -66,7 +66,6 @@ LeaderElectionWebLock.prototype = {
   },
   die: function die() {
     var _this4 = this;
-    var ret = sendLeaderMessage(this, 'death');
     this._lstns.forEach(function (listener) {
       return _this4.broadcastChannel.removeEventListener('internal', listener);
     });
@@ -85,6 +84,6 @@ LeaderElectionWebLock.prototype = {
     if (this._wKMC.c) {
       this._wKMC.c.abort('LeaderElectionWebLock.die() called');
     }
-    return ret;
+    return sendLeaderMessage(this, 'death');
   }
 };
