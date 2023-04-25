@@ -3,6 +3,10 @@
 
 ## X.X.X (comming soon)
 
+## 5.1.0 (25 April 2023)
+
+- REFACTOR check for native method [#1157](https://github.com/pubkey/broadcast-channel/pull/1157)
+
 ## 5.0.1 (23 March 2023)
 
 - FIX hasLeader() is mixing up states
