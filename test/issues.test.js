@@ -28,14 +28,14 @@ describe('issues.test.js', () => {
         const fs = require('fs');
         const channelName = AsyncTestUtil.randomString(12);
 
-        const channel1 = new BroadcastChannel(channelName, { type: 'node' });
+        const channel1 = new BroadcastChannel(channelName);
         await channel1._prepP;
 
         // remove socket-file
         fs.unlinkSync(channel1._state.socketEE.path);
 
         // send message over other channel
-        const channel2 = new BroadcastChannel(channelName, { type: 'node' });
+        const channel2 = new BroadcastChannel(channelName);
         await channel2.postMessage({
             foo: 'bar'
         });

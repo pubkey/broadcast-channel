@@ -42,6 +42,10 @@ export function onMessage(channelState, fn) {
 }
 
 export function canBeUsed() {
+    if (typeof window === 'undefined' && typeof self === 'undefined') {
+        return false;
+    }
+
     if (typeof BroadcastChannel === 'function') {
         if (BroadcastChannel._pubkey) {
             throw new Error(
