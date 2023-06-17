@@ -131,7 +131,7 @@
     "karma-mocha": "2.0.1",
     "karma-opera-launcher": "1.0.0",
     "karma-safari-launcher": "1.0.0",
-    "mocha": "10.1.0",
+    "mocha": "10.2.0",
     "pre-commit": "1.2.2",
     "random-int": "3.0.0",
     "random-token": "0.0.8",
