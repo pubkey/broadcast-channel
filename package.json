@@ -13,6 +13,10 @@
         "types": "./types/index.d.ts",
         "import": "./dist/esbrowser/index.js",
         "default": "./dist/lib/index.es5.js"
+      },
+      "default": {
+        "types": "./types/index.d.ts",
+        "default": "./dist/lib/index.es5.js"
       }
     },
     "./package.json": "./package.json"
