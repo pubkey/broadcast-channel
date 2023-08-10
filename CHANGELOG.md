@@ -3,6 +3,9 @@
 
 ## X.X.X (comming soon)
 
+## 5.2.0 (11 August 2023)
+https://github.com/pubkey/broadcast-channel/pull/1237
+
 ## 5.1.0 (25 April 2023)
 
 - REFACTOR check for native method [#1157](https://github.com/pubkey/broadcast-channel/pull/1157)
