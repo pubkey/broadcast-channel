@@ -94,7 +94,6 @@
     "@babel/runtime": "7.22.10",
     "oblivious-set": "1.1.1",
     "p-queue": "6.6.2",
-    "rimraf": "3.0.2",
     "unload": "2.4.1"
   },
   "devDependencies": {
@@ -139,6 +138,7 @@
     "pre-commit": "1.2.2",
     "random-int": "3.0.0",
     "random-token": "0.0.8",
+    "rimraf": "5.0.1",
     "rollup": "3.28.0",
     "@rollup/plugin-terser": "0.4.3",
     "testcafe": "3.1.0",
