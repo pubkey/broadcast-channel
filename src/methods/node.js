@@ -10,7 +10,6 @@ import os from 'os';
 import events from 'events';
 import net from 'net';
 import path from 'path';
-import rimraf from 'rimraf';
 import PQueue from 'p-queue';
 import {
     add as unloadAdd
@@ -47,7 +46,21 @@ const readFile = util.promisify(fs.readFile);
 const unlink = util.promisify(fs.unlink);
 const readdir = util.promisify(fs.readdir);
 const chmod = util.promisify(fs.chmod);
-const removeDir = util.promisify(rimraf);
+const rmDir = util.promisify(fs.rm);
+
+const removeDir = async (p) => {
+    try {
+        return await rmDir(p,
+            {
+                recursive: true
+            }
+        );
+    } catch (err) {
+        if (err.code !== 'ENOENT') {
+            throw err;
+        }
+    }
+};
 
 const OTHER_INSTANCES = {};
 const TMP_FOLDER_NAME = 'pubkey.bc';
