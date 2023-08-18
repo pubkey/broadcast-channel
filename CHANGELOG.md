@@ -3,6 +3,8 @@
 
 ## X.X.X (comming soon)
 
+https://github.com/pubkey/broadcast-channel/pull/1243
+
 ## 5.2.0 (11 August 2023)
 https://github.com/pubkey/broadcast-channel/pull/1237
 
