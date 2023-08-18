@@ -43,7 +43,6 @@ var _os = _interopRequireDefault(require("os"));
 var _events = _interopRequireDefault(require("events"));
 var _net = _interopRequireDefault(require("net"));
 var _path = _interopRequireDefault(require("path"));
-var _rimraf = _interopRequireDefault(require("rimraf"));
 var _pQueue = _interopRequireDefault(require("p-queue"));
 var _unload = require("unload");
 var _options = require("../options.js");
@@ -73,7 +72,37 @@ var readFile = _util["default"].promisify(_fs["default"].readFile);
 var unlink = _util["default"].promisify(_fs["default"].unlink);
 var readdir = _util["default"].promisify(_fs["default"].readdir);
 var chmod = _util["default"].promisify(_fs["default"].chmod);
-var removeDir = _util["default"].promisify(_rimraf["default"]);
+var rmDir = _util["default"].promisify(_fs["default"].rm);
+var removeDir = /*#__PURE__*/function () {
+  var _ref = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee(p) {
+    return _regenerator["default"].wrap(function _callee$(_context) {
+      while (1) switch (_context.prev = _context.next) {
+        case 0:
+          _context.prev = 0;
+          _context.next = 3;
+          return rmDir(p, {
+            recursive: true
+          });
+        case 3:
+          return _context.abrupt("return", _context.sent);
+        case 6:
+          _context.prev = 6;
+          _context.t0 = _context["catch"](0);
+          if (!(_context.t0.code !== 'ENOENT')) {
+            _context.next = 10;
+            break;
+          }
+          throw _context.t0;
+        case 10:
+        case "end":
+          return _context.stop();
+      }
+    }, _callee, null, [[0, 6]]);
+  }));
+  return function removeDir(_x) {
+    return _ref.apply(this, arguments);
+  };
+}();
 var OTHER_INSTANCES = {};
 var TMP_FOLDER_NAME = 'pubkey.bc';
 var TMP_FOLDER_BASE = _path["default"].join(_os["default"].tmpdir(), TMP_FOLDER_NAME);
@@ -113,25 +142,25 @@ function ensureBaseFolderExists() {
   return _ensureBaseFolderExists.apply(this, arguments);
 }
 function _ensureBaseFolderExists() {
-  _ensureBaseFolderExists = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3() {
-    return _regenerator["default"].wrap(function _callee3$(_context3) {
-      while (1) switch (_context3.prev = _context3.next) {
+  _ensureBaseFolderExists = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee4() {
+    return _regenerator["default"].wrap(function _callee4$(_context4) {
+      while (1) switch (_context4.prev = _context4.next) {
         case 0:
           if (!ENSURE_BASE_FOLDER_EXISTS_PROMISE) {
             ENSURE_BASE_FOLDER_EXISTS_PROMISE = mkdir(TMP_FOLDER_BASE)["catch"](function () {
               return null;
             });
           }
-          return _context3.abrupt("return", ENSURE_BASE_FOLDER_EXISTS_PROMISE);
+          return _context4.abrupt("return", ENSURE_BASE_FOLDER_EXISTS_PROMISE);
         case 2:
         case "end":
-          return _context3.stop();
+          return _context4.stop();
       }
-    }, _callee3);
+    }, _callee4);
   }));
   return _ensureBaseFolderExists.apply(this, arguments);
 }
-function ensureFoldersExist(_x, _x2) {
+function ensureFoldersExist(_x2, _x3) {
   return _ensureFoldersExist.apply(this, arguments);
 }
 /**
@@ -139,21 +168,21 @@ function ensureFoldersExist(_x, _x2) {
  * @return {Promise<true>}
  */
 function _ensureFoldersExist() {
-  _ensureFoldersExist = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee4(channelName, paths) {
+  _ensureFoldersExist = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee5(channelName, paths) {
     var chmodValue;
-    return _regenerator["default"].wrap(function _callee4$(_context4) {
-      while (1) switch (_context4.prev = _context4.next) {
+    return _regenerator["default"].wrap(function _callee5$(_context5) {
+      while (1) switch (_context5.prev = _context5.next) {
         case 0:
           paths = paths || getPaths(channelName);
-          _context4.next = 3;
+          _context5.next = 3;
           return ensureBaseFolderExists();
         case 3:
-          _context4.next = 5;
+          _context5.next = 5;
           return mkdir(paths.channelBase)["catch"](function () {
             return null;
           });
         case 5:
-          _context4.next = 7;
+          _context5.next = 7;
           return Promise.all([mkdir(paths.readers)["catch"](function () {
             return null;
           }), mkdir(paths.messages)["catch"](function () {
@@ -162,15 +191,15 @@ function _ensureFoldersExist() {
         case 7:
           // set permissions so other users can use the same channel
           chmodValue = '777';
-          _context4.next = 10;
+          _context5.next = 10;
           return Promise.all([chmod(paths.channelBase, chmodValue), chmod(paths.readers, chmodValue), chmod(paths.messages, chmodValue)])["catch"](function () {
             return null;
           });
         case 10:
         case "end":
-          return _context4.stop();
+          return _context5.stop();
       }
-    }, _callee4);
+    }, _callee5);
   }));
   return _ensureFoldersExist.apply(this, arguments);
 }
@@ -178,27 +207,27 @@ function clearNodeFolder() {
   return _clearNodeFolder.apply(this, arguments);
 }
 function _clearNodeFolder() {
-  _clearNodeFolder = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee5() {
-    return _regenerator["default"].wrap(function _callee5$(_context5) {
-      while (1) switch (_context5.prev = _context5.next) {
+  _clearNodeFolder = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee6() {
+    return _regenerator["default"].wrap(function _callee6$(_context6) {
+      while (1) switch (_context6.prev = _context6.next) {
         case 0:
           if (!(!TMP_FOLDER_BASE || TMP_FOLDER_BASE === '' || TMP_FOLDER_BASE === '/')) {
-            _context5.next = 2;
+            _context6.next = 2;
             break;
           }
           throw new Error('BroadcastChannel.clearNodeFolder(): path is wrong');
         case 2:
           ENSURE_BASE_FOLDER_EXISTS_PROMISE = null;
-          _context5.next = 5;
+          _context6.next = 5;
           return removeDir(TMP_FOLDER_BASE);
         case 5:
           ENSURE_BASE_FOLDER_EXISTS_PROMISE = null;
-          return _context5.abrupt("return", true);
+          return _context6.abrupt("return", true);
         case 7:
         case "end":
-          return _context5.stop();
+          return _context6.stop();
       }
-    }, _callee5);
+    }, _callee6);
   }));
   return _clearNodeFolder.apply(this, arguments);
 }
@@ -234,28 +263,28 @@ function countChannelFolders() {
   return _countChannelFolders.apply(this, arguments);
 }
 function _countChannelFolders() {
-  _countChannelFolders = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee6() {
+  _countChannelFolders = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee7() {
     var folders;
-    return _regenerator["default"].wrap(function _callee6$(_context6) {
-      while (1) switch (_context6.prev = _context6.next) {
+    return _regenerator["default"].wrap(function _callee7$(_context7) {
+      while (1) switch (_context7.prev = _context7.next) {
         case 0:
-          _context6.next = 2;
+          _context7.next = 2;
           return ensureBaseFolderExists();
         case 2:
-          _context6.next = 4;
+          _context7.next = 4;
           return readdir(TMP_FOLDER_BASE);
         case 4:
-          folders = _context6.sent;
-          return _context6.abrupt("return", folders.length);
+          folders = _context7.sent;
+          return _context7.abrupt("return", folders.length);
         case 6:
         case "end":
-          return _context6.stop();
+          return _context7.stop();
       }
-    }, _callee6);
+    }, _callee7);
   }));
   return _countChannelFolders.apply(this, arguments);
 }
-function connectionError(_x3) {
+function connectionError(_x4) {
   return _connectionError.apply(this, arguments);
 }
 /**
@@ -263,45 +292,45 @@ function connectionError(_x3) {
  * @return {{emitter: EventEmitter, server: any}}
  */
 function _connectionError() {
-  _connectionError = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee7(originalError) {
+  _connectionError = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee8(originalError) {
     var count, addObj, text;
-    return _regenerator["default"].wrap(function _callee7$(_context7) {
-      while (1) switch (_context7.prev = _context7.next) {
+    return _regenerator["default"].wrap(function _callee8$(_context8) {
+      while (1) switch (_context8.prev = _context8.next) {
         case 0:
-          _context7.next = 2;
+          _context8.next = 2;
           return countChannelFolders();
         case 2:
-          count = _context7.sent;
+          count = _context8.sent;
           if (!(count < 30)) {
-            _context7.next = 5;
+            _context8.next = 5;
             break;
           }
-          return _context7.abrupt("return", originalError);
+          return _context8.abrupt("return", originalError);
         case 5:
           addObj = {};
-          Object.entries(originalError).forEach(function (_ref3) {
-            var k = _ref3[0],
-              v = _ref3[1];
+          Object.entries(originalError).forEach(function (_ref4) {
+            var k = _ref4[0],
+              v = _ref4[1];
             return addObj[k] = v;
           });
           text = 'BroadcastChannel.create(): error: ' + 'This might happen if you have created to many channels, ' + 'like when you use BroadcastChannel in unit-tests.' + 'Try using BroadcastChannel.clearNodeFolder() to clear the tmp-folder before each test.' + 'See https://github.com/pubkey/broadcast-channel#clear-tmp-folder';
-          return _context7.abrupt("return", new Error(text + ': ' + JSON.stringify(addObj, null, 2)));
+          return _context8.abrupt("return", new Error(text + ': ' + JSON.stringify(addObj, null, 2)));
         case 9:
         case "end":
-          return _context7.stop();
+          return _context8.stop();
       }
-    }, _callee7);
+    }, _callee8);
   }));
   return _connectionError.apply(this, arguments);
 }
-function createSocketEventEmitter(_x4, _x5, _x6) {
+function createSocketEventEmitter(_x5, _x6, _x7) {
   return _createSocketEventEmitter.apply(this, arguments);
 }
 function _createSocketEventEmitter() {
-  _createSocketEventEmitter = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee10(channelName, readerUuid, paths) {
+  _createSocketEventEmitter = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee11(channelName, readerUuid, paths) {
     var pathToSocket, emitter, server;
-    return _regenerator["default"].wrap(function _callee10$(_context10) {
-      while (1) switch (_context10.prev = _context10.next) {
+    return _regenerator["default"].wrap(function _callee11$(_context11) {
+      while (1) switch (_context11.prev = _context11.next) {
         case 0:
           pathToSocket = socketPath(channelName, readerUuid, paths);
           emitter = new _events["default"].EventEmitter();
@@ -311,74 +340,74 @@ function _createSocketEventEmitter() {
               emitter.emit('data', msg.toString());
             });
           });
-          _context10.next = 5;
+          _context11.next = 5;
           return new Promise(function (resolve, reject) {
             server.on('error', /*#__PURE__*/function () {
-              var _ref4 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee8(err) {
-                var useErr;
-                return _regenerator["default"].wrap(function _callee8$(_context8) {
-                  while (1) switch (_context8.prev = _context8.next) {
-                    case 0:
-                      _context8.next = 2;
-                      return connectionError(err);
-                    case 2:
-                      useErr = _context8.sent;
-                      reject(useErr);
-                    case 4:
-                    case "end":
-                      return _context8.stop();
-                  }
-                }, _callee8);
-              }));
-              return function (_x26) {
-                return _ref4.apply(this, arguments);
-              };
-            }());
-            server.listen(pathToSocket, /*#__PURE__*/function () {
-              var _ref5 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee9(err, res) {
+              var _ref5 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee9(err) {
                 var useErr;
                 return _regenerator["default"].wrap(function _callee9$(_context9) {
                   while (1) switch (_context9.prev = _context9.next) {
                     case 0:
-                      if (!err) {
-                        _context9.next = 7;
-                        break;
-                      }
-                      _context9.next = 3;
+                      _context9.next = 2;
                       return connectionError(err);
-                    case 3:
+                    case 2:
                       useErr = _context9.sent;
                       reject(useErr);
-                      _context9.next = 8;
-                      break;
-                    case 7:
-                      resolve(res);
-                    case 8:
+                    case 4:
                     case "end":
                       return _context9.stop();
                   }
                 }, _callee9);
               }));
-              return function (_x27, _x28) {
+              return function (_x27) {
                 return _ref5.apply(this, arguments);
+              };
+            }());
+            server.listen(pathToSocket, /*#__PURE__*/function () {
+              var _ref6 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee10(err, res) {
+                var useErr;
+                return _regenerator["default"].wrap(function _callee10$(_context10) {
+                  while (1) switch (_context10.prev = _context10.next) {
+                    case 0:
+                      if (!err) {
+                        _context10.next = 7;
+                        break;
+                      }
+                      _context10.next = 3;
+                      return connectionError(err);
+                    case 3:
+                      useErr = _context10.sent;
+                      reject(useErr);
+                      _context10.next = 8;
+                      break;
+                    case 7:
+                      resolve(res);
+                    case 8:
+                    case "end":
+                      return _context10.stop();
+                  }
+                }, _callee10);
+              }));
+              return function (_x28, _x29) {
+                return _ref6.apply(this, arguments);
               };
             }());
           });
         case 5:
-          return _context10.abrupt("return", {
+          return _context11.abrupt("return", {
             path: pathToSocket,
             emitter: emitter,
             server: server
           });
         case 6:
         case "end":
-          return _context10.stop();
+          return _context11.stop();
       }
-    }, _callee10);
+    }, _callee11);
   }));
   return _createSocketEventEmitter.apply(this, arguments);
 }
-function openClientConnection(_x7, _x8) {
+function openClientConnection(_x8, _x9) {
   return _openClientConnection.apply(this, arguments);
 }
 /**
@@ -387,14 +416,14 @@ function openClientConnection(_x7, _x8) {
  * @return {Promise}
  */
 function _openClientConnection() {
-  _openClientConnection = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee11(channelName, readerUuid) {
+  _openClientConnection = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee12(channelName, readerUuid) {
     var pathToSocket, client;
-    return _regenerator["default"].wrap(function _callee11$(_context11) {
-      while (1) switch (_context11.prev = _context11.next) {
+    return _regenerator["default"].wrap(function _callee12$(_context12) {
+      while (1) switch (_context12.prev = _context12.next) {
         case 0:
           pathToSocket = socketPath(channelName, readerUuid);
           client = new _net["default"].Socket();
-          return _context11.abrupt("return", new Promise(function (res, rej) {
+          return _context12.abrupt("return", new Promise(function (res, rej) {
             client.connect(pathToSocket, function () {
               return res(client);
             });
@@ -404,9 +433,9 @@ function _openClientConnection() {
           }));
         case 3:
         case "end":
-          return _context11.stop();
+          return _context12.stop();
       }
-    }, _callee11);
+    }, _callee12);
   }));
   return _openClientConnection.apply(this, arguments);
 }
@@ -435,22 +464,22 @@ function writeMessage(channelName, readerUuid, messageJson, paths) {
  * returns the uuids of all readers
  * @return {string[]}
  */
-function getReadersUuids(_x9, _x10) {
+function getReadersUuids(_x10, _x11) {
   return _getReadersUuids.apply(this, arguments);
 }
 function _getReadersUuids() {
-  _getReadersUuids = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee12(channelName, paths) {
+  _getReadersUuids = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee13(channelName, paths) {
     var readersPath, files;
-    return _regenerator["default"].wrap(function _callee12$(_context12) {
-      while (1) switch (_context12.prev = _context12.next) {
+    return _regenerator["default"].wrap(function _callee13$(_context13) {
+      while (1) switch (_context13.prev = _context13.next) {
         case 0:
           paths = paths || getPaths(channelName);
           readersPath = paths.readers;
-          _context12.next = 4;
+          _context13.next = 4;
           return readdir(readersPath);
         case 4:
-          files = _context12.sent;
-          return _context12.abrupt("return", files.map(function (file) {
+          files = _context13.sent;
+          return _context13.abrupt("return", files.map(function (file) {
             return file.split('.');
           }).filter(function (split) {
             return split[1] === 'json';
@@ -460,47 +489,47 @@ function _getReadersUuids() {
           }));
         case 6:
         case "end":
-          return _context12.stop();
-      }
-    }, _callee12);
-  }));
-  return _getReadersUuids.apply(this, arguments);
-}
-function messagePath(_x11, _x12, _x13, _x14) {
-  return _messagePath.apply(this, arguments);
-}
-function _messagePath() {
-  _messagePath = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee13(channelName, time, token, writerUuid) {
-    var fileName;
-    return _regenerator["default"].wrap(function _callee13$(_context13) {
-      while (1) switch (_context13.prev = _context13.next) {
-        case 0:
-          fileName = time + '_' + writerUuid + '_' + token + '.json';
-          return _context13.abrupt("return", _path["default"].join(getPaths(channelName).messages, fileName));
-        case 2:
-        case "end":
           return _context13.stop();
       }
     }, _callee13);
   }));
+  return _getReadersUuids.apply(this, arguments);
+}
+function messagePath(_x12, _x13, _x14, _x15) {
   return _messagePath.apply(this, arguments);
 }
-function getAllMessages(_x15, _x16) {
-  return _getAllMessages.apply(this, arguments);
-}
-function _getAllMessages() {
-  _getAllMessages = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee14(channelName, paths) {
-    var messagesPath, files;
+function _messagePath() {
+  _messagePath = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee14(channelName, time, token, writerUuid) {
+    var fileName;
     return _regenerator["default"].wrap(function _callee14$(_context14) {
       while (1) switch (_context14.prev = _context14.next) {
         case 0:
+          fileName = time + '_' + writerUuid + '_' + token + '.json';
+          return _context14.abrupt("return", _path["default"].join(getPaths(channelName).messages, fileName));
+        case 2:
+        case "end":
+          return _context14.stop();
+      }
+    }, _callee14);
+  }));
+  return _messagePath.apply(this, arguments);
+}
+function getAllMessages(_x16, _x17) {
+  return _getAllMessages.apply(this, arguments);
+}
+function _getAllMessages() {
+  _getAllMessages = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee15(channelName, paths) {
+    var messagesPath, files;
+    return _regenerator["default"].wrap(function _callee15$(_context15) {
+      while (1) switch (_context15.prev = _context15.next) {
+        case 0:
           paths = paths || getPaths(channelName);
           messagesPath = paths.messages;
-          _context14.next = 4;
+          _context15.next = 4;
           return readdir(messagesPath);
         case 4:
-          files = _context14.sent;
-          return _context14.abrupt("return", files.map(function (file) {
+          files = _context15.sent;
+          return _context15.abrupt("return", files.map(function (file) {
             var fileName = file.split('.')[0];
             var split = fileName.split('_');
             return {
@@ -512,9 +541,9 @@ function _getAllMessages() {
           }));
         case 6:
         case "end":
-          return _context14.stop();
+          return _context15.stop();
       }
-    }, _callee14);
+    }, _callee15);
   }));
   return _getAllMessages.apply(this, arguments);
 }
@@ -532,17 +561,17 @@ function readMessage(messageObj) {
     return JSON.parse(content);
   });
 }
-function cleanOldMessages(_x17, _x18) {
+function cleanOldMessages(_x18, _x19) {
   return _cleanOldMessages.apply(this, arguments);
 }
 function _cleanOldMessages() {
-  _cleanOldMessages = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee15(messageObjects, ttl) {
+  _cleanOldMessages = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee16(messageObjects, ttl) {
     var olderThan;
-    return _regenerator["default"].wrap(function _callee15$(_context15) {
-      while (1) switch (_context15.prev = _context15.next) {
+    return _regenerator["default"].wrap(function _callee16$(_context16) {
+      while (1) switch (_context16.prev = _context16.next) {
         case 0:
           olderThan = microSeconds() - ttl * 1000; // convert ttl to microseconds
-          _context15.next = 3;
+          _context16.next = 3;
           return Promise.all(messageObjects.filter(function (obj) {
             return obj.time < olderThan;
           }).map(function (obj) {
@@ -552,9 +581,9 @@ function _cleanOldMessages() {
           }));
         case 3:
         case "end":
-          return _context15.stop();
+          return _context16.stop();
       }
-    }, _callee15);
+    }, _callee16);
   }));
   return _cleanOldMessages.apply(this, arguments);
 }
@@ -565,11 +594,11 @@ var type = 'node';
  * @return {Promise<any>}
  */
 exports.type = type;
-function create(_x19) {
+function create(_x20) {
   return _create.apply(this, arguments);
 }
 function _create() {
-  _create = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee16(channelName) {
+  _create = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee17(channelName) {
     var options,
       time,
       paths,
@@ -579,11 +608,11 @@ function _create() {
       _yield$Promise$all,
       socketEE,
       infoFilePath,
-      _args16 = arguments;
-    return _regenerator["default"].wrap(function _callee16$(_context16) {
-      while (1) switch (_context16.prev = _context16.next) {
+      _args17 = arguments;
+    return _regenerator["default"].wrap(function _callee17$(_context17) {
+      while (1) switch (_context17.prev = _context17.next) {
         case 0:
-          options = _args16.length > 1 && _args16[1] !== undefined ? _args16[1] : {};
+          options = _args17.length > 1 && _args17[1] !== undefined ? _args17[1] : {};
           options = (0, _options.fillOptionsWithDefaults)(options);
           time = microSeconds();
           paths = getPaths(channelName);
@@ -618,13 +647,13 @@ function _create() {
           };
           if (!OTHER_INSTANCES[channelName]) OTHER_INSTANCES[channelName] = [];
           OTHER_INSTANCES[channelName].push(state);
-          _context16.next = 11;
+          _context17.next = 11;
           return ensureFolderExistsPromise;
         case 11:
-          _context16.next = 13;
+          _context17.next = 13;
           return Promise.all([createSocketEventEmitter(channelName, uuid, paths), createSocketInfoFile(channelName, uuid, paths), refreshReaderClients(state)]);
         case 13:
-          _yield$Promise$all = _context16.sent;
+          _yield$Promise$all = _context17.sent;
           socketEE = _yield$Promise$all[0];
           infoFilePath = _yield$Promise$all[1];
           state.socketEE = socketEE;
@@ -646,12 +675,12 @@ function _create() {
               }
             });
           });
-          return _context16.abrupt("return", state);
+          return _context17.abrupt("return", state);
         case 20:
         case "end":
-          return _context16.stop();
+          return _context17.stop();
       }
-    }, _callee16);
+    }, _callee17);
   }));
   return _create.apply(this, arguments);
 }
@@ -670,7 +699,7 @@ function _filterMessage(msgObj, state) {
  * when the socket pings, so that we now new messages came,
  * run this
  */
-function handleMessagePing(_x20, _x21) {
+function handleMessagePing(_x21, _x22) {
   return _handleMessagePing.apply(this, arguments);
 }
 /**
@@ -678,26 +707,26 @@ function handleMessagePing(_x20, _x21) {
  * @return {Promise<void>}
  */
 function _handleMessagePing() {
-  _handleMessagePing = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee17(state, msgObj) {
+  _handleMessagePing = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee18(state, msgObj) {
     var messages, useMessages;
-    return _regenerator["default"].wrap(function _callee17$(_context17) {
-      while (1) switch (_context17.prev = _context17.next) {
+    return _regenerator["default"].wrap(function _callee18$(_context18) {
+      while (1) switch (_context18.prev = _context18.next) {
         case 0:
           if (state.messagesCallback) {
-            _context17.next = 2;
+            _context18.next = 2;
             break;
           }
-          return _context17.abrupt("return");
+          return _context18.abrupt("return");
         case 2:
           if (msgObj) {
-            _context17.next = 8;
+            _context18.next = 8;
             break;
           }
-          _context17.next = 5;
+          _context18.next = 5;
           return getAllMessages(state.channelName, state.paths);
         case 5:
-          messages = _context17.sent;
-          _context17.next = 9;
+          messages = _context18.sent;
+          _context18.next = 9;
           break;
         case 8:
           // get single message
@@ -710,12 +739,12 @@ function _handleMessagePing() {
           }); // sort by time
           // if no listener or message, so not do anything
           if (!(!useMessages.length || !state.messagesCallback)) {
-            _context17.next = 12;
+            _context18.next = 12;
             break;
           }
-          return _context17.abrupt("return");
+          return _context18.abrupt("return");
         case 12:
-          _context17.next = 14;
+          _context18.next = 14;
           return Promise.all(useMessages.map(function (msgObj) {
             return readMessage(msgObj).then(function (content) {
               return msgObj.content = content;
@@ -731,9 +760,9 @@ function _handleMessagePing() {
           });
         case 15:
         case "end":
-          return _context17.stop();
+          return _context18.stop();
       }
-    }, _callee17);
+    }, _callee18);
   }));
   return _handleMessagePing.apply(this, arguments);
 }
@@ -743,29 +772,29 @@ function refreshReaderClients(channelState) {
     Object.keys(channelState.otherReaderClients).filter(function (readerUuid) {
       return !otherReaders.includes(readerUuid);
     }).forEach( /*#__PURE__*/function () {
-      var _ref = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee(readerUuid) {
-        return _regenerator["default"].wrap(function _callee$(_context) {
-          while (1) switch (_context.prev = _context.next) {
+      var _ref2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee2(readerUuid) {
+        return _regenerator["default"].wrap(function _callee2$(_context2) {
+          while (1) switch (_context2.prev = _context2.next) {
             case 0:
-              _context.prev = 0;
-              _context.next = 3;
+              _context2.prev = 0;
+              _context2.next = 3;
               return channelState.otherReaderClients[readerUuid].destroy();
             case 3:
-              _context.next = 7;
+              _context2.next = 7;
               break;
             case 5:
-              _context.prev = 5;
-              _context.t0 = _context["catch"](0);
+              _context2.prev = 5;
+              _context2.t0 = _context2["catch"](0);
             case 7:
               delete channelState.otherReaderClients[readerUuid];
             case 8:
             case "end":
-              return _context.stop();
+              return _context2.stop();
           }
-        }, _callee, null, [[0, 5]]);
+        }, _callee2, null, [[0, 5]]);
       }));
-      return function (_x22) {
-        return _ref.apply(this, arguments);
+      return function (_x23) {
+        return _ref2.apply(this, arguments);
       };
     }());
 
@@ -777,43 +806,43 @@ function refreshReaderClients(channelState) {
       return !channelState.otherReaderClients[readerUuid];
     }) // not already has client
     .map( /*#__PURE__*/function () {
-      var _ref2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee2(readerUuid) {
+      var _ref3 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3(readerUuid) {
         var client;
-        return _regenerator["default"].wrap(function _callee2$(_context2) {
-          while (1) switch (_context2.prev = _context2.next) {
+        return _regenerator["default"].wrap(function _callee3$(_context3) {
+          while (1) switch (_context3.prev = _context3.next) {
             case 0:
-              _context2.prev = 0;
+              _context3.prev = 0;
               if (!channelState.closed) {
-                _context2.next = 3;
+                _context3.next = 3;
                 break;
               }
-              return _context2.abrupt("return");
+              return _context3.abrupt("return");
             case 3:
-              _context2.prev = 3;
-              _context2.next = 6;
+              _context3.prev = 3;
+              _context3.next = 6;
               return openClientConnection(channelState.channelName, readerUuid);
             case 6:
-              client = _context2.sent;
+              client = _context3.sent;
               channelState.otherReaderClients[readerUuid] = client;
-              _context2.next = 12;
+              _context3.next = 12;
               break;
             case 10:
-              _context2.prev = 10;
-              _context2.t0 = _context2["catch"](3);
+              _context3.prev = 10;
+              _context3.t0 = _context3["catch"](3);
             case 12:
-              _context2.next = 16;
+              _context3.next = 16;
               break;
             case 14:
-              _context2.prev = 14;
-              _context2.t1 = _context2["catch"](0);
+              _context3.prev = 14;
+              _context3.t1 = _context3["catch"](0);
             case 16:
             case "end":
-              return _context2.stop();
+              return _context3.stop();
           }
-        }, _callee2, null, [[0, 14], [3, 10]]);
+        }, _callee3, null, [[0, 14], [3, 10]]);
       }));
-      return function (_x23) {
-        return _ref2.apply(this, arguments);
+      return function (_x24) {
+        return _ref3.apply(this, arguments);
       };
     }()));
   });
@@ -823,7 +852,7 @@ function refreshReaderClients(channelState) {
  * post a message to the other readers
  * @return {Promise<void>}
  */
-function postMessage(_x24, _x25) {
+function postMessage(_x25, _x26) {
   return _postMessage.apply(this, arguments);
 }
 /**
@@ -833,28 +862,28 @@ function postMessage(_x24, _x25) {
  * but will speed up things when this module is used in unit-tests.
  */
 function _postMessage() {
-  _postMessage = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee19(channelState, messageJson) {
+  _postMessage = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee20(channelState, messageJson) {
     var writePromise;
-    return _regenerator["default"].wrap(function _callee19$(_context19) {
-      while (1) switch (_context19.prev = _context19.next) {
+    return _regenerator["default"].wrap(function _callee20$(_context20) {
+      while (1) switch (_context20.prev = _context20.next) {
         case 0:
           writePromise = channelState.writeFileQueue.add(function () {
             return writeMessage(channelState.channelName, channelState.uuid, messageJson, channelState.paths);
           });
-          channelState.writeBlockPromise = channelState.writeBlockPromise.then( /*#__PURE__*/(0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee18() {
+          channelState.writeBlockPromise = channelState.writeBlockPromise.then( /*#__PURE__*/(0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee19() {
             var _yield$Promise$all2, msgObj, pingStr, writeToReadersPromise;
-            return _regenerator["default"].wrap(function _callee18$(_context18) {
-              while (1) switch (_context18.prev = _context18.next) {
+            return _regenerator["default"].wrap(function _callee19$(_context19) {
+              while (1) switch (_context19.prev = _context19.next) {
                 case 0:
-                  _context18.next = 2;
+                  _context19.next = 2;
                   return new Promise(function (res) {
                     return setTimeout(res, 0);
                   });
                 case 2:
-                  _context18.next = 4;
+                  _context19.next = 4;
                   return Promise.all([writePromise, refreshReaderClients(channelState)]);
                 case 4:
-                  _yield$Promise$all2 = _context18.sent;
+                  _yield$Promise$all2 = _context19.sent;
                   msgObj = _yield$Promise$all2[0];
                   emitOverFastPath(channelState, msgObj, messageJson);
                   pingStr = '{"t":' + msgObj.time + ',"u":"' + msgObj.uuid + '","to":"' + msgObj.token + '"}|';
@@ -877,19 +906,19 @@ function _postMessage() {
                       return cleanOldMessages(allMessages, channelState.options.node.ttl);
                     });
                   }
-                  return _context18.abrupt("return", writeToReadersPromise);
+                  return _context19.abrupt("return", writeToReadersPromise);
                 case 11:
                 case "end":
-                  return _context18.stop();
+                  return _context19.stop();
               }
-            }, _callee18);
+            }, _callee19);
           })));
-          return _context19.abrupt("return", channelState.writeBlockPromise);
+          return _context20.abrupt("return", channelState.writeBlockPromise);
         case 3:
         case "end":
-          return _context19.stop();
+          return _context20.stop();
       }
-    }, _callee19);
+    }, _callee20);
   }));
   return _postMessage.apply(this, arguments);
 }
