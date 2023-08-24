@@ -91,21 +91,21 @@
     "lint"
   ],
   "dependencies": {
-    "@babel/runtime": "7.22.10",
+    "@babel/runtime": "7.22.11",
     "oblivious-set": "1.1.1",
     "p-queue": "6.6.2",
     "unload": "2.4.1"
   },
   "devDependencies": {
     "@babel/cli": "7.22.10",
-    "@babel/core": "7.22.10",
+    "@babel/core": "7.22.11",
     "@babel/plugin-proposal-object-rest-spread": "7.20.7",
     "@babel/plugin-transform-member-expression-literals": "7.22.5",
     "@babel/plugin-transform-property-literals": "7.22.5",
     "@babel/plugin-transform-runtime": "7.22.10",
     "@babel/polyfill": "7.12.1",
     "@babel/preset-env": "7.22.10",
-    "@babel/types": "7.22.10",
+    "@babel/types": "7.22.11",
     "@types/core-js": "2.5.5",
     "assert": "2.0.0",
     "async-test-util": "2.1.0",
