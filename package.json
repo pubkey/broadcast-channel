@@ -141,7 +141,7 @@
     "rimraf": "5.0.1",
     "rollup": "3.28.1",
     "@rollup/plugin-terser": "0.4.3",
-    "testcafe": "3.2.0",
+    "testcafe": "3.3.0",
     "ts-node": "10.9.1",
     "typescript": "5.2.2",
     "uglify-js": "3.17.4",
