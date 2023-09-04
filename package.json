@@ -106,7 +106,7 @@
     "@babel/polyfill": "7.12.1",
     "@babel/preset-env": "7.22.15",
     "@babel/types": "7.22.15",
-    "@types/core-js": "2.5.5",
+    "@types/core-js": "2.5.6",
     "assert": "2.0.0",
     "async-test-util": "2.1.0",
     "browserify": "17.0.0",
