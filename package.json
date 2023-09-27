@@ -138,7 +138,7 @@
     "pre-commit": "1.2.2",
     "random-int": "3.0.0",
     "random-token": "0.0.8",
-    "rimraf": "5.0.4",
+    "rimraf": "5.0.5",
     "rollup": "3.29.3",
     "@rollup/plugin-terser": "0.4.3",
     "testcafe": "3.3.0",
