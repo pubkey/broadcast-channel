@@ -140,7 +140,7 @@
     "random-token": "0.0.8",
     "rimraf": "5.0.5",
     "rollup": "3.29.4",
-    "@rollup/plugin-terser": "0.4.3",
+    "@rollup/plugin-terser": "0.4.4",
     "testcafe": "3.3.0",
     "ts-node": "10.9.1",
     "typescript": "5.2.2",
