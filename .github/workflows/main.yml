@@ -45,7 +45,7 @@ jobs:
 
       # install
       - name: install node modules
-        run: npm install
+        run: npm install --legacy-peer-deps
 
       - name: build
         run: npm run build
@@ -115,7 +115,7 @@ jobs:
             ${{ runner.os }}-test-node
 
       - name: install node modules
-        run: npm install
+        run: npm install --legacy-peer-deps
 
       - name: build
         run: npm run build
