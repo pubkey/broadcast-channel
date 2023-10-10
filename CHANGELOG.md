@@ -3,6 +3,8 @@
 
 ## X.X.X (comming soon)
 
+## 5.4.0 (10 October 2023)
+
 - FIX import of `p-queue` throws `is not a constructor`
 
 ## 5.3.0 (18 August 2023)

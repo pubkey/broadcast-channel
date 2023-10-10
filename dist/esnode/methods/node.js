@@ -13,6 +13,7 @@ import events from 'events';
 import net from 'net';
 import path from 'path';
 import PQueue from 'p-queue';
+var PQueueConstructor = PQueue["default"] ? PQueue["default"] : PQueue;
 import { add as unloadAdd } from 'unload';
 import { fillOptionsWithDefaults } from '../options.js';
 import { randomInt, randomToken, PROMISE_RESOLVED_VOID } from '../util.js';
@@ -596,7 +597,7 @@ function _create() {
              * which could throw an error.
              * Must always be smaller than options.node.maxParallelWrites
              */
-            writeFileQueue: new PQueue({
+            writeFileQueue: new PQueueConstructor({
               concurrency: options.node.maxParallelWrites
             }),
             messagesCallbackTime: null,

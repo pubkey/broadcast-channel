@@ -14,10 +14,9 @@ var _options = require("./options.js");
  * Contains all open channels,
  * used in tests to ensure everything is closed.
  */
-var OPEN_BROADCAST_CHANNELS = new Set();
-exports.OPEN_BROADCAST_CHANNELS = OPEN_BROADCAST_CHANNELS;
+var OPEN_BROADCAST_CHANNELS = exports.OPEN_BROADCAST_CHANNELS = new Set();
 var lastId = 0;
-var BroadcastChannel = function BroadcastChannel(name, options) {
+var BroadcastChannel = exports.BroadcastChannel = function BroadcastChannel(name, options) {
   // identifier of the channel to debug stuff
   this.id = lastId++;
   OPEN_BROADCAST_CHANNELS.add(this);
@@ -74,7 +73,6 @@ var BroadcastChannel = function BroadcastChannel(name, options) {
  * window.BroadcastChannel with this
  * See methods/native.js
  */
-exports.BroadcastChannel = BroadcastChannel;
 BroadcastChannel._pubkey = true;
 
 /**
@@ -404,7 +402,7 @@ var _leaderElectionUtil = require("./leader-election-util.js");
  * A faster version of the leader elector that uses the WebLock API
  * @link https://developer.mozilla.org/en-US/docs/Web/API/Web_Locks_API
  */
-var LeaderElectionWebLock = function LeaderElectionWebLock(broadcastChannel, options) {
+var LeaderElectionWebLock = exports.LeaderElectionWebLock = function LeaderElectionWebLock(broadcastChannel, options) {
   var _this = this;
   this.broadcastChannel = broadcastChannel;
   broadcastChannel._befC.push(function () {
@@ -424,7 +422,6 @@ var LeaderElectionWebLock = function LeaderElectionWebLock(broadcastChannel, opt
   // lock name
   this.lN = 'pubkey-bc||' + broadcastChannel.method.type + '||' + broadcastChannel.name;
 };
-exports.LeaderElectionWebLock = LeaderElectionWebLock;
 LeaderElectionWebLock.prototype = {
   hasLeader: function hasLeader() {
     var _this2 = this;
@@ -872,8 +869,7 @@ var _options = require("../options.js");
  * @link https://rxdb.info/slow-indexeddb.html
  */
 
-var microSeconds = _util.microSeconds;
-exports.microSeconds = microSeconds;
+var microSeconds = exports.microSeconds = _util.microSeconds;
 var DB_PREFIX = 'pubkey.broadcast-channel-0-';
 var OBJECT_STORE_ID = 'messages';
 
@@ -881,12 +877,10 @@ var OBJECT_STORE_ID = 'messages';
  * Use relaxed durability for faster performance on all transactions.
  * @link https://nolanlawson.com/2021/08/22/speeding-up-indexeddb-reads-and-writes/
  */
-var TRANSACTION_SETTINGS = {
+var TRANSACTION_SETTINGS = exports.TRANSACTION_SETTINGS = {
   durability: 'relaxed'
 };
-exports.TRANSACTION_SETTINGS = TRANSACTION_SETTINGS;
-var type = 'idb';
-exports.type = type;
+var type = exports.type = 'idb';
 function getIdb() {
   if (typeof indexedDB !== 'undefined') return indexedDB;
   if (typeof window !== 'undefined') {
@@ -1198,7 +1192,7 @@ function canBeUsed() {
 function averageResponseTime(options) {
   return options.idb.fallbackInterval * 2;
 }
-var IndexedDBMethod = {
+var IndexedDBMethod = exports.IndexedDBMethod = {
   create: create,
   close: close,
   onMessage: onMessage,
@@ -1208,7 +1202,6 @@ var IndexedDBMethod = {
   averageResponseTime: averageResponseTime,
   microSeconds: microSeconds
 };
-exports.IndexedDBMethod = IndexedDBMethod;
 },{"../options.js":12,"../util.js":13,"oblivious-set":321}],9:[function(require,module,exports){
 "use strict";
 
@@ -1239,16 +1232,14 @@ var _util = require("../util.js");
  * @link https://caniuse.com/#feat=indexeddb
  */
 
-var microSeconds = _util.microSeconds;
-exports.microSeconds = microSeconds;
+var microSeconds = exports.microSeconds = _util.microSeconds;
 var KEY_PREFIX = 'pubkey.broadcastChannel-';
-var type = 'localstorage';
+var type = exports.type = 'localstorage';
 
 /**
  * copied from crosstab
  * @link https://github.com/tejacques/crosstab/blob/master/src/crosstab.js#L32
  */
-exports.type = type;
 function getLocalStorage() {
   var localStorage;
   if (typeof window === 'undefined') return null;
@@ -1371,7 +1362,7 @@ function averageResponseTime() {
   }
   return defaultTime;
 }
-var LocalstorageMethod = {
+var LocalstorageMethod = exports.LocalstorageMethod = {
   create: create,
   close: close,
   onMessage: onMessage,
@@ -1381,7 +1372,6 @@ var LocalstorageMethod = {
   averageResponseTime: averageResponseTime,
   microSeconds: microSeconds
 };
-exports.LocalstorageMethod = LocalstorageMethod;
 },{"../options.js":12,"../util.js":13,"oblivious-set":321}],10:[function(require,module,exports){
 "use strict";
 
@@ -1398,10 +1388,8 @@ exports.onMessage = onMessage;
 exports.postMessage = postMessage;
 exports.type = void 0;
 var _util = require("../util.js");
-var microSeconds = _util.microSeconds;
-exports.microSeconds = microSeconds;
-var type = 'native';
-exports.type = type;
+var microSeconds = exports.microSeconds = _util.microSeconds;
+var type = exports.type = 'native';
 function create(channelName) {
   var state = {
     messagesCallback: null,
@@ -1444,7 +1432,7 @@ function canBeUsed() {
 function averageResponseTime() {
   return 150;
 }
-var NativeMethod = {
+var NativeMethod = exports.NativeMethod = {
   create: create,
   close: close,
   onMessage: onMessage,
@@ -1454,7 +1442,6 @@ var NativeMethod = {
   averageResponseTime: averageResponseTime,
   microSeconds: microSeconds
 };
-exports.NativeMethod = NativeMethod;
 },{"../util.js":13}],11:[function(require,module,exports){
 "use strict";
 
@@ -1471,10 +1458,8 @@ exports.onMessage = onMessage;
 exports.postMessage = postMessage;
 exports.type = void 0;
 var _util = require("../util.js");
-var microSeconds = _util.microSeconds;
-exports.microSeconds = microSeconds;
-var type = 'simulate';
-exports.type = type;
+var microSeconds = exports.microSeconds = _util.microSeconds;
+var type = exports.type = 'simulate';
 var SIMULATE_CHANNELS = new Set();
 function create(channelName) {
   var state = {
@@ -1513,7 +1498,7 @@ function canBeUsed() {
 function averageResponseTime() {
   return 5;
 }
-var SimulateMethod = {
+var SimulateMethod = exports.SimulateMethod = {
   create: create,
   close: close,
   onMessage: onMessage,
@@ -1523,7 +1508,6 @@ var SimulateMethod = {
   averageResponseTime: averageResponseTime,
   microSeconds: microSeconds
 };
-exports.SimulateMethod = SimulateMethod;
 },{"../util.js":13}],12:[function(require,module,exports){
 "use strict";
 
@@ -1583,12 +1567,9 @@ exports.supportsWebLockAPI = supportsWebLockAPI;
 function isPromise(obj) {
   return obj && typeof obj.then === 'function';
 }
-var PROMISE_RESOLVED_FALSE = Promise.resolve(false);
-exports.PROMISE_RESOLVED_FALSE = PROMISE_RESOLVED_FALSE;
-var PROMISE_RESOLVED_TRUE = Promise.resolve(true);
-exports.PROMISE_RESOLVED_TRUE = PROMISE_RESOLVED_TRUE;
-var PROMISE_RESOLVED_VOID = Promise.resolve();
-exports.PROMISE_RESOLVED_VOID = PROMISE_RESOLVED_VOID;
+var PROMISE_RESOLVED_FALSE = exports.PROMISE_RESOLVED_FALSE = Promise.resolve(false);
+var PROMISE_RESOLVED_TRUE = exports.PROMISE_RESOLVED_TRUE = Promise.resolve(true);
+var PROMISE_RESOLVED_VOID = exports.PROMISE_RESOLVED_VOID = Promise.resolve();
 function sleep(time, resolveWith) {
   if (!time) time = 0;
   return new Promise(function (res) {
@@ -1685,14 +1666,14 @@ require("core-js/web");
 
 require("regenerator-runtime/runtime");
 },{"core-js/es6":17,"core-js/fn/array/flat-map":18,"core-js/fn/array/includes":19,"core-js/fn/object/entries":20,"core-js/fn/object/get-own-property-descriptors":21,"core-js/fn/object/values":22,"core-js/fn/promise/finally":23,"core-js/fn/string/pad-end":24,"core-js/fn/string/pad-start":25,"core-js/fn/string/trim-end":26,"core-js/fn/string/trim-start":27,"core-js/fn/symbol/async-iterator":28,"core-js/web":320,"regenerator-runtime/runtime":323}],16:[function(require,module,exports){
-function _typeof(obj) {
+function _typeof(o) {
   "@babel/helpers - typeof";
 
-  return (module.exports = _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) {
-    return typeof obj;
-  } : function (obj) {
-    return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-  }, module.exports.__esModule = true, module.exports["default"] = module.exports), _typeof(obj);
+  return (module.exports = _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) {
+    return typeof o;
+  } : function (o) {
+    return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o;
+  }, module.exports.__esModule = true, module.exports["default"] = module.exports), _typeof(o);
 }
 module.exports = _typeof, module.exports.__esModule = true, module.exports["default"] = module.exports;
 },{}],17:[function(require,module,exports){

@@ -16,12 +16,9 @@ exports.supportsWebLockAPI = supportsWebLockAPI;
 function isPromise(obj) {
   return obj && typeof obj.then === 'function';
 }
-var PROMISE_RESOLVED_FALSE = Promise.resolve(false);
-exports.PROMISE_RESOLVED_FALSE = PROMISE_RESOLVED_FALSE;
-var PROMISE_RESOLVED_TRUE = Promise.resolve(true);
-exports.PROMISE_RESOLVED_TRUE = PROMISE_RESOLVED_TRUE;
-var PROMISE_RESOLVED_VOID = Promise.resolve();
-exports.PROMISE_RESOLVED_VOID = PROMISE_RESOLVED_VOID;
+var PROMISE_RESOLVED_FALSE = exports.PROMISE_RESOLVED_FALSE = Promise.resolve(false);
+var PROMISE_RESOLVED_TRUE = exports.PROMISE_RESOLVED_TRUE = Promise.resolve(true);
+var PROMISE_RESOLVED_VOID = exports.PROMISE_RESOLVED_VOID = Promise.resolve();
 function sleep(time, resolveWith) {
   if (!time) time = 0;
   return new Promise(function (res) {

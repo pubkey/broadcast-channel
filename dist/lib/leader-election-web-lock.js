@@ -10,7 +10,7 @@ var _leaderElectionUtil = require("./leader-election-util.js");
  * A faster version of the leader elector that uses the WebLock API
  * @link https://developer.mozilla.org/en-US/docs/Web/API/Web_Locks_API
  */
-var LeaderElectionWebLock = function LeaderElectionWebLock(broadcastChannel, options) {
+var LeaderElectionWebLock = exports.LeaderElectionWebLock = function LeaderElectionWebLock(broadcastChannel, options) {
   var _this = this;
   this.broadcastChannel = broadcastChannel;
   broadcastChannel._befC.push(function () {
@@ -30,7 +30,6 @@ var LeaderElectionWebLock = function LeaderElectionWebLock(broadcastChannel, opt
   // lock name
   this.lN = 'pubkey-bc||' + broadcastChannel.method.type + '||' + broadcastChannel.name;
 };
-exports.LeaderElectionWebLock = LeaderElectionWebLock;
 LeaderElectionWebLock.prototype = {
   hasLeader: function hasLeader() {
     var _this2 = this;

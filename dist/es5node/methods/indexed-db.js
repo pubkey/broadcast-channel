@@ -33,8 +33,7 @@ var _options = require("../options.js");
  * @link https://rxdb.info/slow-indexeddb.html
  */
 
-var microSeconds = _util.microSeconds;
-exports.microSeconds = microSeconds;
+var microSeconds = exports.microSeconds = _util.microSeconds;
 var DB_PREFIX = 'pubkey.broadcast-channel-0-';
 var OBJECT_STORE_ID = 'messages';
 
@@ -42,12 +41,10 @@ var OBJECT_STORE_ID = 'messages';
  * Use relaxed durability for faster performance on all transactions.
  * @link https://nolanlawson.com/2021/08/22/speeding-up-indexeddb-reads-and-writes/
  */
-var TRANSACTION_SETTINGS = {
+var TRANSACTION_SETTINGS = exports.TRANSACTION_SETTINGS = {
   durability: 'relaxed'
 };
-exports.TRANSACTION_SETTINGS = TRANSACTION_SETTINGS;
-var type = 'idb';
-exports.type = type;
+var type = exports.type = 'idb';
 function getIdb() {
   if (typeof indexedDB !== 'undefined') return indexedDB;
   if (typeof window !== 'undefined') {
@@ -359,7 +356,7 @@ function canBeUsed() {
 function averageResponseTime(options) {
   return options.idb.fallbackInterval * 2;
 }
-var IndexedDBMethod = {
+var IndexedDBMethod = exports.IndexedDBMethod = {
   create: create,
   close: close,
   onMessage: onMessage,
@@ -369,4 +366,3 @@ var IndexedDBMethod = {
   averageResponseTime: averageResponseTime,
   microSeconds: microSeconds
 };
-exports.IndexedDBMethod = IndexedDBMethod;

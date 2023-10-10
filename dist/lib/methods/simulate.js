@@ -13,10 +13,8 @@ exports.onMessage = onMessage;
 exports.postMessage = postMessage;
 exports.type = void 0;
 var _util = require("../util.js");
-var microSeconds = _util.microSeconds;
-exports.microSeconds = microSeconds;
-var type = 'simulate';
-exports.type = type;
+var microSeconds = exports.microSeconds = _util.microSeconds;
+var type = exports.type = 'simulate';
 var SIMULATE_CHANNELS = new Set();
 function create(channelName) {
   var state = {
@@ -55,7 +53,7 @@ function canBeUsed() {
 function averageResponseTime() {
   return 5;
 }
-var SimulateMethod = {
+var SimulateMethod = exports.SimulateMethod = {
   create: create,
   close: close,
   onMessage: onMessage,
@@ -65,4 +63,3 @@ var SimulateMethod = {
   averageResponseTime: averageResponseTime,
   microSeconds: microSeconds
 };
-exports.SimulateMethod = SimulateMethod;

@@ -13,10 +13,8 @@ exports.onMessage = onMessage;
 exports.postMessage = postMessage;
 exports.type = void 0;
 var _util = require("../util.js");
-var microSeconds = _util.microSeconds;
-exports.microSeconds = microSeconds;
-var type = 'native';
-exports.type = type;
+var microSeconds = exports.microSeconds = _util.microSeconds;
+var type = exports.type = 'native';
 function create(channelName) {
   var state = {
     messagesCallback: null,
@@ -59,7 +57,7 @@ function canBeUsed() {
 function averageResponseTime() {
   return 150;
 }
-var NativeMethod = {
+var NativeMethod = exports.NativeMethod = {
   create: create,
   close: close,
   onMessage: onMessage,
@@ -69,4 +67,3 @@ var NativeMethod = {
   averageResponseTime: averageResponseTime,
   microSeconds: microSeconds
 };
-exports.NativeMethod = NativeMethod;

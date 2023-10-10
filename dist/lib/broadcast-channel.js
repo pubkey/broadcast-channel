@@ -13,10 +13,9 @@ var _options = require("./options.js");
  * Contains all open channels,
  * used in tests to ensure everything is closed.
  */
-var OPEN_BROADCAST_CHANNELS = new Set();
-exports.OPEN_BROADCAST_CHANNELS = OPEN_BROADCAST_CHANNELS;
+var OPEN_BROADCAST_CHANNELS = exports.OPEN_BROADCAST_CHANNELS = new Set();
 var lastId = 0;
-var BroadcastChannel = function BroadcastChannel(name, options) {
+var BroadcastChannel = exports.BroadcastChannel = function BroadcastChannel(name, options) {
   // identifier of the channel to debug stuff
   this.id = lastId++;
   OPEN_BROADCAST_CHANNELS.add(this);
@@ -73,7 +72,6 @@ var BroadcastChannel = function BroadcastChannel(name, options) {
  * window.BroadcastChannel with this
  * See methods/native.js
  */
-exports.BroadcastChannel = BroadcastChannel;
 BroadcastChannel._pubkey = true;
 
 /**

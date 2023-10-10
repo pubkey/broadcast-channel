@@ -27,16 +27,14 @@ var _util = require("../util.js");
  * @link https://caniuse.com/#feat=indexeddb
  */
 
-var microSeconds = _util.microSeconds;
-exports.microSeconds = microSeconds;
+var microSeconds = exports.microSeconds = _util.microSeconds;
 var KEY_PREFIX = 'pubkey.broadcastChannel-';
-var type = 'localstorage';
+var type = exports.type = 'localstorage';
 
 /**
  * copied from crosstab
  * @link https://github.com/tejacques/crosstab/blob/master/src/crosstab.js#L32
  */
-exports.type = type;
 function getLocalStorage() {
   var localStorage;
   if (typeof window === 'undefined') return null;
@@ -159,7 +157,7 @@ function averageResponseTime() {
   }
   return defaultTime;
 }
-var LocalstorageMethod = {
+var LocalstorageMethod = exports.LocalstorageMethod = {
   create: create,
   close: close,
   onMessage: onMessage,
@@ -169,4 +167,3 @@ var LocalstorageMethod = {
   averageResponseTime: averageResponseTime,
   microSeconds: microSeconds
 };
-exports.LocalstorageMethod = LocalstorageMethod;

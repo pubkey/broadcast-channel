@@ -53,6 +53,7 @@ var _obliviousSet = require("oblivious-set");
  * The ipc is handled via sockets and file-writes to the tmp-folder
  */
 
+var PQueueConstructor = _pQueue["default"]["default"] ? _pQueue["default"]["default"] : _pQueue["default"];
 /**
  * windows sucks, so we have handle windows-type of socket-paths
  * @link https://gist.github.com/domenic/2790533#gistcomment-331356
@@ -105,8 +106,7 @@ var removeDir = /*#__PURE__*/function () {
 }();
 var OTHER_INSTANCES = {};
 var TMP_FOLDER_NAME = 'pubkey.bc';
-var TMP_FOLDER_BASE = _path["default"].join(_os["default"].tmpdir(), TMP_FOLDER_NAME);
-exports.TMP_FOLDER_BASE = TMP_FOLDER_BASE;
+var TMP_FOLDER_BASE = exports.TMP_FOLDER_BASE = _path["default"].join(_os["default"].tmpdir(), TMP_FOLDER_NAME);
 var getPathsCache = new Map();
 function getPaths(channelName) {
   if (!getPathsCache.has(channelName)) {
@@ -587,13 +587,12 @@ function _cleanOldMessages() {
   }));
   return _cleanOldMessages.apply(this, arguments);
 }
-var type = 'node';
+var type = exports.type = 'node';
 
 /**
  * creates a new channelState
  * @return {Promise<any>}
  */
-exports.type = type;
 function create(_x20) {
   return _create.apply(this, arguments);
 }
@@ -631,7 +630,7 @@ function _create() {
              * which could throw an error.
              * Must always be smaller than options.node.maxParallelWrites
              */
-            writeFileQueue: new _pQueue["default"]({
+            writeFileQueue: new PQueueConstructor({
               concurrency: options.node.maxParallelWrites
             }),
             messagesCallbackTime: null,
