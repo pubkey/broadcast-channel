@@ -11,6 +11,7 @@ import events from 'events';
 import net from 'net';
 import path from 'path';
 import PQueue from 'p-queue';
+const PQueueConstructor = PQueue.default ? PQueue.default : PQueue;
 import {
     add as unloadAdd
 } from 'unload';
@@ -399,7 +400,7 @@ export async function create(channelName, options = {}) {
          * which could throw an error.
          * Must always be smaller than options.node.maxParallelWrites
          */
-        writeFileQueue: new PQueue({ concurrency: options.node.maxParallelWrites }),
+        writeFileQueue: new PQueueConstructor({ concurrency: options.node.maxParallelWrites }),
         messagesCallbackTime: null,
         messagesCallback: null,
         // ensures we do not read messages in parallel

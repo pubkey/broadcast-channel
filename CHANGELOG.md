@@ -3,6 +3,8 @@
 
 ## X.X.X (comming soon)
 
+- FIX import of `p-queue` throws `is not a constructor`
+
 ## 5.3.0 (18 August 2023)
 
 https://github.com/pubkey/broadcast-channel/pull/1243
