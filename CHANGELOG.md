@@ -3,6 +3,9 @@
 
 ## X.X.X (comming soon)
 
+## 5.5.0 (17 October 2023)
+
+- Add `sideEffects: false`
 ## 5.4.0 (10 October 2023)
 
 - FIX import of `p-queue` throws `is not a constructor`
