@@ -48,7 +48,7 @@ var additional = 0;
  * The main reason for this hack is to ensure that BroadcastChannel behaves equal to production when it is used in fast-running unit tests.
  */
 function microSeconds() {
-  var ms = new Date().getTime();
+  var ms = Date.now();
   if (ms === lastMs) {
     additional++;
     return ms * 1000 + additional;

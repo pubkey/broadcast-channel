@@ -3,6 +3,8 @@
 
 ## X.X.X (comming soon)
 
+## 5.5.1 (23 October 2023)
+
 - REPLACE `new Date().getTime()` with `Date.now()` which is faster
 
 ## 5.5.0 (17 October 2023)

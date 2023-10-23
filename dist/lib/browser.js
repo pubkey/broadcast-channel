@@ -943,7 +943,7 @@ function createDatabase(channelName) {
  * so other readers can find it
  */
 function writeMessage(db, readerUuid, messageJson) {
-  var time = new Date().getTime();
+  var time = Date.now();
   var writeObject = {
     uuid: readerUuid,
     time: time,
@@ -1050,7 +1050,7 @@ function removeMessagesById(channelState, ids) {
   }));
 }
 function getOldMessages(db, ttl) {
-  var olderThen = new Date().getTime() - ttl;
+  var olderThen = Date.now() - ttl;
   var tx = db.transaction(OBJECT_STORE_ID, 'readonly', TRANSACTION_SETTINGS);
   var objectStore = tx.objectStore(OBJECT_STORE_ID);
   var ret = [];
@@ -1275,7 +1275,7 @@ function postMessage(channelState, messageJson) {
       var key = storageKey(channelState.channelName);
       var writeObj = {
         token: (0, _util.randomToken)(),
-        time: new Date().getTime(),
+        time: Date.now(),
         data: messageJson,
         uuid: channelState.uuid
       };
@@ -1607,7 +1607,7 @@ var additional = 0;
  * The main reason for this hack is to ensure that BroadcastChannel behaves equal to production when it is used in fast-running unit tests.
  */
 function microSeconds() {
-  var ms = new Date().getTime();
+  var ms = Date.now();
   if (ms === lastMs) {
     additional++;
     return ms * 1000 + additional;

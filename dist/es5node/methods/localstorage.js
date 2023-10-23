@@ -62,7 +62,7 @@ function postMessage(channelState, messageJson) {
       var key = storageKey(channelState.channelName);
       var writeObj = {
         token: (0, _util.randomToken)(),
-        time: new Date().getTime(),
+        time: Date.now(),
         data: messageJson,
         uuid: channelState.uuid
       };
