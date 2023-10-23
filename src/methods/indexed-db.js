@@ -90,7 +90,7 @@ export function createDatabase(channelName) {
  * so other readers can find it
  */
 export function writeMessage(db, readerUuid, messageJson) {
-    const time = new Date().getTime();
+    const time = Date.now();
     const writeObject = {
         uuid: readerUuid,
         time,
@@ -203,7 +203,7 @@ export function removeMessagesById(channelState, ids) {
 }
 
 export function getOldMessages(db, ttl) {
-    const olderThen = new Date().getTime() - ttl;
+    const olderThen = Date.now() - ttl;
     const tx = db.transaction(OBJECT_STORE_ID, 'readonly', TRANSACTION_SETTINGS);
     const objectStore = tx.objectStore(OBJECT_STORE_ID);
     const ret = [];

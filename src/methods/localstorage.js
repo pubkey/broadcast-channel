@@ -56,7 +56,7 @@ export function postMessage(channelState, messageJson) {
             const key = storageKey(channelState.channelName);
             const writeObj = {
                 token: randomToken(),
-                time: new Date().getTime(),
+                time: Date.now(),
                 data: messageJson,
                 uuid: channelState.uuid
             };
