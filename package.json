@@ -108,7 +108,7 @@
     "@babel/types": "7.23.0",
     "@types/core-js": "2.5.7",
     "assert": "2.1.0",
-    "async-test-util": "2.1.1",
+    "async-test-util": "2.2.0",
     "browserify": "17.0.0",
     "child-process-promise": "2.2.1",
     "clone": "2.1.2",
