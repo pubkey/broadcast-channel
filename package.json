@@ -92,7 +92,7 @@
   ],
   "dependencies": {
     "@babel/runtime": "7.23.2",
-    "oblivious-set": "1.1.1",
+    "oblivious-set": "1.4.0",
     "p-queue": "6.6.2",
     "unload": "2.4.1"
   },
