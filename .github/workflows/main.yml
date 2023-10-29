@@ -13,6 +13,11 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+# https://stackoverflow.com/a/72408109/3443137
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
@@ -122,6 +127,56 @@ jobs:
 
       - name: test node
         run: npm run test:node
+
+
+  test-deno:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4.0.0
+        with:
+          node-version: '18.12.1'
+
+      # https://docs.github.com/en/free-pro-team@latest/actions/guides/caching-dependencies-to-speed-up-workflows
+      - name: Reuse npm cache folder
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: |
+            ~/.npm
+            ./node_modules
+            ./test-electron/node_modules
+          # invalidate cache when any package.json changes
+          key: ${{ runner.os }}-npm-test-deno-x1-${{ env.cache-name }}-${{ hashFiles('**/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-test-deno-x1-${{ env.cache-name }}-
+            ${{ runner.os }}-npm-test-deno
+            ${{ runner.os }}-test-deno
+
+      - name: install node modules
+        run: npm install --legacy-peer-deps
+
+      - name: build
+        run: npm run build
+
+      - name: Reuse deno cache folder
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-deno-modules
+        with:
+          path: |
+            /home/runner/.cache/deno
+          # do not cache based on package.json because deno install randomly fails
+          # and it would then never succeed on the first run on dependency updateds
+          key: ${{ runner.os }}-deno-x1-
+
+      - name: run deno tests
+        run: |
+          sudo npm i -g cross-env
+          deno info
+          deno run ./test/test-deno.js
 
 
 # TODO this does not work atm. fix this.

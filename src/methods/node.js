@@ -3,13 +3,13 @@
  * The ipc is handled via sockets and file-writes to the tmp-folder
  */
 
-import util from 'util';
-import fs from 'fs';
-import crypto from 'crypto';
-import os from 'os';
-import events from 'events';
-import net from 'net';
-import path from 'path';
+import util from 'node:util';
+import fs from 'node:fs';
+import crypto from 'node:crypto';
+import os from 'node:os';
+import events from 'node:events';
+import net from 'node:net';
+import path from 'node:path';
 import PQueue from 'p-queue';
 const PQueueConstructor = PQueue.default ? PQueue.default : PQueue;
 import {
