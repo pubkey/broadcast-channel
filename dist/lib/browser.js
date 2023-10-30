@@ -397,7 +397,7 @@ function beLeader(leaderElector) {
   leaderElector._lstns.push(isLeaderListener);
   return sendLeaderMessage(leaderElector, 'tell');
 }
-},{"unload":19}],6:[function(require,module,exports){
+},{"unload":20}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1428,6 +1428,13 @@ function onMessage(channelState, fn) {
   channelState.messagesCallback = fn;
 }
 function canBeUsed() {
+  // Deno runtime
+  // eslint-disable-next-line
+  if (typeof globalThis !== 'undefined' && globalThis.Deno && globalThis.Deno.args) {
+    return true;
+  }
+
+  // Browser runtime
   if ((typeof window !== 'undefined' || typeof self !== 'undefined') && typeof BroadcastChannel === 'function') {
     if (BroadcastChannel._pubkey) {
       throw new Error('BroadcastChannel: Do not overwrite window.BroadcastChannel with this module, this is not a polyfill');
@@ -1642,6 +1649,35 @@ function _typeof(o) {
 module.exports = _typeof, module.exports.__esModule = true, module.exports["default"] = module.exports;
 },{}],16:[function(require,module,exports){
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const pkg = __importStar(require("./index.js"));
+module.exports = pkg;
+
+},{"./index.js":17}],17:[function(require,module,exports){
+"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.now = exports.removeTooOldValues = exports.ObliviousSet = void 0;
 /**
@@ -1649,21 +1685,21 @@ exports.now = exports.removeTooOldValues = exports.ObliviousSet = void 0;
  * a given entry when a new entry is set and the ttl
  * of the old one is over
  */
-var ObliviousSet = /** @class */ (function () {
-    function ObliviousSet(ttl) {
+class ObliviousSet {
+    ttl;
+    map = new Map();
+    /**
+     * Creating calls to setTimeout() is expensive,
+     * so we only do that if there is not timeout already open.
+     */
+    _to = false;
+    constructor(ttl) {
         this.ttl = ttl;
-        this.map = new Map();
-        /**
-         * Creating calls to setTimeout() is expensive,
-         * so we only do that if there is not timeout already open.
-         */
-        this._to = false;
     }
-    ObliviousSet.prototype.has = function (value) {
+    has(value) {
         return this.map.has(value);
-    };
-    ObliviousSet.prototype.add = function (value) {
-        var _this = this;
+    }
+    add(value) {
         this.map.set(value, now());
         /**
          * When a new value is added,
@@ -1673,36 +1709,35 @@ var ObliviousSet = /** @class */ (function () {
          */
         if (!this._to) {
             this._to = true;
-            setTimeout(function () {
-                _this._to = false;
-                removeTooOldValues(_this);
+            setTimeout(() => {
+                this._to = false;
+                removeTooOldValues(this);
             }, 0);
         }
-    };
-    ObliviousSet.prototype.clear = function () {
+    }
+    clear() {
         this.map.clear();
-    };
-    return ObliviousSet;
-}());
+    }
+}
 exports.ObliviousSet = ObliviousSet;
 /**
  * Removes all entries from the set
  * where the TTL has expired
  */
 function removeTooOldValues(obliviousSet) {
-    var olderThen = now() - obliviousSet.ttl;
-    var iterator = obliviousSet.map[Symbol.iterator]();
+    const olderThen = now() - obliviousSet.ttl;
+    const iterator = obliviousSet.map[Symbol.iterator]();
     /**
      * Because we can assume the new values are added at the bottom,
      * we start from the top and stop as soon as we reach a non-too-old value.
      */
     while (true) {
-        var next = iterator.next().value;
+        const next = iterator.next().value;
         if (!next) {
             return; // no more elements
         }
-        var value = next[0];
-        var time = next[1];
+        const value = next[0];
+        const time = next[1];
         if (time < olderThen) {
             obliviousSet.map.delete(value);
         }
@@ -1714,11 +1749,11 @@ function removeTooOldValues(obliviousSet) {
 }
 exports.removeTooOldValues = removeTooOldValues;
 function now() {
-    return new Date().getTime();
+    return Date.now();
 }
 exports.now = now;
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -1904,7 +1939,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1956,7 +1991,7 @@ function addBrowser(fn) {
    * @link https://stackoverflow.com/a/26193516/3443137
    */
 }
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 (function (process){(function (){
 "use strict";
 
@@ -2017,7 +2052,7 @@ function getSize() {
   return LISTENERS.size;
 }
 }).call(this)}).call(this,require('_process'))
-},{"./browser.js":18,"./node.js":20,"_process":17}],20:[function(require,module,exports){
+},{"./browser.js":19,"./node.js":21,"_process":18}],21:[function(require,module,exports){
 (function (process){(function (){
 "use strict";
 
@@ -2056,4 +2091,4 @@ function addNode(fn) {
   });
 }
 }).call(this)}).call(this,require('_process'))
-},{"_process":17}]},{},[2]);
+},{"_process":18}]},{},[2]);

@@ -3,6 +3,8 @@
 
 ## X.X.X (comming soon)
 
+## 6.0.0 (30 October 2023)
+
 - ADD support for the Deno runtime
 
 ## 5.5.1 (23 October 2023)

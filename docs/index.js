@@ -389,7 +389,7 @@ function beLeader(leaderElector) {
   leaderElector._lstns.push(isLeaderListener);
   return sendLeaderMessage(leaderElector, 'tell');
 }
-},{"unload":325}],5:[function(require,module,exports){
+},{"unload":326}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1420,6 +1420,13 @@ function onMessage(channelState, fn) {
   channelState.messagesCallback = fn;
 }
 function canBeUsed() {
+  // Deno runtime
+  // eslint-disable-next-line
+  if (typeof globalThis !== 'undefined' && globalThis.Deno && globalThis.Deno.args) {
+    return true;
+  }
+
+  // Browser runtime
   if ((typeof window !== 'undefined' || typeof self !== 'undefined') && typeof BroadcastChannel === 'function') {
     if (BroadcastChannel._pubkey) {
       throw new Error('BroadcastChannel: Do not overwrite window.BroadcastChannel with this module, this is not a polyfill');
@@ -1665,7 +1672,7 @@ require("core-js/fn/promise/finally");
 require("core-js/web");
 
 require("regenerator-runtime/runtime");
-},{"core-js/es6":17,"core-js/fn/array/flat-map":18,"core-js/fn/array/includes":19,"core-js/fn/object/entries":20,"core-js/fn/object/get-own-property-descriptors":21,"core-js/fn/object/values":22,"core-js/fn/promise/finally":23,"core-js/fn/string/pad-end":24,"core-js/fn/string/pad-start":25,"core-js/fn/string/trim-end":26,"core-js/fn/string/trim-start":27,"core-js/fn/symbol/async-iterator":28,"core-js/web":320,"regenerator-runtime/runtime":323}],16:[function(require,module,exports){
+},{"core-js/es6":17,"core-js/fn/array/flat-map":18,"core-js/fn/array/includes":19,"core-js/fn/object/entries":20,"core-js/fn/object/get-own-property-descriptors":21,"core-js/fn/object/values":22,"core-js/fn/promise/finally":23,"core-js/fn/string/pad-end":24,"core-js/fn/string/pad-start":25,"core-js/fn/string/trim-end":26,"core-js/fn/string/trim-start":27,"core-js/fn/symbol/async-iterator":28,"core-js/web":320,"regenerator-runtime/runtime":324}],16:[function(require,module,exports){
 function _typeof(o) {
   "@babel/helpers - typeof";
 
@@ -8105,6 +8112,35 @@ module.exports = require('../modules/_core');
 
 },{"../modules/_core":66,"../modules/web.dom.iterable":317,"../modules/web.immediate":318,"../modules/web.timers":319}],321:[function(require,module,exports){
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const pkg = __importStar(require("./index.js"));
+module.exports = pkg;
+
+},{"./index.js":322}],322:[function(require,module,exports){
+"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.now = exports.removeTooOldValues = exports.ObliviousSet = void 0;
 /**
@@ -8112,21 +8148,21 @@ exports.now = exports.removeTooOldValues = exports.ObliviousSet = void 0;
  * a given entry when a new entry is set and the ttl
  * of the old one is over
  */
-var ObliviousSet = /** @class */ (function () {
-    function ObliviousSet(ttl) {
+class ObliviousSet {
+    ttl;
+    map = new Map();
+    /**
+     * Creating calls to setTimeout() is expensive,
+     * so we only do that if there is not timeout already open.
+     */
+    _to = false;
+    constructor(ttl) {
         this.ttl = ttl;
-        this.map = new Map();
-        /**
-         * Creating calls to setTimeout() is expensive,
-         * so we only do that if there is not timeout already open.
-         */
-        this._to = false;
     }
-    ObliviousSet.prototype.has = function (value) {
+    has(value) {
         return this.map.has(value);
-    };
-    ObliviousSet.prototype.add = function (value) {
-        var _this = this;
+    }
+    add(value) {
         this.map.set(value, now());
         /**
          * When a new value is added,
@@ -8136,36 +8172,35 @@ var ObliviousSet = /** @class */ (function () {
          */
         if (!this._to) {
             this._to = true;
-            setTimeout(function () {
-                _this._to = false;
-                removeTooOldValues(_this);
+            setTimeout(() => {
+                this._to = false;
+                removeTooOldValues(this);
             }, 0);
         }
-    };
-    ObliviousSet.prototype.clear = function () {
+    }
+    clear() {
         this.map.clear();
-    };
-    return ObliviousSet;
-}());
+    }
+}
 exports.ObliviousSet = ObliviousSet;
 /**
  * Removes all entries from the set
  * where the TTL has expired
  */
 function removeTooOldValues(obliviousSet) {
-    var olderThen = now() - obliviousSet.ttl;
-    var iterator = obliviousSet.map[Symbol.iterator]();
+    const olderThen = now() - obliviousSet.ttl;
+    const iterator = obliviousSet.map[Symbol.iterator]();
     /**
      * Because we can assume the new values are added at the bottom,
      * we start from the top and stop as soon as we reach a non-too-old value.
      */
     while (true) {
-        var next = iterator.next().value;
+        const next = iterator.next().value;
         if (!next) {
             return; // no more elements
         }
-        var value = next[0];
-        var time = next[1];
+        const value = next[0];
+        const time = next[1];
         if (time < olderThen) {
             obliviousSet.map.delete(value);
         }
@@ -8177,11 +8212,11 @@ function removeTooOldValues(obliviousSet) {
 }
 exports.removeTooOldValues = removeTooOldValues;
 function now() {
-    return new Date().getTime();
+    return Date.now();
 }
 exports.now = now;
 
-},{}],322:[function(require,module,exports){
+},{}],323:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -8367,7 +8402,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],323:[function(require,module,exports){
+},{}],324:[function(require,module,exports){
 /**
  * Copyright (c) 2014-present, Facebook, Inc.
  *
@@ -9130,7 +9165,7 @@ try {
   }
 }
 
-},{}],324:[function(require,module,exports){
+},{}],325:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -9182,7 +9217,7 @@ function addBrowser(fn) {
    * @link https://stackoverflow.com/a/26193516/3443137
    */
 }
-},{}],325:[function(require,module,exports){
+},{}],326:[function(require,module,exports){
 (function (process){(function (){
 "use strict";
 
@@ -9243,7 +9278,7 @@ function getSize() {
   return LISTENERS.size;
 }
 }).call(this)}).call(this,require('_process'))
-},{"./browser.js":324,"./node.js":326,"_process":322}],326:[function(require,module,exports){
+},{"./browser.js":325,"./node.js":327,"_process":323}],327:[function(require,module,exports){
 (function (process){(function (){
 "use strict";
 
@@ -9282,7 +9317,7 @@ function addNode(fn) {
   });
 }
 }).call(this)}).call(this,require('_process'))
-},{"_process":322}],327:[function(require,module,exports){
+},{"_process":323}],328:[function(require,module,exports){
 "use strict";
 
 /* eslint-disable */
@@ -9326,4 +9361,4 @@ channel.onmessage = function (message) {
   console.dir('recieved message: ' + message);
   addTextToMessageBox('recieved: ' + message);
 };
-},{"../../":2,"@babel/polyfill":14}]},{},[327]);
+},{"../../":2,"@babel/polyfill":14}]},{},[328]);
