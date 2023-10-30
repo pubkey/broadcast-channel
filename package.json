@@ -1,7 +1,7 @@
 {
   "name": "broadcast-channel",
   "version": "5.5.1",
-  "description": "A BroadcastChannel that works in New Browsers, Old Browsers, WebWorkers and NodeJs and iframes",
+  "description": "A BroadcastChannel that works in New Browsers, Old Browsers, WebWorkers, NodeJs, Deno and iframes",
   "exports": {
     ".": {
       "node": {
@@ -34,7 +34,9 @@
     "postMessage",
     "crosstab",
     "ipc",
-    "leader-election"
+    "leader-election",
+    "queue",
+    "inter-process"
   ],
   "repository": {
     "type": "git",

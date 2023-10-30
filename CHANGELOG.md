@@ -3,6 +3,8 @@
 
 ## X.X.X (comming soon)
 
+- ADD support for the Deno runtime
+
 ## 5.5.1 (23 October 2023)
 
 - REPLACE `new Date().getTime()` with `Date.now()` which is faster
