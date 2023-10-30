@@ -94,7 +94,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        node: ['17.3.0', '18.12.1']
+        node: ['18.18.2', '20.9.0']
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node.js environment
@@ -136,7 +136,7 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v4.0.0
         with:
-          node-version: '18.12.1'
+          node-version: '20.9.0'
 
       # https://docs.github.com/en/free-pro-team@latest/actions/guides/caching-dependencies-to-speed-up-workflows
       - name: Reuse npm cache folder
