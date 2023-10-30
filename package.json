@@ -9,6 +9,11 @@
         "import": "./dist/esnode/index.js",
         "default": "./dist/es5node/index.js"
       },
+      "deno": {
+        "types": "./types/index.d.ts",
+        "import": "./dist/esbrowser/index.js",
+        "default": "./dist/lib/index.js"
+      },
       "browser": {
         "types": "./types/index.d.ts",
         "import": "./dist/esbrowser/index.js",

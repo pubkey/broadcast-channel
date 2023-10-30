@@ -1,4 +1,4 @@
-import { BroadcastChannel } from '../dist/esnode/index.js';
+import { BroadcastChannel } from '../dist/esbrowser/index.js';
 import { randomString } from 'async-test-util';
 import assert from 'assert';
 export async function run() {
