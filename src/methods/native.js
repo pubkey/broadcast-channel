@@ -42,6 +42,14 @@ export function onMessage(channelState, fn) {
 }
 
 export function canBeUsed() {
+
+    // Deno runtime
+    // eslint-disable-next-line
+    if (globalThis && globalThis.Deno && globalThis.Deno.args) {
+        return true;
+    }
+
+    // Browser runtime
     if (
         (typeof window !== 'undefined' || typeof self !== 'undefined') &&
         typeof BroadcastChannel === 'function'

@@ -176,7 +176,7 @@ jobs:
         run: |
           sudo npm i -g cross-env
           deno info
-          deno run ./test/test-deno.js
+          npm run test:deno
 
 
 # TODO this does not work atm. fix this.
