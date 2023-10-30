@@ -1,13 +1,18 @@
 {
   "name": "broadcast-channel",
   "version": "5.5.1",
-  "description": "A BroadcastChannel that works in New Browsers, Old Browsers, WebWorkers and NodeJs and iframes",
+  "description": "A BroadcastChannel that works in New Browsers, Old Browsers, WebWorkers, NodeJs, Deno and iframes",
   "exports": {
     ".": {
       "node": {
         "types": "./types/index.d.ts",
         "import": "./dist/esnode/index.js",
         "default": "./dist/es5node/index.js"
+      },
+      "deno": {
+        "types": "./types/index.d.ts",
+        "import": "./dist/esbrowser/index.js",
+        "default": "./dist/lib/index.js"
       },
       "browser": {
         "types": "./types/index.d.ts",
@@ -34,7 +39,9 @@
     "postMessage",
     "crosstab",
     "ipc",
-    "leader-election"
+    "leader-election",
+    "queue",
+    "inter-process"
   ],
   "repository": {
     "type": "git",
@@ -58,6 +65,7 @@
     "test:module:cjs": "npm run build:es5node && mocha ./test/module.cjs.test.js -b --timeout 6000 --exit",
     "test:node": "npm run build:es5node && mocha ./test/index.test.js -b --timeout 6000 --exit",
     "test:node:loop": "npm run test:node && npm run test:node:loop",
+    "test:deno": "deno run --allow-env --unstable ./test/test-deno.js",
     "test:browser": "npm run build && karma start ./config/karma.conf.js --single-run",
     "test:e2e": "concurrently \"npm run docs:serve\" \"sleep 20 && testcafe -b && testcafe chrome -e test/e2e.test.js --hostname localhost\" --kill-others --success first",
     "test:typings": "npm run build && mocha ./test/typings.test.js -b --timeout 12000 --exit",

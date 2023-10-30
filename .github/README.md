@@ -7,7 +7,7 @@
 
 <h1 align="center">BroadcastChannel</h1>
 <p align="center">
-  <strong>A BroadcastChannel to send data across multiple browser-tabs or nodejs-processes</strong>
+  <strong>A BroadcastChannel to send data across multiple browser-tabs or nodejs-processes or Deno-Deploy-Instances</strong>
   <br/>
   <span>+ LeaderElection over the channels</span><br />
 </p>
@@ -22,7 +22,7 @@
 
 * * *
 
-A BroadcastChannel that allows you to send data between different browser-tabs or nodejs-processes.
+A BroadcastChannel that allows you to send data between different browser-tabs or nodejs-processes or Deno-Deploy-Instances.
 
 - It works completely **client-side** and **offline**,
 - Tested on **old browsers**, **new browsers**, **WebWorkers**, **Iframes** and **NodeJs**.
@@ -188,7 +188,7 @@ Depending in which environment this is used, a proper method is automatically se
 
 | Method           | Used in                                                         | Description                                                                                                                                             |
 | ---------------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Native**       | [Modern Browsers](https://caniuse.com/broadcastchannel)         | If the browser supports the BroadcastChannel-API, this method will be used because it is the fastest                                                    |
+| **Native**       | [Modern Browsers](https://caniuse.com/broadcastchannel)         | If the browser supports the BroadcastChannel-API, this method will be used because it is the fastest. This is also used in Deno runtimes.               |
 | **IndexedDB**    | [Browsers with WebWorkers](https://caniuse.com/#feat=indexeddb) | If there is no native BroadcastChannel support, the IndexedDB method is used because it supports messaging between browser-tabs, iframes and WebWorkers |
 | **LocalStorage** | [Older Browsers](https://caniuse.com/#feat=namevalue-storage)   | In older browsers that do not support IndexedDb, a localstorage-method is used                                                                          |
 | **Sockets**      | NodeJs                                                          | In NodeJs the communication is handled by sockets that send each other messages                                                                         |
@@ -282,7 +282,7 @@ This module is optimised for:
 -   This is not a polyfill. Do not set this module to `window.BroadcastChannel`. This implementation behaves similiar to the [BroadcastChannel-Standard](https://developer.mozilla.org/en-US/docs/Web/API/Broadcast_Channel_API) with these limitations:
     - You can only send data that can be `JSON.stringify`-ed,
     - While the offical API emits [onmessage-events](https://developer.mozilla.org/en-US/docs/Web/API/BroadcastChannel/onmessage), this module directly emitts the data which was posted.
--   This is not a replacement for a message queue. If you use this in NodeJs and want send more than 50 messages per second, you should use proper [IPC-Tooling](https://en.wikipedia.org/wiki/Message_queue).
+-   This is not a replacement for a message queue. If you use this in NodeJs or Deno and want send more than 50 messages per second, you should use proper [IPC-Tooling](https://en.wikipedia.org/wiki/Message_queue).
 
 
 ## Browser Support

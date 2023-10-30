@@ -15,7 +15,7 @@
 
 <h1 align="center">BroadcastChannel</h1>
 <p align="center">
-  <strong>A BroadcastChannel that works in old browsers, new browsers, WebWorkers and NodeJs</strong>
+  <strong>A BroadcastChannel that works in old browsers, new browsers, WebWorkers and NodeJs and Deno</strong>
   <br/>
   <span>+ LeaderElection over the channels</span>
 </p>

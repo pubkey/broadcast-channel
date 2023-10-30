@@ -1,3 +1,4 @@
+
 import {
     microSeconds as micro,
     PROMISE_RESOLVED_VOID
@@ -42,6 +43,14 @@ export function onMessage(channelState, fn) {
 }
 
 export function canBeUsed() {
+
+    // Deno runtime
+    // eslint-disable-next-line
+    if (typeof globalThis !== 'undefined' && globalThis.Deno && globalThis.Deno.args) {
+        return true;
+    }
+
+    // Browser runtime
     if (
         (typeof window !== 'undefined' || typeof self !== 'undefined') &&
         typeof BroadcastChannel === 'function'
