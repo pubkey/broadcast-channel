@@ -6,10 +6,13 @@ export async function run() {
     console.log('--- 1');
 
     console.dir({
+        // eslint-disable-next-line
         'globalThis.Deno': !!globalThis.Deno,
+        // eslint-disable-next-line
         'globalThis.Deno.args': !!globalThis.Deno.args
     });
     console.log('--- 2');
+    // eslint-disable-next-line
     console.log(Object.keys(Deno).sort().join(', '));
 
     console.log('--- 3');
