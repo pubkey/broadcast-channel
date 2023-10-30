@@ -46,7 +46,7 @@ export function canBeUsed() {
 
     // Deno runtime
     // eslint-disable-next-line
-    if (globalThis && globalThis.Deno && globalThis.Deno.args) {
+    if (typeof globalThis !== 'undefined' && globalThis.Deno && globalThis.Deno.args) {
         return true;
     }
 
