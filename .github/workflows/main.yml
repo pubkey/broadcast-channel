@@ -172,6 +172,10 @@ jobs:
           # and it would then never succeed on the first run on dependency updateds
           key: ${{ runner.os }}-deno-x1-
 
+      - uses: denoland/setup-deno@v1
+        with:
+          # https://github.com/denoland/deno/releases
+          deno-version: "1.37.2"
       - name: run deno tests
         run: |
           sudo npm i -g cross-env
