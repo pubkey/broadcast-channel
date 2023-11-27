@@ -10,14 +10,15 @@ export const type = 'native';
 
 export function create(channelName) {
     const state = {
+        time: micro(),
         messagesCallback: null,
         bc: new BroadcastChannel(channelName),
         subFns: [] // subscriberFunctions
     };
 
-    state.bc.onmessage = msg => {
+    state.bc.onmessage = msgEvent => {
         if (state.messagesCallback) {
-            state.messagesCallback(msg.data);
+            state.messagesCallback(msgEvent.data);
         }
     };
 

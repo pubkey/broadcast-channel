@@ -184,9 +184,7 @@ BroadcastChannel.prototype = {
  * @returns {Promise} that resolved when the message sending is done
  */
 function _post(broadcastChannel, type, msg) {
-    console.log('_post - 0 ' + !!broadcastChannel._prepP);
     const time = broadcastChannel.method.microSeconds();
-    console.log('_post time ' + time);
     const msgObj = {
         time,
         type,
@@ -194,10 +192,7 @@ function _post(broadcastChannel, type, msg) {
     };
 
     const awaitPrepare = broadcastChannel._prepP ? broadcastChannel._prepP : PROMISE_RESOLVED_VOID;
-    console.log('_post - 1');
     return awaitPrepare.then(() => {
-        console.log('_post - 2');
-
         const sendPromise = broadcastChannel.method.postMessage(
             broadcastChannel._state,
             msgObj
@@ -205,7 +200,6 @@ function _post(broadcastChannel, type, msg) {
 
         // add/remove to unsent messages list
         broadcastChannel._uMP.add(sendPromise);
-        console.log('_post - 3');
         sendPromise
             .catch()
             .then(() => broadcastChannel._uMP.delete(sendPromise));
@@ -217,8 +211,6 @@ function _post(broadcastChannel, type, msg) {
 function _prepareChannel(channel) {
     const maybePromise = channel.method.create(channel.name, channel.options);
     if (isPromise(maybePromise)) {
-
-        console.log('CRAETE IS POROMSE!');
         channel._prepP = maybePromise;
         maybePromise.then(s => {
             // used in tests to simulate slow runtime
@@ -228,7 +220,6 @@ function _prepareChannel(channel) {
             channel._state = s;
         });
     } else {
-        console.log('CRAETE IS NOT POROMSE!');
         channel._state = maybePromise;
     }
 }
@@ -257,19 +248,7 @@ function _startListening(channel) {
         const listenerFn = msgObj => {
             channel._addEL[msgObj.type]
                 .forEach(listenerObject => {
-                    /**
-                     * Getting the current time in JavaScript has no good precision.
-                     * So instead of only listening to events that happened 'after' the listener
-                     * was added, we also listen to events that happened 100ms before it.
-                     * This ensures that when another process, like a WebWorker, sends events
-                     * we do not miss them out because their timestamp is a bit off compared to the main process.
-                     * Not doing this would make messages missing when we send data directly after subscribing and awaiting a response.
-                     * @link https://johnresig.com/blog/accuracy-of-javascript-time/
-                     */
-                    const hundredMsInMicro = 100 * 1000;
-                    const minMessageTime = listenerObject.time - hundredMsInMicro;
-
-                    if (msgObj.time >= minMessageTime) {
+                    if (msgObj.time >= listenerObject.time) {
                         listenerObject.fn(msgObj.data);
                     }
                 });

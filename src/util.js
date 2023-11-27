@@ -28,25 +28,21 @@ export function randomToken() {
 
 
 let lastMs = 0;
-let additional = 0;
 
 /**
- * returns the current time in micro-seconds,
+ * Returns the current unix time in micro-seconds,
  * WARNING: This is a pseudo-function
  * Performance.now is not reliable in webworkers, so we just make sure to never return the same time.
  * This is enough in browsers, and this function will not be used in nodejs.
  * The main reason for this hack is to ensure that BroadcastChannel behaves equal to production when it is used in fast-running unit tests.
  */
 export function microSeconds() {
-    const ms = Date.now();
-    if (ms === lastMs) {
-        additional++;
-        return ms * 1000 + additional;
-    } else {
-        lastMs = ms;
-        additional = 0;
-        return ms * 1000;
+    let ret = Date.now() * 1000; // milliseconds to microseconds
+    if (ret <= lastMs) {
+        ret = lastMs + 1;
     }
+    lastMs = ret;
+    return ret;
 }
 
 /**
