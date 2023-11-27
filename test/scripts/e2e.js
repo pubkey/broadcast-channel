@@ -138,6 +138,8 @@ function run() {
                 });
             });
         }
+
+        await wait(1000);
         console.log('========== START SENDING MESSAGES ' + channel.type);
         startTime = new Date().getTime();
         channel.postMessage({
@@ -267,6 +269,7 @@ function run() {
             messages$.next(msg);
         }
         channel.addEventListener('message', workerListener);
+        await wait(1000);
 
         while (t > 0) {
             t--;

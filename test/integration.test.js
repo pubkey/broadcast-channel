@@ -277,9 +277,6 @@ function runTest(channelOptions) {
                     await otherChannel.close();
                 });
                 it('should not read messages created before the channel was created (many messages)', async () => {
-
-                    console.log('.................... START TEST');
-
                     await AsyncTestUtil.wait(100);
 
                     const channelName = AsyncTestUtil.randomString(12);
@@ -293,8 +290,6 @@ function runTest(channelOptions) {
                          */
                         channel.postMessage('msg_from_before');
                     });
-
-                    console.log('--------------- CRAETE OTHER CAHNNEL');
                     const otherChannel = new BroadcastChannel(channelName, channelOptions);
                     const emittedOther = [];
                     otherChannel.onmessage = msg => emittedOther.push(msg);
