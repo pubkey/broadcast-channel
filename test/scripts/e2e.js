@@ -14,7 +14,9 @@ var {
     randomNumber,
     randomBoolean
 } = require('async-test-util');
-
+import {
+    Subject
+} from 'rxjs';
 
 function run() {
     console.log('run()');
@@ -258,6 +260,14 @@ function run() {
         const perRun = 100;
         let k = 0;
         let done = 0;
+
+
+        const messages$ = new Subject();
+        const workerListener = msg => {
+            messages$.next(msg);
+        }
+        channel.addEventListener('message', workerListener);
+
         while (t > 0) {
             t--;
             await Promise.all(
@@ -269,17 +279,16 @@ function run() {
 
                     const msgId = 'worker-test-' + startTime + '-' + k++;
                     const waitForResponsePromise = new Promise(res => {
-                        const listener = msg => {
+                        const sub = messages$.subscribe(msg => {
                             if (msg.answer == true && msg.original.id === msgId) {
                                 console.dir('msg for response:;:');
                                 console.dir(msg);
                                 done++;
                                 messageCountWorkerContainer.innerHTML = done;
-                                channel.removeEventListener('message', listener);
+                                sub.unsubscribe();
                                 res();
                             }
-                        };
-                        channel.addEventListener('message', listener);
+                        });
                     });
                     channel.postMessage({
                         from: 'main-worker',
@@ -299,6 +308,8 @@ function run() {
                 })
             );
         }
+
+        channel.removeEventListener('message', workerListener);
 
         body.style.backgroundColor = 'green';
         stateContainer.innerHTML = 'SUCCESS'

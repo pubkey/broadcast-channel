@@ -143,21 +143,21 @@ jobs:
           node-version-file: ".nvmrc"
 
       # https://docs.github.com/en/free-pro-team@latest/actions/guides/caching-dependencies-to-speed-up-workflows
-      # - name: Reuse npm cache folder
-      #   uses: actions/cache@v3
-      #   env:
-      #     cache-name: cache-node-modules
-      #   with:
-      #     path: |
-      #       ~/.npm
-      #       ./node_modules
-      #       ./test-electron/node_modules
-      #     # invalidate cache when any package.json changes
-      #     key: ${{ runner.os }}-npm-test-deno-x3-${{ env.cache-name }}-${{ hashFiles('**/package.json') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-npm-test-deno-x3-${{ env.cache-name }}-
-      #       ${{ runner.os }}-npm-test-deno
-      #       ${{ runner.os }}-test-deno
+      - name: Reuse npm cache folder
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-node-deno-modules
+        with:
+          path: |
+            ~/.npm
+            ./node_modules
+            ./test-electron/node_modules
+          # invalidate cache when any package.json changes
+          key: ${{ runner.os }}-npm-test-deno-x3-${{ env.cache-name }}-${{ hashFiles('**/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-test-deno-x3-${{ env.cache-name }}-
+            ${{ runner.os }}-npm-test-deno
+            ${{ runner.os }}-test-deno
 
       - name: install node modules
         run: npm install --legacy-peer-deps
