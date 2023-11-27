@@ -46,10 +46,10 @@ jobs:
             ./node_modules
             ./test-electron/node_modules
           # invalidate cache when any package.json changes
-          key: ${{ runner.os }}-npm-x2-${{ env.cache-name }}-${{ hashFiles('**/package.json') }}
+          key: ${{ runner.os }}-npm-x3-${{ env.cache-name }}-${{ hashFiles('**/package.json') }}
           restore-keys: |
-            ${{ runner.os }}-npm-x2-${{ env.cache-name }}-
-            ${{ runner.os }}-npm-x2-
+            ${{ runner.os }}-npm-x3-${{ env.cache-name }}-
+            ${{ runner.os }}-npm-x3-
             ${{ runner.os }}-
 
       # install
@@ -117,9 +117,9 @@ jobs:
             ./node_modules
             ./test-electron/node_modules
           # invalidate cache when any package.json changes
-          key: ${{ runner.os }}-npm-test-node-x2-${{ matrix.node }}-${{ env.cache-name }}-${{ hashFiles('**/package.json') }}
+          key: ${{ runner.os }}-npm-test-node-x3-${{ matrix.node }}-${{ env.cache-name }}-${{ hashFiles('**/package.json') }}
           restore-keys: |
-            ${{ runner.os }}-npm-test-node-x2-${{ matrix.node }}-${{ env.cache-name }}-
+            ${{ runner.os }}-npm-test-node-x3-${{ matrix.node }}-${{ env.cache-name }}-
             ${{ runner.os }}-npm-test-node
             ${{ runner.os }}-test-node
 
@@ -153,9 +153,9 @@ jobs:
             ./node_modules
             ./test-electron/node_modules
           # invalidate cache when any package.json changes
-          key: ${{ runner.os }}-npm-test-deno-x2-${{ env.cache-name }}-${{ hashFiles('**/package.json') }}
+          key: ${{ runner.os }}-npm-test-deno-x3-${{ env.cache-name }}-${{ hashFiles('**/package.json') }}
           restore-keys: |
-            ${{ runner.os }}-npm-test-deno-x2-${{ env.cache-name }}-
+            ${{ runner.os }}-npm-test-deno-x3-${{ env.cache-name }}-
             ${{ runner.os }}-npm-test-deno
             ${{ runner.os }}-test-deno
 
@@ -174,7 +174,7 @@ jobs:
             /home/runner/.cache/deno
           # do not cache based on package.json because deno install randomly fails
           # and it would then never succeed on the first run on dependency updateds
-          key: ${{ runner.os }}-deno-x2-
+          key: ${{ runner.os }}-deno-x3-
 
       - uses: denoland/setup-deno@v1
         with:
