@@ -3,6 +3,10 @@
 
 ## X.X.X (comming soon)
 
+## 7.0.0 (27 November 2023)
+
+- CHANGE do not emit messages that have been existed before the channel was created.
+
 ## 6.0.0 (30 October 2023)
 
 - ADD support for the Deno runtime

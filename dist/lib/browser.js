@@ -238,18 +238,7 @@ function _startListening(channel) {
 
     var listenerFn = function listenerFn(msgObj) {
       channel._addEL[msgObj.type].forEach(function (listenerObject) {
-        /**
-         * Getting the current time in JavaScript has no good precision.
-         * So instead of only listening to events that happened 'after' the listener
-         * was added, we also listen to events that happened 100ms before it.
-         * This ensures that when another process, like a WebWorker, sends events
-         * we do not miss them out because their timestamp is a bit off compared to the main process.
-         * Not doing this would make messages missing when we send data directly after subscribing and awaiting a response.
-         * @link https://johnresig.com/blog/accuracy-of-javascript-time/
-         */
-        var hundredMsInMicro = 100 * 1000;
-        var minMessageTime = listenerObject.time - hundredMsInMicro;
-        if (msgObj.time >= minMessageTime) {
+        if (msgObj.time >= listenerObject.time) {
           listenerObject.fn(msgObj.data);
         }
       });
@@ -1400,14 +1389,15 @@ var microSeconds = exports.microSeconds = _util.microSeconds;
 var type = exports.type = 'native';
 function create(channelName) {
   var state = {
+    time: (0, _util.microSeconds)(),
     messagesCallback: null,
     bc: new BroadcastChannel(channelName),
     subFns: [] // subscriberFunctions
   };
 
-  state.bc.onmessage = function (msg) {
+  state.bc.onmessage = function (msgEvent) {
     if (state.messagesCallback) {
-      state.messagesCallback(msg.data);
+      state.messagesCallback(msgEvent.data);
     }
   };
   return state;
@@ -1463,7 +1453,7 @@ var NativeMethod = exports.NativeMethod = {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.SimulateMethod = void 0;
+exports.SimulateMethod = exports.SIMULATE_DELAY_TIME = void 0;
 exports.averageResponseTime = averageResponseTime;
 exports.canBeUsed = canBeUsed;
 exports.close = close;
@@ -1478,6 +1468,7 @@ var type = exports.type = 'simulate';
 var SIMULATE_CHANNELS = new Set();
 function create(channelName) {
   var state = {
+    time: microSeconds(),
     name: channelName,
     messagesCallback: null
   };
@@ -1487,21 +1478,25 @@ function create(channelName) {
 function close(channelState) {
   SIMULATE_CHANNELS["delete"](channelState);
 }
+var SIMULATE_DELAY_TIME = exports.SIMULATE_DELAY_TIME = 5;
 function postMessage(channelState, messageJson) {
   return new Promise(function (res) {
     return setTimeout(function () {
       var channelArray = Array.from(SIMULATE_CHANNELS);
-      channelArray.filter(function (channel) {
-        return channel.name === channelState.name;
-      }).filter(function (channel) {
-        return channel !== channelState;
-      }).filter(function (channel) {
-        return !!channel.messagesCallback;
-      }).forEach(function (channel) {
-        return channel.messagesCallback(messageJson);
+      channelArray.forEach(function (channel) {
+        if (channel.name === channelState.name &&
+        // has same name
+        channel !== channelState &&
+        // not own channel
+        !!channel.messagesCallback &&
+        // has subscribers
+        channel.time < messageJson.time // channel not created after postMessage() call
+        ) {
+          channel.messagesCallback(messageJson);
+        }
       });
       res();
-    }, 5);
+    }, SIMULATE_DELAY_TIME);
   });
 }
 function onMessage(channelState, fn) {
@@ -1511,7 +1506,7 @@ function canBeUsed() {
   return true;
 }
 function averageResponseTime() {
-  return 5;
+  return SIMULATE_DELAY_TIME;
 }
 var SimulateMethod = exports.SimulateMethod = {
   create: create,
@@ -1604,25 +1599,21 @@ function randomToken() {
   return Math.random().toString(36).substring(2);
 }
 var lastMs = 0;
-var additional = 0;
 
 /**
- * returns the current time in micro-seconds,
+ * Returns the current unix time in micro-seconds,
  * WARNING: This is a pseudo-function
  * Performance.now is not reliable in webworkers, so we just make sure to never return the same time.
  * This is enough in browsers, and this function will not be used in nodejs.
  * The main reason for this hack is to ensure that BroadcastChannel behaves equal to production when it is used in fast-running unit tests.
  */
 function microSeconds() {
-  var ms = Date.now();
-  if (ms === lastMs) {
-    additional++;
-    return ms * 1000 + additional;
-  } else {
-    lastMs = ms;
-    additional = 0;
-    return ms * 1000;
+  var ret = Date.now() * 1000; // milliseconds to microseconds
+  if (ret <= lastMs) {
+    ret = lastMs + 1;
   }
+  lastMs = ret;
+  return ret;
 }
 
 /**

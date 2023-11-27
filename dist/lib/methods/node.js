@@ -440,11 +440,13 @@ function _openClientConnection() {
   return _openClientConnection.apply(this, arguments);
 }
 function writeMessage(channelName, readerUuid, messageJson, paths) {
+  var time = messageJson.time;
+  if (!time) {
+    time = microSeconds();
+  }
   paths = paths || getPaths(channelName);
-  var time = microSeconds();
   var writeObject = {
     uuid: readerUuid,
-    time: time,
     data: messageJson
   };
   var token = (0, _util2.randomToken)();
@@ -687,8 +689,8 @@ function _filterMessage(msgObj, state) {
   if (msgObj.senderUuid === state.uuid) return false; // not send by own
   if (state.emittedMessagesIds.has(msgObj.token)) return false; // not already emitted
   if (!state.messagesCallback) return false; // no listener
-  if (msgObj.time < state.messagesCallbackTime) return false; // not older then onMessageCallback
-  if (msgObj.time < state.time) return false; // msgObj is older then channel
+  if (msgObj.time < state.messagesCallbackTime) return false; // not older than onMessageCallback
+  if (msgObj.time < state.time) return false; // msgObj is older than channel
 
   state.emittedMessagesIds.add(msgObj.token);
   return true;

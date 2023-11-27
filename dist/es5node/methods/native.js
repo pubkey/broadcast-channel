@@ -17,14 +17,15 @@ var microSeconds = exports.microSeconds = _util.microSeconds;
 var type = exports.type = 'native';
 function create(channelName) {
   var state = {
+    time: (0, _util.microSeconds)(),
     messagesCallback: null,
     bc: new BroadcastChannel(channelName),
     subFns: [] // subscriberFunctions
   };
 
-  state.bc.onmessage = function (msg) {
+  state.bc.onmessage = function (msgEvent) {
     if (state.messagesCallback) {
-      state.messagesCallback(msg.data);
+      state.messagesCallback(msgEvent.data);
     }
   };
   return state;

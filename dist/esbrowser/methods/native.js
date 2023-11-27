@@ -3,14 +3,15 @@ export var microSeconds = micro;
 export var type = 'native';
 export function create(channelName) {
   var state = {
+    time: micro(),
     messagesCallback: null,
     bc: new BroadcastChannel(channelName),
     subFns: [] // subscriberFunctions
   };
 
-  state.bc.onmessage = function (msg) {
+  state.bc.onmessage = function (msgEvent) {
     if (state.messagesCallback) {
-      state.messagesCallback(msg.data);
+      state.messagesCallback(msgEvent.data);
     }
   };
   return state;

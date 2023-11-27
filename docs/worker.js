@@ -1464,7 +1464,6 @@ function create(channelName) {
     name: channelName,
     messagesCallback: null
   };
-  console.log('created channel ' + state.counter);
   SIMULATE_CHANNELS.add(state);
   return state;
 }

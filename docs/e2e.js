@@ -1464,7 +1464,6 @@ function create(channelName) {
     name: channelName,
     messagesCallback: null
   };
-  console.log('created channel ' + state.counter);
   SIMULATE_CHANNELS.add(state);
   return state;
 }
@@ -23944,6 +23943,9 @@ function run() {
             });
           });
         case 14:
+          _context.next = 16;
+          return wait(1000);
+        case 16:
           console.log('========== START SENDING MESSAGES ' + channel.type);
           startTime = new Date().getTime();
           channel.postMessage({
@@ -23951,7 +23953,7 @@ function run() {
             step: 0
           });
           console.log('main: message send (0)');
-        case 18:
+        case 20:
         case "end":
           return _context.stop();
       }
@@ -24100,13 +24102,15 @@ function run() {
             messages$.next(msg);
           };
           channel.addEventListener('message', workerListener);
-        case 17:
+          _context5.next = 19;
+          return wait(1000);
+        case 19:
           if (!(t > 0)) {
-            _context5.next = 23;
+            _context5.next = 25;
             break;
           }
           t--;
-          _context5.next = 21;
+          _context5.next = 23;
           return Promise.all(new Array(perRun).fill(0).map( /*#__PURE__*/(0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee4() {
             var msgId, waitForResponsePromise;
             return _regenerator["default"].wrap(function _callee4$(_context4) {
@@ -24154,16 +24158,16 @@ function run() {
               }
             }, _callee4);
           }))));
-        case 21:
-          _context5.next = 17;
-          break;
         case 23:
+          _context5.next = 19;
+          break;
+        case 25:
           channel.removeEventListener('message', workerListener);
           body.style.backgroundColor = 'green';
           stateContainer.innerHTML = 'SUCCESS';
           amountTime = new Date().getTime() - startTime;
           document.getElementById('time-amount').innerHTML = amountTime + 'ms';
-        case 28:
+        case 30:
         case "end":
           return _context5.stop();
       }
