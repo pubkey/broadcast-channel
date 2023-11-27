@@ -776,13 +776,13 @@ if (isNode) {
     useOptions.push({
         type: 'node',
         node: {
-            useFastPath: true
+            useFastPath: false
         }
     });
     useOptions.push({
         type: 'node',
         node: {
-            useFastPath: false
+            useFastPath: true
         }
     });
 } else {

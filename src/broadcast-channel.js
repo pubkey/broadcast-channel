@@ -184,7 +184,9 @@ BroadcastChannel.prototype = {
  * @returns {Promise} that resolved when the message sending is done
  */
 function _post(broadcastChannel, type, msg) {
+    console.log('_post - 0 ' + !!broadcastChannel._prepP);
     const time = broadcastChannel.method.microSeconds();
+    console.log('_post time ' + time);
     const msgObj = {
         time,
         type,
@@ -192,7 +194,9 @@ function _post(broadcastChannel, type, msg) {
     };
 
     const awaitPrepare = broadcastChannel._prepP ? broadcastChannel._prepP : PROMISE_RESOLVED_VOID;
+    console.log('_post - 1');
     return awaitPrepare.then(() => {
+        console.log('_post - 2');
 
         const sendPromise = broadcastChannel.method.postMessage(
             broadcastChannel._state,
@@ -201,6 +205,7 @@ function _post(broadcastChannel, type, msg) {
 
         // add/remove to unsent messages list
         broadcastChannel._uMP.add(sendPromise);
+        console.log('_post - 3');
         sendPromise
             .catch()
             .then(() => broadcastChannel._uMP.delete(sendPromise));
@@ -212,6 +217,8 @@ function _post(broadcastChannel, type, msg) {
 function _prepareChannel(channel) {
     const maybePromise = channel.method.create(channel.name, channel.options);
     if (isPromise(maybePromise)) {
+
+        console.log('CRAETE IS POROMSE!');
         channel._prepP = maybePromise;
         maybePromise.then(s => {
             // used in tests to simulate slow runtime
@@ -221,6 +228,7 @@ function _prepareChannel(channel) {
             channel._state = s;
         });
     } else {
+        console.log('CRAETE IS NOT POROMSE!');
         channel._state = maybePromise;
     }
 }
