@@ -194,7 +194,7 @@ function runTest(channelOptions) {
 
                     /**
                      * We have to wait 200ms here because only 'too old' messages should be filtered out.
-                     * Becuase the JavaScript time precision is not good enough, we also emit messages that are only a bit off.
+                     * Because the JavaScript time precision is not good enough, we also emit messages that are only a bit off.
                      * This ensures we do not miss out messages which would be way more critical then getting additionals.
                      */
                     await AsyncTestUtil.wait(200);
@@ -253,15 +253,48 @@ function runTest(channelOptions) {
                     channel.close();
                     otherChannel.close();
                 });
-                it('should not read messages created before the channel was created', async () => {
+                it('should not read messages created before the channel was created (one message)', async () => {
                     await AsyncTestUtil.wait(100);
 
                     const channelName = AsyncTestUtil.randomString(12);
                     const channel = new BroadcastChannel(channelName, channelOptions);
 
                     await channel.postMessage('foo1');
-                    await AsyncTestUtil.wait(50);
 
+                    const otherChannel = new BroadcastChannel(channelName, channelOptions);
+                    const emittedOther = [];
+                    otherChannel.onmessage = msg => emittedOther.push(msg);
+
+                    await channel.postMessage('foo2');
+                    await channel.postMessage('foo3');
+
+                    await AsyncTestUtil.waitUntil(() => emittedOther.length >= 2);
+                    await AsyncTestUtil.wait(100);
+
+                    assert.equal(emittedOther.length, 2);
+
+                    await channel.close();
+                    await otherChannel.close();
+                });
+                it('should not read messages created before the channel was created (many messages)', async () => {
+
+                    console.log('.................... START TEST');
+
+                    await AsyncTestUtil.wait(100);
+
+                    const channelName = AsyncTestUtil.randomString(12);
+                    const channel = new BroadcastChannel(channelName, channelOptions);
+
+                    new Array(10).fill(0).forEach(() => {
+                        /**
+                         * Do not await here!
+                         * It should not receive these messages even
+                         * when the postMessage() was called but not finished yet.
+                         */
+                        channel.postMessage('msg_from_before');
+                    });
+
+                    console.log('--------------- CRAETE OTHER CAHNNEL');
                     const otherChannel = new BroadcastChannel(channelName, channelOptions);
                     const emittedOther = [];
                     otherChannel.onmessage = msg => emittedOther.push(msg);

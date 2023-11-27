@@ -10,11 +10,12 @@ const SIMULATE_CHANNELS = new Set();
 
 export function create(channelName) {
     const state = {
+        time: microSeconds(),
         name: channelName,
         messagesCallback: null
     };
+    console.log('created channel ' + state.counter);
     SIMULATE_CHANNELS.add(state);
-
     return state;
 }
 
@@ -22,16 +23,23 @@ export function close(channelState) {
     SIMULATE_CHANNELS.delete(channelState);
 }
 
+export const SIMULATE_DELAY_TIME = 5;
+
 export function postMessage(channelState, messageJson) {
     return new Promise(res => setTimeout(() => {
         const channelArray = Array.from(SIMULATE_CHANNELS);
-        channelArray
-            .filter(channel => channel.name === channelState.name)
-            .filter(channel => channel !== channelState)
-            .filter(channel => !!channel.messagesCallback)
-            .forEach(channel => channel.messagesCallback(messageJson));
+        channelArray.forEach(channel => {
+            if (
+                channel.name === channelState.name && // has same name
+                channel !== channelState && // not own channel
+                !!channel.messagesCallback && // has subscribers
+                channel.time < messageJson.time // channel not created after postMessage() call
+            ) {
+                channel.messagesCallback(messageJson);
+            }
+        });
         res();
-    }, 5));
+    }, SIMULATE_DELAY_TIME));
 }
 
 export function onMessage(channelState, fn) {
@@ -44,7 +52,7 @@ export function canBeUsed() {
 
 
 export function averageResponseTime() {
-    return 5;
+    return SIMULATE_DELAY_TIME;
 }
 
 export const SimulateMethod = {

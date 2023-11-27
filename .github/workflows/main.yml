@@ -32,7 +32,7 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v4.0.0
         with:
-          node-version: '20.9.0'
+          node-version-file: ".nvmrc"
 
       # https://docs.github.com/en/free-pro-team@latest/actions/guides/caching-dependencies-to-speed-up-workflows
       - name: Reuse npm cache folder
@@ -140,7 +140,7 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v4.0.0
         with:
-          node-version: '20.9.0'
+          node-version-file: ".nvmrc"
 
       # https://docs.github.com/en/free-pro-team@latest/actions/guides/caching-dependencies-to-speed-up-workflows
       - name: Reuse npm cache folder
