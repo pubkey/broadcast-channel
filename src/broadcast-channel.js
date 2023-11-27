@@ -193,7 +193,6 @@ function _post(broadcastChannel, type, msg) {
 
     const awaitPrepare = broadcastChannel._prepP ? broadcastChannel._prepP : PROMISE_RESOLVED_VOID;
     return awaitPrepare.then(() => {
-
         const sendPromise = broadcastChannel.method.postMessage(
             broadcastChannel._state,
             msgObj
@@ -249,19 +248,7 @@ function _startListening(channel) {
         const listenerFn = msgObj => {
             channel._addEL[msgObj.type]
                 .forEach(listenerObject => {
-                    /**
-                     * Getting the current time in JavaScript has no good precision.
-                     * So instead of only listening to events that happened 'after' the listener
-                     * was added, we also listen to events that happened 100ms before it.
-                     * This ensures that when another process, like a WebWorker, sends events
-                     * we do not miss them out because their timestamp is a bit off compared to the main process.
-                     * Not doing this would make messages missing when we send data directly after subscribing and awaiting a response.
-                     * @link https://johnresig.com/blog/accuracy-of-javascript-time/
-                     */
-                    const hundredMsInMicro = 100 * 1000;
-                    const minMessageTime = listenerObject.time - hundredMsInMicro;
-
-                    if (msgObj.time >= minMessageTime) {
+                    if (msgObj.time >= listenerObject.time) {
                         listenerObject.fn(msgObj.data);
                     }
                 });

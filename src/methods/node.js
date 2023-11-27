@@ -272,11 +272,15 @@ export async function openClientConnection(channelName, readerUuid) {
  * @return {Promise}
  */
 export function writeMessage(channelName, readerUuid, messageJson, paths) {
+
+    let time = messageJson.time;
+    if (!time) {
+        time = microSeconds();
+    }
+
     paths = paths || getPaths(channelName);
-    const time = microSeconds();
     const writeObject = {
         uuid: readerUuid,
-        time,
         data: messageJson
     };
 
@@ -451,8 +455,8 @@ export function _filterMessage(msgObj, state) {
     if (msgObj.senderUuid === state.uuid) return false; // not send by own
     if (state.emittedMessagesIds.has(msgObj.token)) return false; // not already emitted
     if (!state.messagesCallback) return false; // no listener
-    if (msgObj.time < state.messagesCallbackTime) return false; // not older then onMessageCallback
-    if (msgObj.time < state.time) return false; // msgObj is older then channel
+    if (msgObj.time < state.messagesCallbackTime) return false; // not older than onMessageCallback
+    if (msgObj.time < state.time) return false; // msgObj is older than channel
 
     state.emittedMessagesIds.add(msgObj.token);
     return true;
