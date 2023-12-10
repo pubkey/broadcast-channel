@@ -99,21 +99,21 @@
     "lint"
   ],
   "dependencies": {
-    "@babel/runtime": "7.23.4",
+    "@babel/runtime": "7.23.5",
     "oblivious-set": "1.4.0",
     "p-queue": "6.6.2",
     "unload": "2.4.1"
   },
   "devDependencies": {
     "@babel/cli": "7.23.4",
-    "@babel/core": "7.23.3",
+    "@babel/core": "7.23.5",
     "@babel/plugin-proposal-object-rest-spread": "7.20.7",
     "@babel/plugin-transform-member-expression-literals": "7.23.3",
     "@babel/plugin-transform-property-literals": "7.23.3",
     "@babel/plugin-transform-runtime": "7.23.4",
     "@babel/polyfill": "7.12.1",
-    "@babel/preset-env": "7.23.3",
-    "@babel/types": "7.23.4",
+    "@babel/preset-env": "7.23.5",
+    "@babel/types": "7.23.5",
     "@rollup/plugin-terser": "0.4.4",
     "@types/core-js": "2.5.8",
     "assert": "2.1.0",
