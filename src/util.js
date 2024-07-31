@@ -16,14 +16,21 @@ export function sleep(time, resolveWith) {
 }
 
 export function randomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1) + min);
+    const arr = new Uint32Array(1);
+    crypto.getRandomValues(arr);
+    const randomFloat = arr[0] * Math.pow(2, -32);
+    return Math.floor(randomFloat * (max - min + 1) + min);
 }
 
-/**
- * https://stackoverflow.com/a/8084248
- */
 export function randomToken() {
-    return Math.random().toString(36).substring(2);
+    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    const randomArray = new Uint8Array(11);
+    crypto.getRandomValues(randomArray);
+    randomArray.forEach((number) => {
+        result += chars[number % chars.length];
+    });
+    return result;
 }
 
 
