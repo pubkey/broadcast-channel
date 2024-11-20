@@ -118,7 +118,7 @@
     "@types/core-js": "2.5.8",
     "assert": "2.1.0",
     "async-test-util": "2.2.1",
-    "browserify": "17.0.0",
+    "browserify": "17.0.1",
     "child-process-promise": "2.2.1",
     "clone": "2.1.2",
     "concurrently": "8.2.2",
