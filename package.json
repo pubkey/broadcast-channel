@@ -147,7 +147,7 @@
     "pre-commit": "1.2.2",
     "random-int": "3.0.0",
     "random-token": "0.0.8",
-    "rimraf": "5.0.5",
+    "rimraf": "5.0.10",
     "rollup": "4.21.0",
     "testcafe": "3.4.0",
     "ts-node": "10.9.2",
