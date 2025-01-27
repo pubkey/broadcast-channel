@@ -30,7 +30,7 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
       - name: Setup Node.js environment
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@v4.2.0
         with:
           node-version-file: ".nvmrc"
 
@@ -102,7 +102,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node.js environment
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@v4.2.0
         with:
           node-version: ${{ matrix.node }}
 
@@ -138,7 +138,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node.js environment
-        uses: actions/setup-node@v4.0.3
+        uses: actions/setup-node@v4.2.0
         with:
           node-version-file: ".nvmrc"
 
