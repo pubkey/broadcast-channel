@@ -75,7 +75,7 @@ var readdir = _util["default"].promisify(_fs["default"].readdir);
 var chmod = _util["default"].promisify(_fs["default"].chmod);
 var rmDir = _util["default"].promisify(_fs["default"].rm);
 var removeDir = /*#__PURE__*/function () {
-  var _ref = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee(p) {
+  var _ref = (0, _asyncToGenerator2["default"])(/*#__PURE__*/_regenerator["default"].mark(function _callee(p) {
     return _regenerator["default"].wrap(function _callee$(_context) {
       while (1) switch (_context.prev = _context.next) {
         case 0:
@@ -142,7 +142,7 @@ function ensureBaseFolderExists() {
   return _ensureBaseFolderExists.apply(this, arguments);
 }
 function _ensureBaseFolderExists() {
-  _ensureBaseFolderExists = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee4() {
+  _ensureBaseFolderExists = (0, _asyncToGenerator2["default"])(/*#__PURE__*/_regenerator["default"].mark(function _callee4() {
     return _regenerator["default"].wrap(function _callee4$(_context4) {
       while (1) switch (_context4.prev = _context4.next) {
         case 0:
@@ -168,7 +168,7 @@ function ensureFoldersExist(_x2, _x3) {
  * @return {Promise<true>}
  */
 function _ensureFoldersExist() {
-  _ensureFoldersExist = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee5(channelName, paths) {
+  _ensureFoldersExist = (0, _asyncToGenerator2["default"])(/*#__PURE__*/_regenerator["default"].mark(function _callee5(channelName, paths) {
     var chmodValue;
     return _regenerator["default"].wrap(function _callee5$(_context5) {
       while (1) switch (_context5.prev = _context5.next) {
@@ -207,7 +207,7 @@ function clearNodeFolder() {
   return _clearNodeFolder.apply(this, arguments);
 }
 function _clearNodeFolder() {
-  _clearNodeFolder = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee6() {
+  _clearNodeFolder = (0, _asyncToGenerator2["default"])(/*#__PURE__*/_regenerator["default"].mark(function _callee6() {
     return _regenerator["default"].wrap(function _callee6$(_context6) {
       while (1) switch (_context6.prev = _context6.next) {
         case 0:
@@ -263,7 +263,7 @@ function countChannelFolders() {
   return _countChannelFolders.apply(this, arguments);
 }
 function _countChannelFolders() {
-  _countChannelFolders = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee7() {
+  _countChannelFolders = (0, _asyncToGenerator2["default"])(/*#__PURE__*/_regenerator["default"].mark(function _callee7() {
     var folders;
     return _regenerator["default"].wrap(function _callee7$(_context7) {
       while (1) switch (_context7.prev = _context7.next) {
@@ -292,7 +292,7 @@ function connectionError(_x4) {
  * @return {{emitter: EventEmitter, server: any}}
  */
 function _connectionError() {
-  _connectionError = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee8(originalError) {
+  _connectionError = (0, _asyncToGenerator2["default"])(/*#__PURE__*/_regenerator["default"].mark(function _callee8(originalError) {
     var count, addObj, text;
     return _regenerator["default"].wrap(function _callee8$(_context8) {
       while (1) switch (_context8.prev = _context8.next) {
@@ -327,7 +327,7 @@ function createSocketEventEmitter(_x5, _x6, _x7) {
   return _createSocketEventEmitter.apply(this, arguments);
 }
 function _createSocketEventEmitter() {
-  _createSocketEventEmitter = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee11(channelName, readerUuid, paths) {
+  _createSocketEventEmitter = (0, _asyncToGenerator2["default"])(/*#__PURE__*/_regenerator["default"].mark(function _callee11(channelName, readerUuid, paths) {
     var pathToSocket, emitter, server;
     return _regenerator["default"].wrap(function _callee11$(_context11) {
       while (1) switch (_context11.prev = _context11.next) {
@@ -343,7 +343,7 @@ function _createSocketEventEmitter() {
           _context11.next = 5;
           return new Promise(function (resolve, reject) {
             server.on('error', /*#__PURE__*/function () {
-              var _ref5 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee9(err) {
+              var _ref5 = (0, _asyncToGenerator2["default"])(/*#__PURE__*/_regenerator["default"].mark(function _callee9(err) {
                 var useErr;
                 return _regenerator["default"].wrap(function _callee9$(_context9) {
                   while (1) switch (_context9.prev = _context9.next) {
@@ -364,7 +364,7 @@ function _createSocketEventEmitter() {
               };
             }());
             server.listen(pathToSocket, /*#__PURE__*/function () {
-              var _ref6 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee10(err, res) {
+              var _ref6 = (0, _asyncToGenerator2["default"])(/*#__PURE__*/_regenerator["default"].mark(function _callee10(err, res) {
                 var useErr;
                 return _regenerator["default"].wrap(function _callee10$(_context10) {
                   while (1) switch (_context10.prev = _context10.next) {
@@ -416,7 +416,7 @@ function openClientConnection(_x8, _x9) {
  * @return {Promise}
  */
 function _openClientConnection() {
-  _openClientConnection = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee12(channelName, readerUuid) {
+  _openClientConnection = (0, _asyncToGenerator2["default"])(/*#__PURE__*/_regenerator["default"].mark(function _callee12(channelName, readerUuid) {
     var pathToSocket, client;
     return _regenerator["default"].wrap(function _callee12$(_context12) {
       while (1) switch (_context12.prev = _context12.next) {
@@ -470,7 +470,7 @@ function getReadersUuids(_x10, _x11) {
   return _getReadersUuids.apply(this, arguments);
 }
 function _getReadersUuids() {
-  _getReadersUuids = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee13(channelName, paths) {
+  _getReadersUuids = (0, _asyncToGenerator2["default"])(/*#__PURE__*/_regenerator["default"].mark(function _callee13(channelName, paths) {
     var readersPath, files;
     return _regenerator["default"].wrap(function _callee13$(_context13) {
       while (1) switch (_context13.prev = _context13.next) {
@@ -501,7 +501,7 @@ function messagePath(_x12, _x13, _x14, _x15) {
   return _messagePath.apply(this, arguments);
 }
 function _messagePath() {
-  _messagePath = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee14(channelName, time, token, writerUuid) {
+  _messagePath = (0, _asyncToGenerator2["default"])(/*#__PURE__*/_regenerator["default"].mark(function _callee14(channelName, time, token, writerUuid) {
     var fileName;
     return _regenerator["default"].wrap(function _callee14$(_context14) {
       while (1) switch (_context14.prev = _context14.next) {
@@ -520,7 +520,7 @@ function getAllMessages(_x16, _x17) {
   return _getAllMessages.apply(this, arguments);
 }
 function _getAllMessages() {
-  _getAllMessages = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee15(channelName, paths) {
+  _getAllMessages = (0, _asyncToGenerator2["default"])(/*#__PURE__*/_regenerator["default"].mark(function _callee15(channelName, paths) {
     var messagesPath, files;
     return _regenerator["default"].wrap(function _callee15$(_context15) {
       while (1) switch (_context15.prev = _context15.next) {
@@ -567,7 +567,7 @@ function cleanOldMessages(_x18, _x19) {
   return _cleanOldMessages.apply(this, arguments);
 }
 function _cleanOldMessages() {
-  _cleanOldMessages = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee16(messageObjects, ttl) {
+  _cleanOldMessages = (0, _asyncToGenerator2["default"])(/*#__PURE__*/_regenerator["default"].mark(function _callee16(messageObjects, ttl) {
     var olderThan;
     return _regenerator["default"].wrap(function _callee16$(_context16) {
       while (1) switch (_context16.prev = _context16.next) {
@@ -599,7 +599,7 @@ function create(_x20) {
   return _create.apply(this, arguments);
 }
 function _create() {
-  _create = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee17(channelName) {
+  _create = (0, _asyncToGenerator2["default"])(/*#__PURE__*/_regenerator["default"].mark(function _callee17(channelName) {
     var options,
       time,
       paths,
@@ -708,7 +708,7 @@ function handleMessagePing(_x21, _x22) {
  * @return {Promise<void>}
  */
 function _handleMessagePing() {
-  _handleMessagePing = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee18(state, msgObj) {
+  _handleMessagePing = (0, _asyncToGenerator2["default"])(/*#__PURE__*/_regenerator["default"].mark(function _callee18(state, msgObj) {
     var messages, useMessages;
     return _regenerator["default"].wrap(function _callee18$(_context18) {
       while (1) switch (_context18.prev = _context18.next) {
@@ -772,8 +772,8 @@ function refreshReaderClients(channelState) {
     // remove subscriptions to closed readers
     Object.keys(channelState.otherReaderClients).filter(function (readerUuid) {
       return !otherReaders.includes(readerUuid);
-    }).forEach( /*#__PURE__*/function () {
-      var _ref2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee2(readerUuid) {
+    }).forEach(/*#__PURE__*/function () {
+      var _ref2 = (0, _asyncToGenerator2["default"])(/*#__PURE__*/_regenerator["default"].mark(function _callee2(readerUuid) {
         return _regenerator["default"].wrap(function _callee2$(_context2) {
           while (1) switch (_context2.prev = _context2.next) {
             case 0:
@@ -806,8 +806,8 @@ function refreshReaderClients(channelState) {
     .filter(function (readerUuid) {
       return !channelState.otherReaderClients[readerUuid];
     }) // not already has client
-    .map( /*#__PURE__*/function () {
-      var _ref3 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3(readerUuid) {
+    .map(/*#__PURE__*/function () {
+      var _ref3 = (0, _asyncToGenerator2["default"])(/*#__PURE__*/_regenerator["default"].mark(function _callee3(readerUuid) {
         var client;
         return _regenerator["default"].wrap(function _callee3$(_context3) {
           while (1) switch (_context3.prev = _context3.next) {
@@ -863,7 +863,7 @@ function postMessage(_x25, _x26) {
  * but will speed up things when this module is used in unit-tests.
  */
 function _postMessage() {
-  _postMessage = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee20(channelState, messageJson) {
+  _postMessage = (0, _asyncToGenerator2["default"])(/*#__PURE__*/_regenerator["default"].mark(function _callee20(channelState, messageJson) {
     var writePromise;
     return _regenerator["default"].wrap(function _callee20$(_context20) {
       while (1) switch (_context20.prev = _context20.next) {
@@ -871,7 +871,7 @@ function _postMessage() {
           writePromise = channelState.writeFileQueue.add(function () {
             return writeMessage(channelState.channelName, channelState.uuid, messageJson, channelState.paths);
           });
-          channelState.writeBlockPromise = channelState.writeBlockPromise.then( /*#__PURE__*/(0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee19() {
+          channelState.writeBlockPromise = channelState.writeBlockPromise.then(/*#__PURE__*/(0, _asyncToGenerator2["default"])(/*#__PURE__*/_regenerator["default"].mark(function _callee19() {
             var _yield$Promise$all2, msgObj, pingStr, writeToReadersPromise;
             return _regenerator["default"].wrap(function _callee19$(_context19) {
               while (1) switch (_context19.prev = _context19.next) {

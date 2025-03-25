@@ -373,7 +373,6 @@ function beLeader(leaderElector) {
       sendLeaderMessage(leaderElector, 'tell'); // ensure other leader also knows the problem
     }
   };
-
   leaderElector.broadcastChannel.addEventListener('internal', isLeaderListener);
   leaderElector._lstns.push(isLeaderListener);
   return sendLeaderMessage(leaderElector, 'tell');
@@ -650,7 +649,7 @@ LeaderElection.prototype = {
     });
   },
   awaitLeadership: function awaitLeadership() {
-    if ( /* _awaitLeadershipPromise */
+    if (/* _awaitLeadershipPromise */
     !this._aLP) {
       this._aLP = _awaitLeadershipOnce(this);
     }
@@ -707,7 +706,7 @@ function _awaitLeadershipOnce(leaderElector) {
      * Try on fallbackInterval
      * @recursive
      */
-    var tryOnFallBack = function tryOnFallBack() {
+    var _tryOnFallBack = function tryOnFallBack() {
       return (0, _util.sleep)(leaderElector._options.fallbackInterval).then(function () {
         if (leaderElector.isDead || resolved) {
           return;
@@ -719,13 +718,13 @@ function _awaitLeadershipOnce(leaderElector) {
             if (leaderElector.isLeader) {
               finish();
             } else {
-              tryOnFallBack();
+              _tryOnFallBack();
             }
           });
         }
       });
     };
-    tryOnFallBack();
+    _tryOnFallBack();
 
     // try when other leader dies
     var whenDeathListener = function whenDeathListener(msg) {
@@ -778,7 +777,7 @@ var _indexedDb = require("./methods/indexed-db.js");
 var _localstorage = require("./methods/localstorage.js");
 var _simulate = require("./methods/simulate.js");
 function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(e) { return e ? t : r; })(e); }
-function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != _typeof(e) && "function" != typeof e) return { "default": e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && Object.prototype.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n["default"] = e, t && t.set(e, n), n; }
+function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != _typeof(e) && "function" != typeof e) return { "default": e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && {}.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n["default"] = e, t && t.set(e, n), n; }
 // the line below will be removed from es5/browser builds
 
 // order is important
@@ -1308,7 +1307,6 @@ function create(channelName, options) {
     uuid: uuid,
     eMIs: eMIs // emittedMessagesIds
   };
-
   state.listener = addStorageEventListener(channelName, function (msgObj) {
     if (!state.messagesCallback) return; // no listener
     if (msgObj.uuid === uuid) return; // own message
@@ -1386,7 +1384,6 @@ function create(channelName) {
     bc: new BroadcastChannel(channelName),
     subFns: [] // subscriberFunctions
   };
-
   state.bc.onmessage = function (msgEvent) {
     if (state.messagesCallback) {
       state.messagesCallback(msgEvent.data);
@@ -1667,11 +1664,11 @@ require("regenerator-runtime/runtime");
 function _typeof(o) {
   "@babel/helpers - typeof";
 
-  return (module.exports = _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) {
+  return module.exports = _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (o) {
     return typeof o;
   } : function (o) {
     return o && "function" == typeof Symbol && o.constructor === Symbol && o !== Symbol.prototype ? "symbol" : typeof o;
-  }, module.exports.__esModule = true, module.exports["default"] = module.exports), _typeof(o);
+  }, module.exports.__esModule = true, module.exports["default"] = module.exports, _typeof(o);
 }
 module.exports = _typeof, module.exports.__esModule = true, module.exports["default"] = module.exports;
 },{}],17:[function(require,module,exports){

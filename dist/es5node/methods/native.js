@@ -22,7 +22,6 @@ function create(channelName) {
     bc: new BroadcastChannel(channelName),
     subFns: [] // subscriberFunctions
   };
-
   state.bc.onmessage = function (msgEvent) {
     if (state.messagesCallback) {
       state.messagesCallback(msgEvent.data);
