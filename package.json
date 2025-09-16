@@ -101,7 +101,7 @@
   "dependencies": {
     "@babel/runtime": "7.28.2",
     "oblivious-set": "1.4.0",
-    "p-queue": "6.6.2",
+    "p-queue": "8.1.1",
     "unload": "2.4.1"
   },
   "devDependencies": {
