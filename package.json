@@ -145,7 +145,7 @@
     "karma-safari-launcher": "1.0.0",
     "mocha": "10.8.2",
     "pre-commit": "1.2.2",
-    "random-int": "3.0.0",
+    "random-int": "3.1.0",
     "random-token": "0.0.8",
     "rimraf": "5.0.10",
     "rollup": "4.50.2",
