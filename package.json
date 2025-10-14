@@ -148,7 +148,7 @@
     "random-int": "3.1.0",
     "random-token": "0.0.8",
     "rimraf": "5.0.10",
-    "rollup": "4.52.3",
+    "rollup": "4.52.4",
     "testcafe": "3.7.2",
     "ts-node": "10.9.2",
     "typescript": "5.4.5",
