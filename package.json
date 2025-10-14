@@ -124,7 +124,7 @@
     "concurrently": "8.2.2",
     "convert-hrtime": "5.0.0",
     "copyfiles": "2.4.1",
-    "cross-env": "7.0.3",
+    "cross-env": "10.1.0",
     "detect-node": "2.1.0",
     "eslint": "8.57.1",
     "gzip-size-cli": "5.1.0",
