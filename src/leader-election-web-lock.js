@@ -50,7 +50,7 @@ LeaderElectionWebLock.prototype = {
                 this._wKMC.res = res;
                 this._wKMC.rej = rej;
             });
-            this._wLMP = new Promise((res) => {
+            this._wLMP = new Promise((res, reject) => {
                 navigator.locks.request(
                     this.lN,
                     {
@@ -64,7 +64,12 @@ LeaderElectionWebLock.prototype = {
                         res();
                         return returnPromise;
                     }
-                ).catch(() => { });
+                ).catch((err) => {
+                    if (this._wKMC.rej) {
+                        this._wKMC.rej(err);
+                    }
+                    reject(err);
+                });
             });
         }
         return this._wLMP;
