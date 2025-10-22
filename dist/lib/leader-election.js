@@ -174,7 +174,7 @@ LeaderElection.prototype = {
     });
   },
   awaitLeadership: function awaitLeadership() {
-    if ( /* _awaitLeadershipPromise */
+    if (/* _awaitLeadershipPromise */
     !this._aLP) {
       this._aLP = _awaitLeadershipOnce(this);
     }
@@ -231,7 +231,7 @@ function _awaitLeadershipOnce(leaderElector) {
      * Try on fallbackInterval
      * @recursive
      */
-    var tryOnFallBack = function tryOnFallBack() {
+    var _tryOnFallBack = function tryOnFallBack() {
       return (0, _util.sleep)(leaderElector._options.fallbackInterval).then(function () {
         if (leaderElector.isDead || resolved) {
           return;
@@ -243,13 +243,13 @@ function _awaitLeadershipOnce(leaderElector) {
             if (leaderElector.isLeader) {
               finish();
             } else {
-              tryOnFallBack();
+              _tryOnFallBack();
             }
           });
         }
       });
     };
-    tryOnFallBack();
+    _tryOnFallBack();
 
     // try when other leader dies
     var whenDeathListener = function whenDeathListener(msg) {

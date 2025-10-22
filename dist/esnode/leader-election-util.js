@@ -36,7 +36,6 @@ export function beLeader(leaderElector) {
       sendLeaderMessage(leaderElector, 'tell'); // ensure other leader also knows the problem
     }
   };
-
   leaderElector.broadcastChannel.addEventListener('internal', isLeaderListener);
   leaderElector._lstns.push(isLeaderListener);
   return sendLeaderMessage(leaderElector, 'tell');

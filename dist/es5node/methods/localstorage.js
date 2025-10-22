@@ -114,7 +114,6 @@ function create(channelName, options) {
     uuid: uuid,
     eMIs: eMIs // emittedMessagesIds
   };
-
   state.listener = addStorageEventListener(channelName, function (msgObj) {
     if (!state.messagesCallback) return; // no listener
     if (msgObj.uuid === uuid) return; // own message
