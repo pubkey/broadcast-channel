@@ -5,7 +5,7 @@
 
 ## 7.2.0 (27 October 2025)
 
-- fix(leader-election-web-lock): rethrow WebLocks acquisition errors toavoid stuck leader election [#1360](https://github.com/pubkey/broadcast-channel/pull/1360)
+- fix(leader-election-web-lock): rethrow WebLocks acquisition errors to avoid stuck leader election [#1360](https://github.com/pubkey/broadcast-channel/pull/1360)
 
 ## 7.0.0 (27 November 2023)
 
