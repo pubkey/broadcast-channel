@@ -52,7 +52,7 @@ LeaderElectionWebLock.prototype = {
         _this3._wKMC.res = res;
         _this3._wKMC.rej = rej;
       });
-      this._wLMP = new Promise(function (res) {
+      this._wLMP = new Promise(function (res, reject) {
         navigator.locks.request(_this3.lN, {
           signal: _this3._wKMC.c.signal
         }, function () {
@@ -61,7 +61,12 @@ LeaderElectionWebLock.prototype = {
           (0, _leaderElectionUtil.beLeader)(_this3);
           res();
           return returnPromise;
-        })["catch"](function () {});
+        })["catch"](function (err) {
+          if (_this3._wKMC.rej) {
+            _this3._wKMC.rej(err);
+          }
+          reject(err);
+        });
       });
     }
     return this._wLMP;
