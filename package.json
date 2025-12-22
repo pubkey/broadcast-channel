@@ -149,7 +149,7 @@
     "random-token": "0.0.8",
     "rimraf": "6.1.0",
     "rollup": "4.52.5",
-    "testcafe": "3.7.2",
+    "testcafe": "3.7.3",
     "ts-node": "10.9.2",
     "typescript": "5.4.5",
     "uglify-js": "3.19.3",
