@@ -3,6 +3,11 @@
 
 ## X.X.X (comming soon)
 
+## 7.3.0 (20 January 2026)
+
+- FIX `unhandledRejection` thrown when `leader.die()` is called while a call to `awaitLeadership()` is still running.
+
+
 ## 7.2.0 (27 October 2025)
 
 - fix(leader-election-web-lock): rethrow WebLocks acquisition errors to avoid stuck leader election [#1360](https://github.com/pubkey/broadcast-channel/pull/1360)
