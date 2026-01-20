@@ -91,7 +91,7 @@ LeaderElectionWebLock.prototype = {
             this._wKMC.res();
         }
         if (this._wKMC.c) {
-            this._wKMC.c.abort('LeaderElectionWebLock.die() called');
+            this._wKMC.c.abort(new Error('LeaderElectionWebLock.die() called'));
         }
         return sendLeaderMessage(this, 'death');
     }
