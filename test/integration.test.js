@@ -18,6 +18,28 @@ if (isNode) {
         console.dir(origin);
         process.exit(1);
     });
+
+    /**
+     * In no case it should throw an unhandledRejection
+     */
+    process.on('unhandledRejection', async function (error, p) {
+        console.log('unhandledRejection');
+
+        // use log and error because some CI terminals do not show errors.
+        try {
+            console.dir(await p);
+        } catch (err) {
+            console.log('------- COULD NOT AWAIT p');
+            logUnknownError(err);
+            logUnknownError(error);
+            process.exit(5);
+        }
+        console.dir((error).stack);
+        console.error(error);
+        console.dir(error);
+        console.log('------- END OF unhandledRejection debug logs');
+        process.exit(5);
+    });
 }
 
 /**
@@ -797,3 +819,18 @@ if (isNode) {
 }
 
 useOptions.forEach(o => runTest(o));
+
+
+function logUnknownError(err) {
+    if (err instanceof Error) {
+        console.error(err.stack || err.message);
+    } else {
+        console.error('Non-Error rejection:', err);
+        console.error(err.stack || err.message);
+        try {
+            console.error(JSON.stringify(err, null, 2));
+        } catch (err2) {
+            console.error(String(err));
+        }
+    }
+}

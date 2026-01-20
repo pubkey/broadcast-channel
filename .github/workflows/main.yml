@@ -98,7 +98,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        node: ['18.18.2', '20.9.0']
+        node: ['22.22.0', '24.13.0']
     steps:
       - uses: actions/checkout@v6
       - name: Setup Node.js environment

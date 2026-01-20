@@ -31,6 +31,7 @@ export const LeaderElectionWebLock = function (broadcastChannel, options) {
 };
 
 
+const LEADER_DIE_ABORT_SIGNAL_MESSAGE = 'LeaderElectionWebLock.die() called';
 
 LeaderElectionWebLock.prototype = {
     hasLeader() {
@@ -65,10 +66,19 @@ LeaderElectionWebLock.prototype = {
                         return returnPromise;
                     }
                 ).catch((err) => {
-                    if (this._wKMC.rej) {
-                        this._wKMC.rej(err);
+                    if (err.message && err.message === LEADER_DIE_ABORT_SIGNAL_MESSAGE) {
+                        /**
+                         * In this case we do nothing!
+                         * The leader died and awaitLeadership()
+                         * will never resolve. Also since this is not an error,
+                         * it will not throw.
+                         */
+                    } else {
+                        if (this._wKMC.rej) {
+                            this._wKMC.rej(err);
+                        }
+                        reject(err);
                     }
-                    reject(err);
                 });
             });
         }
@@ -90,8 +100,13 @@ LeaderElectionWebLock.prototype = {
         if (this._wKMC.res) {
             this._wKMC.res();
         }
+
+        /**
+         * We have to fire an abort signal
+         * so that the navigator.locks.request stops.
+         */
         if (this._wKMC.c) {
-            this._wKMC.c.abort(new Error('LeaderElectionWebLock.die() called'));
+            this._wKMC.c.abort(new Error(LEADER_DIE_ABORT_SIGNAL_MESSAGE));
         }
         return sendLeaderMessage(this, 'death');
     }
