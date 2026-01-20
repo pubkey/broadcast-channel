@@ -829,7 +829,7 @@ function logUnknownError(err) {
         console.error(err.stack || err.message);
         try {
             console.error(JSON.stringify(err, null, 2));
-        } catch {
+        } catch (err2) {
             console.error(String(err));
         }
     }
