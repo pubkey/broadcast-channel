@@ -410,6 +410,7 @@ var LeaderElectionWebLock = exports.LeaderElectionWebLock = function LeaderElect
   // lock name
   this.lN = 'pubkey-bc||' + broadcastChannel.method.type + '||' + broadcastChannel.name;
 };
+var LEADER_DIE_ABORT_SIGNAL_MESSAGE = 'LeaderElectionWebLock.die() called';
 LeaderElectionWebLock.prototype = {
   hasLeader: function hasLeader() {
     var _this2 = this;
@@ -442,10 +443,19 @@ LeaderElectionWebLock.prototype = {
           res();
           return returnPromise;
         })["catch"](function (err) {
-          if (_this3._wKMC.rej) {
-            _this3._wKMC.rej(err);
+          if (err.message && err.message === LEADER_DIE_ABORT_SIGNAL_MESSAGE) {
+            /**
+             * In this case we do nothing!
+             * The leader died and awaitLeadership()
+             * will never resolve. Also since this is not an error,
+             * it will not throw.
+             */
+          } else {
+            if (_this3._wKMC.rej) {
+              _this3._wKMC.rej(err);
+            }
+            reject(err);
           }
-          reject(err);
         });
       });
     }
@@ -471,8 +481,13 @@ LeaderElectionWebLock.prototype = {
     if (this._wKMC.res) {
       this._wKMC.res();
     }
+
+    /**
+     * We have to fire an abort signal
+     * so that the navigator.locks.request stops.
+     */
     if (this._wKMC.c) {
-      this._wKMC.c.abort('LeaderElectionWebLock.die() called');
+      this._wKMC.c.abort(new Error(LEADER_DIE_ABORT_SIGNAL_MESSAGE));
     }
     return (0, _leaderElectionUtil.sendLeaderMessage)(this, 'death');
   }
@@ -24279,8 +24294,12 @@ if (hasToStringTag && gOPD && getProto) {
 				// @ts-expect-error TS won't narrow inside a closure
 				descriptor = gOPD(superProto, Symbol.toStringTag);
 			}
-			// @ts-expect-error TODO: fix
-			cache['$' + typedArray] = callBind(descriptor.get);
+			if (descriptor && descriptor.get) {
+				var bound = callBind(descriptor.get);
+				cache[
+					/** @type {`$${import('.').TypedArrayName}`} */ ('$' + typedArray)
+				] = bound;
+			}
 		}
 	});
 } else {
@@ -24288,12 +24307,13 @@ if (hasToStringTag && gOPD && getProto) {
 		var arr = new g[typedArray]();
 		var fn = arr.slice || arr.set;
 		if (fn) {
-			cache[
-				/** @type {`$${import('.').TypedArrayName}`} */ ('$' + typedArray)
-			] = /** @type {import('./types').BoundSlice | import('./types').BoundSet} */ (
+			var bound = /** @type {import('./types').BoundSlice | import('./types').BoundSet} */ (
 				// @ts-expect-error TODO FIXME
 				callBind(fn)
 			);
+			cache[
+				/** @type {`$${import('.').TypedArrayName}`} */ ('$' + typedArray)
+			] = bound;
 		}
 	});
 }
