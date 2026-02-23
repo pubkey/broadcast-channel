@@ -8,3 +8,4 @@ export * from "./method-chooser";
 export { RedundantAdaptiveBroadcastChannel } from "./redundant-adaptive-broadcast-channel";
 export * from "./types";
 export { IndexedDbMethod, LocalstorageMethod, NativeMethod, ServerMethod };
+export { decodeBase64Url, encodeBase64Url, fromBase64, toBase64, toBufferLike } from "@toruslabs/metadata-helpers";

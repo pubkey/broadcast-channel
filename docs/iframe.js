@@ -11844,6 +11844,1049 @@
     }
   });
 
+  // node_modules/ethereum-cryptography/node_modules/@noble/hashes/_u64.js
+  var require_u64 = __commonJS({
+    "node_modules/ethereum-cryptography/node_modules/@noble/hashes/_u64.js"(exports) {
+      "use strict";
+      Object.defineProperty(exports, "__esModule", { value: true });
+      exports.toBig = exports.shrSL = exports.shrSH = exports.rotrSL = exports.rotrSH = exports.rotrBL = exports.rotrBH = exports.rotr32L = exports.rotr32H = exports.rotlSL = exports.rotlSH = exports.rotlBL = exports.rotlBH = exports.add5L = exports.add5H = exports.add4L = exports.add4H = exports.add3L = exports.add3H = void 0;
+      exports.add = add;
+      exports.fromBig = fromBig;
+      exports.split = split;
+      var U32_MASK64 = /* @__PURE__ */ BigInt(2 ** 32 - 1);
+      var _32n = /* @__PURE__ */ BigInt(32);
+      function fromBig(n, le = false) {
+        if (le)
+          return { h: Number(n & U32_MASK64), l: Number(n >> _32n & U32_MASK64) };
+        return { h: Number(n >> _32n & U32_MASK64) | 0, l: Number(n & U32_MASK64) | 0 };
+      }
+      function split(lst, le = false) {
+        const len = lst.length;
+        let Ah = new Uint32Array(len);
+        let Al = new Uint32Array(len);
+        for (let i = 0; i < len; i++) {
+          const { h, l } = fromBig(lst[i], le);
+          [Ah[i], Al[i]] = [h, l];
+        }
+        return [Ah, Al];
+      }
+      var toBig = (h, l) => BigInt(h >>> 0) << _32n | BigInt(l >>> 0);
+      exports.toBig = toBig;
+      var shrSH = (h, _l, s) => h >>> s;
+      exports.shrSH = shrSH;
+      var shrSL = (h, l, s) => h << 32 - s | l >>> s;
+      exports.shrSL = shrSL;
+      var rotrSH = (h, l, s) => h >>> s | l << 32 - s;
+      exports.rotrSH = rotrSH;
+      var rotrSL = (h, l, s) => h << 32 - s | l >>> s;
+      exports.rotrSL = rotrSL;
+      var rotrBH = (h, l, s) => h << 64 - s | l >>> s - 32;
+      exports.rotrBH = rotrBH;
+      var rotrBL = (h, l, s) => h >>> s - 32 | l << 64 - s;
+      exports.rotrBL = rotrBL;
+      var rotr32H = (_h, l) => l;
+      exports.rotr32H = rotr32H;
+      var rotr32L = (h, _l) => h;
+      exports.rotr32L = rotr32L;
+      var rotlSH = (h, l, s) => h << s | l >>> 32 - s;
+      exports.rotlSH = rotlSH;
+      var rotlSL = (h, l, s) => l << s | h >>> 32 - s;
+      exports.rotlSL = rotlSL;
+      var rotlBH = (h, l, s) => l << s - 32 | h >>> 64 - s;
+      exports.rotlBH = rotlBH;
+      var rotlBL = (h, l, s) => h << s - 32 | l >>> 64 - s;
+      exports.rotlBL = rotlBL;
+      function add(Ah, Al, Bh, Bl) {
+        const l = (Al >>> 0) + (Bl >>> 0);
+        return { h: Ah + Bh + (l / 2 ** 32 | 0) | 0, l: l | 0 };
+      }
+      var add3L = (Al, Bl, Cl) => (Al >>> 0) + (Bl >>> 0) + (Cl >>> 0);
+      exports.add3L = add3L;
+      var add3H = (low, Ah, Bh, Ch) => Ah + Bh + Ch + (low / 2 ** 32 | 0) | 0;
+      exports.add3H = add3H;
+      var add4L = (Al, Bl, Cl, Dl) => (Al >>> 0) + (Bl >>> 0) + (Cl >>> 0) + (Dl >>> 0);
+      exports.add4L = add4L;
+      var add4H = (low, Ah, Bh, Ch, Dh) => Ah + Bh + Ch + Dh + (low / 2 ** 32 | 0) | 0;
+      exports.add4H = add4H;
+      var add5L = (Al, Bl, Cl, Dl, El) => (Al >>> 0) + (Bl >>> 0) + (Cl >>> 0) + (Dl >>> 0) + (El >>> 0);
+      exports.add5L = add5L;
+      var add5H = (low, Ah, Bh, Ch, Dh, Eh) => Ah + Bh + Ch + Dh + Eh + (low / 2 ** 32 | 0) | 0;
+      exports.add5H = add5H;
+      var u64 = {
+        fromBig,
+        split,
+        toBig,
+        shrSH,
+        shrSL,
+        rotrSH,
+        rotrSL,
+        rotrBH,
+        rotrBL,
+        rotr32H,
+        rotr32L,
+        rotlSH,
+        rotlSL,
+        rotlBH,
+        rotlBL,
+        add,
+        add3L,
+        add3H,
+        add4L,
+        add4H,
+        add5H,
+        add5L
+      };
+      exports.default = u64;
+    }
+  });
+
+  // node_modules/ethereum-cryptography/node_modules/@noble/hashes/crypto.js
+  var require_crypto = __commonJS({
+    "node_modules/ethereum-cryptography/node_modules/@noble/hashes/crypto.js"(exports) {
+      "use strict";
+      Object.defineProperty(exports, "__esModule", { value: true });
+      exports.crypto = void 0;
+      exports.crypto = typeof globalThis === "object" && "crypto" in globalThis ? globalThis.crypto : void 0;
+    }
+  });
+
+  // node_modules/ethereum-cryptography/node_modules/@noble/hashes/utils.js
+  var require_utils = __commonJS({
+    "node_modules/ethereum-cryptography/node_modules/@noble/hashes/utils.js"(exports) {
+      "use strict";
+      Object.defineProperty(exports, "__esModule", { value: true });
+      exports.wrapXOFConstructorWithOpts = exports.wrapConstructorWithOpts = exports.wrapConstructor = exports.Hash = exports.nextTick = exports.swap32IfBE = exports.byteSwapIfBE = exports.swap8IfBE = exports.isLE = void 0;
+      exports.isBytes = isBytes2;
+      exports.anumber = anumber2;
+      exports.abytes = abytes2;
+      exports.ahash = ahash2;
+      exports.aexists = aexists2;
+      exports.aoutput = aoutput2;
+      exports.u8 = u8;
+      exports.u32 = u32;
+      exports.clean = clean2;
+      exports.createView = createView2;
+      exports.rotr = rotr2;
+      exports.rotl = rotl;
+      exports.byteSwap = byteSwap;
+      exports.byteSwap32 = byteSwap32;
+      exports.bytesToHex = bytesToHex2;
+      exports.hexToBytes = hexToBytes2;
+      exports.asyncLoop = asyncLoop;
+      exports.utf8ToBytes = utf8ToBytes;
+      exports.bytesToUtf8 = bytesToUtf8;
+      exports.toBytes = toBytes;
+      exports.kdfInputToBytes = kdfInputToBytes;
+      exports.concatBytes = concatBytes2;
+      exports.checkOpts = checkOpts;
+      exports.createHasher = createHasher3;
+      exports.createOptHasher = createOptHasher;
+      exports.createXOFer = createXOFer;
+      exports.randomBytes = randomBytes2;
+      var crypto_1 = require_crypto();
+      function isBytes2(a) {
+        return a instanceof Uint8Array || ArrayBuffer.isView(a) && a.constructor.name === "Uint8Array";
+      }
+      function anumber2(n) {
+        if (!Number.isSafeInteger(n) || n < 0)
+          throw new Error("positive integer expected, got " + n);
+      }
+      function abytes2(b, ...lengths) {
+        if (!isBytes2(b))
+          throw new Error("Uint8Array expected");
+        if (lengths.length > 0 && !lengths.includes(b.length))
+          throw new Error("Uint8Array expected of length " + lengths + ", got length=" + b.length);
+      }
+      function ahash2(h) {
+        if (typeof h !== "function" || typeof h.create !== "function")
+          throw new Error("Hash should be wrapped by utils.createHasher");
+        anumber2(h.outputLen);
+        anumber2(h.blockLen);
+      }
+      function aexists2(instance, checkFinished = true) {
+        if (instance.destroyed)
+          throw new Error("Hash instance has been destroyed");
+        if (checkFinished && instance.finished)
+          throw new Error("Hash#digest() has already been called");
+      }
+      function aoutput2(out, instance) {
+        abytes2(out);
+        const min = instance.outputLen;
+        if (out.length < min) {
+          throw new Error("digestInto() expects output buffer of length at least " + min);
+        }
+      }
+      function u8(arr) {
+        return new Uint8Array(arr.buffer, arr.byteOffset, arr.byteLength);
+      }
+      function u32(arr) {
+        return new Uint32Array(arr.buffer, arr.byteOffset, Math.floor(arr.byteLength / 4));
+      }
+      function clean2(...arrays) {
+        for (let i = 0; i < arrays.length; i++) {
+          arrays[i].fill(0);
+        }
+      }
+      function createView2(arr) {
+        return new DataView(arr.buffer, arr.byteOffset, arr.byteLength);
+      }
+      function rotr2(word, shift) {
+        return word << 32 - shift | word >>> shift;
+      }
+      function rotl(word, shift) {
+        return word << shift | word >>> 32 - shift >>> 0;
+      }
+      exports.isLE = (() => new Uint8Array(new Uint32Array([287454020]).buffer)[0] === 68)();
+      function byteSwap(word) {
+        return word << 24 & 4278190080 | word << 8 & 16711680 | word >>> 8 & 65280 | word >>> 24 & 255;
+      }
+      exports.swap8IfBE = exports.isLE ? (n) => n : (n) => byteSwap(n);
+      exports.byteSwapIfBE = exports.swap8IfBE;
+      function byteSwap32(arr) {
+        for (let i = 0; i < arr.length; i++) {
+          arr[i] = byteSwap(arr[i]);
+        }
+        return arr;
+      }
+      exports.swap32IfBE = exports.isLE ? (u) => u : byteSwap32;
+      var hasHexBuiltin2 = /* @__PURE__ */ (() => (
+        // @ts-ignore
+        typeof Uint8Array.from([]).toHex === "function" && typeof Uint8Array.fromHex === "function"
+      ))();
+      var hexes2 = /* @__PURE__ */ Array.from({ length: 256 }, (_, i) => i.toString(16).padStart(2, "0"));
+      function bytesToHex2(bytes) {
+        abytes2(bytes);
+        if (hasHexBuiltin2)
+          return bytes.toHex();
+        let hex = "";
+        for (let i = 0; i < bytes.length; i++) {
+          hex += hexes2[bytes[i]];
+        }
+        return hex;
+      }
+      var asciis2 = { _0: 48, _9: 57, A: 65, F: 70, a: 97, f: 102 };
+      function asciiToBase162(ch) {
+        if (ch >= asciis2._0 && ch <= asciis2._9)
+          return ch - asciis2._0;
+        if (ch >= asciis2.A && ch <= asciis2.F)
+          return ch - (asciis2.A - 10);
+        if (ch >= asciis2.a && ch <= asciis2.f)
+          return ch - (asciis2.a - 10);
+        return;
+      }
+      function hexToBytes2(hex) {
+        if (typeof hex !== "string")
+          throw new Error("hex string expected, got " + typeof hex);
+        if (hasHexBuiltin2)
+          return Uint8Array.fromHex(hex);
+        const hl = hex.length;
+        const al = hl / 2;
+        if (hl % 2)
+          throw new Error("hex string expected, got unpadded hex of length " + hl);
+        const array = new Uint8Array(al);
+        for (let ai = 0, hi = 0; ai < al; ai++, hi += 2) {
+          const n1 = asciiToBase162(hex.charCodeAt(hi));
+          const n2 = asciiToBase162(hex.charCodeAt(hi + 1));
+          if (n1 === void 0 || n2 === void 0) {
+            const char = hex[hi] + hex[hi + 1];
+            throw new Error('hex string expected, got non-hex character "' + char + '" at index ' + hi);
+          }
+          array[ai] = n1 * 16 + n2;
+        }
+        return array;
+      }
+      var nextTick = async () => {
+      };
+      exports.nextTick = nextTick;
+      async function asyncLoop(iters, tick, cb) {
+        let ts = Date.now();
+        for (let i = 0; i < iters; i++) {
+          cb(i);
+          const diff = Date.now() - ts;
+          if (diff >= 0 && diff < tick)
+            continue;
+          await (0, exports.nextTick)();
+          ts += diff;
+        }
+      }
+      function utf8ToBytes(str) {
+        if (typeof str !== "string")
+          throw new Error("string expected");
+        return new Uint8Array(new TextEncoder().encode(str));
+      }
+      function bytesToUtf8(bytes) {
+        return new TextDecoder().decode(bytes);
+      }
+      function toBytes(data) {
+        if (typeof data === "string")
+          data = utf8ToBytes(data);
+        abytes2(data);
+        return data;
+      }
+      function kdfInputToBytes(data) {
+        if (typeof data === "string")
+          data = utf8ToBytes(data);
+        abytes2(data);
+        return data;
+      }
+      function concatBytes2(...arrays) {
+        let sum = 0;
+        for (let i = 0; i < arrays.length; i++) {
+          const a = arrays[i];
+          abytes2(a);
+          sum += a.length;
+        }
+        const res = new Uint8Array(sum);
+        for (let i = 0, pad = 0; i < arrays.length; i++) {
+          const a = arrays[i];
+          res.set(a, pad);
+          pad += a.length;
+        }
+        return res;
+      }
+      function checkOpts(defaults, opts) {
+        if (opts !== void 0 && {}.toString.call(opts) !== "[object Object]")
+          throw new Error("options should be object or undefined");
+        const merged = Object.assign(defaults, opts);
+        return merged;
+      }
+      var Hash = class {
+      };
+      exports.Hash = Hash;
+      function createHasher3(hashCons) {
+        const hashC = (msg) => hashCons().update(toBytes(msg)).digest();
+        const tmp = hashCons();
+        hashC.outputLen = tmp.outputLen;
+        hashC.blockLen = tmp.blockLen;
+        hashC.create = () => hashCons();
+        return hashC;
+      }
+      function createOptHasher(hashCons) {
+        const hashC = (msg, opts) => hashCons(opts).update(toBytes(msg)).digest();
+        const tmp = hashCons({});
+        hashC.outputLen = tmp.outputLen;
+        hashC.blockLen = tmp.blockLen;
+        hashC.create = (opts) => hashCons(opts);
+        return hashC;
+      }
+      function createXOFer(hashCons) {
+        const hashC = (msg, opts) => hashCons(opts).update(toBytes(msg)).digest();
+        const tmp = hashCons({});
+        hashC.outputLen = tmp.outputLen;
+        hashC.blockLen = tmp.blockLen;
+        hashC.create = (opts) => hashCons(opts);
+        return hashC;
+      }
+      exports.wrapConstructor = createHasher3;
+      exports.wrapConstructorWithOpts = createOptHasher;
+      exports.wrapXOFConstructorWithOpts = createXOFer;
+      function randomBytes2(bytesLength = 32) {
+        if (crypto_1.crypto && typeof crypto_1.crypto.getRandomValues === "function") {
+          return crypto_1.crypto.getRandomValues(new Uint8Array(bytesLength));
+        }
+        if (crypto_1.crypto && typeof crypto_1.crypto.randomBytes === "function") {
+          return Uint8Array.from(crypto_1.crypto.randomBytes(bytesLength));
+        }
+        throw new Error("crypto.getRandomValues must be defined");
+      }
+    }
+  });
+
+  // node_modules/ethereum-cryptography/node_modules/@noble/hashes/sha3.js
+  var require_sha3 = __commonJS({
+    "node_modules/ethereum-cryptography/node_modules/@noble/hashes/sha3.js"(exports) {
+      "use strict";
+      Object.defineProperty(exports, "__esModule", { value: true });
+      exports.shake256 = exports.shake128 = exports.keccak_512 = exports.keccak_384 = exports.keccak_256 = exports.keccak_224 = exports.sha3_512 = exports.sha3_384 = exports.sha3_256 = exports.sha3_224 = exports.Keccak = void 0;
+      exports.keccakP = keccakP;
+      var _u64_ts_1 = require_u64();
+      var utils_ts_1 = require_utils();
+      var _0n6 = BigInt(0);
+      var _1n5 = BigInt(1);
+      var _2n4 = BigInt(2);
+      var _7n2 = BigInt(7);
+      var _256n = BigInt(256);
+      var _0x71n = BigInt(113);
+      var SHA3_PI = [];
+      var SHA3_ROTL = [];
+      var _SHA3_IOTA = [];
+      for (let round = 0, R = _1n5, x = 1, y = 0; round < 24; round++) {
+        [x, y] = [y, (2 * x + 3 * y) % 5];
+        SHA3_PI.push(2 * (5 * y + x));
+        SHA3_ROTL.push((round + 1) * (round + 2) / 2 % 64);
+        let t = _0n6;
+        for (let j = 0; j < 7; j++) {
+          R = (R << _1n5 ^ (R >> _7n2) * _0x71n) % _256n;
+          if (R & _2n4)
+            t ^= _1n5 << (_1n5 << /* @__PURE__ */ BigInt(j)) - _1n5;
+        }
+        _SHA3_IOTA.push(t);
+      }
+      var IOTAS = (0, _u64_ts_1.split)(_SHA3_IOTA, true);
+      var SHA3_IOTA_H = IOTAS[0];
+      var SHA3_IOTA_L = IOTAS[1];
+      var rotlH = (h, l, s) => s > 32 ? (0, _u64_ts_1.rotlBH)(h, l, s) : (0, _u64_ts_1.rotlSH)(h, l, s);
+      var rotlL = (h, l, s) => s > 32 ? (0, _u64_ts_1.rotlBL)(h, l, s) : (0, _u64_ts_1.rotlSL)(h, l, s);
+      function keccakP(s, rounds = 24) {
+        const B = new Uint32Array(5 * 2);
+        for (let round = 24 - rounds; round < 24; round++) {
+          for (let x = 0; x < 10; x++)
+            B[x] = s[x] ^ s[x + 10] ^ s[x + 20] ^ s[x + 30] ^ s[x + 40];
+          for (let x = 0; x < 10; x += 2) {
+            const idx1 = (x + 8) % 10;
+            const idx0 = (x + 2) % 10;
+            const B0 = B[idx0];
+            const B1 = B[idx0 + 1];
+            const Th = rotlH(B0, B1, 1) ^ B[idx1];
+            const Tl = rotlL(B0, B1, 1) ^ B[idx1 + 1];
+            for (let y = 0; y < 50; y += 10) {
+              s[x + y] ^= Th;
+              s[x + y + 1] ^= Tl;
+            }
+          }
+          let curH = s[2];
+          let curL = s[3];
+          for (let t = 0; t < 24; t++) {
+            const shift = SHA3_ROTL[t];
+            const Th = rotlH(curH, curL, shift);
+            const Tl = rotlL(curH, curL, shift);
+            const PI = SHA3_PI[t];
+            curH = s[PI];
+            curL = s[PI + 1];
+            s[PI] = Th;
+            s[PI + 1] = Tl;
+          }
+          for (let y = 0; y < 50; y += 10) {
+            for (let x = 0; x < 10; x++)
+              B[x] = s[y + x];
+            for (let x = 0; x < 10; x++)
+              s[y + x] ^= ~B[(x + 2) % 10] & B[(x + 4) % 10];
+          }
+          s[0] ^= SHA3_IOTA_H[round];
+          s[1] ^= SHA3_IOTA_L[round];
+        }
+        (0, utils_ts_1.clean)(B);
+      }
+      var Keccak = class _Keccak extends utils_ts_1.Hash {
+        // NOTE: we accept arguments in bytes instead of bits here.
+        constructor(blockLen, suffix, outputLen, enableXOF = false, rounds = 24) {
+          super();
+          this.pos = 0;
+          this.posOut = 0;
+          this.finished = false;
+          this.destroyed = false;
+          this.enableXOF = false;
+          this.blockLen = blockLen;
+          this.suffix = suffix;
+          this.outputLen = outputLen;
+          this.enableXOF = enableXOF;
+          this.rounds = rounds;
+          (0, utils_ts_1.anumber)(outputLen);
+          if (!(0 < blockLen && blockLen < 200))
+            throw new Error("only keccak-f1600 function is supported");
+          this.state = new Uint8Array(200);
+          this.state32 = (0, utils_ts_1.u32)(this.state);
+        }
+        clone() {
+          return this._cloneInto();
+        }
+        keccak() {
+          (0, utils_ts_1.swap32IfBE)(this.state32);
+          keccakP(this.state32, this.rounds);
+          (0, utils_ts_1.swap32IfBE)(this.state32);
+          this.posOut = 0;
+          this.pos = 0;
+        }
+        update(data) {
+          (0, utils_ts_1.aexists)(this);
+          data = (0, utils_ts_1.toBytes)(data);
+          (0, utils_ts_1.abytes)(data);
+          const { blockLen, state } = this;
+          const len = data.length;
+          for (let pos = 0; pos < len; ) {
+            const take = Math.min(blockLen - this.pos, len - pos);
+            for (let i = 0; i < take; i++)
+              state[this.pos++] ^= data[pos++];
+            if (this.pos === blockLen)
+              this.keccak();
+          }
+          return this;
+        }
+        finish() {
+          if (this.finished)
+            return;
+          this.finished = true;
+          const { state, suffix, pos, blockLen } = this;
+          state[pos] ^= suffix;
+          if ((suffix & 128) !== 0 && pos === blockLen - 1)
+            this.keccak();
+          state[blockLen - 1] ^= 128;
+          this.keccak();
+        }
+        writeInto(out) {
+          (0, utils_ts_1.aexists)(this, false);
+          (0, utils_ts_1.abytes)(out);
+          this.finish();
+          const bufferOut = this.state;
+          const { blockLen } = this;
+          for (let pos = 0, len = out.length; pos < len; ) {
+            if (this.posOut >= blockLen)
+              this.keccak();
+            const take = Math.min(blockLen - this.posOut, len - pos);
+            out.set(bufferOut.subarray(this.posOut, this.posOut + take), pos);
+            this.posOut += take;
+            pos += take;
+          }
+          return out;
+        }
+        xofInto(out) {
+          if (!this.enableXOF)
+            throw new Error("XOF is not possible for this instance");
+          return this.writeInto(out);
+        }
+        xof(bytes) {
+          (0, utils_ts_1.anumber)(bytes);
+          return this.xofInto(new Uint8Array(bytes));
+        }
+        digestInto(out) {
+          (0, utils_ts_1.aoutput)(out, this);
+          if (this.finished)
+            throw new Error("digest() was already called");
+          this.writeInto(out);
+          this.destroy();
+          return out;
+        }
+        digest() {
+          return this.digestInto(new Uint8Array(this.outputLen));
+        }
+        destroy() {
+          this.destroyed = true;
+          (0, utils_ts_1.clean)(this.state);
+        }
+        _cloneInto(to) {
+          const { blockLen, suffix, outputLen, rounds, enableXOF } = this;
+          to || (to = new _Keccak(blockLen, suffix, outputLen, enableXOF, rounds));
+          to.state32.set(this.state32);
+          to.pos = this.pos;
+          to.posOut = this.posOut;
+          to.finished = this.finished;
+          to.rounds = rounds;
+          to.suffix = suffix;
+          to.outputLen = outputLen;
+          to.enableXOF = enableXOF;
+          to.destroyed = this.destroyed;
+          return to;
+        }
+      };
+      exports.Keccak = Keccak;
+      var gen = (suffix, blockLen, outputLen) => (0, utils_ts_1.createHasher)(() => new Keccak(blockLen, suffix, outputLen));
+      exports.sha3_224 = (() => gen(6, 144, 224 / 8))();
+      exports.sha3_256 = (() => gen(6, 136, 256 / 8))();
+      exports.sha3_384 = (() => gen(6, 104, 384 / 8))();
+      exports.sha3_512 = (() => gen(6, 72, 512 / 8))();
+      exports.keccak_224 = (() => gen(1, 144, 224 / 8))();
+      exports.keccak_256 = (() => gen(1, 136, 256 / 8))();
+      exports.keccak_384 = (() => gen(1, 104, 384 / 8))();
+      exports.keccak_512 = (() => gen(1, 72, 512 / 8))();
+      var genShake = (suffix, blockLen, outputLen) => (0, utils_ts_1.createXOFer)((opts = {}) => new Keccak(blockLen, suffix, opts.dkLen === void 0 ? outputLen : opts.dkLen, true));
+      exports.shake128 = (() => genShake(31, 168, 128 / 8))();
+      exports.shake256 = (() => genShake(31, 136, 256 / 8))();
+    }
+  });
+
+  // node_modules/ethereum-cryptography/node_modules/@noble/curves/abstract/utils.js
+  var require_utils2 = __commonJS({
+    "node_modules/ethereum-cryptography/node_modules/@noble/curves/abstract/utils.js"(exports) {
+      "use strict";
+      Object.defineProperty(exports, "__esModule", { value: true });
+      exports.notImplemented = exports.bitMask = void 0;
+      exports.isBytes = isBytes2;
+      exports.abytes = abytes2;
+      exports.abool = abool2;
+      exports.numberToHexUnpadded = numberToHexUnpadded2;
+      exports.hexToNumber = hexToNumber2;
+      exports.bytesToHex = bytesToHex2;
+      exports.hexToBytes = hexToBytes2;
+      exports.bytesToNumberBE = bytesToNumberBE2;
+      exports.bytesToNumberLE = bytesToNumberLE2;
+      exports.numberToBytesBE = numberToBytesBE2;
+      exports.numberToBytesLE = numberToBytesLE2;
+      exports.numberToVarBytesBE = numberToVarBytesBE2;
+      exports.ensureBytes = ensureBytes;
+      exports.concatBytes = concatBytes2;
+      exports.equalBytes = equalBytes2;
+      exports.utf8ToBytes = utf8ToBytes;
+      exports.inRange = inRange2;
+      exports.aInRange = aInRange2;
+      exports.bitLen = bitLen2;
+      exports.bitGet = bitGet2;
+      exports.bitSet = bitSet2;
+      exports.createHmacDrbg = createHmacDrbg2;
+      exports.validateObject = validateObject2;
+      exports.memoized = memoized2;
+      var _0n6 = /* @__PURE__ */ BigInt(0);
+      var _1n5 = /* @__PURE__ */ BigInt(1);
+      function isBytes2(a) {
+        return a instanceof Uint8Array || ArrayBuffer.isView(a) && a.constructor.name === "Uint8Array";
+      }
+      function abytes2(item) {
+        if (!isBytes2(item))
+          throw new Error("Uint8Array expected");
+      }
+      function abool2(title, value) {
+        if (typeof value !== "boolean")
+          throw new Error(title + " boolean expected, got " + value);
+      }
+      function numberToHexUnpadded2(num2) {
+        const hex = num2.toString(16);
+        return hex.length & 1 ? "0" + hex : hex;
+      }
+      function hexToNumber2(hex) {
+        if (typeof hex !== "string")
+          throw new Error("hex string expected, got " + typeof hex);
+        return hex === "" ? _0n6 : BigInt("0x" + hex);
+      }
+      var hasHexBuiltin2 = (
+        // @ts-ignore
+        typeof Uint8Array.from([]).toHex === "function" && typeof Uint8Array.fromHex === "function"
+      );
+      var hexes2 = /* @__PURE__ */ Array.from({ length: 256 }, (_, i) => i.toString(16).padStart(2, "0"));
+      function bytesToHex2(bytes) {
+        abytes2(bytes);
+        if (hasHexBuiltin2)
+          return bytes.toHex();
+        let hex = "";
+        for (let i = 0; i < bytes.length; i++) {
+          hex += hexes2[bytes[i]];
+        }
+        return hex;
+      }
+      var asciis2 = { _0: 48, _9: 57, A: 65, F: 70, a: 97, f: 102 };
+      function asciiToBase162(ch) {
+        if (ch >= asciis2._0 && ch <= asciis2._9)
+          return ch - asciis2._0;
+        if (ch >= asciis2.A && ch <= asciis2.F)
+          return ch - (asciis2.A - 10);
+        if (ch >= asciis2.a && ch <= asciis2.f)
+          return ch - (asciis2.a - 10);
+        return;
+      }
+      function hexToBytes2(hex) {
+        if (typeof hex !== "string")
+          throw new Error("hex string expected, got " + typeof hex);
+        if (hasHexBuiltin2)
+          return Uint8Array.fromHex(hex);
+        const hl = hex.length;
+        const al = hl / 2;
+        if (hl % 2)
+          throw new Error("hex string expected, got unpadded hex of length " + hl);
+        const array = new Uint8Array(al);
+        for (let ai = 0, hi = 0; ai < al; ai++, hi += 2) {
+          const n1 = asciiToBase162(hex.charCodeAt(hi));
+          const n2 = asciiToBase162(hex.charCodeAt(hi + 1));
+          if (n1 === void 0 || n2 === void 0) {
+            const char = hex[hi] + hex[hi + 1];
+            throw new Error('hex string expected, got non-hex character "' + char + '" at index ' + hi);
+          }
+          array[ai] = n1 * 16 + n2;
+        }
+        return array;
+      }
+      function bytesToNumberBE2(bytes) {
+        return hexToNumber2(bytesToHex2(bytes));
+      }
+      function bytesToNumberLE2(bytes) {
+        abytes2(bytes);
+        return hexToNumber2(bytesToHex2(Uint8Array.from(bytes).reverse()));
+      }
+      function numberToBytesBE2(n, len) {
+        return hexToBytes2(n.toString(16).padStart(len * 2, "0"));
+      }
+      function numberToBytesLE2(n, len) {
+        return numberToBytesBE2(n, len).reverse();
+      }
+      function numberToVarBytesBE2(n) {
+        return hexToBytes2(numberToHexUnpadded2(n));
+      }
+      function ensureBytes(title, hex, expectedLength) {
+        let res;
+        if (typeof hex === "string") {
+          try {
+            res = hexToBytes2(hex);
+          } catch (e) {
+            throw new Error(title + " must be hex string or Uint8Array, cause: " + e);
+          }
+        } else if (isBytes2(hex)) {
+          res = Uint8Array.from(hex);
+        } else {
+          throw new Error(title + " must be hex string or Uint8Array");
+        }
+        const len = res.length;
+        if (typeof expectedLength === "number" && len !== expectedLength)
+          throw new Error(title + " of length " + expectedLength + " expected, got " + len);
+        return res;
+      }
+      function concatBytes2(...arrays) {
+        let sum = 0;
+        for (let i = 0; i < arrays.length; i++) {
+          const a = arrays[i];
+          abytes2(a);
+          sum += a.length;
+        }
+        const res = new Uint8Array(sum);
+        for (let i = 0, pad = 0; i < arrays.length; i++) {
+          const a = arrays[i];
+          res.set(a, pad);
+          pad += a.length;
+        }
+        return res;
+      }
+      function equalBytes2(a, b) {
+        if (a.length !== b.length)
+          return false;
+        let diff = 0;
+        for (let i = 0; i < a.length; i++)
+          diff |= a[i] ^ b[i];
+        return diff === 0;
+      }
+      function utf8ToBytes(str) {
+        if (typeof str !== "string")
+          throw new Error("string expected");
+        return new Uint8Array(new TextEncoder().encode(str));
+      }
+      var isPosBig2 = (n) => typeof n === "bigint" && _0n6 <= n;
+      function inRange2(n, min, max) {
+        return isPosBig2(n) && isPosBig2(min) && isPosBig2(max) && min <= n && n < max;
+      }
+      function aInRange2(title, n, min, max) {
+        if (!inRange2(n, min, max))
+          throw new Error("expected valid " + title + ": " + min + " <= n < " + max + ", got " + n);
+      }
+      function bitLen2(n) {
+        let len;
+        for (len = 0; n > _0n6; n >>= _1n5, len += 1)
+          ;
+        return len;
+      }
+      function bitGet2(n, pos) {
+        return n >> BigInt(pos) & _1n5;
+      }
+      function bitSet2(n, pos, value) {
+        return n | (value ? _1n5 : _0n6) << BigInt(pos);
+      }
+      var bitMask2 = (n) => (_1n5 << BigInt(n)) - _1n5;
+      exports.bitMask = bitMask2;
+      var u8n = (len) => new Uint8Array(len);
+      var u8fr = (arr) => Uint8Array.from(arr);
+      function createHmacDrbg2(hashLen, qByteLen, hmacFn) {
+        if (typeof hashLen !== "number" || hashLen < 2)
+          throw new Error("hashLen must be a number");
+        if (typeof qByteLen !== "number" || qByteLen < 2)
+          throw new Error("qByteLen must be a number");
+        if (typeof hmacFn !== "function")
+          throw new Error("hmacFn must be a function");
+        let v = u8n(hashLen);
+        let k = u8n(hashLen);
+        let i = 0;
+        const reset = () => {
+          v.fill(1);
+          k.fill(0);
+          i = 0;
+        };
+        const h = (...b) => hmacFn(k, v, ...b);
+        const reseed = (seed = u8n(0)) => {
+          k = h(u8fr([0]), seed);
+          v = h();
+          if (seed.length === 0)
+            return;
+          k = h(u8fr([1]), seed);
+          v = h();
+        };
+        const gen = () => {
+          if (i++ >= 1e3)
+            throw new Error("drbg: tried 1000 values");
+          let len = 0;
+          const out = [];
+          while (len < qByteLen) {
+            v = h();
+            const sl = v.slice();
+            out.push(sl);
+            len += v.length;
+          }
+          return concatBytes2(...out);
+        };
+        const genUntil = (seed, pred) => {
+          reset();
+          reseed(seed);
+          let res = void 0;
+          while (!(res = pred(gen())))
+            reseed();
+          reset();
+          return res;
+        };
+        return genUntil;
+      }
+      var validatorFns = {
+        bigint: (val) => typeof val === "bigint",
+        function: (val) => typeof val === "function",
+        boolean: (val) => typeof val === "boolean",
+        string: (val) => typeof val === "string",
+        stringOrUint8Array: (val) => typeof val === "string" || isBytes2(val),
+        isSafeInteger: (val) => Number.isSafeInteger(val),
+        array: (val) => Array.isArray(val),
+        field: (val, object) => object.Fp.isValid(val),
+        hash: (val) => typeof val === "function" && Number.isSafeInteger(val.outputLen)
+      };
+      function validateObject2(object, validators, optValidators = {}) {
+        const checkField = (fieldName, type, isOptional) => {
+          const checkVal = validatorFns[type];
+          if (typeof checkVal !== "function")
+            throw new Error("invalid validator function");
+          const val = object[fieldName];
+          if (isOptional && val === void 0)
+            return;
+          if (!checkVal(val, object)) {
+            throw new Error("param " + String(fieldName) + " is invalid. Expected " + type + ", got " + val);
+          }
+        };
+        for (const [fieldName, type] of Object.entries(validators))
+          checkField(fieldName, type, false);
+        for (const [fieldName, type] of Object.entries(optValidators))
+          checkField(fieldName, type, true);
+        return object;
+      }
+      var notImplemented2 = () => {
+        throw new Error("not implemented");
+      };
+      exports.notImplemented = notImplemented2;
+      function memoized2(fn) {
+        const map = /* @__PURE__ */ new WeakMap();
+        return (arg, ...args) => {
+          const val = map.get(arg);
+          if (val !== void 0)
+            return val;
+          const computed = fn(arg, ...args);
+          map.set(arg, computed);
+          return computed;
+        };
+      }
+    }
+  });
+
+  // node_modules/ethereum-cryptography/node_modules/@noble/hashes/_assert.js
+  var require_assert = __commonJS({
+    "node_modules/ethereum-cryptography/node_modules/@noble/hashes/_assert.js"(exports) {
+      "use strict";
+      Object.defineProperty(exports, "__esModule", { value: true });
+      exports.aoutput = exports.anumber = exports.aexists = exports.abytes = void 0;
+      var utils_ts_1 = require_utils();
+      exports.abytes = utils_ts_1.abytes;
+      exports.aexists = utils_ts_1.aexists;
+      exports.anumber = utils_ts_1.anumber;
+      exports.aoutput = utils_ts_1.aoutput;
+    }
+  });
+
+  // node_modules/ethereum-cryptography/utils.js
+  var require_utils3 = __commonJS({
+    "node_modules/ethereum-cryptography/utils.js"(exports) {
+      "use strict";
+      Object.defineProperty(exports, "__esModule", { value: true });
+      exports.assertBytes = exports.assertBool = exports.utf8ToBytes = exports.toHex = exports.createView = exports.concatBytes = exports.bytesToHex = void 0;
+      exports.bytesToUtf8 = bytesToUtf8;
+      exports.hexToBytes = hexToBytes2;
+      exports.equalsBytes = equalsBytes;
+      exports.wrapHash = wrapHash;
+      var utils_1 = require_utils2();
+      Object.defineProperty(exports, "assertBool", { enumerable: true, get: function() {
+        return utils_1.abool;
+      } });
+      var _assert_1 = require_assert();
+      Object.defineProperty(exports, "assertBytes", { enumerable: true, get: function() {
+        return _assert_1.abytes;
+      } });
+      var utils_2 = require_utils();
+      var utils_3 = require_utils();
+      Object.defineProperty(exports, "bytesToHex", { enumerable: true, get: function() {
+        return utils_3.bytesToHex;
+      } });
+      Object.defineProperty(exports, "concatBytes", { enumerable: true, get: function() {
+        return utils_3.concatBytes;
+      } });
+      Object.defineProperty(exports, "createView", { enumerable: true, get: function() {
+        return utils_3.createView;
+      } });
+      Object.defineProperty(exports, "toHex", { enumerable: true, get: function() {
+        return utils_3.bytesToHex;
+      } });
+      Object.defineProperty(exports, "utf8ToBytes", { enumerable: true, get: function() {
+        return utils_3.utf8ToBytes;
+      } });
+      function bytesToUtf8(data) {
+        if (!(data instanceof Uint8Array)) {
+          throw new TypeError(`bytesToUtf8 expected Uint8Array, got ${typeof data}`);
+        }
+        return new TextDecoder().decode(data);
+      }
+      function hexToBytes2(data) {
+        const sliced = data.startsWith("0x") ? data.substring(2) : data;
+        return (0, utils_2.hexToBytes)(sliced);
+      }
+      function equalsBytes(a, b) {
+        if (a.length !== b.length) {
+          return false;
+        }
+        for (let i = 0; i < a.length; i++) {
+          if (a[i] !== b[i]) {
+            return false;
+          }
+        }
+        return true;
+      }
+      function wrapHash(hash) {
+        return (msg) => {
+          (0, _assert_1.abytes)(msg);
+          return hash(msg);
+        };
+      }
+    }
+  });
+
+  // node_modules/ethereum-cryptography/keccak.js
+  var require_keccak = __commonJS({
+    "node_modules/ethereum-cryptography/keccak.js"(exports) {
+      "use strict";
+      Object.defineProperty(exports, "__esModule", { value: true });
+      exports.keccak512 = exports.keccak384 = exports.keccak256 = exports.keccak224 = void 0;
+      var sha3_1 = require_sha3();
+      var utils_js_1 = require_utils3();
+      exports.keccak224 = (0, utils_js_1.wrapHash)(sha3_1.keccak_224);
+      exports.keccak256 = (() => {
+        const k = (0, utils_js_1.wrapHash)(sha3_1.keccak_256);
+        k.create = sha3_1.keccak_256.create;
+        return k;
+      })();
+      exports.keccak384 = (0, utils_js_1.wrapHash)(sha3_1.keccak_384);
+      exports.keccak512 = (0, utils_js_1.wrapHash)(sha3_1.keccak_512);
+    }
+  });
+
+  // node_modules/@toruslabs/metadata-helpers/dist/lib.cjs/utils.js
+  var require_utils4 = __commonJS({
+    "node_modules/@toruslabs/metadata-helpers/dist/lib.cjs/utils.js"(exports) {
+      "use strict";
+      var secp256k1_js = (init_secp256k1(), __toCommonJS(secp256k1_exports));
+      var utils_js = (init_utils2(), __toCommonJS(utils_exports));
+      var keccak = require_keccak();
+      function keccak256(data) {
+        return keccak.keccak256(data);
+      }
+      function utf8ToBytes(str) {
+        return new TextEncoder().encode(str);
+      }
+      function bytesToUtf8(bytes) {
+        return new TextDecoder().decode(bytes);
+      }
+      function bytesToBase64(bytes) {
+        const binString = Array.from(bytes, (byte) => String.fromCodePoint(byte)).join("");
+        return btoa(binString);
+      }
+      function base64ToBytes(base64) {
+        const binString = atob(base64);
+        return Uint8Array.from(binString, (ch) => ch.codePointAt(0));
+      }
+      function toEthereumSignature(recoveredSig) {
+        const ethSig = new Uint8Array(65);
+        ethSig.set(recoveredSig.slice(1, 65), 0);
+        ethSig[64] = recoveredSig[0];
+        return ethSig;
+      }
+      function getPublicKeyCoords(privateKeyHex) {
+        const privKeyBytes = utils_js.hexToBytes(privateKeyHex.padStart(64, "0"));
+        const pubKeyUncompressed = secp256k1_js.secp256k1.getPublicKey(privKeyBytes, false);
+        const x = utils_js.bytesToHex(pubKeyUncompressed.slice(1, 33));
+        const y = utils_js.bytesToHex(pubKeyUncompressed.slice(33, 65));
+        return {
+          x,
+          y
+        };
+      }
+      function coordsToPublicKey(x, y) {
+        const xBytes = utils_js.hexToBytes(x.padStart(64, "0"));
+        const yBytes = utils_js.hexToBytes(y.padStart(64, "0"));
+        const pubKey = new Uint8Array(65);
+        pubKey[0] = 4;
+        pubKey.set(xBytes, 1);
+        pubKey.set(yBytes, 33);
+        return pubKey;
+      }
+      Object.defineProperty(exports, "secp256k1", {
+        enumerable: true,
+        get: function() {
+          return secp256k1_js.secp256k1;
+        }
+      });
+      Object.defineProperty(exports, "bytesToHex", {
+        enumerable: true,
+        get: function() {
+          return utils_js.bytesToHex;
+        }
+      });
+      Object.defineProperty(exports, "hexToBytes", {
+        enumerable: true,
+        get: function() {
+          return utils_js.hexToBytes;
+        }
+      });
+      exports.base64ToBytes = base64ToBytes;
+      exports.bytesToBase64 = bytesToBase64;
+      exports.bytesToUtf8 = bytesToUtf8;
+      exports.coordsToPublicKey = coordsToPublicKey;
+      exports.getPublicKeyCoords = getPublicKeyCoords;
+      exports.keccak256 = keccak256;
+      exports.toEthereumSignature = toEthereumSignature;
+      exports.utf8ToBytes = utf8ToBytes;
+    }
+  });
+
+  // node_modules/@toruslabs/metadata-helpers/dist/lib.cjs/base64url.js
+  var require_base64url = __commonJS({
+    "node_modules/@toruslabs/metadata-helpers/dist/lib.cjs/base64url.js"(exports) {
+      "use strict";
+      var utils = require_utils4();
+      function padString(input) {
+        const segmentLength = 4;
+        const diff = input.length % segmentLength;
+        if (!diff) {
+          return input;
+        }
+        return input + "=".repeat(segmentLength - diff);
+      }
+      function encodeBase64Url(input) {
+        const bytes = typeof input === "string" ? utils.utf8ToBytes(input) : input;
+        return fromBase64(utils.bytesToBase64(bytes));
+      }
+      function decodeBase64Url(base64url) {
+        return utils.bytesToUtf8(utils.base64ToBytes(toBase64(base64url)));
+      }
+      function toBase64(base64url) {
+        const urlString = base64url instanceof Uint8Array ? utils.bytesToUtf8(base64url) : base64url;
+        return padString(urlString).replace(/-/g, "+").replace(/_/g, "/");
+      }
+      function fromBase64(base64) {
+        return base64.replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
+      }
+      function toBufferLike(base64url) {
+        return utils.base64ToBytes(toBase64(base64url));
+      }
+      exports.decodeBase64Url = decodeBase64Url;
+      exports.encodeBase64Url = encodeBase64Url;
+      exports.fromBase64 = fromBase64;
+      exports.toBase64 = toBase64;
+      exports.toBufferLike = toBufferLike;
+    }
+  });
+
   // node_modules/@babel/runtime/helpers/typeof.js
   var require_typeof = __commonJS({
     "node_modules/@babel/runtime/helpers/typeof.js"(exports, module) {
@@ -13959,1006 +15002,6 @@
     }
   });
 
-  // node_modules/ethereum-cryptography/node_modules/@noble/hashes/_u64.js
-  var require_u64 = __commonJS({
-    "node_modules/ethereum-cryptography/node_modules/@noble/hashes/_u64.js"(exports) {
-      "use strict";
-      Object.defineProperty(exports, "__esModule", { value: true });
-      exports.toBig = exports.shrSL = exports.shrSH = exports.rotrSL = exports.rotrSH = exports.rotrBL = exports.rotrBH = exports.rotr32L = exports.rotr32H = exports.rotlSL = exports.rotlSH = exports.rotlBL = exports.rotlBH = exports.add5L = exports.add5H = exports.add4L = exports.add4H = exports.add3L = exports.add3H = void 0;
-      exports.add = add;
-      exports.fromBig = fromBig;
-      exports.split = split;
-      var U32_MASK64 = /* @__PURE__ */ BigInt(2 ** 32 - 1);
-      var _32n = /* @__PURE__ */ BigInt(32);
-      function fromBig(n, le = false) {
-        if (le)
-          return { h: Number(n & U32_MASK64), l: Number(n >> _32n & U32_MASK64) };
-        return { h: Number(n >> _32n & U32_MASK64) | 0, l: Number(n & U32_MASK64) | 0 };
-      }
-      function split(lst, le = false) {
-        const len = lst.length;
-        let Ah = new Uint32Array(len);
-        let Al = new Uint32Array(len);
-        for (let i = 0; i < len; i++) {
-          const { h, l } = fromBig(lst[i], le);
-          [Ah[i], Al[i]] = [h, l];
-        }
-        return [Ah, Al];
-      }
-      var toBig = (h, l) => BigInt(h >>> 0) << _32n | BigInt(l >>> 0);
-      exports.toBig = toBig;
-      var shrSH = (h, _l, s) => h >>> s;
-      exports.shrSH = shrSH;
-      var shrSL = (h, l, s) => h << 32 - s | l >>> s;
-      exports.shrSL = shrSL;
-      var rotrSH = (h, l, s) => h >>> s | l << 32 - s;
-      exports.rotrSH = rotrSH;
-      var rotrSL = (h, l, s) => h << 32 - s | l >>> s;
-      exports.rotrSL = rotrSL;
-      var rotrBH = (h, l, s) => h << 64 - s | l >>> s - 32;
-      exports.rotrBH = rotrBH;
-      var rotrBL = (h, l, s) => h >>> s - 32 | l << 64 - s;
-      exports.rotrBL = rotrBL;
-      var rotr32H = (_h, l) => l;
-      exports.rotr32H = rotr32H;
-      var rotr32L = (h, _l) => h;
-      exports.rotr32L = rotr32L;
-      var rotlSH = (h, l, s) => h << s | l >>> 32 - s;
-      exports.rotlSH = rotlSH;
-      var rotlSL = (h, l, s) => l << s | h >>> 32 - s;
-      exports.rotlSL = rotlSL;
-      var rotlBH = (h, l, s) => l << s - 32 | h >>> 64 - s;
-      exports.rotlBH = rotlBH;
-      var rotlBL = (h, l, s) => h << s - 32 | l >>> 64 - s;
-      exports.rotlBL = rotlBL;
-      function add(Ah, Al, Bh, Bl) {
-        const l = (Al >>> 0) + (Bl >>> 0);
-        return { h: Ah + Bh + (l / 2 ** 32 | 0) | 0, l: l | 0 };
-      }
-      var add3L = (Al, Bl, Cl) => (Al >>> 0) + (Bl >>> 0) + (Cl >>> 0);
-      exports.add3L = add3L;
-      var add3H = (low, Ah, Bh, Ch) => Ah + Bh + Ch + (low / 2 ** 32 | 0) | 0;
-      exports.add3H = add3H;
-      var add4L = (Al, Bl, Cl, Dl) => (Al >>> 0) + (Bl >>> 0) + (Cl >>> 0) + (Dl >>> 0);
-      exports.add4L = add4L;
-      var add4H = (low, Ah, Bh, Ch, Dh) => Ah + Bh + Ch + Dh + (low / 2 ** 32 | 0) | 0;
-      exports.add4H = add4H;
-      var add5L = (Al, Bl, Cl, Dl, El) => (Al >>> 0) + (Bl >>> 0) + (Cl >>> 0) + (Dl >>> 0) + (El >>> 0);
-      exports.add5L = add5L;
-      var add5H = (low, Ah, Bh, Ch, Dh, Eh) => Ah + Bh + Ch + Dh + Eh + (low / 2 ** 32 | 0) | 0;
-      exports.add5H = add5H;
-      var u64 = {
-        fromBig,
-        split,
-        toBig,
-        shrSH,
-        shrSL,
-        rotrSH,
-        rotrSL,
-        rotrBH,
-        rotrBL,
-        rotr32H,
-        rotr32L,
-        rotlSH,
-        rotlSL,
-        rotlBH,
-        rotlBL,
-        add,
-        add3L,
-        add3H,
-        add4L,
-        add4H,
-        add5H,
-        add5L
-      };
-      exports.default = u64;
-    }
-  });
-
-  // node_modules/ethereum-cryptography/node_modules/@noble/hashes/crypto.js
-  var require_crypto = __commonJS({
-    "node_modules/ethereum-cryptography/node_modules/@noble/hashes/crypto.js"(exports) {
-      "use strict";
-      Object.defineProperty(exports, "__esModule", { value: true });
-      exports.crypto = void 0;
-      exports.crypto = typeof globalThis === "object" && "crypto" in globalThis ? globalThis.crypto : void 0;
-    }
-  });
-
-  // node_modules/ethereum-cryptography/node_modules/@noble/hashes/utils.js
-  var require_utils = __commonJS({
-    "node_modules/ethereum-cryptography/node_modules/@noble/hashes/utils.js"(exports) {
-      "use strict";
-      Object.defineProperty(exports, "__esModule", { value: true });
-      exports.wrapXOFConstructorWithOpts = exports.wrapConstructorWithOpts = exports.wrapConstructor = exports.Hash = exports.nextTick = exports.swap32IfBE = exports.byteSwapIfBE = exports.swap8IfBE = exports.isLE = void 0;
-      exports.isBytes = isBytes2;
-      exports.anumber = anumber2;
-      exports.abytes = abytes2;
-      exports.ahash = ahash2;
-      exports.aexists = aexists2;
-      exports.aoutput = aoutput2;
-      exports.u8 = u8;
-      exports.u32 = u32;
-      exports.clean = clean2;
-      exports.createView = createView2;
-      exports.rotr = rotr2;
-      exports.rotl = rotl;
-      exports.byteSwap = byteSwap;
-      exports.byteSwap32 = byteSwap32;
-      exports.bytesToHex = bytesToHex2;
-      exports.hexToBytes = hexToBytes2;
-      exports.asyncLoop = asyncLoop;
-      exports.utf8ToBytes = utf8ToBytes;
-      exports.bytesToUtf8 = bytesToUtf8;
-      exports.toBytes = toBytes;
-      exports.kdfInputToBytes = kdfInputToBytes;
-      exports.concatBytes = concatBytes2;
-      exports.checkOpts = checkOpts;
-      exports.createHasher = createHasher3;
-      exports.createOptHasher = createOptHasher;
-      exports.createXOFer = createXOFer;
-      exports.randomBytes = randomBytes2;
-      var crypto_1 = require_crypto();
-      function isBytes2(a) {
-        return a instanceof Uint8Array || ArrayBuffer.isView(a) && a.constructor.name === "Uint8Array";
-      }
-      function anumber2(n) {
-        if (!Number.isSafeInteger(n) || n < 0)
-          throw new Error("positive integer expected, got " + n);
-      }
-      function abytes2(b, ...lengths) {
-        if (!isBytes2(b))
-          throw new Error("Uint8Array expected");
-        if (lengths.length > 0 && !lengths.includes(b.length))
-          throw new Error("Uint8Array expected of length " + lengths + ", got length=" + b.length);
-      }
-      function ahash2(h) {
-        if (typeof h !== "function" || typeof h.create !== "function")
-          throw new Error("Hash should be wrapped by utils.createHasher");
-        anumber2(h.outputLen);
-        anumber2(h.blockLen);
-      }
-      function aexists2(instance, checkFinished = true) {
-        if (instance.destroyed)
-          throw new Error("Hash instance has been destroyed");
-        if (checkFinished && instance.finished)
-          throw new Error("Hash#digest() has already been called");
-      }
-      function aoutput2(out, instance) {
-        abytes2(out);
-        const min = instance.outputLen;
-        if (out.length < min) {
-          throw new Error("digestInto() expects output buffer of length at least " + min);
-        }
-      }
-      function u8(arr) {
-        return new Uint8Array(arr.buffer, arr.byteOffset, arr.byteLength);
-      }
-      function u32(arr) {
-        return new Uint32Array(arr.buffer, arr.byteOffset, Math.floor(arr.byteLength / 4));
-      }
-      function clean2(...arrays) {
-        for (let i = 0; i < arrays.length; i++) {
-          arrays[i].fill(0);
-        }
-      }
-      function createView2(arr) {
-        return new DataView(arr.buffer, arr.byteOffset, arr.byteLength);
-      }
-      function rotr2(word, shift) {
-        return word << 32 - shift | word >>> shift;
-      }
-      function rotl(word, shift) {
-        return word << shift | word >>> 32 - shift >>> 0;
-      }
-      exports.isLE = (() => new Uint8Array(new Uint32Array([287454020]).buffer)[0] === 68)();
-      function byteSwap(word) {
-        return word << 24 & 4278190080 | word << 8 & 16711680 | word >>> 8 & 65280 | word >>> 24 & 255;
-      }
-      exports.swap8IfBE = exports.isLE ? (n) => n : (n) => byteSwap(n);
-      exports.byteSwapIfBE = exports.swap8IfBE;
-      function byteSwap32(arr) {
-        for (let i = 0; i < arr.length; i++) {
-          arr[i] = byteSwap(arr[i]);
-        }
-        return arr;
-      }
-      exports.swap32IfBE = exports.isLE ? (u) => u : byteSwap32;
-      var hasHexBuiltin2 = /* @__PURE__ */ (() => (
-        // @ts-ignore
-        typeof Uint8Array.from([]).toHex === "function" && typeof Uint8Array.fromHex === "function"
-      ))();
-      var hexes2 = /* @__PURE__ */ Array.from({ length: 256 }, (_, i) => i.toString(16).padStart(2, "0"));
-      function bytesToHex2(bytes) {
-        abytes2(bytes);
-        if (hasHexBuiltin2)
-          return bytes.toHex();
-        let hex = "";
-        for (let i = 0; i < bytes.length; i++) {
-          hex += hexes2[bytes[i]];
-        }
-        return hex;
-      }
-      var asciis2 = { _0: 48, _9: 57, A: 65, F: 70, a: 97, f: 102 };
-      function asciiToBase162(ch) {
-        if (ch >= asciis2._0 && ch <= asciis2._9)
-          return ch - asciis2._0;
-        if (ch >= asciis2.A && ch <= asciis2.F)
-          return ch - (asciis2.A - 10);
-        if (ch >= asciis2.a && ch <= asciis2.f)
-          return ch - (asciis2.a - 10);
-        return;
-      }
-      function hexToBytes2(hex) {
-        if (typeof hex !== "string")
-          throw new Error("hex string expected, got " + typeof hex);
-        if (hasHexBuiltin2)
-          return Uint8Array.fromHex(hex);
-        const hl = hex.length;
-        const al = hl / 2;
-        if (hl % 2)
-          throw new Error("hex string expected, got unpadded hex of length " + hl);
-        const array = new Uint8Array(al);
-        for (let ai = 0, hi = 0; ai < al; ai++, hi += 2) {
-          const n1 = asciiToBase162(hex.charCodeAt(hi));
-          const n2 = asciiToBase162(hex.charCodeAt(hi + 1));
-          if (n1 === void 0 || n2 === void 0) {
-            const char = hex[hi] + hex[hi + 1];
-            throw new Error('hex string expected, got non-hex character "' + char + '" at index ' + hi);
-          }
-          array[ai] = n1 * 16 + n2;
-        }
-        return array;
-      }
-      var nextTick = async () => {
-      };
-      exports.nextTick = nextTick;
-      async function asyncLoop(iters, tick, cb) {
-        let ts = Date.now();
-        for (let i = 0; i < iters; i++) {
-          cb(i);
-          const diff = Date.now() - ts;
-          if (diff >= 0 && diff < tick)
-            continue;
-          await (0, exports.nextTick)();
-          ts += diff;
-        }
-      }
-      function utf8ToBytes(str) {
-        if (typeof str !== "string")
-          throw new Error("string expected");
-        return new Uint8Array(new TextEncoder().encode(str));
-      }
-      function bytesToUtf8(bytes) {
-        return new TextDecoder().decode(bytes);
-      }
-      function toBytes(data) {
-        if (typeof data === "string")
-          data = utf8ToBytes(data);
-        abytes2(data);
-        return data;
-      }
-      function kdfInputToBytes(data) {
-        if (typeof data === "string")
-          data = utf8ToBytes(data);
-        abytes2(data);
-        return data;
-      }
-      function concatBytes2(...arrays) {
-        let sum = 0;
-        for (let i = 0; i < arrays.length; i++) {
-          const a = arrays[i];
-          abytes2(a);
-          sum += a.length;
-        }
-        const res = new Uint8Array(sum);
-        for (let i = 0, pad = 0; i < arrays.length; i++) {
-          const a = arrays[i];
-          res.set(a, pad);
-          pad += a.length;
-        }
-        return res;
-      }
-      function checkOpts(defaults, opts) {
-        if (opts !== void 0 && {}.toString.call(opts) !== "[object Object]")
-          throw new Error("options should be object or undefined");
-        const merged = Object.assign(defaults, opts);
-        return merged;
-      }
-      var Hash = class {
-      };
-      exports.Hash = Hash;
-      function createHasher3(hashCons) {
-        const hashC = (msg) => hashCons().update(toBytes(msg)).digest();
-        const tmp = hashCons();
-        hashC.outputLen = tmp.outputLen;
-        hashC.blockLen = tmp.blockLen;
-        hashC.create = () => hashCons();
-        return hashC;
-      }
-      function createOptHasher(hashCons) {
-        const hashC = (msg, opts) => hashCons(opts).update(toBytes(msg)).digest();
-        const tmp = hashCons({});
-        hashC.outputLen = tmp.outputLen;
-        hashC.blockLen = tmp.blockLen;
-        hashC.create = (opts) => hashCons(opts);
-        return hashC;
-      }
-      function createXOFer(hashCons) {
-        const hashC = (msg, opts) => hashCons(opts).update(toBytes(msg)).digest();
-        const tmp = hashCons({});
-        hashC.outputLen = tmp.outputLen;
-        hashC.blockLen = tmp.blockLen;
-        hashC.create = (opts) => hashCons(opts);
-        return hashC;
-      }
-      exports.wrapConstructor = createHasher3;
-      exports.wrapConstructorWithOpts = createOptHasher;
-      exports.wrapXOFConstructorWithOpts = createXOFer;
-      function randomBytes2(bytesLength = 32) {
-        if (crypto_1.crypto && typeof crypto_1.crypto.getRandomValues === "function") {
-          return crypto_1.crypto.getRandomValues(new Uint8Array(bytesLength));
-        }
-        if (crypto_1.crypto && typeof crypto_1.crypto.randomBytes === "function") {
-          return Uint8Array.from(crypto_1.crypto.randomBytes(bytesLength));
-        }
-        throw new Error("crypto.getRandomValues must be defined");
-      }
-    }
-  });
-
-  // node_modules/ethereum-cryptography/node_modules/@noble/hashes/sha3.js
-  var require_sha3 = __commonJS({
-    "node_modules/ethereum-cryptography/node_modules/@noble/hashes/sha3.js"(exports) {
-      "use strict";
-      Object.defineProperty(exports, "__esModule", { value: true });
-      exports.shake256 = exports.shake128 = exports.keccak_512 = exports.keccak_384 = exports.keccak_256 = exports.keccak_224 = exports.sha3_512 = exports.sha3_384 = exports.sha3_256 = exports.sha3_224 = exports.Keccak = void 0;
-      exports.keccakP = keccakP;
-      var _u64_ts_1 = require_u64();
-      var utils_ts_1 = require_utils();
-      var _0n6 = BigInt(0);
-      var _1n5 = BigInt(1);
-      var _2n4 = BigInt(2);
-      var _7n2 = BigInt(7);
-      var _256n = BigInt(256);
-      var _0x71n = BigInt(113);
-      var SHA3_PI = [];
-      var SHA3_ROTL = [];
-      var _SHA3_IOTA = [];
-      for (let round = 0, R = _1n5, x = 1, y = 0; round < 24; round++) {
-        [x, y] = [y, (2 * x + 3 * y) % 5];
-        SHA3_PI.push(2 * (5 * y + x));
-        SHA3_ROTL.push((round + 1) * (round + 2) / 2 % 64);
-        let t = _0n6;
-        for (let j = 0; j < 7; j++) {
-          R = (R << _1n5 ^ (R >> _7n2) * _0x71n) % _256n;
-          if (R & _2n4)
-            t ^= _1n5 << (_1n5 << /* @__PURE__ */ BigInt(j)) - _1n5;
-        }
-        _SHA3_IOTA.push(t);
-      }
-      var IOTAS = (0, _u64_ts_1.split)(_SHA3_IOTA, true);
-      var SHA3_IOTA_H = IOTAS[0];
-      var SHA3_IOTA_L = IOTAS[1];
-      var rotlH = (h, l, s) => s > 32 ? (0, _u64_ts_1.rotlBH)(h, l, s) : (0, _u64_ts_1.rotlSH)(h, l, s);
-      var rotlL = (h, l, s) => s > 32 ? (0, _u64_ts_1.rotlBL)(h, l, s) : (0, _u64_ts_1.rotlSL)(h, l, s);
-      function keccakP(s, rounds = 24) {
-        const B = new Uint32Array(5 * 2);
-        for (let round = 24 - rounds; round < 24; round++) {
-          for (let x = 0; x < 10; x++)
-            B[x] = s[x] ^ s[x + 10] ^ s[x + 20] ^ s[x + 30] ^ s[x + 40];
-          for (let x = 0; x < 10; x += 2) {
-            const idx1 = (x + 8) % 10;
-            const idx0 = (x + 2) % 10;
-            const B0 = B[idx0];
-            const B1 = B[idx0 + 1];
-            const Th = rotlH(B0, B1, 1) ^ B[idx1];
-            const Tl = rotlL(B0, B1, 1) ^ B[idx1 + 1];
-            for (let y = 0; y < 50; y += 10) {
-              s[x + y] ^= Th;
-              s[x + y + 1] ^= Tl;
-            }
-          }
-          let curH = s[2];
-          let curL = s[3];
-          for (let t = 0; t < 24; t++) {
-            const shift = SHA3_ROTL[t];
-            const Th = rotlH(curH, curL, shift);
-            const Tl = rotlL(curH, curL, shift);
-            const PI = SHA3_PI[t];
-            curH = s[PI];
-            curL = s[PI + 1];
-            s[PI] = Th;
-            s[PI + 1] = Tl;
-          }
-          for (let y = 0; y < 50; y += 10) {
-            for (let x = 0; x < 10; x++)
-              B[x] = s[y + x];
-            for (let x = 0; x < 10; x++)
-              s[y + x] ^= ~B[(x + 2) % 10] & B[(x + 4) % 10];
-          }
-          s[0] ^= SHA3_IOTA_H[round];
-          s[1] ^= SHA3_IOTA_L[round];
-        }
-        (0, utils_ts_1.clean)(B);
-      }
-      var Keccak = class _Keccak extends utils_ts_1.Hash {
-        // NOTE: we accept arguments in bytes instead of bits here.
-        constructor(blockLen, suffix, outputLen, enableXOF = false, rounds = 24) {
-          super();
-          this.pos = 0;
-          this.posOut = 0;
-          this.finished = false;
-          this.destroyed = false;
-          this.enableXOF = false;
-          this.blockLen = blockLen;
-          this.suffix = suffix;
-          this.outputLen = outputLen;
-          this.enableXOF = enableXOF;
-          this.rounds = rounds;
-          (0, utils_ts_1.anumber)(outputLen);
-          if (!(0 < blockLen && blockLen < 200))
-            throw new Error("only keccak-f1600 function is supported");
-          this.state = new Uint8Array(200);
-          this.state32 = (0, utils_ts_1.u32)(this.state);
-        }
-        clone() {
-          return this._cloneInto();
-        }
-        keccak() {
-          (0, utils_ts_1.swap32IfBE)(this.state32);
-          keccakP(this.state32, this.rounds);
-          (0, utils_ts_1.swap32IfBE)(this.state32);
-          this.posOut = 0;
-          this.pos = 0;
-        }
-        update(data) {
-          (0, utils_ts_1.aexists)(this);
-          data = (0, utils_ts_1.toBytes)(data);
-          (0, utils_ts_1.abytes)(data);
-          const { blockLen, state } = this;
-          const len = data.length;
-          for (let pos = 0; pos < len; ) {
-            const take = Math.min(blockLen - this.pos, len - pos);
-            for (let i = 0; i < take; i++)
-              state[this.pos++] ^= data[pos++];
-            if (this.pos === blockLen)
-              this.keccak();
-          }
-          return this;
-        }
-        finish() {
-          if (this.finished)
-            return;
-          this.finished = true;
-          const { state, suffix, pos, blockLen } = this;
-          state[pos] ^= suffix;
-          if ((suffix & 128) !== 0 && pos === blockLen - 1)
-            this.keccak();
-          state[blockLen - 1] ^= 128;
-          this.keccak();
-        }
-        writeInto(out) {
-          (0, utils_ts_1.aexists)(this, false);
-          (0, utils_ts_1.abytes)(out);
-          this.finish();
-          const bufferOut = this.state;
-          const { blockLen } = this;
-          for (let pos = 0, len = out.length; pos < len; ) {
-            if (this.posOut >= blockLen)
-              this.keccak();
-            const take = Math.min(blockLen - this.posOut, len - pos);
-            out.set(bufferOut.subarray(this.posOut, this.posOut + take), pos);
-            this.posOut += take;
-            pos += take;
-          }
-          return out;
-        }
-        xofInto(out) {
-          if (!this.enableXOF)
-            throw new Error("XOF is not possible for this instance");
-          return this.writeInto(out);
-        }
-        xof(bytes) {
-          (0, utils_ts_1.anumber)(bytes);
-          return this.xofInto(new Uint8Array(bytes));
-        }
-        digestInto(out) {
-          (0, utils_ts_1.aoutput)(out, this);
-          if (this.finished)
-            throw new Error("digest() was already called");
-          this.writeInto(out);
-          this.destroy();
-          return out;
-        }
-        digest() {
-          return this.digestInto(new Uint8Array(this.outputLen));
-        }
-        destroy() {
-          this.destroyed = true;
-          (0, utils_ts_1.clean)(this.state);
-        }
-        _cloneInto(to) {
-          const { blockLen, suffix, outputLen, rounds, enableXOF } = this;
-          to || (to = new _Keccak(blockLen, suffix, outputLen, enableXOF, rounds));
-          to.state32.set(this.state32);
-          to.pos = this.pos;
-          to.posOut = this.posOut;
-          to.finished = this.finished;
-          to.rounds = rounds;
-          to.suffix = suffix;
-          to.outputLen = outputLen;
-          to.enableXOF = enableXOF;
-          to.destroyed = this.destroyed;
-          return to;
-        }
-      };
-      exports.Keccak = Keccak;
-      var gen = (suffix, blockLen, outputLen) => (0, utils_ts_1.createHasher)(() => new Keccak(blockLen, suffix, outputLen));
-      exports.sha3_224 = (() => gen(6, 144, 224 / 8))();
-      exports.sha3_256 = (() => gen(6, 136, 256 / 8))();
-      exports.sha3_384 = (() => gen(6, 104, 384 / 8))();
-      exports.sha3_512 = (() => gen(6, 72, 512 / 8))();
-      exports.keccak_224 = (() => gen(1, 144, 224 / 8))();
-      exports.keccak_256 = (() => gen(1, 136, 256 / 8))();
-      exports.keccak_384 = (() => gen(1, 104, 384 / 8))();
-      exports.keccak_512 = (() => gen(1, 72, 512 / 8))();
-      var genShake = (suffix, blockLen, outputLen) => (0, utils_ts_1.createXOFer)((opts = {}) => new Keccak(blockLen, suffix, opts.dkLen === void 0 ? outputLen : opts.dkLen, true));
-      exports.shake128 = (() => genShake(31, 168, 128 / 8))();
-      exports.shake256 = (() => genShake(31, 136, 256 / 8))();
-    }
-  });
-
-  // node_modules/ethereum-cryptography/node_modules/@noble/curves/abstract/utils.js
-  var require_utils2 = __commonJS({
-    "node_modules/ethereum-cryptography/node_modules/@noble/curves/abstract/utils.js"(exports) {
-      "use strict";
-      Object.defineProperty(exports, "__esModule", { value: true });
-      exports.notImplemented = exports.bitMask = void 0;
-      exports.isBytes = isBytes2;
-      exports.abytes = abytes2;
-      exports.abool = abool2;
-      exports.numberToHexUnpadded = numberToHexUnpadded2;
-      exports.hexToNumber = hexToNumber2;
-      exports.bytesToHex = bytesToHex2;
-      exports.hexToBytes = hexToBytes2;
-      exports.bytesToNumberBE = bytesToNumberBE2;
-      exports.bytesToNumberLE = bytesToNumberLE2;
-      exports.numberToBytesBE = numberToBytesBE2;
-      exports.numberToBytesLE = numberToBytesLE2;
-      exports.numberToVarBytesBE = numberToVarBytesBE2;
-      exports.ensureBytes = ensureBytes;
-      exports.concatBytes = concatBytes2;
-      exports.equalBytes = equalBytes2;
-      exports.utf8ToBytes = utf8ToBytes;
-      exports.inRange = inRange2;
-      exports.aInRange = aInRange2;
-      exports.bitLen = bitLen2;
-      exports.bitGet = bitGet2;
-      exports.bitSet = bitSet2;
-      exports.createHmacDrbg = createHmacDrbg2;
-      exports.validateObject = validateObject2;
-      exports.memoized = memoized2;
-      var _0n6 = /* @__PURE__ */ BigInt(0);
-      var _1n5 = /* @__PURE__ */ BigInt(1);
-      function isBytes2(a) {
-        return a instanceof Uint8Array || ArrayBuffer.isView(a) && a.constructor.name === "Uint8Array";
-      }
-      function abytes2(item) {
-        if (!isBytes2(item))
-          throw new Error("Uint8Array expected");
-      }
-      function abool2(title, value) {
-        if (typeof value !== "boolean")
-          throw new Error(title + " boolean expected, got " + value);
-      }
-      function numberToHexUnpadded2(num2) {
-        const hex = num2.toString(16);
-        return hex.length & 1 ? "0" + hex : hex;
-      }
-      function hexToNumber2(hex) {
-        if (typeof hex !== "string")
-          throw new Error("hex string expected, got " + typeof hex);
-        return hex === "" ? _0n6 : BigInt("0x" + hex);
-      }
-      var hasHexBuiltin2 = (
-        // @ts-ignore
-        typeof Uint8Array.from([]).toHex === "function" && typeof Uint8Array.fromHex === "function"
-      );
-      var hexes2 = /* @__PURE__ */ Array.from({ length: 256 }, (_, i) => i.toString(16).padStart(2, "0"));
-      function bytesToHex2(bytes) {
-        abytes2(bytes);
-        if (hasHexBuiltin2)
-          return bytes.toHex();
-        let hex = "";
-        for (let i = 0; i < bytes.length; i++) {
-          hex += hexes2[bytes[i]];
-        }
-        return hex;
-      }
-      var asciis2 = { _0: 48, _9: 57, A: 65, F: 70, a: 97, f: 102 };
-      function asciiToBase162(ch) {
-        if (ch >= asciis2._0 && ch <= asciis2._9)
-          return ch - asciis2._0;
-        if (ch >= asciis2.A && ch <= asciis2.F)
-          return ch - (asciis2.A - 10);
-        if (ch >= asciis2.a && ch <= asciis2.f)
-          return ch - (asciis2.a - 10);
-        return;
-      }
-      function hexToBytes2(hex) {
-        if (typeof hex !== "string")
-          throw new Error("hex string expected, got " + typeof hex);
-        if (hasHexBuiltin2)
-          return Uint8Array.fromHex(hex);
-        const hl = hex.length;
-        const al = hl / 2;
-        if (hl % 2)
-          throw new Error("hex string expected, got unpadded hex of length " + hl);
-        const array = new Uint8Array(al);
-        for (let ai = 0, hi = 0; ai < al; ai++, hi += 2) {
-          const n1 = asciiToBase162(hex.charCodeAt(hi));
-          const n2 = asciiToBase162(hex.charCodeAt(hi + 1));
-          if (n1 === void 0 || n2 === void 0) {
-            const char = hex[hi] + hex[hi + 1];
-            throw new Error('hex string expected, got non-hex character "' + char + '" at index ' + hi);
-          }
-          array[ai] = n1 * 16 + n2;
-        }
-        return array;
-      }
-      function bytesToNumberBE2(bytes) {
-        return hexToNumber2(bytesToHex2(bytes));
-      }
-      function bytesToNumberLE2(bytes) {
-        abytes2(bytes);
-        return hexToNumber2(bytesToHex2(Uint8Array.from(bytes).reverse()));
-      }
-      function numberToBytesBE2(n, len) {
-        return hexToBytes2(n.toString(16).padStart(len * 2, "0"));
-      }
-      function numberToBytesLE2(n, len) {
-        return numberToBytesBE2(n, len).reverse();
-      }
-      function numberToVarBytesBE2(n) {
-        return hexToBytes2(numberToHexUnpadded2(n));
-      }
-      function ensureBytes(title, hex, expectedLength) {
-        let res;
-        if (typeof hex === "string") {
-          try {
-            res = hexToBytes2(hex);
-          } catch (e) {
-            throw new Error(title + " must be hex string or Uint8Array, cause: " + e);
-          }
-        } else if (isBytes2(hex)) {
-          res = Uint8Array.from(hex);
-        } else {
-          throw new Error(title + " must be hex string or Uint8Array");
-        }
-        const len = res.length;
-        if (typeof expectedLength === "number" && len !== expectedLength)
-          throw new Error(title + " of length " + expectedLength + " expected, got " + len);
-        return res;
-      }
-      function concatBytes2(...arrays) {
-        let sum = 0;
-        for (let i = 0; i < arrays.length; i++) {
-          const a = arrays[i];
-          abytes2(a);
-          sum += a.length;
-        }
-        const res = new Uint8Array(sum);
-        for (let i = 0, pad = 0; i < arrays.length; i++) {
-          const a = arrays[i];
-          res.set(a, pad);
-          pad += a.length;
-        }
-        return res;
-      }
-      function equalBytes2(a, b) {
-        if (a.length !== b.length)
-          return false;
-        let diff = 0;
-        for (let i = 0; i < a.length; i++)
-          diff |= a[i] ^ b[i];
-        return diff === 0;
-      }
-      function utf8ToBytes(str) {
-        if (typeof str !== "string")
-          throw new Error("string expected");
-        return new Uint8Array(new TextEncoder().encode(str));
-      }
-      var isPosBig2 = (n) => typeof n === "bigint" && _0n6 <= n;
-      function inRange2(n, min, max) {
-        return isPosBig2(n) && isPosBig2(min) && isPosBig2(max) && min <= n && n < max;
-      }
-      function aInRange2(title, n, min, max) {
-        if (!inRange2(n, min, max))
-          throw new Error("expected valid " + title + ": " + min + " <= n < " + max + ", got " + n);
-      }
-      function bitLen2(n) {
-        let len;
-        for (len = 0; n > _0n6; n >>= _1n5, len += 1)
-          ;
-        return len;
-      }
-      function bitGet2(n, pos) {
-        return n >> BigInt(pos) & _1n5;
-      }
-      function bitSet2(n, pos, value) {
-        return n | (value ? _1n5 : _0n6) << BigInt(pos);
-      }
-      var bitMask2 = (n) => (_1n5 << BigInt(n)) - _1n5;
-      exports.bitMask = bitMask2;
-      var u8n = (len) => new Uint8Array(len);
-      var u8fr = (arr) => Uint8Array.from(arr);
-      function createHmacDrbg2(hashLen, qByteLen, hmacFn) {
-        if (typeof hashLen !== "number" || hashLen < 2)
-          throw new Error("hashLen must be a number");
-        if (typeof qByteLen !== "number" || qByteLen < 2)
-          throw new Error("qByteLen must be a number");
-        if (typeof hmacFn !== "function")
-          throw new Error("hmacFn must be a function");
-        let v = u8n(hashLen);
-        let k = u8n(hashLen);
-        let i = 0;
-        const reset = () => {
-          v.fill(1);
-          k.fill(0);
-          i = 0;
-        };
-        const h = (...b) => hmacFn(k, v, ...b);
-        const reseed = (seed = u8n(0)) => {
-          k = h(u8fr([0]), seed);
-          v = h();
-          if (seed.length === 0)
-            return;
-          k = h(u8fr([1]), seed);
-          v = h();
-        };
-        const gen = () => {
-          if (i++ >= 1e3)
-            throw new Error("drbg: tried 1000 values");
-          let len = 0;
-          const out = [];
-          while (len < qByteLen) {
-            v = h();
-            const sl = v.slice();
-            out.push(sl);
-            len += v.length;
-          }
-          return concatBytes2(...out);
-        };
-        const genUntil = (seed, pred) => {
-          reset();
-          reseed(seed);
-          let res = void 0;
-          while (!(res = pred(gen())))
-            reseed();
-          reset();
-          return res;
-        };
-        return genUntil;
-      }
-      var validatorFns = {
-        bigint: (val) => typeof val === "bigint",
-        function: (val) => typeof val === "function",
-        boolean: (val) => typeof val === "boolean",
-        string: (val) => typeof val === "string",
-        stringOrUint8Array: (val) => typeof val === "string" || isBytes2(val),
-        isSafeInteger: (val) => Number.isSafeInteger(val),
-        array: (val) => Array.isArray(val),
-        field: (val, object) => object.Fp.isValid(val),
-        hash: (val) => typeof val === "function" && Number.isSafeInteger(val.outputLen)
-      };
-      function validateObject2(object, validators, optValidators = {}) {
-        const checkField = (fieldName, type, isOptional) => {
-          const checkVal = validatorFns[type];
-          if (typeof checkVal !== "function")
-            throw new Error("invalid validator function");
-          const val = object[fieldName];
-          if (isOptional && val === void 0)
-            return;
-          if (!checkVal(val, object)) {
-            throw new Error("param " + String(fieldName) + " is invalid. Expected " + type + ", got " + val);
-          }
-        };
-        for (const [fieldName, type] of Object.entries(validators))
-          checkField(fieldName, type, false);
-        for (const [fieldName, type] of Object.entries(optValidators))
-          checkField(fieldName, type, true);
-        return object;
-      }
-      var notImplemented2 = () => {
-        throw new Error("not implemented");
-      };
-      exports.notImplemented = notImplemented2;
-      function memoized2(fn) {
-        const map = /* @__PURE__ */ new WeakMap();
-        return (arg, ...args) => {
-          const val = map.get(arg);
-          if (val !== void 0)
-            return val;
-          const computed = fn(arg, ...args);
-          map.set(arg, computed);
-          return computed;
-        };
-      }
-    }
-  });
-
-  // node_modules/ethereum-cryptography/node_modules/@noble/hashes/_assert.js
-  var require_assert = __commonJS({
-    "node_modules/ethereum-cryptography/node_modules/@noble/hashes/_assert.js"(exports) {
-      "use strict";
-      Object.defineProperty(exports, "__esModule", { value: true });
-      exports.aoutput = exports.anumber = exports.aexists = exports.abytes = void 0;
-      var utils_ts_1 = require_utils();
-      exports.abytes = utils_ts_1.abytes;
-      exports.aexists = utils_ts_1.aexists;
-      exports.anumber = utils_ts_1.anumber;
-      exports.aoutput = utils_ts_1.aoutput;
-    }
-  });
-
-  // node_modules/ethereum-cryptography/utils.js
-  var require_utils3 = __commonJS({
-    "node_modules/ethereum-cryptography/utils.js"(exports) {
-      "use strict";
-      Object.defineProperty(exports, "__esModule", { value: true });
-      exports.assertBytes = exports.assertBool = exports.utf8ToBytes = exports.toHex = exports.createView = exports.concatBytes = exports.bytesToHex = void 0;
-      exports.bytesToUtf8 = bytesToUtf8;
-      exports.hexToBytes = hexToBytes2;
-      exports.equalsBytes = equalsBytes;
-      exports.wrapHash = wrapHash;
-      var utils_1 = require_utils2();
-      Object.defineProperty(exports, "assertBool", { enumerable: true, get: function() {
-        return utils_1.abool;
-      } });
-      var _assert_1 = require_assert();
-      Object.defineProperty(exports, "assertBytes", { enumerable: true, get: function() {
-        return _assert_1.abytes;
-      } });
-      var utils_2 = require_utils();
-      var utils_3 = require_utils();
-      Object.defineProperty(exports, "bytesToHex", { enumerable: true, get: function() {
-        return utils_3.bytesToHex;
-      } });
-      Object.defineProperty(exports, "concatBytes", { enumerable: true, get: function() {
-        return utils_3.concatBytes;
-      } });
-      Object.defineProperty(exports, "createView", { enumerable: true, get: function() {
-        return utils_3.createView;
-      } });
-      Object.defineProperty(exports, "toHex", { enumerable: true, get: function() {
-        return utils_3.bytesToHex;
-      } });
-      Object.defineProperty(exports, "utf8ToBytes", { enumerable: true, get: function() {
-        return utils_3.utf8ToBytes;
-      } });
-      function bytesToUtf8(data) {
-        if (!(data instanceof Uint8Array)) {
-          throw new TypeError(`bytesToUtf8 expected Uint8Array, got ${typeof data}`);
-        }
-        return new TextDecoder().decode(data);
-      }
-      function hexToBytes2(data) {
-        const sliced = data.startsWith("0x") ? data.substring(2) : data;
-        return (0, utils_2.hexToBytes)(sliced);
-      }
-      function equalsBytes(a, b) {
-        if (a.length !== b.length) {
-          return false;
-        }
-        for (let i = 0; i < a.length; i++) {
-          if (a[i] !== b[i]) {
-            return false;
-          }
-        }
-        return true;
-      }
-      function wrapHash(hash) {
-        return (msg) => {
-          (0, _assert_1.abytes)(msg);
-          return hash(msg);
-        };
-      }
-    }
-  });
-
-  // node_modules/ethereum-cryptography/keccak.js
-  var require_keccak = __commonJS({
-    "node_modules/ethereum-cryptography/keccak.js"(exports) {
-      "use strict";
-      Object.defineProperty(exports, "__esModule", { value: true });
-      exports.keccak512 = exports.keccak384 = exports.keccak256 = exports.keccak224 = void 0;
-      var sha3_1 = require_sha3();
-      var utils_js_1 = require_utils3();
-      exports.keccak224 = (0, utils_js_1.wrapHash)(sha3_1.keccak_224);
-      exports.keccak256 = (() => {
-        const k = (0, utils_js_1.wrapHash)(sha3_1.keccak_256);
-        k.create = sha3_1.keccak_256.create;
-        return k;
-      })();
-      exports.keccak384 = (0, utils_js_1.wrapHash)(sha3_1.keccak_384);
-      exports.keccak512 = (0, utils_js_1.wrapHash)(sha3_1.keccak_512);
-    }
-  });
-
-  // node_modules/@toruslabs/metadata-helpers/dist/lib.cjs/utils.js
-  var require_utils4 = __commonJS({
-    "node_modules/@toruslabs/metadata-helpers/dist/lib.cjs/utils.js"(exports) {
-      "use strict";
-      var secp256k1_js = (init_secp256k1(), __toCommonJS(secp256k1_exports));
-      var utils_js = (init_utils2(), __toCommonJS(utils_exports));
-      var keccak = require_keccak();
-      function keccak256(data) {
-        return keccak.keccak256(data);
-      }
-      function utf8ToBytes(str) {
-        return new TextEncoder().encode(str);
-      }
-      function bytesToUtf8(bytes) {
-        return new TextDecoder().decode(bytes);
-      }
-      function bytesToBase64(bytes) {
-        const binString = Array.from(bytes, (byte) => String.fromCodePoint(byte)).join("");
-        return btoa(binString);
-      }
-      function toEthereumSignature(recoveredSig) {
-        const ethSig = new Uint8Array(65);
-        ethSig.set(recoveredSig.slice(1, 65), 0);
-        ethSig[64] = recoveredSig[0];
-        return ethSig;
-      }
-      function getPublicKeyCoords(privateKeyHex) {
-        const privKeyBytes = utils_js.hexToBytes(privateKeyHex.padStart(64, "0"));
-        const pubKeyUncompressed = secp256k1_js.secp256k1.getPublicKey(privKeyBytes, false);
-        const x = utils_js.bytesToHex(pubKeyUncompressed.slice(1, 33));
-        const y = utils_js.bytesToHex(pubKeyUncompressed.slice(33, 65));
-        return {
-          x,
-          y
-        };
-      }
-      function coordsToPublicKey(x, y) {
-        const xBytes = utils_js.hexToBytes(x.padStart(64, "0"));
-        const yBytes = utils_js.hexToBytes(y.padStart(64, "0"));
-        const pubKey = new Uint8Array(65);
-        pubKey[0] = 4;
-        pubKey.set(xBytes, 1);
-        pubKey.set(yBytes, 33);
-        return pubKey;
-      }
-      Object.defineProperty(exports, "secp256k1", {
-        enumerable: true,
-        get: function() {
-          return secp256k1_js.secp256k1;
-        }
-      });
-      Object.defineProperty(exports, "bytesToHex", {
-        enumerable: true,
-        get: function() {
-          return utils_js.bytesToHex;
-        }
-      });
-      Object.defineProperty(exports, "hexToBytes", {
-        enumerable: true,
-        get: function() {
-          return utils_js.hexToBytes;
-        }
-      });
-      exports.bytesToBase64 = bytesToBase64;
-      exports.bytesToUtf8 = bytesToUtf8;
-      exports.coordsToPublicKey = coordsToPublicKey;
-      exports.getPublicKeyCoords = getPublicKeyCoords;
-      exports.keccak256 = keccak256;
-      exports.toEthereumSignature = toEthereumSignature;
-      exports.utf8ToBytes = utf8ToBytes;
-    }
-  });
-
   // node_modules/@toruslabs/metadata-helpers/dist/lib.cjs/MetadataStorageLayer.js
   var require_MetadataStorageLayer = __commonJS({
     "node_modules/@toruslabs/metadata-helpers/dist/lib.cjs/MetadataStorageLayer.js"(exports) {
@@ -15150,12 +15193,19 @@
   var require_lib5 = __commonJS({
     "node_modules/@toruslabs/metadata-helpers/dist/lib.cjs/index.js"(exports) {
       "use strict";
+      var base64url = require_base64url();
       var MetadataStorageLayer = require_MetadataStorageLayer();
       var utils = require_utils4();
       var webAuthnShareResolver = require_webAuthnShareResolver();
       var utils_js = (init_utils2(), __toCommonJS(utils_exports));
       var secp256k1_js = (init_secp256k1(), __toCommonJS(secp256k1_exports));
+      exports.decodeBase64Url = base64url.decodeBase64Url;
+      exports.encodeBase64Url = base64url.encodeBase64Url;
+      exports.fromBase64 = base64url.fromBase64;
+      exports.toBase64 = base64url.toBase64;
+      exports.toBufferLike = base64url.toBufferLike;
       exports.MetadataStorageLayer = MetadataStorageLayer.MetadataStorageLayer;
+      exports.base64ToBytes = utils.base64ToBytes;
       exports.bytesToBase64 = utils.bytesToBase64;
       exports.bytesToUtf8 = utils.bytesToUtf8;
       exports.coordsToPublicKey = utils.coordsToPublicKey;
@@ -20925,6 +20975,7 @@
       var broadcastChannel = require_broadcast_channel();
       var methodChooser = require_method_chooser();
       var redundantAdaptiveBroadcastChannel = require_redundant_adaptive_broadcast_channel();
+      var metadataHelpers = require_lib5();
       exports.IndexedDbMethod = indexedDb;
       exports.LocalstorageMethod = localstorage;
       exports.NativeMethod = native;
@@ -20934,6 +20985,36 @@
       exports.enforceOptions = broadcastChannel.enforceOptions;
       exports.chooseMethod = methodChooser.chooseMethod;
       exports.RedundantAdaptiveBroadcastChannel = redundantAdaptiveBroadcastChannel.RedundantAdaptiveBroadcastChannel;
+      Object.defineProperty(exports, "decodeBase64Url", {
+        enumerable: true,
+        get: function() {
+          return metadataHelpers.decodeBase64Url;
+        }
+      });
+      Object.defineProperty(exports, "encodeBase64Url", {
+        enumerable: true,
+        get: function() {
+          return metadataHelpers.encodeBase64Url;
+        }
+      });
+      Object.defineProperty(exports, "fromBase64", {
+        enumerable: true,
+        get: function() {
+          return metadataHelpers.fromBase64;
+        }
+      });
+      Object.defineProperty(exports, "toBase64", {
+        enumerable: true,
+        get: function() {
+          return metadataHelpers.toBase64;
+        }
+      });
+      Object.defineProperty(exports, "toBufferLike", {
+        enumerable: true,
+        get: function() {
+          return metadataHelpers.toBufferLike;
+        }
+      });
     }
   });
 
