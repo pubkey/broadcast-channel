@@ -42,7 +42,7 @@ export type BroadcastChannelOptions = {
 
 declare type EventContext = 'message' | 'internal' | 'leader';
 
-declare type OnMessageHandler<T> = ((this: BroadcastChannel, ev: T) => any) | null;
+export declare type OnMessageHandler<T> = ((this: BroadcastChannel, ev: T) => any) | null;
 
 /**
  * api as defined in
