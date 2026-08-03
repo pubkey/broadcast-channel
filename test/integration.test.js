@@ -668,7 +668,9 @@ function runTest(channelOptions) {
                     const savedLocks = (typeof navigator !== 'undefined') ? navigator.locks : undefined;
                     if (typeof navigator !== 'undefined' && savedLocks !== undefined) {
                         Object.defineProperty(navigator, 'locks', {
-                            value: undefined, configurable: true, writable: true
+                            value: undefined,
+                            configurable: true,
+                            writable: true
                         });
                     }
                     try {
@@ -699,7 +701,9 @@ function runTest(channelOptions) {
                     } finally {
                         if (typeof navigator !== 'undefined' && savedLocks !== undefined) {
                             Object.defineProperty(navigator, 'locks', {
-                                value: savedLocks, configurable: true, writable: true
+                                value: savedLocks,
+                                configurable: true,
+                                writable: true
                             });
                         }
                     }
