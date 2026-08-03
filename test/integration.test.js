@@ -656,6 +656,40 @@ function runTest(channelOptions) {
                         channels.map(c => c.close())
                     );
                 });
+                it('should not become leader or post after die() is called during election', async () => {
+                    const channelName = AsyncTestUtil.randomString(12);
+                    const channel = new BroadcastChannel(channelName, channelOptions);
+                    const elector = createLeaderElection(channel);
+
+                    // Track messages posted on this channel after die()
+                    const messagesAfterDie = [];
+
+                    // Start election without awaiting
+                    elector.awaitLeadership();
+
+                    // Kill immediately while election is in-flight
+                    await elector.die();
+
+                    // Record any further messages posted after die()
+                    const listener = () => messagesAfterDie.push(true);
+                    channel.addEventListener('internal', listener);
+
+                    // Wait longer than the full election cycle to let any in-flight
+                    // promises settle and potentially call beLeader()
+                    await AsyncTestUtil.wait(500);
+
+                    channel.removeEventListener('internal', listener);
+
+                    assert.strictEqual(elector.isDead, true, 'elector should be dead');
+                    assert.strictEqual(elector.isLeader, false, 'dead elector must not become leader');
+                    assert.strictEqual(
+                        messagesAfterDie.length,
+                        0,
+                        'no messages should be posted on the channel after die()'
+                    );
+
+                    channel.close();
+                });
             });
             describe('.awaitLeadership()', () => {
                 it('should resolve when elector becomes leader', async () => {

@@ -61,7 +61,9 @@ LeaderElectionWebLock.prototype = {
                         // if the lock resolved, we can drop the abort controller
                         this._wKMC.c = undefined;
 
-                        beLeader(this);
+                        if (!this.isDead) {
+                            beLeader(this);
+                        }
                         res();
                         return returnPromise;
                     }
@@ -89,6 +91,9 @@ LeaderElectionWebLock.prototype = {
         // Do nothing because there are no duplicates in the WebLock version
     },
     die() {
+        if (this.isDead) {
+            return this._dP;
+        }
         this._lstns.forEach(listener => this.broadcastChannel.removeEventListener('internal', listener));
         this._lstns = [];
         this._unl.forEach(uFn => uFn.remove());
@@ -108,6 +113,7 @@ LeaderElectionWebLock.prototype = {
         if (this._wKMC.c) {
             this._wKMC.c.abort(new Error(LEADER_DIE_ABORT_SIGNAL_MESSAGE));
         }
-        return sendLeaderMessage(this, 'death');
+        this._dP = sendLeaderMessage(this, 'death');
+        return this._dP;
     }
 };

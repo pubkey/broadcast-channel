@@ -153,7 +153,12 @@ LeaderElection.prototype = {
                     stopCriteriaPromise.then(() => Promise.reject(new Error()))
                 ]))
                 // send again in case another instance was just created
-                .then(() => sendLeaderMessage(this, 'apply'))
+                .then(() => {
+                    if (this.isDead) {
+                        return;
+                    }
+                    return sendLeaderMessage(this, 'apply');
+                })
                 // let others time to respond
                 .then(() => Promise.race([
                     sleep(waitForAnswerTime),
@@ -162,11 +167,11 @@ LeaderElection.prototype = {
                 .catch(() => { })
                 .then(() => {
                     this.broadcastChannel.removeEventListener('internal', handleMessage);
-                    if (!stopCriteria) {
+                    if (!stopCriteria && !this.isDead) {
                         // no stop criteria -> own is leader
                         return beLeader(this).then(() => true);
                     } else {
-                        // other is leader
+                        // other is leader or elector is dead
                         return false;
                     }
                 });
@@ -195,6 +200,9 @@ LeaderElection.prototype = {
     },
 
     die() {
+        if (this.isDead) {
+            return this._dP;
+        }
         this._lstns.forEach(listener => this.broadcastChannel.removeEventListener('internal', listener));
         this._lstns = [];
         this._unl.forEach(uFn => uFn.remove());
@@ -205,7 +213,8 @@ LeaderElection.prototype = {
             this.isLeader = false;
         }
         this.isDead = true;
-        return sendLeaderMessage(this, 'death');
+        this._dP = sendLeaderMessage(this, 'death');
+        return this._dP;
     }
 };
 
