@@ -137,6 +137,9 @@ LeaderElection.prototype = {
       })
       // send again in case another instance was just created
       .then(function () {
+        if (_this2.isDead) {
+          return;
+        }
         return sendLeaderMessage(_this2, 'apply');
       })
       // let others time to respond
@@ -146,13 +149,13 @@ LeaderElection.prototype = {
         })]);
       })["catch"](function () {}).then(function () {
         _this2.broadcastChannel.removeEventListener('internal', handleMessage);
-        if (!stopCriteria) {
+        if (!stopCriteria && !_this2.isDead) {
           // no stop criteria -> own is leader
           return beLeader(_this2).then(function () {
             return true;
           });
         } else {
-          // other is leader
+          // other is leader or elector is dead
           return false;
         }
       });
@@ -179,6 +182,9 @@ LeaderElection.prototype = {
   },
   die: function die() {
     var _this3 = this;
+    if (this.isDead) {
+      return this._dP;
+    }
     this._lstns.forEach(function (listener) {
       return _this3.broadcastChannel.removeEventListener('internal', listener);
     });
@@ -192,7 +198,8 @@ LeaderElection.prototype = {
       this.isLeader = false;
     }
     this.isDead = true;
-    return sendLeaderMessage(this, 'death');
+    this._dP = sendLeaderMessage(this, 'death');
+    return this._dP;
   }
 };
 

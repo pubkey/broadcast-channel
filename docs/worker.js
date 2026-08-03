@@ -439,7 +439,9 @@ LeaderElectionWebLock.prototype = {
         }, function () {
           // if the lock resolved, we can drop the abort controller
           _this3._wKMC.c = undefined;
-          (0, _leaderElectionUtil.beLeader)(_this3);
+          if (!_this3.isDead) {
+            (0, _leaderElectionUtil.beLeader)(_this3);
+          }
           res();
           return returnPromise;
         })["catch"](function (err) {
@@ -466,6 +468,9 @@ LeaderElectionWebLock.prototype = {
   },
   die: function die() {
     var _this4 = this;
+    if (this.isDead) {
+      return this._dP;
+    }
     this._lstns.forEach(function (listener) {
       return _this4.broadcastChannel.removeEventListener('internal', listener);
     });
@@ -489,7 +494,8 @@ LeaderElectionWebLock.prototype = {
     if (this._wKMC.c) {
       this._wKMC.c.abort(new Error(LEADER_DIE_ABORT_SIGNAL_MESSAGE));
     }
-    return (0, _leaderElectionUtil.sendLeaderMessage)(this, 'death');
+    this._dP = (0, _leaderElectionUtil.sendLeaderMessage)(this, 'death');
+    return this._dP;
   }
 };
 },{"./leader-election-util.js":4,"./util.js":13}],6:[function(require,module,exports){
@@ -638,6 +644,9 @@ LeaderElection.prototype = {
       })
       // send again in case another instance was just created
       .then(function () {
+        if (_this2.isDead) {
+          return;
+        }
         return (0, _leaderElectionUtil.sendLeaderMessage)(_this2, 'apply');
       })
       // let others time to respond
@@ -647,13 +656,13 @@ LeaderElection.prototype = {
         })]);
       })["catch"](function () {}).then(function () {
         _this2.broadcastChannel.removeEventListener('internal', handleMessage);
-        if (!stopCriteria) {
+        if (!stopCriteria && !_this2.isDead) {
           // no stop criteria -> own is leader
           return (0, _leaderElectionUtil.beLeader)(_this2).then(function () {
             return true;
           });
         } else {
-          // other is leader
+          // other is leader or elector is dead
           return false;
         }
       });
@@ -680,6 +689,9 @@ LeaderElection.prototype = {
   },
   die: function die() {
     var _this3 = this;
+    if (this.isDead) {
+      return this._dP;
+    }
     this._lstns.forEach(function (listener) {
       return _this3.broadcastChannel.removeEventListener('internal', listener);
     });
@@ -693,7 +705,8 @@ LeaderElection.prototype = {
       this.isLeader = false;
     }
     this.isDead = true;
-    return (0, _leaderElectionUtil.sendLeaderMessage)(this, 'death');
+    this._dP = (0, _leaderElectionUtil.sendLeaderMessage)(this, 'death');
+    return this._dP;
   }
 };
 
@@ -4266,10 +4279,10 @@ var applyBind = require('call-bind-apply-helpers/applyBind');
 
 module.exports = function callBind(originalFunction) {
 	var func = callBindBasic(arguments);
-	var adjustedLength = originalFunction.length - (arguments.length - 1);
+	var adjustedLength = 1 + originalFunction.length - (arguments.length - 1);
 	return setFunctionLength(
 		func,
-		1 + (adjustedLength > 0 ? adjustedLength : 0),
+		adjustedLength > 0 ? adjustedLength : 0,
 		true
 	);
 };
@@ -15785,9 +15798,8 @@ module.exports = function getSideChannelList() {
 			}
 		},
 		'delete': function (key) {
-			var root = $o && $o.next;
 			var deletedNode = listDelete($o, key);
-			if (deletedNode && root && root === deletedNode) {
+			if (deletedNode && $o && !$o.next) {
 				$o = void undefined;
 			}
 			return !!deletedNode;
@@ -15809,7 +15821,6 @@ module.exports = function getSideChannelList() {
 			listSet(/** @type {NonNullable<typeof $o>} */ ($o), key, value);
 		}
 	};
-	// @ts-expect-error TODO: figure out why this is erroring
 	return channel;
 };
 
@@ -15990,7 +16001,10 @@ module.exports = function getSideChannel() {
 	var channel = {
 		assert: function (key) {
 			if (!channel.has(key)) {
-				throw new $TypeError('Side channel does not contain ' + inspect(key));
+				var keyDesc = key && Object(key) === key
+					? 'the given object key'
+					: inspect(key);
+				throw new $TypeError('Side channel does not contain ' + keyDesc);
 			}
 		},
 		'delete': function (key) {
@@ -16010,7 +16024,7 @@ module.exports = function getSideChannel() {
 			$channelData.set(key, value);
 		}
 	};
-	// @ts-expect-error TODO: figure out why this is erroring
+
 	return channel;
 };
 
@@ -16293,6 +16307,9 @@ var typedArrays = availableTypedArrays();
 
 var $slice = callBound('String.prototype.slice');
 
+/** @import { BoundSet, BoundSlice, Cache, Getter } from './types' */
+/** @import { TypedArrayName } from '.' */
+
 /** @type {<T = unknown>(array: readonly T[], value: unknown) => number} */
 var $indexOf = callBound('Array.prototype.indexOf', true) || function indexOf(array, value) {
 	for (var i = 0; i < array.length; i += 1) {
@@ -16303,8 +16320,7 @@ var $indexOf = callBound('Array.prototype.indexOf', true) || function indexOf(ar
 	return -1;
 };
 
-/** @typedef {import('./types').Getter} Getter */
-/** @type {import('./types').Cache} */
+/** @type {Cache} */
 var cache = { __proto__: null };
 if (hasToStringTag && gOPD && getProto) {
 	forEach(typedArrays, function (typedArray) {
@@ -16321,7 +16337,8 @@ if (hasToStringTag && gOPD && getProto) {
 			if (descriptor && descriptor.get) {
 				var bound = callBind(descriptor.get);
 				cache[
-					/** @type {`$${import('.').TypedArrayName}`} */ ('$' + typedArray)
+					/** @type {`$${TypedArrayName}`} */
+					('$' + typedArray)
 				] = bound;
 			}
 		}
@@ -16331,62 +16348,72 @@ if (hasToStringTag && gOPD && getProto) {
 		var arr = new g[typedArray]();
 		var fn = arr.slice || arr.set;
 		if (fn) {
-			var bound = /** @type {import('./types').BoundSlice | import('./types').BoundSet} */ (
+			var bound = /** @type {BoundSlice | BoundSet} */ (
 				// @ts-expect-error TODO FIXME
 				callBind(fn)
 			);
 			cache[
-				/** @type {`$${import('.').TypedArrayName}`} */ ('$' + typedArray)
+				/** @type {`$${TypedArrayName}`} */
+				('$' + typedArray)
 			] = bound;
 		}
 	});
 }
 
-/** @type {(value: object) => false | import('.').TypedArrayName} */
-var tryTypedArrays = function tryAllTypedArrays(value) {
-	/** @type {ReturnType<typeof tryAllTypedArrays>} */ var found = false;
+/** @type {(value: object) => false | TypedArrayName} */
+function tryTypedArrays(value) {
+	/** @type {ReturnType<typeof tryTypedArrays>} */ var found = false;
 	forEach(
-		/** @type {Record<`\$${import('.').TypedArrayName}`, Getter>} */ (cache),
-		/** @type {(getter: Getter, name: `\$${import('.').TypedArrayName}`) => void} */
+		/** @type {Record<`$${TypedArrayName}`, Getter>} */ (cache),
+		/** @param {Getter} getter @param {`$${TypedArrayName}`} typedArray */
 		function (getter, typedArray) {
 			if (!found) {
 				try {
 					// @ts-expect-error a throw is fine here
 					if ('$' + getter(value) === typedArray) {
-						found = /** @type {import('.').TypedArrayName} */ ($slice(typedArray, 1));
+						found = /** @type {TypedArrayName} */ ($slice(typedArray, 1));
 					}
 				} catch (e) { /**/ }
 			}
 		}
 	);
 	return found;
-};
+}
 
-/** @type {(value: object) => false | import('.').TypedArrayName} */
-var trySlices = function tryAllSlices(value) {
-	/** @type {ReturnType<typeof tryAllSlices>} */ var found = false;
+/** @type {(value: object) => false | TypedArrayName} */
+function trySlices(value) {
+	/** @type {ReturnType<typeof trySlices>} */ var found = false;
 	forEach(
-		/** @type {Record<`\$${import('.').TypedArrayName}`, Getter>} */(cache),
-		/** @type {(getter: Getter, name: `\$${import('.').TypedArrayName}`) => void} */ function (getter, name) {
+		/** @type {Record<`$${TypedArrayName}`, Getter>} */(cache),
+		/** @param {Getter} getter @param {`$${TypedArrayName}`} name */ function (getter, name) {
 			if (!found) {
 				try {
 					// @ts-expect-error a throw is fine here
 					getter(value);
-					found = /** @type {import('.').TypedArrayName} */ ($slice(name, 1));
+					found = /** @type {TypedArrayName} */ ($slice(name, 1));
 				} catch (e) { /**/ }
 			}
 		}
 	);
 	return found;
-};
+}
 
-/** @type {import('.')} */
+/** @type {(tag: unknown) => tag is typeof typedArrays[number]} */
+function isTATag(tag) {
+	return $indexOf(typedArrays, tag) > -1;
+}
+
+/**
+ * @type {import('.')}
+ * @param {unknown} value
+ */
 module.exports = function whichTypedArray(value) {
-	if (!value || typeof value !== 'object') { return false; }
+	if (!value || typeof value !== 'object') {
+		return false;
+	}
 	if (!hasToStringTag) {
-		/** @type {string} */
 		var tag = $slice($toString(value), 8, -1);
-		if ($indexOf(typedArrays, tag) > -1) {
+		if (isTATag(tag)) {
 			return tag;
 		}
 		if (tag !== 'Object') {
