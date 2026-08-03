@@ -59,7 +59,9 @@ LeaderElectionWebLock.prototype = {
         }, function () {
           // if the lock resolved, we can drop the abort controller
           _this3._wKMC.c = undefined;
-          (0, _leaderElectionUtil.beLeader)(_this3);
+          if (!_this3.isDead) {
+            (0, _leaderElectionUtil.beLeader)(_this3);
+          }
           res();
           return returnPromise;
         })["catch"](function (err) {
@@ -86,6 +88,9 @@ LeaderElectionWebLock.prototype = {
   },
   die: function die() {
     var _this4 = this;
+    if (this.isDead) {
+      return this._dP;
+    }
     this._lstns.forEach(function (listener) {
       return _this4.broadcastChannel.removeEventListener('internal', listener);
     });
@@ -109,6 +114,7 @@ LeaderElectionWebLock.prototype = {
     if (this._wKMC.c) {
       this._wKMC.c.abort(new Error(LEADER_DIE_ABORT_SIGNAL_MESSAGE));
     }
-    return (0, _leaderElectionUtil.sendLeaderMessage)(this, 'death');
+    this._dP = (0, _leaderElectionUtil.sendLeaderMessage)(this, 'death');
+    return this._dP;
   }
 };

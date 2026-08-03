@@ -656,6 +656,58 @@ function runTest(channelOptions) {
                         channels.map(c => c.close())
                     );
                 });
+                it('should not become leader after die() is called during election', async () => {
+                    /**
+                     * This test exercises the LeaderElection (non-WebLock) applyRun() fix.
+                     * On runtimes where navigator.locks exists (Node >= 21, Bun with WebLock,
+                     * modern browsers) createLeaderElection() would pick LeaderElectionWebLock
+                     * instead, where the AbortController prevents the race entirely.
+                     * We temporarily patch navigator.locks away so the plain LeaderElection
+                     * code path — where the applyRun() isDead guard matters — is always tested.
+                     */
+                    const savedLocks = (typeof navigator !== 'undefined') ? navigator.locks : undefined;
+                    if (typeof navigator !== 'undefined' && savedLocks !== undefined) {
+                        Object.defineProperty(navigator, 'locks', {
+                            value: undefined,
+                            configurable: true,
+                            writable: true
+                        });
+                    }
+                    try {
+                        const channelName = AsyncTestUtil.randomString(12);
+                        const channel = new BroadcastChannel(channelName, channelOptions);
+                        const elector = createLeaderElection(channel);
+
+                        // Confirm we are testing the plain LeaderElection path
+                        assert.strictEqual(
+                            typeof elector.applyOnce, 'function',
+                            'LeaderElection (non-WebLock) should be used'
+                        );
+
+                        // Start election without awaiting
+                        elector.awaitLeadership();
+
+                        // Kill immediately while election is in-flight
+                        await elector.die();
+
+                        // Wait longer than the full election cycle to let any in-flight
+                        // promises settle and potentially call beLeader()
+                        await AsyncTestUtil.wait(500);
+
+                        assert.strictEqual(elector.isDead, true, 'elector should be dead');
+                        assert.strictEqual(elector.isLeader, false, 'dead elector must not become leader');
+
+                        channel.close();
+                    } finally {
+                        if (typeof navigator !== 'undefined' && savedLocks !== undefined) {
+                            Object.defineProperty(navigator, 'locks', {
+                                value: savedLocks,
+                                configurable: true,
+                                writable: true
+                            });
+                        }
+                    }
+                });
             });
             describe('.awaitLeadership()', () => {
                 it('should resolve when elector becomes leader', async () => {
