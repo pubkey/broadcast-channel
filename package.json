@@ -99,7 +99,7 @@
     "lint"
   ],
   "dependencies": {
-    "@babel/runtime": "7.29.7",
+    "@babel/runtime": "7.29.10",
     "oblivious-set": "2.0.0",
     "p-queue": "6.6.2",
     "unload": "2.4.1"
