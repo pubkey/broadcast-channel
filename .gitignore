@@ -11,3 +11,4 @@ toruslabs-*.tgz
 dist/
 .DS_Store
 .vitest/
+.cursor/skills/migrating-to-torus-cli/
