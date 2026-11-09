@@ -1,7 +1,18 @@
 # CHANGELOG
 
-
 ## X.X.X (comming soon)
+
+## 14.0.0
+
+### Major Changes
+
+- 6395de3: Require Node `>=24.22.0` and npm `>=12`. Node 26 is the development runtime. Publish TypeScript declarations from `dist/lib.cjs/index.d.ts`. Version 13.3.0 published them in `dist/lib.cjs/types/`. Remove the `@babel/runtime` dependency. The Vite+ build does not reference it.
+
+  Publish one bundled file per format. Version 13.3.0 published one file per module, so an import of a path inside `dist/`, such as `dist/lib.cjs/methods/native.js`, no longer resolves. The browser bundles `dist/lib/browser.js` and `dist/lib/browser.min.js` stay at the same paths and still set the global `BroadcastChannel`. They target ES2020.
+
+  The CommonJS and ES module files are no longer transpiled by Babel. They keep modern syntax such as optional chaining and class fields. A bundler that targets old browsers must transpile this package.
+
+  Update `@toruslabs/constants` to 17, `@toruslabs/eccrypto` to 8 and `@toruslabs/metadata-helpers` to 9.
 
 ## 4.11.0 (12 April 2022)
 
@@ -15,101 +26,122 @@
 ## 4.9.0 (23 December 2021)
 
 Bugfixes:
-  - When listening to messages directly, responses that where send directly after `addEventListener()` where missing because of inaccurate JavaScript timing.
+
+- When listening to messages directly, responses that where send directly after `addEventListener()` where missing because of inaccurate JavaScript timing.
 
 ## 4.8.0 (15 December 2021)
 
 Changes:
-  - Better determine the correct `responseTime` to use to make it less likely to elect duplicate leaders.
+
+- Better determine the correct `responseTime` to use to make it less likely to elect duplicate leaders.
 
 ## 4.7.1 (13 December 2021)
 
 Bugfixes:
-  - Remove useless log at leader election fallback interval.
+
+- Remove useless log at leader election fallback interval.
 
 ## 4.7.0 (3 December 2021)
 
 Bugfixes:
-  - Prevent `EMFILE, too many open files` error when writing many messages at once.
+
+- Prevent `EMFILE, too many open files` error when writing many messages at once.
 
 ## 4.6.0 (2 December 2021)
 
 Other:
-  - Added `broadcastChannel.id()` for debugging
+
+- Added `broadcastChannel.id()` for debugging
 
 Bugfixes:
-  - Refactor `applyOnce()` queue to ensure we do not run more often then needed.
+
+- Refactor `applyOnce()` queue to ensure we do not run more often then needed.
 
 ## 4.5.0 (5 November 2021)
 
 Bugfixes:
-  - Running `applyOnce()` in a loop must not fully block the JavaScript process.
+
+- Running `applyOnce()` in a loop must not fully block the JavaScript process.
 
 ## 4.4.0 (2 November 2021)
 
 Other:
-  - Replaced `js-sha` with node's `crypto` module.
+
+- Replaced `js-sha` with node's `crypto` module.
 
 ## 4.3.1 (30 October 2021)
 
 Bugfixes:
-  - Fixed broken promise rejection.
+
+- Fixed broken promise rejection.
 
 ## 4.3.0 (30 October 2021)
 
 Features:
-  - Added `LeaderElector.hasLeader`
-  - Added `LeaderElector.broadcastChannel`
+
+- Added `LeaderElector.hasLeader`
+- Added `LeaderElector.broadcastChannel`
 
 ## 4.2.0 (3 August 2021)
 
 Bugfixes:
-  - Fixed Webpack 5 Relative Import Support. Thanks [catrielmuller](https://github.com/catrielmuller)
+
+- Fixed Webpack 5 Relative Import Support. Thanks [catrielmuller](https://github.com/catrielmuller)
+
 ## 4.1.0 (2 August 2021)
 
 Bugfixes:
-  - Fixed various problems with the module loading. Thanks [benmccann](https://github.com/benmccann) and [chbdetta](https://github.com/chbdetta)
 
+- Fixed various problems with the module loading. Thanks [benmccann](https://github.com/benmccann) and [chbdetta](https://github.com/chbdetta)
 
 ## 4.0.0 (15 July 2021)
 
 Other:
-  - Changed entrypoints and method-choosing [#679](https://github.com/pubkey/broadcast-channel/pull/679). Thanks [benmccann](https://github.com/benmccann)
+
+- Changed entrypoints and method-choosing [#679](https://github.com/pubkey/broadcast-channel/pull/679). Thanks [benmccann](https://github.com/benmccann)
 
 ## 3.7.0 (13 June 2021)
 
 Other:
-  - Moved `ObliviousSet` into [its own npm module](https://www.npmjs.com/package/oblivious-set)
+
+- Moved `ObliviousSet` into [its own npm module](https://www.npmjs.com/package/oblivious-set)
 
 ## 3.6.0 (19 May 2021)
 
 Features:
-  - Added `BroadcastChannel.isClosed` [#544](https://github.com/pubkey/broadcast-channel/issues/544)
+
+- Added `BroadcastChannel.isClosed` [#544](https://github.com/pubkey/broadcast-channel/issues/544)
 
 Other:
-  - Updated dependencies to work with newer node versions
+
+- Updated dependencies to work with newer node versions
 
 ## 3.5.3 (11 March 2021)
 
 Bugfixes:
-  - Fixed broken typings
+
+- Fixed broken typings
 
 ## 3.5.2 (11 March 2021)
 
 Bugfixes:
-  - `BroadcastChannel.close()` waits for all ongoing message sending to be finished before resolving.
+
+- `BroadcastChannel.close()` waits for all ongoing message sending to be finished before resolving.
 
 ## 3.5.0 (11 March 2021)
 
 Features:
-  - Added `LeaderElector.onduplicate`
+
+- Added `LeaderElector.onduplicate`
 
 ## 3.4.0 (24 January 2021)
 
 Bugfixes:
-  - fix cursor error in Safari [#420](https://github.com/pubkey/broadcast-channel/pull/420)
+
+- fix cursor error in Safari [#420](https://github.com/pubkey/broadcast-channel/pull/420)
 
 ## 3.3.0 (20 October 2020)
 
 Bugfixes:
-  - `new BroadcastChannel().close()` should not resolve before all cleanup is done  [#348](https://github.com/pubkey/broadcast-channel/pull/348)
+
+- `new BroadcastChannel().close()` should not resolve before all cleanup is done [#348](https://github.com/pubkey/broadcast-channel/pull/348)
