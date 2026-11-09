@@ -31,7 +31,7 @@ function run() {
     var selectEl = document.getElementById('method-type-select');
     selectEl.onchange = function (ev) {
         var newValue = selectEl.value;
-        var newUrl = location.origin + location.pathname + '?methodType=' + newValue;
+        var newUrl = location.origin + location.pathname + '?methodType=' + encodeURIComponent(newValue);
         location = newUrl;
     };
     if (methodType) {
