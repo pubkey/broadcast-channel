@@ -37,6 +37,8 @@ jobs:
         run: npm run build
       - name: Check TypeScript projects
         run: npm run typecheck
+      - name: Test package typings
+        run: npm run test:typings
       - name: Install Playwright browsers
         run: npm exec -- playwright install --with-deps
       - name: Run tests
