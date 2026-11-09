@@ -77,7 +77,7 @@
     "@vitest/browser-playwright": "5.1.0",
     "@vitest/coverage-istanbul": "5.1.0",
     "clone": "^2.1.2",
-    "concurrently": "^9.2.1",
+    "concurrently": "^10.0.6",
     "detect-node": "^2.1.0",
     "esbuild": "^0.28.1",
     "http-server": "^14.1.1",
