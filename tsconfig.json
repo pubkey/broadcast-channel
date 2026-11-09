@@ -1,9 +1,7 @@
 {
-  "extends": "@toruslabs/config/tsconfig.default.json",
+  "extends": "@toruslabs/config/tsconfig.library.json",
   "compilerOptions": {
-    "rootDir": ".",
-    "allowJs": true,
-    "declaration": false,
-    "outDir": "./dist"
-  }
+    "lib": ["ES2024", "DOM", "DOM.Iterable"]
+  },
+  "include": ["src", "test"]
 }

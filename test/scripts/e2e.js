@@ -2,7 +2,6 @@
 /**
  * used in docs/e2e.html
  */
-require('@babel/polyfill');
 var { BroadcastChannel } = require('../../');
 var { getParameterByName } = require('./util.js');
 

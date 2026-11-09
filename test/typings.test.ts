@@ -1,4 +1,4 @@
-/* eslint-disable vitest/expect-expect */
+/* oxlint-disable vitest/expect-expect */
 /**
  * checks if the typings are correct
  * run via 'npm run test:typings'
@@ -7,11 +7,12 @@ import { spawn } from "child_process";
 import fs from "fs";
 import os from "os";
 import path from "path";
-import { describe, expect, it } from "vitest";
+
+import { describe, expect, it } from "vite-plus/test";
 
 describe("typings.test.ts", () => {
   // Use the built types folder
-  const mainPath = path.join(__dirname, "../dist/lib.cjs/types");
+  const mainPath = path.join(__dirname, "../dist/lib.cjs");
   const codeBase = `
         import { 
             BroadcastChannel
@@ -31,7 +32,7 @@ describe("typings.test.ts", () => {
       const stdout: string[] = [];
       const stderr: string[] = [];
 
-      const child = spawn("tsc", ["--noEmit", "--strict", "--target", "es6", "--module", "commonjs", "--skipLibCheck", tempFile]);
+      const child = spawn("tsc", ["--noEmit", "--strict", "--target", "es6", "--module", "commonjs", "--skipLibCheck", "--ignoreConfig", tempFile]);
 
       child.stdout.on("data", (data: Buffer) => {
         stdout.push(data.toString());
@@ -70,7 +71,7 @@ describe("typings.test.ts", () => {
   describe("basic", () => {
     it("should sucess on basic test", async () => {
       // eslint-disable-next-line prettier/prettier
-      await checkTypes("console.log(\"Hello, world!\")");
+      await checkTypes('console.log("Hello, world!")');
     });
 
     it("should fail on broken code", async () => {

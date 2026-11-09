@@ -2,7 +2,6 @@
 /**
  * used in docs/index.html
  */
-require('@babel/polyfill');
 var { BroadcastChannel } = require('../../');
 
 var channelName = 'demo';

@@ -1,31 +1,31 @@
-import { describe, it } from "vitest";
+import { describe, it } from "vite-plus/test";
 
 import { BroadcastChannel } from "../src/index.js";
 import { randomString, wait } from "./test-util";
 
 const benchmark = {
   openClose: {},
-  sendRecieve: {},
+  sendRecieve: {} as { parallel?: number; series?: number },
 };
 
 const options = {
   node: {
     useFastPath: false,
   },
-  type: "simulate",
+  type: "simulate" as const,
 };
 
-const elapsedTime = (before) => {
+const elapsedTime = (before: number) => {
   return performance.now() - before;
 };
 
 describe("performance.test.js", () => {
-  // eslint-disable-next-line vitest/expect-expect
+  // oxlint-disable-next-line vitest/expect-expect
   it("wait a bit for jit etc..", async () => {
     await wait(2000);
   });
 
-  // eslint-disable-next-line vitest/expect-expect
+  // oxlint-disable-next-line vitest/expect-expect
   it("open/close channels", async () => {
     const channelName = randomString(10);
 
@@ -43,14 +43,14 @@ describe("performance.test.js", () => {
     benchmark.openClose = elapsed;
   });
 
-  // eslint-disable-next-line vitest/expect-expect
+  // oxlint-disable-next-line vitest/expect-expect
   it("sendRecieve.parallel", async () => {
     const channelName = randomString(10);
     const channelSender = new BroadcastChannel(channelName, options);
     const channelReciever = new BroadcastChannel(channelName, options);
     const msgAmount = 2000;
     let emittedCount = 0;
-    const waitPromise = new Promise((resolve) => {
+    const waitPromise = new Promise<void>((resolve) => {
       channelReciever.onmessage = () => {
         emittedCount++;
         if (emittedCount === msgAmount) {
@@ -72,7 +72,7 @@ describe("performance.test.js", () => {
     benchmark.sendRecieve.parallel = elapsed;
   });
 
-  // eslint-disable-next-line vitest/expect-expect
+  // oxlint-disable-next-line vitest/expect-expect
   it("sendRecieve.series", { timeout: 10000 }, async () => {
     const channelName = randomString(10);
     const channelSender = new BroadcastChannel(channelName, options);
@@ -84,7 +84,7 @@ describe("performance.test.js", () => {
       channelReciever.postMessage("pong");
     };
 
-    const waitPromise = new Promise((resolve) => {
+    const waitPromise = new Promise<void>((resolve) => {
       channelSender.onmessage = () => {
         emittedCount++;
         if (emittedCount === msgAmount) {
@@ -106,7 +106,7 @@ describe("performance.test.js", () => {
     benchmark.sendRecieve.series = elapsed;
   });
 
-  // eslint-disable-next-line vitest/expect-expect
+  // oxlint-disable-next-line vitest/expect-expect
   it("show result", () => {
     console.log("benchmark result:");
     console.log(JSON.stringify(benchmark, null, 2));

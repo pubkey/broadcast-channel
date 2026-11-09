@@ -1,8 +1,17 @@
-import { BUILD_ENV, STORAGE_SERVER_MAP, STORAGE_SERVER_SOCKET_URL_MAP } from "@toruslabs/constants";
+import { BUILD_ENV, BUILD_ENV_TYPE, STORAGE_SERVER_MAP, STORAGE_SERVER_SOCKET_URL_MAP } from "@toruslabs/constants";
 
 import { Options } from "./types";
 
-export function fillOptionsWithDefaults(originalOptions: Options = {}): Options {
+type Filled<T, K extends keyof T> = T & Required<Pick<T, K>>;
+
+export type FilledOptions = Options & {
+  webWorkerSupport: boolean;
+  idb: Filled<NonNullable<Options["idb"]>, "ttl" | "fallbackInterval">;
+  localstorage: Filled<NonNullable<Options["localstorage"]>, "removeTimeout">;
+  server: Filled<NonNullable<Options["server"]>, "api_url" | "socket_url" | "removeTimeout"> & { build_env: BUILD_ENV_TYPE };
+};
+
+export function fillOptionsWithDefaults(originalOptions: Options = {}): FilledOptions {
   const options: Options = JSON.parse(JSON.stringify(originalOptions));
 
   // main
@@ -30,5 +39,5 @@ export function fillOptionsWithDefaults(originalOptions: Options = {}): Options 
   // custom methods
   if (originalOptions.methods) options.methods = originalOptions.methods;
 
-  return options;
+  return options as FilledOptions;
 }

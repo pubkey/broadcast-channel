@@ -2,7 +2,6 @@
 /**
  * used in docs/iframe.html
  */
-require('@babel/polyfill');
 var { getParameterByName } = require('./util.js');
 
 var msgContainer = document.getElementById('messages');

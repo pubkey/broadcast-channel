@@ -10,3 +10,4 @@ tmp/
 toruslabs-*.tgz
 dist/
 .DS_Store
+.vitest/

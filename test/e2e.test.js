@@ -1,13 +1,18 @@
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-unused-expressions */
+/* oxlint-disable no-console */
+/* oxlint-disable @typescript-eslint/no-unused-expressions */
 
 import { Selector } from "testcafe";
-
-import { waitUntil } from "./test-util";
 
 const BASE_PAGE = "http://localhost:8080/e2e.html";
 
 fixture`Example page`.page`http://localhost:8080/`;
+
+// TestCafe compiles TypeScript tests with its bundled TypeScript 4.9, which cannot parse the installed @types/node.
+async function waitUntil(condition, interval) {
+  while (!(await condition())) {
+    await new Promise((resolve) => setTimeout(resolve, interval));
+  }
+}
 
 /**
  * Checks if there where errors on the browser console.
@@ -44,33 +49,29 @@ async function nativeBroadcastChannelExists(t) {
       }
 
       await assertNoErrors(t);
-      await waitUntil(
-        async () => {
-          await assertNoErrors(t);
-          const stateContainer = Selector("#state");
-          const exists = await stateContainer.exists;
-          if (!exists) {
-            console.log("stateContainer not exists");
-            /*
+      await waitUntil(async () => {
+        await assertNoErrors(t);
+        const stateContainer = Selector("#state");
+        const exists = await stateContainer.exists;
+        if (!exists) {
+          console.log("stateContainer not exists");
+          /*
                         const out = await t.getBrowserConsoleMessages();
                         console.log('out:');
                         console.log(JSON.stringify(out));
                         */
-            return false;
-          } else {
-            console.log("stateContainer exists");
-          }
-          const value = await stateContainer.innerText;
-          //       console.log(value);
+          return false;
+        } else {
+          console.log("stateContainer exists");
+        }
+        const value = await stateContainer.innerText;
+        //       console.log(value);
 
-          // make a console.log so travis does not terminate because of no output
-          console.log("BroadcastChannel(" + methodType + ") still no success");
+        // make a console.log so travis does not terminate because of no output
+        console.log("BroadcastChannel(" + methodType + ") still no success");
 
-          return value === "SUCCESS";
-        },
-        0,
-        500
-      );
+        return value === "SUCCESS";
+      }, 500);
     }
   );
 });
