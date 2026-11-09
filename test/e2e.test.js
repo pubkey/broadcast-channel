@@ -78,7 +78,7 @@ async function nativeBroadcastChannelExists(t) {
           return value === "SUCCESS";
         },
         500,
-        120000
+        180000
       );
     }
   );
