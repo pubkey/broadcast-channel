@@ -91,11 +91,11 @@
   },
   "lint-staged": {
     "!(*d).{js,ts,mjs,mts}": [
-      "vp fmt",
-      "vp lint --fix"
+      "vp fmt --no-error-on-unmatched-pattern",
+      "vp lint --fix --no-error-on-unmatched-pattern"
     ],
     "!(package-lock).{json,md}": [
-      "vp fmt"
+      "vp fmt --no-error-on-unmatched-pattern"
     ]
   },
   "overrides": {
