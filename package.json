@@ -62,7 +62,7 @@
     "@toruslabs/eccrypto": "^8.0.0",
     "@toruslabs/metadata-helpers": "^9.0.0",
     "loglevel": "^1.9.2",
-    "oblivious-set": "2.0.0",
+    "oblivious-set": "^2.0.0",
     "socket.io-client": "^4.8.4"
   },
   "devDependencies": {
@@ -76,15 +76,15 @@
     "@types/node": "^26.6.6",
     "@vitest/browser-playwright": "5.1.0",
     "@vitest/coverage-istanbul": "5.1.0",
-    "clone": "2.1.2",
+    "clone": "^2.1.2",
     "concurrently": "^9.2.1",
     "detect-node": "^2.1.0",
     "esbuild": "^0.28.1",
-    "http-server": "14.1.1",
+    "http-server": "^14.1.1",
     "husky": "^9.1.7",
     "lint-staged": "^17.6.0",
     "playwright": "^1.65.0",
-    "testcafe": "3.7.7",
+    "testcafe": "^3.7.7",
     "typescript": "^7.0.2",
     "unload": "^2.4.1",
     "vite-plus": "1.5.0"
