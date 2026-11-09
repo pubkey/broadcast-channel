@@ -1,4 +1,3 @@
-/* eslint-disable */
 /**
  * used in docs/e2e.html
  */

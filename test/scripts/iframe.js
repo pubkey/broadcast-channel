@@ -1,4 +1,3 @@
-/* eslint-disable */
 /**
  * used in docs/iframe.html
  */

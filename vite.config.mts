@@ -38,7 +38,7 @@ export default defineConfig({
   fmt: { ...formatPreset(), ignorePatterns: [...generatedDemoBundles, ...unformattedFiles] },
   lint: {
     ...lint,
-    ignorePatterns: [...(lint.ignorePatterns ?? []), ...generatedDemoBundles],
+    ignorePatterns: [...(lint.ignorePatterns ?? []), ...generatedDemoBundles, "test/scripts/**"],
     rules: { ...lint.rules, "tsdoc/syntax": "off" },
     overrides: [...(lint.overrides ?? []), { files: ["test/**"], rules: { "no-console": "off" } }],
   },

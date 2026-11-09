@@ -1,4 +1,3 @@
-/* eslint-disable */
 /**
  * used in the test-docs as web-worker
  */

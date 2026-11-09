@@ -70,7 +70,6 @@ describe("typings.test.ts", () => {
 
   describe("basic", () => {
     it("should sucess on basic test", async () => {
-      // eslint-disable-next-line prettier/prettier
       await checkTypes('console.log("Hello, world!")');
     });
 
