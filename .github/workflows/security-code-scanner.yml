@@ -1,0 +1,27 @@
+name: Security code scanner
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+  schedule:
+    - cron: "17 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  security-scan:
+    uses: MetaMask/action-security-code-scanner/.github/workflows/security-scan.yml@becb242930b3cc271c26da0280050db9c157e291 # v2.1.1
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    with:
+      scanner-ref: becb242930b3cc271c26da0280050db9c157e291 # v2.1.1
+      paths-ignored: |
+        **/node_modules/**
+        **/dist/**
+        **/build/**
+        **/coverage/**
