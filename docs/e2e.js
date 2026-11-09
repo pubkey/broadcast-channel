@@ -16663,6 +16663,7 @@
           });
         });
       }
+      await wait(1e3);
       console.log("========== START SENDING MESSAGES " + channel.type);
       startTime = (/* @__PURE__ */ new Date()).getTime();
       channel.postMessage({

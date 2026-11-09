@@ -139,6 +139,7 @@ function run() {
                 });
             });
         }
+        await wait(1000);
         console.log('========== START SENDING MESSAGES ' + channel.type);
         startTime = new Date().getTime();
         channel.postMessage({
