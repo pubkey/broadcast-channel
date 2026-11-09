@@ -1,6 +1,6 @@
-/* eslint-disable vitest/expect-expect */
+/* oxlint-disable vitest/expect-expect */
 import isNode from "detect-node";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 
 import { BroadcastChannel } from "../src/index.js";
 import { randomString } from "./test-util";
@@ -9,10 +9,11 @@ describe("issues.test.js", () => {
   it("#4 should throw when window.BroadcastChannel is overwritten", async () => {
     if (isNode) return; // only on browsers
     const bcBefore = window.BroadcastChannel;
-    window.BroadcastChannel = BroadcastChannel;
+    window.BroadcastChannel = BroadcastChannel as unknown as typeof window.BroadcastChannel;
 
-    let bc;
+    let bc: BroadcastChannel | undefined;
     await expect(async () => {
+      // @ts-expect-error -- intentionally called without a channel name
       bc = new BroadcastChannel();
     }).rejects.toThrow("polyfill");
 

@@ -1,8 +1,10 @@
 import isNode from "detect-node";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 
-import { IndexedDbMethod } from "../../src/index.js";
+import { IndexedDbMethod, MessageObject } from "../../src/index.js";
 import { randomString, wait, waitUntil } from "../test-util";
+
+type FooMessage = MessageObject & { foo: string };
 
 console.log(IndexedDbMethod.getIdb);
 if (isNode) {
@@ -46,14 +48,14 @@ describe("unit/indexed-db.method.test.js", () => {
   });
 
   describe(".writeMessage()", () => {
-    // eslint-disable-next-line vitest/expect-expect
+    // oxlint-disable-next-line vitest/expect-expect
     it("should write the message to the db", async () => {
       const channelName = randomString(10);
       const readerUuid = randomString(10);
       const db = await IndexedDbMethod.createDatabase(channelName);
       await IndexedDbMethod.writeMessage(db, readerUuid, {
         foo: "bar",
-      });
+      } as FooMessage);
     });
   });
 
@@ -64,11 +66,11 @@ describe("unit/indexed-db.method.test.js", () => {
       const db = await IndexedDbMethod.createDatabase(channelName);
       await IndexedDbMethod.writeMessage(db, readerUuid, {
         foo: "bar",
-      });
+      } as FooMessage);
 
       const messages = await IndexedDbMethod.getAllMessages(db);
       expect(messages).toHaveLength(1);
-      expect(messages[0].data.foo).toBe("bar");
+      expect((messages[0]!.data as FooMessage).foo).toBe("bar");
     });
 
     it("should get the messages", async () => {
@@ -77,10 +79,10 @@ describe("unit/indexed-db.method.test.js", () => {
       const db = await IndexedDbMethod.createDatabase(channelName);
       await IndexedDbMethod.writeMessage(db, readerUuid, {
         foo: "bar",
-      });
+      } as FooMessage);
       await IndexedDbMethod.writeMessage(db, readerUuid, {
         foo: "bar2",
-      });
+      } as FooMessage);
 
       const messages = await IndexedDbMethod.getAllMessages(db);
       expect(messages).toHaveLength(2);
@@ -94,19 +96,19 @@ describe("unit/indexed-db.method.test.js", () => {
       const db = await IndexedDbMethod.createDatabase(channelName);
       const msgJson = {
         foo: "old",
-      };
+      } as FooMessage;
 
       // write 10 messages
-      await Promise.all(new Array(10).fill().map(() => IndexedDbMethod.writeMessage(db, readerUuid, msgJson)));
+      await Promise.all(new Array(10).fill(undefined).map(() => IndexedDbMethod.writeMessage(db, readerUuid, msgJson)));
       await wait(500);
 
       // write 2 new messages
-      await Promise.all(new Array(10).fill().map(() => IndexedDbMethod.writeMessage(db, readerUuid, msgJson)));
+      await Promise.all(new Array(10).fill(undefined).map(() => IndexedDbMethod.writeMessage(db, readerUuid, msgJson)));
 
       const tooOld = await IndexedDbMethod.getOldMessages(db, 200);
       expect(tooOld).toHaveLength(10);
       tooOld.forEach((msg) => {
-        expect(msg.data.foo).toBe("old");
+        expect((msg.data as FooMessage).foo).toBe("old");
       });
     });
   });
@@ -118,7 +120,7 @@ describe("unit/indexed-db.method.test.js", () => {
       const db = await IndexedDbMethod.createDatabase(channelName);
       const msgJson = {
         foo: "bar",
-      };
+      } as FooMessage;
       await IndexedDbMethod.writeMessage(db, readerUuid, msgJson);
 
       await wait(500);
@@ -138,16 +140,16 @@ describe("unit/indexed-db.method.test.js", () => {
       const db = await IndexedDbMethod.createDatabase(channelName);
       const msgJson = {
         foo: "bar",
-      };
+      } as FooMessage;
 
       // write 10 messages
-      await Promise.all(new Array(10).fill().map(() => IndexedDbMethod.writeMessage(db, readerUuid, msgJson)));
+      await Promise.all(new Array(10).fill(undefined).map(() => IndexedDbMethod.writeMessage(db, readerUuid, msgJson)));
 
       // get last 5 messages
       const lastFive = await IndexedDbMethod.getMessagesHigherThan(db, 5);
       expect(lastFive).toHaveLength(5);
-      expect(lastFive[0].id).toBe(6);
-      expect(lastFive[4].id).toBe(10);
+      expect(lastFive[0]!.id).toBe(6);
+      expect(lastFive[4]!.id).toBe(10);
     });
   });
 
@@ -155,6 +157,7 @@ describe("unit/indexed-db.method.test.js", () => {
     describe(".create()", () => {
       it("should create a channelState", async () => {
         const channelName = randomString(10);
+        // @ts-expect-error -- options are optional at runtime
         const channelState = await IndexedDbMethod.create(channelName);
         expect(channelState).toBeTruthy();
         IndexedDbMethod.close(channelState);
@@ -162,7 +165,9 @@ describe("unit/indexed-db.method.test.js", () => {
 
       it("should be called twice", async () => {
         const channelName = randomString(12);
+        // @ts-expect-error -- options are optional at runtime
         const channelState1 = await IndexedDbMethod.create(channelName);
+        // @ts-expect-error -- options are optional at runtime
         const channelState2 = await IndexedDbMethod.create(channelName);
         expect(channelState1).toBeTruthy();
         expect(channelState2).toBeTruthy();
@@ -191,11 +196,12 @@ describe("unit/indexed-db.method.test.js", () => {
     describe(".postMessage()", () => {
       it("should not crash", async () => {
         const channelName = randomString(10);
+        // @ts-expect-error -- options are optional at runtime
         const channelState = await IndexedDbMethod.create(channelName);
         expect(channelState).toBeTruthy();
         await IndexedDbMethod.postMessage(channelState, {
           foo: "bar",
-        });
+        } as FooMessage);
         IndexedDbMethod.close(channelState);
       });
     });
@@ -210,13 +216,15 @@ describe("unit/indexed-db.method.test.js", () => {
     describe(".onMessage()", () => {
       it("should emit the message on other", async () => {
         const channelName = randomString(12);
+        // @ts-expect-error -- options are optional at runtime
         const channelStateOther = await IndexedDbMethod.create(channelName);
+        // @ts-expect-error -- options are optional at runtime
         const channelStateOwn = await IndexedDbMethod.create(channelName);
 
-        const emittedOther = [];
+        const emittedOther: MessageObject[] = [];
         const msgJson = {
           foo: "bar",
-        };
+        } as FooMessage;
 
         IndexedDbMethod.onMessage(channelStateOther, (msg) => emittedOther.push(msg), new Date().getTime());
         await IndexedDbMethod.postMessage(channelStateOwn, msgJson);
@@ -241,15 +249,18 @@ describe("unit/indexed-db.method.test.js", () => {
           value: false,
         });
 
-        const emittedOther = [];
+        const emittedOther: MessageObject[] = [];
+        // @ts-expect-error -- options are optional at runtime
         const channelStateOther = await IndexedDbMethod.create(channelName);
         IndexedDbMethod.onMessage(channelStateOther, (msg) => emittedOther.push(msg), new Date().getTime());
         await wait(100);
 
+        // @ts-expect-error -- options are optional at runtime
+
         const channelStateOwn = await IndexedDbMethod.create(channelName);
         const msgJson = {
           foo: "bar",
-        };
+        } as FooMessage;
         await IndexedDbMethod.postMessage(channelStateOwn, msgJson);
 
         await waitUntil(() => emittedOther.length === 1);
@@ -263,7 +274,7 @@ describe("unit/indexed-db.method.test.js", () => {
   });
 
   describe("other", () => {
-    // eslint-disable-next-line vitest/expect-expect
+    // oxlint-disable-next-line vitest/expect-expect
     it("should have cleaned up the messages", async () => {
       const channelOptions = {
         idb: {
@@ -275,7 +286,7 @@ describe("unit/indexed-db.method.test.js", () => {
       const channelStateOwn = await IndexedDbMethod.create(channelName, channelOptions);
       const msgJson = {
         foo: "bar",
-      };
+      } as FooMessage;
 
       // send 100 messages
       await Promise.all(new Array(100).fill(0).map(() => IndexedDbMethod.postMessage(channelStateOwn, msgJson)));

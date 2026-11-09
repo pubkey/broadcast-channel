@@ -26,7 +26,7 @@ export function enforceOptions(options: BroadcastChannelOptions): void {
 export const OPEN_BROADCAST_CHANNELS = new Set<BroadcastChannel<unknown>>();
 let lastId = 0;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// oxlint-disable-next-line @typescript-eslint/no-explicit-any
 export class BroadcastChannel<T = any> implements IBroadcastChannel<T> {
   static _pubkey = true;
 
@@ -156,7 +156,7 @@ function _post(broadcastChannel: BroadcastChannel<unknown>, type: EventType, msg
   return awaitPrepare.then(() => {
     const sendPromise = broadcastChannel.method.postMessage(broadcastChannel._state, msgObj);
     broadcastChannel._uMP.add(sendPromise);
-    // eslint-disable-next-line promise/catch-or-return
+    // oxlint-disable-next-line promise/catch-or-return
     sendPromise.catch(() => {}).then(() => broadcastChannel._uMP.delete(sendPromise));
     return sendPromise;
   });
@@ -229,7 +229,7 @@ function _addListenerObject(channel: BroadcastChannel<unknown>, type: EventType,
   _startListening(channel);
 }
 
-function _removeListenerObject(channel: BroadcastChannel<unknown>, type: EventType, obj: ListenerObject | null): void {
+function _removeListenerObject(channel: BroadcastChannel<unknown>, type: EventType, obj: ListenerObject | null | undefined): void {
   if (obj) {
     channel._addEL[type] = channel._addEL[type].filter((o) => o !== obj);
     _stopListening(channel);

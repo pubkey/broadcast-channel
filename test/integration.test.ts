@@ -1,9 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable vitest/expect-expect */
+/* oxlint-disable @typescript-eslint/no-explicit-any */
+/* oxlint-disable vitest/expect-expect */
 import clone from "clone";
 import isNode from "detect-node";
 import * as unload from "unload";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 
 import { BroadcastChannel, enforceOptions, OPEN_BROADCAST_CHANNELS, Options, RedundantAdaptiveBroadcastChannel } from "../src";
 import { randomString, wait, waitUntil } from "./test-util";
@@ -55,7 +55,7 @@ function runTest(channelOptions: Options) {
             channel.postMessage("foobar");
             expect.fail("should have thrown");
           } catch (e) {
-            // eslint-disable-next-line vitest/no-conditional-expect
+            // oxlint-disable-next-line vitest/no-conditional-expect
             expect((e as Error).message).toContain("closed");
           }
         });
@@ -388,6 +388,7 @@ function runTest(channelOptions: Options) {
           channel.close();
         });
         it.runIf(channelOptions.methods)("should redo the enforcement when null is given", async () => {
+          // @ts-expect-error -- null intentionally resets the enforced options
           enforceOptions(null);
           const channel = new BroadcastChannel(randomString(12), channelOptions);
           expect(channel.type).toBe(channelOptions.methods!.type);
@@ -398,6 +399,7 @@ function runTest(channelOptions: Options) {
       describe("other", () => {
         it.runIf(!isNode)("should prefer localstorage if webWorkerSupport: false", async () => {
           // disable BroadcastChannel
+          // @ts-expect-error -- null intentionally resets the enforced options
           enforceOptions(null);
           const broadcastChannelBefore = window.BroadcastChannel;
           Object.defineProperty(window, "BroadcastChannel", {
@@ -540,7 +542,7 @@ describe("RedundantAdaptiveBroadcastChannel", () => {
 
       // native channel post message fail
       const nativeChannel = channel.channels.get("native");
-      vi.spyOn(nativeChannel, "postMessage").mockRejectedValue(new Error("test"));
+      vi.spyOn(nativeChannel!, "postMessage").mockRejectedValue(new Error("test"));
 
       const emitted: any[] = [];
       otherChannel.onmessage = (msg) => emitted.push(msg);
@@ -592,7 +594,7 @@ describe("RedundantAdaptiveBroadcastChannel", () => {
 
       // native channel post message fail
       const nativeChannel = channel.channels.get("native");
-      vi.spyOn(nativeChannel, "postMessage").mockResolvedValue(null);
+      vi.spyOn(nativeChannel!, "postMessage").mockResolvedValue(null);
 
       const emitted: any[] = [];
       otherChannel.onmessage = (msg) => emitted.push(msg);

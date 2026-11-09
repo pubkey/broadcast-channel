@@ -1,8 +1,6 @@
-/* eslint-disable */
 /**
  * used in the test-docs as web-worker
  */
-require('@babel/polyfill');
 var {
     BroadcastChannel
 } = require('../../');

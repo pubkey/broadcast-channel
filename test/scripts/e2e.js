@@ -1,8 +1,6 @@
-/* eslint-disable */
 /**
  * used in docs/e2e.html
  */
-require('@babel/polyfill');
 var { BroadcastChannel } = require('../../');
 var { getParameterByName } = require('./util.js');
 
@@ -32,7 +30,7 @@ function run() {
     var selectEl = document.getElementById('method-type-select');
     selectEl.onchange = function (ev) {
         var newValue = selectEl.value;
-        var newUrl = location.origin + location.pathname + '?methodType=' + newValue;
+        var newUrl = location.origin + location.pathname + '?methodType=' + encodeURIComponent(newValue);
         location = newUrl;
     };
     if (methodType) {
@@ -50,13 +48,13 @@ function run() {
     var stateContainer = document.getElementById('state');
     const iframeEl = document.getElementById('test-iframe');
 
-    document.getElementById('user-agent').innerHTML = navigator.userAgent;
+    document.getElementById('user-agent').textContent = navigator.userAgent;
 
     var startTime;
     var channel = new BroadcastChannel('foobar', {
         type: methodType,
     });
-    document.getElementById('method').innerHTML = channel.type;
+    document.getElementById('method').textContent = channel.type;
 
     /**
      * to measure the speed, we:
@@ -76,7 +74,7 @@ function run() {
 
     window.startBroadcastChannel = async function () {
         console.log('window.startBroadcastChannel()');
-        stateContainer.innerHTML = 'running..';
+        stateContainer.textContent = 'running..';
         const rand = new Date().getTime();
 
         channel.onmessage = function (msg) {
@@ -91,14 +89,14 @@ function run() {
                     // sucess
                     console.log('main: sucess');
                     body.style.backgroundColor = 'green';
-                    stateContainer.innerHTML = 'SUCCESS';
+                    stateContainer.textContent = 'SUCCESS';
                     const amountTime = new Date().getTime() - startTime;
-                    document.getElementById('time-amount').innerHTML = amountTime + 'ms';
+                    document.getElementById('time-amount').textContent = amountTime + 'ms';
                 } else {
                     // send next message
                     messagesSend++;
                     console.log('main: send next message (' + messagesSend + ') ====================');
-                    messageCountContainer.innerHTML = messagesSend;
+                    messageCountContainer.textContent = messagesSend;
                     channel.postMessage({
                         from: 'main',
                         foo: 'bar',
@@ -154,7 +152,7 @@ function run() {
     window.startWorkerTest = async function () {
         console.log('window.startWorkerTest()');
 
-        stateContainer.innerHTML = 'running..';
+        stateContainer.textContent = 'running..';
 
         // spawn web-worker
         if (channel.type !== 'localstorage' && typeof window.Worker === 'function') {
@@ -206,7 +204,7 @@ function run() {
                                 console.dir('msg for response:;:');
                                 console.dir(msg);
                                 done++;
-                                messageCountWorkerContainer.innerHTML = done;
+                                messageCountWorkerContainer.textContent = done;
                                 channel.removeEventListener('message', listener);
                                 res();
                             }
@@ -230,9 +228,9 @@ function run() {
         }
 
         body.style.backgroundColor = 'green';
-        stateContainer.innerHTML = 'SUCCESS';
+        stateContainer.textContent = 'SUCCESS';
         const amountTime = new Date().getTime() - startTime;
-        document.getElementById('time-amount').innerHTML = amountTime + 'ms';
+        document.getElementById('time-amount').textContent = amountTime + 'ms';
     };
 
     if (autoStart && autoStart !== '') {

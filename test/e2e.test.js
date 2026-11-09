@@ -1,13 +1,22 @@
-/* eslint-disable no-console */
-/* eslint-disable @typescript-eslint/no-unused-expressions */
+/* oxlint-disable no-console */
+/* oxlint-disable @typescript-eslint/no-unused-expressions */
 
 import { Selector } from "testcafe";
-
-import { waitUntil } from "./test-util";
 
 const BASE_PAGE = "http://localhost:8080/e2e.html";
 
 fixture`Example page`.page`http://localhost:8080/`;
+
+// TestCafe compiles TypeScript tests with its bundled TypeScript 4.9, which cannot parse the installed @types/node.
+async function waitUntil(condition, interval, timeout) {
+  const deadline = Date.now() + timeout;
+  while (!(await condition())) {
+    if (Date.now() > deadline) {
+      throw new Error("waitUntil timed out after " + timeout + "ms");
+    }
+    await new Promise((resolve) => setTimeout(resolve, interval));
+  }
+}
 
 /**
  * Checks if there where errors on the browser console.
@@ -68,8 +77,8 @@ async function nativeBroadcastChannelExists(t) {
 
           return value === "SUCCESS";
         },
-        0,
-        500
+        500,
+        180000
       );
     }
   );

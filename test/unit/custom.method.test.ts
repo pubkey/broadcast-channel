@@ -1,6 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 
-import { BroadcastChannel } from "../../src/index.js";
+import { BroadcastChannel, Method } from "../../src/index.js";
 import { randomString } from "../test-util";
 
 describe("unit/custom.method.test.js", () => {
@@ -11,7 +11,7 @@ describe("unit/custom.method.test.js", () => {
         type: "custom",
         canBeUsed: () => true,
         create: () => ({}),
-      };
+      } as unknown as Method;
       const channel = new BroadcastChannel(channelName, { methods: method });
       expect(channel.method).toBe(method);
       channel.close();
@@ -26,7 +26,7 @@ describe("unit/custom.method.test.js", () => {
         postMessage: () => Promise.resolve(),
         onMessage: () => {},
         close: () => Promise.resolve(),
-      };
+      } as unknown as Method;
       const channel = new BroadcastChannel(channelName, { methods: method });
 
       expect(channel.method).toBe(method);

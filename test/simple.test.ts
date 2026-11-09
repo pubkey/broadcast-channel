@@ -1,7 +1,7 @@
 /**
  * a simple test which just checks if the basics work
  */
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 
 import { BroadcastChannel } from "../src/index.js";
 
@@ -11,7 +11,7 @@ describe("simple.test.js", () => {
     const channel = new BroadcastChannel(channelName);
     const channel2 = new BroadcastChannel(channelName);
 
-    const messages = [];
+    const messages: unknown[] = [];
     channel.onmessage = (msg) => messages.push(msg);
 
     // Send message from channel1

@@ -19,7 +19,7 @@ export type WrappedMessage = {
  * Implementing redundant message delivery by attempting to send messages through multiple channels when the primary channel fails.
  * Ensuring message delivery by using multiple communication methods simultaneously while preventing duplicate message processing.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// oxlint-disable-next-line @typescript-eslint/no-explicit-any
 export class RedundantAdaptiveBroadcastChannel<T = any> implements IBroadcastChannel<T> {
   name: string;
 
@@ -54,7 +54,7 @@ export class RedundantAdaptiveBroadcastChannel<T = any> implements IBroadcastCha
   }
 
   set onmessage(fn: ((data: T) => void) | null) {
-    this.removeEventListener("message", this.onML);
+    if (this.onML) this.removeEventListener("message", this.onML);
     if (fn && typeof fn === "function") {
       this.onML = fn;
       this.addEventListener("message", fn);
@@ -109,7 +109,7 @@ export class RedundantAdaptiveBroadcastChannel<T = any> implements IBroadcastCha
       // Cleanup old nonces (keeping last 1000 to prevent memory issues)
       if (this.processedNonces.size > 1000) {
         const nonces = Array.from(this.processedNonces);
-        const oldestNonce = nonces.sort()[0];
+        const oldestNonce = nonces.sort()[0]!;
         this.processedNonces.delete(oldestNonce);
       }
 

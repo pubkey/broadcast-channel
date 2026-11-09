@@ -209,8 +209,8 @@ export function canBeUsed(): boolean {
   return true;
 }
 
-export function create(channelName: string, options: Options): ChannelState {
-  options = fillOptionsWithDefaults(options);
+export function create(channelName: string, originalOptions: Options): ChannelState {
+  const options = fillOptionsWithDefaults(originalOptions);
   if (!canBeUsed()) {
     throw new Error("BroadcastChannel: server cannot be used");
   }

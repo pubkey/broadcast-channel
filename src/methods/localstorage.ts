@@ -70,6 +70,7 @@ export function storageKey(channelName: string): string {
 export function postMessage(channelState: ChannelState, messageJson: MessageObject): Promise<void> {
   return new Promise<void>((resolve, reject) => {
     sleep()
+      // oxlint-disable-next-line promise/always-return
       .then(() => {
         const key = storageKey(channelState.channelName);
         const writeObj: StorageMessage = {
@@ -79,7 +80,6 @@ export function postMessage(channelState: ChannelState, messageJson: MessageObje
           uuid: channelState.uuid,
         };
         const value = JSON.stringify(writeObj);
-        // eslint-disable-next-line promise/always-return
         getLocalStorage()?.setItem(key, value);
 
         /**

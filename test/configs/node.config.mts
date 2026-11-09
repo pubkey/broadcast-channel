@@ -1,4 +1,4 @@
-import { defineConfig } from "vitest/config";
+import { defineConfig } from "vite-plus";
 
 export default defineConfig({
   test: {
@@ -17,6 +17,7 @@ export default defineConfig({
 
       // unit tests
       "test/unit/custom.method.test.ts",
+      "test/unit/options.test.ts",
     ],
     environment: "node",
   },

@@ -14,7 +14,7 @@ const METHODS: Method[] = [
 ];
 
 export function chooseMethod(options: Options): Method {
-  let chooseMethods: Method[] = [].concat(options.methods || [], METHODS).filter(Boolean);
+  let chooseMethods: Method[] = ([] as Method[]).concat(options.methods || [], METHODS).filter(Boolean);
 
   // directly chosen
   if (options.type) {

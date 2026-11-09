@@ -18,7 +18,7 @@ export const PROMISE_RESOLVED_VOID = Promise.resolve();
 export function sleep<T>(time?: number, resolveWith?: T): Promise<T> {
   if (!time) time = 0;
   return new Promise((resolve) => {
-    setTimeout(() => resolve(resolveWith), time);
+    setTimeout(() => resolve(resolveWith as T), time);
   });
 }
 

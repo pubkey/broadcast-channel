@@ -267,7 +267,7 @@ export function create(channelName: string, options: Options): Promise<ChannelSt
        * contains all messages that have been emitted before
        * @type {ObliviousSet}
        */
-      eMIs: new ObliviousSet(options.idb.ttl * 2),
+      eMIs: new ObliviousSet(options.idb!.ttl! * 2),
       // ensures we do not read messages in parrallel
       writeBlockPromise: PROMISE_RESOLVED_VOID,
       messagesCallback: null,
@@ -285,7 +285,7 @@ export function create(channelName: string, options: Options): Promise<ChannelSt
     db.onclose = function () {
       state.closed = true;
 
-      if (options.idb.onclose) options.idb.onclose();
+      if (options.idb!.onclose) options.idb!.onclose();
     };
 
     /**
@@ -303,7 +303,7 @@ function _readLoop(state: ChannelState): void {
   if (state.closed) return;
 
   readNewMessages(state)
-    .then(() => sleep(state.options.idb.fallbackInterval))
+    .then(() => sleep(state.options.idb!.fallbackInterval))
     .then(() => _readLoop(state))
     .catch((e) => {
       throw e;
@@ -365,7 +365,7 @@ export function postMessage(channelState: ChannelState, messageJson: MessageObje
     .then(() => {
       if (randomInt(0, 10) === 0) {
         /* await (do not await) */
-        cleanOldMessages(channelState.db, channelState.options.idb.ttl);
+        cleanOldMessages(channelState.db, channelState.options.idb!.ttl!);
       }
 
       return PROMISE_RESOLVED_VOID;
@@ -388,5 +388,5 @@ export function canBeUsed(): boolean {
 }
 
 export function averageResponseTime(options: Options): number {
-  return options.idb.fallbackInterval * 2;
+  return options.idb!.fallbackInterval! * 2;
 }
